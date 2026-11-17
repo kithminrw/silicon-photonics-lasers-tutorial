@@ -15,7 +15,7 @@ permalink: /
       <a class="btn btn-primary mr-2" href="{% link preface.md %}">Start reading</a>
       <a class="btn mr-2" href="{% link course-map.md %}">See the course map</a>
       <a class="btn mr-2" href="{% link devices-3d.md %}">PDK devices in 3D</a>
-      <a class="btn" href="https://github.com/kithminrw/silicon-photonics-lasers-tutorial">Source on GitHub</a>
+      <a class="btn" href="https://github.com/kithminrw/photonics-tutorial">Source on GitHub</a>
     </p>
   </div>
 </div>
@@ -58,6 +58,6 @@ Each chapter has one or more demos that run in the browser with no installation:
 
 The tutorial's organisation draws on the open teaching material of the field, above all Chrostowski and Hochberg's *Silicon Photonics Design* and the UBC edX course built around it, the SiEPIC openEBL design–fabrication–test cycle, the AIM Photonics Academy courses and the open PDKs of SiEPIC and gdsfactory. It cites these works and links to them; it does not copy them. Every source is on the [References]({% link references.md %}) page.
 
-**How this tutorial is made.** It is being developed with the help of AI tools, and this draft may contain mistakes. If you spot one, please open a [GitHub issue](https://github.com/kithminrw/silicon-photonics-lasers-tutorial/issues), and we will correct it.
+**How this tutorial is made.** It is being developed with the help of AI tools, and this draft may contain mistakes. If you spot one, please open a [GitHub issue](https://github.com/kithminrw/photonics-tutorial/issues), and we will correct it.
 
 This is a living draft (v0.1, November 2026): Part I (Chapters 1–4) is written, the rest of the outline is in place, seventeen interactive demos and the 3D gallery work, and the remaining chapters are being written part by part.

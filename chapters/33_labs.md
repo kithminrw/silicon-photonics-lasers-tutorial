@@ -13,7 +13,7 @@ Learning by doing, with free tools only.
 
 <p><span class="status status-outline">outline</span> This chapter is an outline: the sections, demos and reading are planned, and the text is still to be written.</p>
 
-The labs use free, open-source tools only. Each lists the chapters it supports; the scripts will live in [`labs/`](https://github.com/kithminrw/silicon-photonics-lasers-tutorial/tree/main/labs).
+The labs use free, open-source tools only. Each lists the chapters it supports; the scripts will live in [`labs/`](https://github.com/kithminrw/photonics-tutorial/tree/main/labs).
 
 **Table 33.1. The labs.**
 {: .tabcaption #tab-33-1 }

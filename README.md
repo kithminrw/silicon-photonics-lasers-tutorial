@@ -5,7 +5,7 @@ to waveguides, passive devices, fibre coupling, modulators and detectors, semico
 on silicon, and the fabrication, testing and data analysis that turn a layout into a working chip,
 across the **Si, SiN, thin-film LiNbO₃ (TFLN), BaTiO₃ (BTO) and InP** platforms.
 
-**Read it online:** <https://kithminrw.github.io/silicon-photonics-lasers-tutorial/>
+**Read it online:** <https://www.kithminrw.com/photonics-tutorial/>
 
 > **Status: draft v0.1 (November 2026).** Part I is written; the other parts are detailed outlines that
 > are being filled in. Corrections are very welcome (see [Contributing](#contributing)).
@@ -59,7 +59,7 @@ Or with Docker, without installing Ruby:
 docker run --rm -p 4000:4000 -v "$PWD":/site -w /site ruby:3.3 bash -c "bundle install && bundle exec jekyll serve --host 0.0.0.0"
 ```
 
-Then open <http://localhost:4000/silicon-photonics-lasers-tutorial/>. (An arm64 container may add an
+Then open <http://localhost:4000/photonics-tutorial/>. (An arm64 container may add an
 `aarch64-linux` platform to `Gemfile.lock`; leave that change out of commits.)
 
 ## Repository layout
@@ -84,7 +84,7 @@ _config.yml, _sass/, _includes/       site settings, "Wafer" colour theme, dark 
 ## Contributing
 
 Spotted a mistake, a broken demo or a missing credit? Please
-[open an issue](https://github.com/kithminrw/silicon-photonics-lasers-tutorial/issues) or a pull request.
+[open an issue](https://github.com/kithminrw/photonics-tutorial/issues) or a pull request.
 Every page has an *Edit this page on GitHub* link.
 
 When writing a page:
@@ -122,7 +122,7 @@ L. Chrostowski and M. Hochberg's *Silicon Photonics Design* (Cambridge Universit
 edX course built around it, the SiEPIC openEBL design–fabrication–test program, the AIM Photonics
 Academy courses and the MIT Virtual Manufacturing Lab simulations, and the open PDKs and tools of the
 SiEPIC and gdsfactory communities. These are cited and linked, not reproduced; the full list is on the
-[References](https://kithminrw.github.io/silicon-photonics-lasers-tutorial/references/) page.
+[References](https://www.kithminrw.com/photonics-tutorial/references/) page.
 
 The 3D models are derived from:
 

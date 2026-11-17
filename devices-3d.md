@@ -12,7 +12,7 @@ Real devices from open process design kits, extruded from their layouts so you c
 <link rel="stylesheet" href="{{ '/assets/css/devices3d.css' | relative_url }}">
 <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.0.0/dist/model-viewer.min.js"></script>
 
-Every model on this page is drawn by its PDK's own [gdsfactory](https://github.com/gdsfactory/gdsfactory) implementation, and each layer is extruded to the thickness and height given by that PDK's layer stack. Heights are to scale, with no vertical exaggeration unless you choose one below. The oxide cladding and the substrate are left out so that you can see the silicon, nitride or lithium niobate; a translucent plate marks the top of the buried oxide. The script that makes the models is [`tools/export_3d.py`](https://github.com/kithminrw/silicon-photonics-lasers-tutorial/blob/main/tools/export_3d.py).
+Every model on this page is drawn by its PDK's own [gdsfactory](https://github.com/gdsfactory/gdsfactory) implementation, and each layer is extruded to the thickness and height given by that PDK's layer stack. Heights are to scale, with no vertical exaggeration unless you choose one below. The oxide cladding and the substrate are left out so that you can see the silicon, nitride or lithium niobate; a translucent plate marks the top of the buried oxide. The script that makes the models is [`tools/export_3d.py`](https://github.com/kithminrw/photonics-tutorial/blob/main/tools/export_3d.py).
 
 **Credit.** The devices belong to their designers and PDKs, named on each card. They are shown here under the PDKs' open-source licences (all MIT), with the papers that describe them; please cite those papers, not this page, when you use a design.
 
