@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 250" font-family="Helvetica, Arial, sans-serif" role="img" aria-label="Photonic link: laser, modulator, multiplexer, coupler, fibre, coupler, demultiplexer, photodetector, with chapter numbers">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#0b7a85"/></marker>
+  </defs>
+  <style>
+    .blk{fill:#f2f5f9;stroke:#172036;stroke-width:1.4}
+    .tx{fill:#172036;font-size:13px;font-weight:700;text-anchor:middle}
+    .ch{fill:#0b7a85;font-size:10.5px;text-anchor:middle}
+    .wg{stroke:#0b7a85;stroke-width:2.4;fill:none;marker-end:url(#ar)}
+    .lbl{fill:#57647a;font-size:10.5px}
+    .chip{fill:none;stroke:#9aa7bd;stroke-dasharray:5 4;stroke-width:1.2}
+    .bar{fill:#e3f4f6;stroke:#0b7a85;stroke-width:1}
+    .bt{fill:#08626b;font-size:11px;text-anchor:middle}
+  </style>
+  <!-- transmitter chip -->
+  <rect class="chip" x="8" y="22" width="372" height="120" rx="8"/>
+  <text class="lbl" x="18" y="38">transmitter PIC</text>
+  <rect class="blk" x="22" y="56" width="74" height="54" rx="5"/><text class="tx" x="59" y="82">Lasers</text><text class="ch" x="59" y="98">Ch 22–27</text>
+  <rect class="blk" x="118" y="56" width="84" height="54" rx="5"/><text class="tx" x="160" y="82">Modulators</text><text class="ch" x="160" y="98">Ch 18–20</text>
+  <rect class="blk" x="224" y="56" width="62" height="54" rx="5"/><text class="tx" x="255" y="82">Mux</text><text class="ch" x="255" y="98">Ch 12–14</text>
+  <rect class="blk" x="306" y="56" width="66" height="54" rx="5"/><text class="tx" x="339" y="78">Coupler</text><text class="ch" x="339" y="94">Ch 15–17</text>
+  <path class="wg" d="M96 83H116"/><path class="wg" d="M202 83H222"/><path class="wg" d="M286 83H304"/>
+  <!-- fibre -->
+  <path d="M372 83 C 400 83, 405 60, 420 60 S 440 106, 455 106 S 470 83, 448 83" fill="none" stroke="none"/>
+  <path class="wg" d="M372 83 C 395 83 395 62 410 62 S 425 104 440 104 S 455 83 446 83" style="marker-end:none"/>
+  <path class="wg" d="M446 83H462"/>
+  <text class="ch" x="416" y="130">fibre · Ch 3</text>
+  <!-- receiver chip -->
+  <rect class="chip" x="456" y="22" width="356" height="120" rx="8"/>
+  <text class="lbl" x="466" y="38">receiver PIC</text>
+  <rect class="blk" x="466" y="56" width="66" height="54" rx="5"/><text class="tx" x="499" y="78">Coupler</text><text class="ch" x="499" y="94">Ch 15–17</text>
+  <rect class="blk" x="554" y="56" width="70" height="54" rx="5"/><text class="tx" x="589" y="82">Demux</text><text class="ch" x="589" y="98">Ch 12–14</text>
+  <rect class="blk" x="646" y="56" width="152" height="54" rx="5"/><text class="tx" x="722" y="82">Photodetectors</text><text class="ch" x="722" y="98">and receivers · Ch 21</text>
+  <path class="wg" d="M532 83H552"/><path class="wg" d="M624 83H644"/>
+  <!-- foundations underneath -->
+  <rect class="bar" x="8" y="156" width="804" height="24" rx="4"/><text class="bt" x="410" y="172">waveguides, bends, couplers, interferometers, rings and gratings · Ch 5–13 (on electromagnetic foundations, Ch 2–4)</text>
+  <rect class="bar" x="8" y="188" width="804" height="24" rx="4"/><text class="bt" x="410" y="204">fabrication, design flow and open PDKs, testing, data analysis · Ch 29–33</text>
+  <rect class="bar" x="8" y="220" width="804" height="24" rx="4"/><text class="bt" x="410" y="236">the link budget, transceivers and applications · Ch 34–35</text>
+</svg>

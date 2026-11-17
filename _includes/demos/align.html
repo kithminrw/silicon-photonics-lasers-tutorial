@@ -1,0 +1,102 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdAlign" role="group" aria-label="Interactive demo: aligning a fibre array to two grating couplers">
+  <div class="bd-head"><span>// try it · align a two-fibre array to a loopback (127 µm pitch)</span>
+    <span class="bd-seg" role="group" aria-label="Step size"><button type="button" data-step="0.5" aria-pressed="false">0.5 µm</button><button type="button" data-step="1" aria-pressed="false">1 µm</button><button type="button" data-step="2" aria-pressed="true">2 µm</button><button type="button" data-step="5" aria-pressed="false">5 µm</button></span></div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="m" aria-hidden="true"></canvas><span class="bd-tag">your search path (map hidden until you reveal it)</span></div>
+    <div>
+      <div class="bd-scope tall"><canvas data-c="p" aria-hidden="true"></canvas><span class="bd-tag">power meter: loopback power against move</span></div>
+    </div>
+  </div>
+  <div class="bd-sliders" style="margin-top:8px">
+    <label class="bd-sl"><span>array rotation (yaw) <b data-v="rot"></b></span><input type="range" data-k="rot" min="-2" max="2" step="0.01" value="0" aria-label="rotation"></label>
+  </div>
+  <div class="bd-controls">
+    <button type="button" class="bd-btn" data-mv="0,1">↑ up</button><button type="button" class="bd-btn" data-mv="0,-1">↓ down</button>
+    <button type="button" class="bd-btn" data-mv="-1,0">← left</button><button type="button" class="bd-btn" data-mv="1,0">→ right</button>
+    <button type="button" class="bd-btn" data-act="auto">auto: spiral, then hill-climb</button>
+    <button type="button" class="bd-toggle" data-act="reveal" aria-pressed="false">reveal the coupling map</button>
+    <button type="button" class="bd-btn" data-act="new">new chip</button>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>loopback power <b data-o="p">–</b></span><span>moves <b data-o="n">0</b></span><span>best possible <b data-o="best">–</b></span><span>1 dB radius per coupler <b data-o="tol">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdAlign'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  var wF = 5.2, wG = 4.6, pitch = 127, P0 = 0, peakIL = -4.5, floor = -70, laser = 0;   // dBm; -4.5 dB per coupler at best
+  var step = 2, x = 0, y = 0, tx = 0, ty = 0, trot = 0, path = [], hist = [], reveal = false, timer = 0, rnd = BD.rng(Date.now() % 100000);
+  var S = BD.bind(root, { rot: { fmt: function (v) { return v.toFixed(2) + '°'; } } }, function () { record(); draw(); });
+  BD.seg(root, 'step', function (v) { step = parseFloat(v); });
+  function newChip() { tx = (rnd() - 0.5) * 30; ty = (rnd() - 0.5) * 30; trot = (rnd() - 0.5) * 1.2; x = 0; y = 0; path = [[0, 0]]; hist = [power()]; draw(); }
+  // two couplers: the array pivots about fibre 1; fibre 2 sits 127 um away along x
+  function eta(d2) { return Math.exp(-2 * d2 / (wF * wF + wG * wG)) * Math.pow(2 * wF * wG / (wF * wF + wG * wG), 2); }
+  function power(px, py, rot, quiet) {
+    px = px === undefined ? x : px; py = py === undefined ? y : py; rot = rot === undefined ? S.rot : rot;
+    var d1 = Math.pow(px - tx, 2) + Math.pow(py - ty, 2), dr = (rot - trot) * Math.PI / 180;
+    var d2 = Math.pow(px - tx + pitch * (1 - Math.cos(dr)), 2) + Math.pow(py - ty + pitch * Math.sin(dr), 2);
+    var lin = eta(d1) * eta(d2) * Math.pow(10, (2 * peakIL - 2 * 10 * Math.log10(eta(0))) / 10);
+    var dbm = laser + 10 * Math.log10(lin + 1e-12);
+    return Math.max(dbm, floor) + (quiet ? 0 : (rnd() - 0.5) * 0.04);
+  }
+  function record() { path.push([x, y]); hist.push(power()); if (hist.length > 400) { hist.shift(); path.shift(); } q('[data-o="n"]').textContent = hist.length - 1; }
+  root.querySelectorAll('[data-mv]').forEach(function (b) { b.addEventListener('click', function () { var m = b.getAttribute('data-mv').split(','); x += step * +m[0]; y += step * +m[1]; record(); draw(); }); });
+  q('[data-act="new"]').addEventListener('click', function () { clearInterval(timer); newChip(); q('[data-o="n"]').textContent = 0; });
+  BD.toggle(q('[data-act="reveal"]'), function (on) { reveal = on; draw(); });
+  q('[data-act="auto"]').addEventListener('click', function () {
+    clearInterval(timer);
+    // square spiral at 3 um pitch until the power rises 20 dB above the floor, then hill-climb with halving steps
+    var seq = [], r = 3, k = 0, dir = [[1, 0], [0, 1], [-1, 0], [0, -1]], len = 1, di = 0, cx = x, cy = y, phase = 'spiral', hs = 2;
+    timer = setInterval(function () {
+      if (phase === 'spiral') {
+        cx += dir[di][0] * r; cy += dir[di][1] * r; k++; if (k >= len) { k = 0; di = (di + 1) % 4; if (di % 2 === 0) len++; }
+        x = cx; y = cy; record(); draw();
+        if (hist[hist.length - 1] > floor + 25 || hist.length > 380) phase = 'climb';
+      } else {
+        var best = power(), moved = false;
+        [[hs, 0], [-hs, 0], [0, hs], [0, -hs]].forEach(function (m) { var p = power(x + m[0], y + m[1]); if (p > best + 0.02) { best = p; x += m[0]; y += m[1]; moved = true; } });
+        record(); draw();
+        if (!moved) { hs /= 2; if (hs < 0.25) clearInterval(timer); }
+      }
+    }, 45);
+  });
+  function draw() {
+    // ---- map / path
+    var dv = BD.setup(q('[data-c="m"]')), R = 24, f = BD.frame(dv, { x: [-R, R], y: [-R, R], pad: { l: 30, b: 22, t: 22 },
+      xt: [[-20, '−20'], [0, '0'], [20, '20 µm']], yt: [[-20, '−20'], [0, '0'], [20, '20']] }), g = dv.g;
+    if (reveal) {
+      var n = 60;
+      for (var i = 0; i < n; i++) for (var j = 0; j < n; j++) {
+        var px = -R + 2 * R * (i + 0.5) / n, py = -R + 2 * R * (j + 0.5) / n, p = power(px, py, S.rot, true);
+        var t = Math.max(0, Math.min(1, (p - floor) / (2 * peakIL - floor)));
+        g.fillStyle = 'rgba(224,184,90,' + (0.85 * t * t).toFixed(3) + ')';
+        g.fillRect(f.X(px - R / n), f.Y(py + R / n), f.X(px + R / n) - f.X(px - R / n) + 0.5, f.Y(py - R / n) - f.Y(py + R / n) + 0.5);
+      }
+      BD.dot(f, tx, ty, BD.C.green, 4);
+    }
+    var xs = path.map(function (p) { return p[0]; }), ys = path.map(function (p) { return p[1]; });
+    BD.line(f, xs, ys, BD.C.blue, 1.2);
+    BD.dot(f, x, y, BD.C.white, 4.5);
+    // ---- power meter history
+    var d2 = BD.setup(q('[data-c="p"]')), nn = Math.max(hist.length, 20), f2 = BD.frame(d2, { x: [0, nn - 1], y: [floor, 0], pad: { l: 44, b: 22 },
+      xt: [[0, '0'], [nn - 1, (nn - 1) + ' moves']], yt: [[floor, floor + ' dBm'], [-40, '−40'], [-20, '−20'], [0, '0']] });
+    BD.line(f2, hist.map(function (_, i) { return i; }), hist, BD.C.gold, 1.8);
+    var bestP = laser + 2 * peakIL;
+    BD.hline(f2, bestP, BD.C.green, [3, 3], 'perfect alignment');
+    // ---- readouts
+    var pnow = hist[hist.length - 1]; q('[data-o="p"]').textContent = pnow <= floor + 0.1 ? '< ' + floor + ' dBm (noise)' : pnow.toFixed(2) + ' dBm';
+    q('[data-o="best"]').textContent = bestP.toFixed(1) + ' dBm';
+    var r1 = Math.sqrt(0.115 * (wF * wF + wG * wG)); q('[data-o="tol"]').textContent = '± ' + r1.toFixed(2) + ' µm';
+    var rotLoss = 10 * Math.log10(eta(Math.pow(pitch * Math.sin((S.rot - trot) * Math.PI / 180), 2)) / eta(0));
+    var c;
+    if (pnow <= floor + 0.1) c = 'Far from the couplers the meter reads only noise: there is no gradient to follow. A blind search, such as a spiral with a pitch smaller than the mode diameter, is needed to find first light.';
+    else if (pnow > bestP - 0.5) c = '<b>Aligned.</b> Within about ' + r1.toFixed(1) + ' µm of the peak each coupler loses less than 1 dB, so a few-micrometre placement error is tolerable; fixing the array with epoxy without moving it by that much is the hard part.';
+    else c = 'You have light: now follow the gradient. The loopback power is the product of two couplings, so each coupler\'s 1 dB circle counts twice.';
+    if (Math.abs(rotLoss) > 0.3) c += ' The array is rotated relative to the chip: the second fibre, 127 µm away, misses its coupler by ' + Math.abs(pitch * Math.sin((S.rot - trot) * Math.PI / 180)).toFixed(1) + ' µm, costing ' + (-rotLoss).toFixed(1) + ' dB. Try the yaw slider.';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  newChip();
+  BD.observe(root, draw);
+})();
+</script>

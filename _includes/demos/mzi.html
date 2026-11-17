@@ -1,0 +1,64 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdMzi" role="group" aria-label="Interactive demo: transmission of a Mach–Zehnder interferometer">
+  <div class="bd-head"><span>// try it · Mach–Zehnder interferometer (2 × 2, Si strip waveguides)</span>
+    <span class="bd-seg" role="group" aria-label="Output port"><button type="button" data-port="both" aria-pressed="true">both ports</button><button type="button" data-port="db" aria-pressed="false">dB scale</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>arm-length difference ΔL <b data-v="dL"></b></span><input type="range" data-k="dL" min="0" max="300" step="0.5" value="100" aria-label="arm length difference"></label>
+    <label class="bd-sl"><span>first splitter (to lower arm) <b data-v="k1"></b></span><input type="range" data-k="k1" min="0.2" max="0.8" step="0.005" value="0.5" aria-label="first splitter ratio"></label>
+    <label class="bd-sl"><span>second splitter <b data-v="k2"></b></span><input type="range" data-k="k2" min="0.2" max="0.8" step="0.005" value="0.5" aria-label="second splitter ratio"></label>
+    <label class="bd-sl"><span>phase shifter on the long arm <b data-v="ph"></b></span><input type="range" data-k="ph" min="0" max="2" step="0.01" value="0" aria-label="phase shift"></label>
+    <label class="bd-sl"><span>waveguide loss <b data-v="a"></b></span><input type="range" data-k="a" min="0" max="20" step="0.1" value="3" aria-label="loss"></label>
+  </div>
+  <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">transmission against wavelength</span></div>
+  <div class="bd-read" aria-live="polite"><span>FSR <b data-o="fsr">–</b></span><span>extinction (bar port) <b data-o="er">–</b></span><span>n<sub>g</sub> <b>4.20</b></span><span>excess loss <b data-o="il">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdMzi'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); }, db = false;
+  var neff0 = 2.44, ng = 4.2, lam0 = 1.55, L0 = 200;   // um; L0 = length of the short arm
+  var S = BD.bind(root, {
+    dL: { fmt: function (x) { return x.toFixed(1) + ' µm'; } }, k1: { fmt: function (x) { return (100 * x).toFixed(1) + ' %'; } },
+    k2: { fmt: function (x) { return (100 * x).toFixed(1) + ' %'; } }, ph: { fmt: function (x) { return x.toFixed(2) + 'π'; } },
+    a: { fmt: function (x) { return x.toFixed(1) + ' dB/cm'; } }
+  }, function () { draw(); });
+  BD.seg(root, 'port', function (v) { db = v === 'db'; draw(); });
+  // returns [bar, cross] power for input at port 1; couplers [[t, -jk], [-jk, t]]
+  function mzi(lam) {
+    var neff = neff0 - (ng - neff0) * (lam - lam0) / lam0, beta = 2 * Math.PI * neff / lam, alpha = S.a / 4.343 * 1e-4 / 2;   // field loss per um
+    var t1 = Math.sqrt(1 - S.k1), c1 = Math.sqrt(S.k1), t2 = Math.sqrt(1 - S.k2), c2 = Math.sqrt(S.k2);
+    var ph1 = beta * L0, ph2 = beta * (L0 + S.dL) + Math.PI * S.ph;
+    var a1 = Math.exp(-alpha * L0), a2 = Math.exp(-alpha * (L0 + S.dL));
+    // after coupler 1: upper = t1, lower = -j c1; after the arms: multiply by a e^{-j ph}
+    var u = [t1 * a1 * Math.cos(-ph1), t1 * a1 * Math.sin(-ph1)];
+    var lr = [c1 * a2 * Math.sin(-ph2), -c1 * a2 * Math.cos(-ph2)];   // (-j c1) e^{-j ph2}
+    // coupler 2: bar = t2 u + (-j c2) l ; cross = (-j c2) u + t2 l
+    var bar = [t2 * u[0] + c2 * lr[1], t2 * u[1] - c2 * lr[0]];
+    var crs = [c2 * u[1] + t2 * lr[0], -c2 * u[0] + t2 * lr[1]];
+    return [bar[0] * bar[0] + bar[1] * bar[1], crs[0] * crs[0] + crs[1] * crs[1]];
+  }
+  function draw() {
+    var xs = [], b = [], c = [], N = 1200, l0 = 1.5, l1 = 1.6, bmin = 1, bmax = 0;
+    for (var i = 0; i <= N; i++) { var l = l0 + (l1 - l0) * i / N, r = mzi(l); xs.push(l); b.push(r[0]); c.push(r[1]); bmin = Math.min(bmin, r[0]); bmax = Math.max(bmax, r[0]); }
+    var dv = BD.setup(q('[data-c="s"]')), f = BD.frame(dv, db ? { x: [l0, l1], y: [-40, 0], pad: { l: 44, b: 22 },
+      xt: [[1.5, '1500'], [1.525, '1525'], [1.55, '1550'], [1.575, '1575'], [1.6, '1600 nm']], yt: [[-40, '−40'], [-20, '−20'], [0, '0 dB']] }
+      : { x: [l0, l1], y: [0, 1.02], pad: { l: 44, b: 22 }, xt: [[1.5, '1500'], [1.525, '1525'], [1.55, '1550'], [1.575, '1575'], [1.6, '1600 nm']], yt: [[0, '0'], [0.5, '0.5'], [1, '1']] });
+    var tr = function (v) { return db ? 10 * Math.log10(Math.max(v, 1e-6)) : v; };
+    BD.line(f, xs, c.map(tr), BD.C.blue, 1.6);
+    BD.line(f, xs, b.map(tr), BD.C.gold, 1.6);
+    dv.g.fillStyle = BD.C.gold; dv.g.fillText('bar', f.p.l + 6, f.p.t + 12); dv.g.fillStyle = BD.C.blue; dv.g.fillText('cross', f.p.l + 36, f.p.t + 12);
+    var fsr = S.dL > 0 ? lam0 * lam0 / (ng * S.dL) : Infinity;
+    q('[data-o="fsr"]').textContent = isFinite(fsr) ? (1000 * fsr).toFixed(2) + ' nm' : '∞ (balanced)';
+    var er = 10 * Math.log10(bmax / Math.max(bmin, 1e-9));
+    q('[data-o="er"]').textContent = S.dL > 0 ? (er > 60 ? '> 60 dB' : er.toFixed(1) + ' dB') : '–';
+    var tot = mzi(lam0); q('[data-o="il"]').textContent = (-10 * Math.log10(tot[0] + tot[1])).toFixed(2) + ' dB';
+    var cap = 'The arm-length difference sets the free spectral range, FSR = λ²/(n<sub>g</sub>ΔL), with the group index, not the effective index. ';
+    if (Math.abs(S.k1 - 0.5) > 0.03 || Math.abs(S.k2 - 0.5) > 0.03) cap += '<b>Unequal splitters limit the extinction</b>: the two arms no longer cancel completely at the nulls. ';
+    else cap += 'With 50/50 splitters and equal losses the nulls are deep; the extra loss of the longer arm slowly fills them in. ';
+    cap += 'The phase shifter slides the fringes sideways without changing their spacing: this is how a thermal or electro-optic MZI switch works.';
+    q('[data-o="cap"]').innerHTML = cap;
+  }
+  BD.observe(root, draw);
+})();
+</script>

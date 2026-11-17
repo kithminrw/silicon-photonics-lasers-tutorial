@@ -1,0 +1,80 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdPlat" role="group" aria-label="Interactive demo: compare two photonic platforms">
+  <div class="bd-head"><span>// try it · compare two platforms (typical values)</span></div>
+  <div class="bd-head" style="margin-top:-4px"><span>A</span>
+    <span class="bd-seg" role="group" aria-label="Platform A"><button type="button" data-pa="si" aria-pressed="true">Si</button><button type="button" data-pa="sin" aria-pressed="false">SiN</button><button type="button" data-pa="ln" aria-pressed="false">TFLN</button><button type="button" data-pa="bto" aria-pressed="false">BTO-on-Si</button><button type="button" data-pa="inp" aria-pressed="false">InP</button></span></div>
+  <div class="bd-head" style="margin-top:-4px"><span>B</span>
+    <span class="bd-seg" role="group" aria-label="Platform B"><button type="button" data-pb="si" aria-pressed="false">Si</button><button type="button" data-pb="sin" aria-pressed="true">SiN</button><button type="button" data-pb="ln" aria-pressed="false">TFLN</button><button type="button" data-pb="bto" aria-pressed="false">BTO-on-Si</button><button type="button" data-pb="inp" aria-pressed="false">InP</button></span></div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="x" aria-hidden="true"></canvas><span class="bd-tag">typical waveguide cross-sections, same scale</span></div>
+    <div class="bd-scope tall"><canvas data-c="r" aria-hidden="true"></canvas><span class="bd-tag">typical ranges (log scales)</span></div>
+  </div>
+  <div class="bd-scope short"><canvas data-c="c" aria-hidden="true"></canvas><span class="bd-tag">what each platform does on its own (● native, ◐ with added material or bonding, ○ no)</span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdPlat'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); }, A = 'si', B = 'sin';
+  // order-of-magnitude values from the reviews cited in Chapter 4; geometry in um
+  var P = {
+    si:  { name: 'Si (220 nm SOI)', core: 3.48, clad: 1.44, loss: [1, 3], bend: [2, 5], col: '#9db3cc', caps: [0, 2, 2, 1, 1],
+           draw: function (g, X, Y) { rect(g, X, Y, -0.25, 0, 0.5, 0.22, '#9db3cc'); } },
+    sin: { name: 'SiN', core: 2.0, clad: 1.44, loss: [0.001, 0.5], bend: [20, 1000], col: '#e0b060', caps: [0, 0, 0, 1, 0],
+           draw: function (g, X, Y) { rect(g, X, Y, -0.6, 0, 1.2, 0.4, '#e0b060'); } },
+    ln:  { name: 'TFLN', core: 2.2, clad: 1.44, loss: [0.03, 0.5], bend: [20, 100], col: '#ee9aaa', caps: [0, 0, 2, 1, 0],
+           draw: function (g, X, Y) { rect(g, X, Y, -1.3, 0, 2.6, 0.2, '#ee9aaa'); g.fillStyle = '#ee9aaa'; g.beginPath(); g.moveTo(X(-0.62), Y(0.2)); g.lineTo(X(0.62), Y(0.2)); g.lineTo(X(0.5), Y(0.4)); g.lineTo(X(-0.5), Y(0.4)); g.fill(); } },
+    bto: { name: 'BTO on Si', core: 2.3, clad: 1.44, loss: [1, 10], bend: [5, 30], col: '#b8a8e0', caps: [0, 1, 2, 1, 1],
+           draw: function (g, X, Y) { rect(g, X, Y, -1.3, 0, 2.6, 0.1, '#b8a8e0'); rect(g, X, Y, -1.3, 0.1, 2.6, 0.05, '#9db3cc'); rect(g, X, Y, -0.3, 0.1, 0.6, 0.17, '#9db3cc'); } },
+    inp: { name: 'InP (generic)', core: 3.36, clad: 3.17, loss: [1, 3], bend: [10, 100], col: '#8e7f5a', caps: [2, 2, 2, 1, 2],
+           draw: function (g, X, Y) { rect(g, X, Y, -1.4, -1.0, 2.8, 1.0, '#c9c2b0'); rect(g, X, Y, -1.0, 0, 2.0, 0.5, '#8e7f5a'); rect(g, X, Y, -1.0, 0.5, 2.0, 1.3, '#c9c2b0'); } }
+  };
+  var CAPS = ['gain / lasers', 'photodetectors', 'fast EO modulation', 'thermal tuning', 'CMOS-foundry process'];
+  P.si.caps = [1, 2, 2, 2, 2]; P.sin.caps = [1, 1, 0, 2, 2]; P.ln.caps = [1, 0, 2, 2, 0]; P.bto.caps = [1, 1, 2, 2, 1]; P.inp.caps = [2, 2, 2, 2, 0];
+  function rect(g, X, Y, x, y, w, h, c) { g.fillStyle = c; g.fillRect(X(x), Y(y + h), X(x + w) - X(x), Y(y) - Y(y + h)); }
+  BD.seg(root, 'pa', function (v) { A = v; draw(); });
+  BD.seg(root, 'pb', function (v) { B = v; draw(); });
+  function draw() {
+    // ---- cross-sections side by side, 1 um scale bar
+    var dv = BD.setup(q('[data-c="x"]')), g = dv.g, sc = Math.min((dv.w - 30) / 7.2, (dv.h - 50) / 3.2);
+    [[A, dv.w * 0.27], [B, dv.w * 0.73]].forEach(function (pp) {
+      var p = P[pp[0]], cx = pp[1], cy = dv.h * 0.62;
+      var X = function (x) { return cx + x * sc; }, Y = function (y) { return cy - y * sc; };
+      if (pp[0] !== 'inp') { g.fillStyle = 'rgba(160,200,240,.18)'; g.fillRect(X(-1.5), Y(0), 3 * sc, 1.1 * sc); g.fillStyle = 'rgba(160,200,240,.08)'; g.fillRect(X(-1.5), Y(1.2), 3 * sc, 1.2 * sc); }
+      p.draw(g, X, Y);
+      g.fillStyle = BD.C.white; g.textAlign = 'center'; g.fillText(p.name, cx, dv.h - 10); g.fillStyle = BD.C.dim; g.fillText('n ' + p.core + ' / ' + p.clad, cx, dv.h - 22); g.textAlign = 'left';
+    });
+    g.strokeStyle = BD.C.white; g.beginPath(); g.moveTo(dv.w - 14, 30); g.lineTo(dv.w - 14, 30 + sc); g.stroke(); g.fillStyle = BD.C.white; g.textAlign = 'right'; g.fillText('1 µm', dv.w - 18, 34 + sc / 2); g.textAlign = 'left';
+    // ---- ranges on log axes: loss (dB/cm), bend radius (um), index contrast
+    var d2 = BD.setup(q('[data-c="r"]')), g2 = d2.g, rows = [['loss (dB/cm)', 'loss', 1e-3, 30], ['min. bend radius (µm)', 'bend', 1, 3000]];
+    var l = 12, r = d2.w - 12, top = 34, rowH = (d2.h - top - 46) / 2;
+    rows.forEach(function (rw, i) {
+      var y0 = top + i * rowH, lo = Math.log10(rw[2]), hi = Math.log10(rw[3]), X = function (v) { return l + (r - l) * (Math.log10(v) - lo) / (hi - lo); };
+      g2.fillStyle = BD.C.axis; g2.fillText(rw[0], l, y0 + 2);
+      g2.strokeStyle = BD.C.grid; for (var e = Math.ceil(lo); e <= hi; e++) { g2.beginPath(); g2.moveTo(X(Math.pow(10, e)), y0 + 8); g2.lineTo(X(Math.pow(10, e)), y0 + rowH - 14); g2.stroke(); g2.fillStyle = BD.C.dim; g2.textAlign = 'center'; g2.fillText(BD.eng(Math.pow(10, e)).replace(' ', ''), X(Math.pow(10, e)), y0 + rowH - 4); g2.textAlign = 'left'; }
+      [[A, BD.C.gold, 0], [B, BD.C.blue, 1]].forEach(function (pp) {
+        var v = P[pp[0]][rw[1]], yy = y0 + 16 + pp[2] * 14;
+        g2.fillStyle = pp[1]; g2.fillRect(X(v[0]), yy, Math.max(3, X(v[1]) - X(v[0])), 9);
+      });
+    });
+    var dc = d2.h - 30; g2.fillStyle = BD.C.axis; g2.fillText('index contrast Δn = n_core − n_clad', l, dc);
+    [[A, BD.C.gold, 0], [B, BD.C.blue, 1]].forEach(function (pp) { var p = P[pp[0]], dn = p.core - p.clad; g2.fillStyle = pp[1]; g2.fillRect(l, dc + 6 + pp[2] * 10, (r - l) * dn / 2.2, 7); g2.fillText(dn.toFixed(2), l + (r - l) * dn / 2.2 + 4, dc + 13 + pp[2] * 10); });
+    // ---- capability matrix
+    var d3 = BD.setup(q('[data-c="c"]')), g3 = d3.g, cw = (d3.w - 120) / CAPS.length, sym = ['○', '◐', '●'];
+    CAPS.forEach(function (cname, i) { g3.fillStyle = BD.C.axis; g3.textAlign = 'center'; g3.fillText(cname, 120 + cw * (i + 0.5), 34); });
+    [[A, BD.C.gold, 0], [B, BD.C.blue, 1]].forEach(function (pp) {
+      var p = P[pp[0]], y = 62 + pp[2] * 30; g3.textAlign = 'left'; g3.fillStyle = pp[1]; g3.fillText(p.name, 10, y);
+      p.caps.forEach(function (cv, i) { g3.textAlign = 'center'; g3.font = '15px sans-serif'; g3.fillStyle = cv ? pp[1] : BD.C.dim; g3.fillText(sym[cv], 120 + cw * (i + 0.5), y + 4); g3.font = '9.5px "IBM Plex Mono", monospace'; });
+    });
+    g3.textAlign = 'left';
+    var pa = P[A], pb = P[B], c;
+    c = pa.name + ' against ' + pb.name + ': ';
+    var ra = pa.core / pa.clad, rb = pb.core / pb.clad;
+    c += (ra > rb ? pa.name : pb.name) + ' has the higher index contrast, so tighter bends and smaller devices; ';
+    c += (pa.loss[0] < pb.loss[0] ? pa.name : pb.name) + ' can reach the lower propagation loss. ';
+    c += 'No platform does everything: silicon lacks gain, SiN and TFLN lack detectors, and InP pays for its gain with higher loss and smaller wafers. Real systems increasingly combine two or more, which is the subject of Section 4.8 and Chapter 27. <i>Values are typical ranges for orientation, not limits.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

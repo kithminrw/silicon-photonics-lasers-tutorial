@@ -1,0 +1,73 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdRing" role="group" aria-label="Interactive demo: spectrum of a ring resonator">
+  <div class="bd-head"><span>// try it · ring resonator (Si strip, n<sub>g</sub> = 4.2)</span>
+    <span class="bd-seg" role="group" aria-label="Configuration"><button type="button" data-cfg="ap" aria-pressed="true">all-pass</button><button type="button" data-cfg="ad" aria-pressed="false">add-drop</button></span>
+    <span class="bd-seg" role="group" aria-label="Span"><button type="button" data-span="wide" aria-pressed="true">several FSRs</button><button type="button" data-span="zoom" aria-pressed="false">zoom on one</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>radius R <b data-v="R"></b></span><input type="range" data-k="R" min="3" max="60" step="0.1" value="10" aria-label="radius"></label>
+    <label class="bd-sl"><span>power coupling κ² (each coupler) <b data-v="k"></b></span><input type="range" data-k="k" min="0" max="100" step="0.1" value="45" aria-label="power coupling"></label>
+    <label class="bd-sl"><span>propagation loss <b data-v="a"></b></span><input type="range" data-k="a" min="0" max="100" step="0.1" value="45" aria-label="loss"></label>
+  </div>
+  <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">transmission (dB) against wavelength</span></div>
+  <div class="bd-read" aria-live="polite"><span>FSR <b data-o="fsr">–</b></span><span>FWHM <b data-o="fw">–</b></span><span>loaded Q <b data-o="ql">–</b></span><span>intrinsic Q <b data-o="qi">–</b></span><span>extinction <b data-o="er">–</b></span><span>finesse <b data-o="fi">–</b></span><span>build-up |E<sub>ring</sub>/E<sub>in</sub>|² <b data-o="bu">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdRing'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); }, cfg = 'ap', zoom = false;
+  var neff0 = 2.44, ng = 4.2, lam0 = 1.55;
+  var S = BD.bind(root, {
+    R: { fmt: function (x) { return x.toFixed(1) + ' µm'; } },
+    k: { map: function (v) { return 1e-3 * Math.pow(10, 2.7 * v / 100); }, fmt: function (x) { return (100 * x).toFixed(x < 0.01 ? 2 : 1) + ' %'; } },
+    a: { map: function (v) { return 0.3 * Math.pow(10, 2 * v / 100); }, fmt: function (x) { return x.toFixed(x < 10 ? 2 : 0) + ' dB/cm'; } }
+  }, function () { draw(); });
+  BD.seg(root, 'cfg', function (v) { cfg = v; draw(); });
+  BD.seg(root, 'span', function (v) { zoom = v === 'zoom'; draw(); });
+  function draw() {
+    var L = 2 * Math.PI * S.R, alpha = S.a * 100 / 4.343, a = Math.exp(-alpha * L * 1e-6 / 2), t1 = Math.sqrt(1 - S.k), t2 = cfg === 'ad' ? t1 : 1;
+    var fsr = lam0 * lam0 / (ng * L), m0 = Math.round(neff0 * L / lam0);
+    // resonance nearest 1550 nm, accounting for dispersion
+    var lres = (function () { var x = neff0 * L / m0; for (var i = 0; i < 20; i++) { var ne = neff0 - (ng - neff0) * (x - lam0) / lam0; x = ne * L / m0; } return x; })();
+    var ra = t1 * t2 * a, fw = (1 - ra) * lres * lres / (Math.PI * ng * L * Math.sqrt(ra));
+    var span = zoom ? Math.max(8 * fw, 0.02 * fsr) : 3.2 * fsr, l0 = lres - span / 2, l1 = lres + span / 2;
+    var xs = [], tp = [], td = [], N = 1600;
+    for (var i = 0; i <= N; i++) {
+      var l = l0 + (l1 - l0) * i / N, ne = neff0 - (ng - neff0) * (l - lam0) / lam0, ph = 2 * Math.PI * ne * L / l, cp = Math.cos(ph);
+      var den = 1 - 2 * ra * cp + ra * ra;
+      tp.push(10 * Math.log10(Math.max((t2 * t2 * a * a - 2 * t1 * t2 * a * cp + t1 * t1) / den, 1e-7)));
+      td.push(10 * Math.log10(Math.max((1 - t1 * t1) * (1 - t2 * t2) * a / den, 1e-7)));
+      xs.push(l);
+    }
+    var ymin = -40, dv = BD.setup(q('[data-c="s"]'));
+    var xt = zoom ? [[l0, ((l0 - lres) * 1e6).toFixed(0) + ' pm'], [lres, (1000 * lres).toFixed(3) + ' nm'], [l1, '+' + ((l1 - lres) * 1e6).toFixed(0) + ' pm']]
+                  : [[l0, (1000 * l0).toFixed(1)], [lres, (1000 * lres).toFixed(2) + ' nm'], [l1, (1000 * l1).toFixed(1)]];
+    var f = BD.frame(dv, { x: [l0, l1], y: [ymin, 1], pad: { l: 44, b: 22 }, xt: xt, yt: [[-40, '−40'], [-30, '−30'], [-20, '−20'], [-10, '−10'], [0, '0 dB']] });
+    if (cfg === 'ad') BD.line(f, xs, td, BD.C.blue, 1.7);
+    BD.line(f, xs, tp, BD.C.gold, 1.9);
+    dv.g.fillStyle = BD.C.gold; dv.g.fillText('through', f.p.l + 6, f.p.t + 12);
+    if (cfg === 'ad') { dv.g.fillStyle = BD.C.blue; dv.g.fillText('drop', f.p.l + 62, f.p.t + 12); }
+    // ---- readouts
+    var tmin = (t2 * t2 * a * a - 2 * t1 * t2 * a + t1 * t1) / Math.pow(1 - ra, 2);
+    var Ql = lres / fw, Qi = 2 * Math.PI * ng / (lres * 1e-6 * alpha);
+    var bu = (1 - t1 * t1) / Math.pow(1 - ra, 2);
+    q('[data-o="fsr"]').textContent = (1000 * fsr).toFixed(2) + ' nm';
+    q('[data-o="fw"]').textContent = fw * 1e6 < 1000 ? (fw * 1e6).toFixed(fw * 1e6 < 10 ? 2 : 1) + ' pm' : (fw * 1e3).toFixed(2) + ' nm';
+    q('[data-o="ql"]').textContent = BD.eng(Ql).replace(' ', '');
+    q('[data-o="qi"]').textContent = BD.eng(Qi).replace(' ', '');
+    var er = -10 * Math.log10(Math.max(tmin, 1e-7)); q('[data-o="er"]').textContent = er > 60 ? '> 60 dB' : er.toFixed(1) + ' dB';
+    q('[data-o="fi"]').textContent = (fsr / fw).toFixed(0);
+    q('[data-o="bu"]').textContent = bu.toFixed(0) + '×';
+    var c, ratio = t1 * t2 / a;
+    if (cfg === 'ap') {
+      if (Math.abs(t1 - a) / (1 - a + 1e-9) < 0.15) c = '<b>Near critical coupling</b> (t ≈ a): the light coupled out of the ring cancels the light passing by, and the through port drops to almost nothing.';
+      else if (t1 > a) c = '<b>Under-coupled</b> (t > a): the ring loses more per round trip than it couples out. The resonance is narrow but shallow; Q is close to the intrinsic Q.';
+      else c = '<b>Over-coupled</b> (t < a): the coupler dominates, the resonance broadens and the dip shallows again.';
+      c += ' From the through port alone, under- and over-coupling with swapped t and a give the same spectrum, which is why Chapter 32 needs more than one measurement to separate them.';
+    } else c = 'In the add-drop ring the drop port peaks where the through port dips; with equal couplers and no loss the drop would take all the power on resonance. Loss lowers the drop peak and leaves a residual dip at the through port.';
+    c += ' The FSR falls as 1/R, while the intrinsic Q depends only on the loss: about ' + BD.eng(Qi).replace(' ', '') + ' at ' + S.a.toFixed(1) + ' dB/cm.';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

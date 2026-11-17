@@ -1,0 +1,97 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdVern" role="group" aria-label="Interactive demo: Vernier ring filter of a tunable laser">
+  <div class="bd-head"><span>// try it · Vernier tunable laser: gain chip + two silicon rings in a loop mirror</span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>ring 1 radius R<sub>1</sub> <b data-v="R1"></b></span><input type="range" data-k="R1" min="5" max="30" step="0.05" value="10" aria-label="ring 1 radius"></label>
+    <label class="bd-sl"><span>ring 2 radius R<sub>2</sub> <b data-v="R2"></b></span><input type="range" data-k="R2" min="5" max="30" step="0.05" value="11" aria-label="ring 2 radius"></label>
+    <label class="bd-sl"><span>ring power coupling κ² <b data-v="k"></b></span><input type="range" data-k="k" min="0.02" max="0.5" step="0.005" value="0.15" aria-label="coupling"></label>
+    <label class="bd-sl"><span>heater on ring 1 (phase) <b data-v="p1"></b></span><input type="range" data-k="p1" min="0" max="2" step="0.005" value="0" aria-label="ring 1 phase"></label>
+    <label class="bd-sl"><span>heater on ring 2 (phase) <b data-v="p2"></b></span><input type="range" data-k="p2" min="0" max="2" step="0.005" value="0" aria-label="ring 2 phase"></label>
+  </div>
+  <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">ring drop spectra, their product (twice, loop mirror) and the gain</span></div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="m" aria-hidden="true"></canvas><span class="bd-tag">tuning map: lasing wavelength against the two heater phases</span></div>
+    <div class="bd-scope tall"><canvas data-c="z" aria-hidden="true"></canvas><span class="bd-tag">zoom: filter peak and cavity modes</span></div>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>FSR<sub>1</sub> / FSR<sub>2</sub> <b data-o="f">–</b></span><span>Vernier FSR <b data-o="v">–</b></span><span>lasing at <b data-o="l">–</b></span><span>next-best supermode <b data-o="s">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdVern'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); }, mapImg = null, mapKey = '';
+  var neff0 = 2.44, ng = 4.2, lam0 = 1.55, aRing = Math.exp(-(3 * 100 / 4.343) / 2 * 1e-6);   // 3 dB/cm, field per um
+  var Lcav = 2500, ngc = 3.9, l0 = 1.5, l1 = 1.6;   // optical cavity: about 2.5 mm, average group index 3.9
+  var S = BD.bind(root, {
+    R1: { fmt: function (x) { return x.toFixed(2) + ' µm'; } }, R2: { fmt: function (x) { return x.toFixed(2) + ' µm'; } },
+    k: { fmt: function (x) { return (100 * x).toFixed(1) + ' %'; } }, p1: { fmt: function (x) { return x.toFixed(2) + 'π'; } }, p2: { fmt: function (x) { return x.toFixed(2) + 'π'; } }
+  }, function () { draw(); });
+  function drop(lam, R, ph) {
+    var L = 2 * Math.PI * R, ne = neff0 - (ng - neff0) * (lam - lam0) / lam0, a = Math.pow(aRing, L), t2 = 1 - S.k;
+    var phi = 2 * Math.PI * ne * L / lam + ph;
+    return S.k * S.k * a / (1 - 2 * t2 * a * Math.cos(phi) + t2 * t2 * a * a);
+  }
+  function gain(lam) { return Math.max(0, 1 - Math.pow((lam - 1.55) / 0.07, 2)); }
+  var dlc = lam0 * lam0 / (2 * ngc * Lcav), modes = [];
+  for (var lm = l0; lm <= l1; lm += dlc) modes.push(lm);
+  function lase(p1, p2) {   // returns [lambda of the winning cavity mode, its net, best net more than 2 nm away]
+    var best = -1, bl = 0, vals = new Float64Array(modes.length);
+    for (var i = 0; i < modes.length; i++) { var l = modes[i], v = gain(l) * Math.pow(drop(l, S.R1, p1) * drop(l, S.R2, p2), 2); vals[i] = v; if (v > best) { best = v; bl = l; } }
+    var second = 0; for (i = 0; i < modes.length; i++) if (Math.abs(modes[i] - bl) > 0.002 && vals[i] > second) second = vals[i];
+    return [bl, best, second];
+  }
+  function hue(l) {   // wavelength 1500..1600 nm to a blue-to-red ramp
+    var t = Math.max(0, Math.min(1, (l - l0) / (l1 - l0)));
+    var r = Math.round(60 + 195 * t), g = Math.round(120 + 100 * Math.sin(Math.PI * t)), b = Math.round(240 - 200 * t);
+    return [r, g, b];
+  }
+  function buildMap() {
+    var key = [S.R1, S.R2, S.k].join(); if (key === mapKey && mapImg) return mapImg;
+    var n = 56, c = document.createElement('canvas'); c.width = n; c.height = n; var g = c.getContext('2d'), img = g.createImageData(n, n);
+    for (var i = 0; i < n; i++) for (var j = 0; j < n; j++) {
+      var r = lase(2 * Math.PI * (i + 0.5) / n, 2 * Math.PI * (j + 0.5) / n), col = hue(r[0]), p = 4 * ((n - 1 - j) * n + i);
+      img.data[p] = col[0]; img.data[p + 1] = col[1]; img.data[p + 2] = col[2]; img.data[p + 3] = 255;
+    }
+    g.putImageData(img, 0, 0); mapImg = c; mapKey = key; return c;
+  }
+  function draw() {
+    var p1 = Math.PI * S.p1, p2 = Math.PI * S.p2, res = lase(p1, p2);
+    // ---- spectra
+    var xs = [], d1 = [], d2 = [], pr = [], gs = [];
+    for (var i = 0; i <= 2000; i++) { var l = l0 + (l1 - l0) * i / 2000, a = drop(l, S.R1, p1), b = drop(l, S.R2, p2); xs.push(l); d1.push(a); d2.push(b); pr.push(Math.pow(a * b, 2)); gs.push(gain(l)); }
+    var dv = BD.setup(q('[data-c="s"]')), f = BD.frame(dv, { x: [l0, l1], y: [0, 1.05], pad: { l: 30, b: 22 },
+      xt: [[1.5, '1500'], [1.525, '1525'], [1.55, '1550'], [1.575, '1575'], [1.6, '1600 nm']], yt: [[0, '0'], [1, '1']] });
+    BD.line(f, xs, d1, 'rgba(224,184,90,.55)', 1); BD.line(f, xs, d2, 'rgba(127,184,240,.55)', 1);
+    BD.line(f, xs, gs, BD.C.dim, 1.2, [5, 4]); BD.line(f, xs, pr, BD.C.green, 2);
+    BD.vline(f, res[0], BD.C.white, [3, 3], 'lasing');
+    // ---- tuning map
+    var dm = BD.setup(q('[data-c="m"]')), g = dm.g, sz = Math.min(dm.w - 70, dm.h - 40), ox = 40, oy = 24, img = buildMap();
+    g.imageSmoothingEnabled = false; g.drawImage(img, ox, oy, sz, sz); g.strokeStyle = BD.C.axis; g.strokeRect(ox, oy, sz, sz);
+    var cx = ox + sz * (S.p1 / 2), cy = oy + sz * (1 - S.p2 / 2);
+    g.strokeStyle = '#fff'; g.lineWidth = 1.5; g.beginPath(); g.arc(cx, cy, 5, 0, 7); g.stroke(); g.lineWidth = 1;
+    g.fillStyle = BD.C.axis; g.fillText('ring 1 phase →', ox, oy + sz + 14); g.save(); g.translate(ox - 8, oy + sz); g.rotate(-Math.PI / 2); g.fillText('ring 2 phase →', 0, 0); g.restore();
+    for (var k = 0; k <= 20; k++) { var col = hue(l0 + (l1 - l0) * k / 20); g.fillStyle = 'rgb(' + col.join(',') + ')'; g.fillRect(ox + sz + 10, oy + sz - sz * (k + 1) / 21, 10, sz / 21 + 0.5); }
+    g.fillStyle = BD.C.axis; g.fillText('1600', ox + sz + 22, oy + 8); g.fillText('1500', ox + sz + 22, oy + sz);
+    // ---- zoom on the selected peak with the cavity modes
+    var zl0 = res[0] - 0.001, zl1 = res[0] + 0.001, zx = [], zy = [], zg = [];
+    for (i = 0; i <= 400; i++) { var lz = zl0 + (zl1 - zl0) * i / 400; zx.push(lz); zy.push(gain(lz) * Math.pow(drop(lz, S.R1, p1) * drop(lz, S.R2, p2), 2)); }
+    var zmax = Math.max.apply(null, zy) * 1.1 || 1;
+    var dz = BD.setup(q('[data-c="z"]')), fz = BD.frame(dz, { x: [zl0, zl1], y: [0, zmax], pad: { l: 30, b: 22 },
+      xt: [[zl0, '−1 nm'], [res[0], (1000 * res[0]).toFixed(2) + ' nm'], [zl1, '+1 nm']], yt: [[0, '0']] });
+    BD.line(fz, zx, zy, BD.C.green, 2);
+    modes.forEach(function (m) { if (m > zl0 && m < zl1) { var v = gain(m) * Math.pow(drop(m, S.R1, p1) * drop(m, S.R2, p2), 2); dz.g.strokeStyle = Math.abs(m - res[0]) < 1e-9 ? BD.C.gold : 'rgba(170,205,240,.45)'; dz.g.beginPath(); dz.g.moveTo(fz.X(m), fz.Y(0)); dz.g.lineTo(fz.X(m), fz.Y(v)); dz.g.stroke(); } });
+    // ---- readouts
+    var F1 = lam0 * lam0 / (ng * 2 * Math.PI * S.R1), F2 = lam0 * lam0 / (ng * 2 * Math.PI * S.R2), FV = F1 * F2 / Math.abs(F1 - F2);
+    q('[data-o="f"]').textContent = (1000 * F1).toFixed(2) + ' / ' + (1000 * F2).toFixed(2) + ' nm';
+    q('[data-o="v"]').textContent = isFinite(FV) ? (FV * 1000).toFixed(0) + ' nm' : '∞';
+    q('[data-o="l"]').textContent = (1000 * res[0]).toFixed(2) + ' nm';
+    q('[data-o="s"]').textContent = res[2] > 0 ? (10 * Math.log10(res[2] / res[1])).toFixed(1) + ' dB' : '–';
+    var cap = 'Each ring alone passes a comb of wavelengths; the two combs have slightly different spacings, so they line up only once every Vernier FSR = FSR₁FSR₂/|FSR₁ − FSR₂|. The laser picks the cavity mode with the highest net gain at that coincidence. ';
+    if (FV < 0.1) cap += '<b>The Vernier FSR is shorter than the gain bandwidth</b>: two supermodes compete and the laser can hop between them. Make the radii closer.';
+    else if (res[2] / res[1] > 0.5) cap += '<b>A neighbouring supermode is almost as strong</b>: the filter barely discriminates. Lower κ² (narrower ring resonances) or adjust a heater.';
+    else cap += 'Tuning one heater makes the wavelength jump by one ring FSR (the coarse steps across the map); tuning both together moves it continuously (the stripes).';
+    q('[data-o="cap"]').innerHTML = cap;
+  }
+  BD.observe(root, draw);
+})();
+</script>

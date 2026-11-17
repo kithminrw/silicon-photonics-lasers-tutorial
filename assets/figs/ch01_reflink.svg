@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 300" font-family="Helvetica, Arial, sans-serif" role="img" aria-label="The reference link: four lasers, four ring modulators on one bus, a grating coupler, 2 km of fibre, a grating coupler, four drop rings and four germanium photodiodes with TIAs">
+  <defs>
+    <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#0b7a85"/></marker>
+  </defs>
+  <style>
+    .wg{stroke:#0b7a85;stroke-width:2.2;fill:none}
+    .ar{marker-end:url(#a1)}
+    .ring{fill:none;stroke:#b5473a;stroke-width:2.4}
+    .las{fill:#fbf1df;stroke:#9a6212;stroke-width:1.3}
+    .pd{fill:#e3f4f6;stroke:#172036;stroke-width:1.3}
+    .t{fill:#172036;font-size:11px}
+    .tb{fill:#172036;font-size:12px;font-weight:700}
+    .s{fill:#57647a;font-size:10px}
+    .chip{fill:none;stroke:#9aa7bd;stroke-dasharray:5 4;stroke-width:1.2}
+    .gc{fill:#7fb8f0}
+  </style>
+  <!-- transmitter -->
+  <rect class="chip" x="8" y="18" width="378" height="236" rx="8"/>
+  <text class="tb" x="20" y="38">Transmitter PIC</text>
+  <g>
+    <rect class="las" x="22" y="58" width="58" height="26" rx="4"/><text class="t" x="51" y="75" text-anchor="middle">λ₁ laser</text>
+    <rect class="las" x="22" y="102" width="58" height="26" rx="4"/><text class="t" x="51" y="119" text-anchor="middle">λ₂ laser</text>
+    <rect class="las" x="22" y="146" width="58" height="26" rx="4"/><text class="t" x="51" y="163" text-anchor="middle">λ₃ laser</text>
+    <rect class="las" x="22" y="190" width="58" height="26" rx="4"/><text class="t" x="51" y="207" text-anchor="middle">λ₄ laser</text>
+  </g>
+  <!-- combiner: lasers into one bus (shown as a simple combiner) -->
+  <path class="wg" d="M80 71 C110 71 112 136 140 136"/><path class="wg" d="M80 115 C108 115 112 136 140 136"/>
+  <path class="wg" d="M80 159 C108 159 112 136 140 136"/><path class="wg" d="M80 203 C110 203 112 136 140 136"/>
+  <text class="s" x="96" y="242">combiner or comb</text>
+  <!-- bus with 4 ring modulators -->
+  <path class="wg" d="M140 136 H330"/>
+  <circle class="ring" cx="172" cy="119" r="13"/><circle class="ring" cx="210" cy="119" r="13"/><circle class="ring" cx="248" cy="119" r="13"/><circle class="ring" cx="286" cy="119" r="13"/>
+  <text class="s" x="172" y="98" text-anchor="middle">λ₁</text><text class="s" x="210" y="98" text-anchor="middle">λ₂</text><text class="s" x="248" y="98" text-anchor="middle">λ₃</text><text class="s" x="286" y="98" text-anchor="middle">λ₄</text>
+  <text class="t" x="229" y="168" text-anchor="middle">ring modulators, 50 Gb/s NRZ each</text>
+  <text class="s" x="229" y="183" text-anchor="middle">heaters lock each ring to its laser</text>
+  <!-- grating coupler TX -->
+  <g transform="translate(332,124)"><rect class="gc" x="0" y="0" width="3" height="24"/><rect class="gc" x="6" y="-2" width="3" height="28"/><rect class="gc" x="12" y="-4" width="3" height="32"/><rect class="gc" x="18" y="-6" width="3" height="36"/></g>
+  <text class="s" x="345" y="186" text-anchor="middle">grating</text><text class="s" x="345" y="198" text-anchor="middle">coupler</text>
+  <!-- fibre -->
+  <path class="wg ar" d="M356 136 C380 136 384 100 410 100 S440 172 466 160 C 470 158 472 140 480 136" style="stroke-dasharray:0"/>
+  <text class="tb" x="418" y="222" text-anchor="middle">2 km SMF</text>
+  <text class="s" x="418" y="236" text-anchor="middle">0.2 dB/km + connectors</text>
+  <!-- receiver -->
+  <rect class="chip" x="452" y="18" width="360" height="236" rx="8"/>
+  <text class="tb" x="464" y="38">Receiver PIC</text>
+  <g transform="translate(482,124)"><rect class="gc" x="18" y="0" width="3" height="24"/><rect class="gc" x="12" y="-2" width="3" height="28"/><rect class="gc" x="6" y="-4" width="3" height="32"/><rect class="gc" x="0" y="-6" width="3" height="36"/></g>
+  <path class="wg" d="M504 136 H780"/>
+  <circle class="ring" cx="548" cy="119" r="13"/><circle class="ring" cx="606" cy="119" r="13"/><circle class="ring" cx="664" cy="119" r="13"/><circle class="ring" cx="722" cy="119" r="13"/>
+  <!-- drop waveguides and PDs -->
+  <path class="wg" d="M530 102 H566"/><path class="wg" d="M588 102 H624"/><path class="wg" d="M646 102 H682"/><path class="wg" d="M704 102 H740"/>
+  <path class="wg ar" d="M566 102 V70"/><path class="wg ar" d="M624 102 V70"/><path class="wg ar" d="M682 102 V70"/><path class="wg ar" d="M740 102 V70"/>
+  <rect class="pd" x="546" y="46" width="40" height="22" rx="3"/><text class="t" x="566" y="61" text-anchor="middle">Ge PD</text>
+  <rect class="pd" x="604" y="46" width="40" height="22" rx="3"/><text class="t" x="624" y="61" text-anchor="middle">Ge PD</text>
+  <rect class="pd" x="662" y="46" width="40" height="22" rx="3"/><text class="t" x="682" y="61" text-anchor="middle">Ge PD</text>
+  <rect class="pd" x="720" y="46" width="40" height="22" rx="3"/><text class="t" x="740" y="61" text-anchor="middle">Ge PD</text>
+  <text class="t" x="642" y="168" text-anchor="middle">drop rings demultiplex λ₁ … λ₄</text>
+  <text class="s" x="642" y="183" text-anchor="middle">each photodiode feeds a TIA (electronics, not shown)</text>
+  <text class="s" x="790" y="140">→</text>
+  <!-- grid -->
+  <text class="s" x="410" y="282" text-anchor="middle">λ₁ … λ₄ = 1546.12, 1549.32, 1552.52, 1555.75 nm (400 GHz ITU grid), 4 × 50 Gb/s = 200 Gb/s</text>
+</svg>

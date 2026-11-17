@@ -1,0 +1,76 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdBragg" role="group" aria-label="Interactive demo: reflection spectrum of a waveguide Bragg grating">
+  <div class="bd-head"><span>// try it · waveguide Bragg grating (transfer matrices)</span>
+    <span class="bd-seg" role="group" aria-label="Apodisation"><button type="button" data-apo="0" aria-pressed="true">uniform</button><button type="button" data-apo="1" aria-pressed="false">Gaussian apodised</button></span>
+    <span class="bd-seg" role="group" aria-label="Phase shift"><button type="button" data-ps="0" aria-pressed="true">no shift</button><button type="button" data-ps="1" aria-pressed="false">λ/4 shift (cavity)</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>grating period Λ <b data-v="P"></b></span><input type="range" data-k="P" min="300" max="340" step="0.1" value="317" aria-label="period"></label>
+    <label class="bd-sl"><span>coupling coefficient κ <b data-v="k"></b></span><input type="range" data-k="k" min="0" max="100" step="0.1" value="50" aria-label="coupling coefficient"></label>
+    <label class="bd-sl"><span>number of periods N <b data-v="N"></b></span><input type="range" data-k="N" min="10" max="2000" step="1" value="300" aria-label="number of periods"></label>
+  </div>
+  <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">reflection and transmission against wavelength</span></div>
+  <div class="bd-read" aria-live="polite"><span>λ<sub>B</sub> <b data-o="lb">–</b></span><span>κL <b data-o="kl">–</b></span><span>peak R <b data-o="r">–</b></span><span>bandwidth (nulls) <b data-o="bw">–</b></span><span>length <b data-o="len">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdBragg'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); }, apo = 0, ps = 0;
+  var neff0 = 2.44, ng = 4.2, lam0 = 1.55;
+  var S = BD.bind(root, {
+    P: { fmt: function (x) { return x.toFixed(1) + ' nm'; } },
+    k: { map: function (v) { return 1000 * Math.pow(10, 2.2 * v / 100); }, fmt: function (x) { return BD.eng(x) + '/m'; } },   // 1e3 .. 1.6e5 /m
+    N: { fmt: function (x) { return x.toFixed(0); } }
+  }, function () { draw(); });
+  BD.seg(root, 'apo', function (v) { apo = +v; draw(); });
+  BD.seg(root, 'ps', function (v) { ps = +v; draw(); });
+  // complex 2x2 helpers: matrices as [a, b, c, d] with complex entries [re, im]
+  function cm(a, b) { return [a[0] * b[0] - a[1] * b[1], a[0] * b[1] + a[1] * b[0]]; }
+  function ca(a, b) { return [a[0] + b[0], a[1] + b[1]]; }
+  function mm(A, B) { return [ca(cm(A[0], B[0]), cm(A[1], B[2])), ca(cm(A[0], B[1]), cm(A[1], B[3])), ca(cm(A[2], B[0]), cm(A[3], B[2])), ca(cm(A[2], B[1]), cm(A[3], B[3]))]; }
+  // uniform section of length l (m), detuning sig (1/m), coupling kap (1/m): coupled-mode transfer matrix
+  function sec(l, sig, kap) {
+    var g2 = kap * kap - sig * sig, ch, sh_g, ss;   // sh_g = sinh(gl)/g, works for g imaginary too
+    if (g2 > 0) { var gg = Math.sqrt(g2); ch = Math.cosh(gg * l); sh_g = Math.sinh(gg * l) / gg; }
+    else if (g2 < 0) { var gi = Math.sqrt(-g2); ch = Math.cos(gi * l); sh_g = Math.sin(gi * l) / gi; }
+    else { ch = 1; sh_g = l; }
+    return [[ch, -sig * sh_g], [0, -kap * sh_g], [0, kap * sh_g], [ch, sig * sh_g]];
+  }
+  function spectrum(lam, nsec) {
+    var neff = neff0 - (ng - neff0) * (lam - lam0) / lam0, P = S.P * 1e-9, sig = 2 * Math.PI * neff / (lam * 1e-6) - Math.PI / P;
+    var L = S.N * P, l = L / nsec, T = [[1, 0], [0, 0], [0, 0], [1, 0]];
+    for (var i = 0; i < nsec; i++) {
+      var z = (i + 0.5) / nsec - 0.5, kap = S.k * (apo ? Math.exp(-Math.pow(z / 0.22, 2)) : 1);
+      T = mm(T, sec(l, sig, kap));
+      if (ps && i === nsec / 2 - 1) T = mm(T, [[0, -1], [0, 0], [0, 0], [0, 1]]);   // grating phase shift of pi (half a period = lambda/4): diag(e^{-j pi/2}, e^{j pi/2})
+    }
+    var a = T[0], c = T[2], d2 = a[0] * a[0] + a[1] * a[1];
+    return (c[0] * c[0] + c[1] * c[1]) / d2;
+  }
+  function draw() {
+    var lb = 2 * neff0 * S.P / 1000, L = S.N * S.P * 1e-9, kl = S.k * L;
+    // centre on the Bragg wavelength including dispersion: lambda_B = 2 neff(lambda_B) Lambda
+    for (var it = 0; it < 20; it++) lb = 2 * (neff0 - (ng - neff0) * (lb - lam0) / lam0) * S.P / 1000;
+    var bwEst = lb * lb / (ng * L * 1e6) * Math.sqrt(Math.pow(kl / Math.PI, 2) + 1);   // um, null-to-null
+    var span = Math.min(Math.max(3 * bwEst, 0.004), 0.12), l0 = lb - span / 2, l1 = lb + span / 2;
+    var nsec = apo ? 40 : (ps ? 2 : 1), xs = [], R = [], T = [], Np = 900, rmax = 0;
+    for (var i = 0; i <= Np; i++) { var l = l0 + (l1 - l0) * i / Np, r = spectrum(l, nsec); xs.push(l); R.push(r); T.push(1 - r); rmax = Math.max(rmax, r); }
+    var dv = BD.setup(q('[data-c="s"]')), f = BD.frame(dv, { x: [l0, l1], y: [0, 1.02], pad: { l: 40, b: 22 },
+      xt: [[l0, (1000 * l0).toFixed(1)], [lb, (1000 * lb).toFixed(1) + ' nm'], [l1, (1000 * l1).toFixed(1)]], yt: [[0, '0'], [0.5, '0.5'], [1, '1']] });
+    BD.line(f, xs, T, BD.C.blue, 1.4); BD.line(f, xs, R, BD.C.gold, 2);
+    dv.g.fillStyle = BD.C.gold; dv.g.fillText('R', f.p.l + 6, f.p.t + 12); dv.g.fillStyle = BD.C.blue; dv.g.fillText('T', f.p.l + 22, f.p.t + 12);
+    q('[data-o="lb"]').textContent = (1000 * lb).toFixed(2) + ' nm';
+    q('[data-o="kl"]').textContent = kl.toFixed(2);
+    q('[data-o="r"]').textContent = (100 * rmax).toFixed(1) + ' %' + (ps ? '' : ' (tanh²κL = ' + (100 * Math.pow(Math.tanh(kl), 2)).toFixed(1) + ' %)');
+    q('[data-o="bw"]').textContent = (1000 * bwEst).toFixed(2) + ' nm';
+    q('[data-o="len"]').textContent = (L * 1e6).toFixed(0) + ' µm';
+    var c = 'Each period reflects a little; at the Bragg wavelength λ<sub>B</sub> = 2n<sub>eff</sub>Λ the reflections add in phase. ';
+    if (ps) c += '<b>A quarter-wave shift in the middle turns the grating into a cavity</b>: a narrow transmission peak opens at the centre of the stop-band. The same idea makes a DFB laser single-mode (Chapter 26).';
+    else if (kl < 1) c += 'With κL below 1 the grating is weak: the peak reflectivity is low and the bandwidth is set by the length, not by κ.';
+    else c += 'With κL = ' + kl.toFixed(1) + ' the peak reflectivity is tanh²(κL); a stronger corrugation widens the stop-band, a longer grating sharpens its edges.';
+    if (apo && !ps) c += ' Apodising the coupling along the grating suppresses the side lobes at the price of a slightly narrower, lower peak.';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

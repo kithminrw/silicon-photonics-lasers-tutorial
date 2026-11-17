@@ -1,0 +1,67 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdPolar" role="group" aria-label="Interactive demo: polarisation ellipse from two field components">
+  <div class="bd-head"><span>// try it · polarisation: add E<sub>x</sub> and E<sub>y</sub></span>
+    <span class="bd-seg" role="group" aria-label="Preset"><button type="button" data-pre="lin" aria-pressed="true">linear 45°</button><button type="button" data-pre="rc" aria-pressed="false">circular</button><button type="button" data-pre="ell" aria-pressed="false">elliptical</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>amplitude E<sub>x</sub> <b data-v="ax"></b></span><input type="range" data-k="ax" min="0" max="1" step="0.01" value="0.71" aria-label="Ex amplitude"></label>
+    <label class="bd-sl"><span>amplitude E<sub>y</sub> <b data-v="ay"></b></span><input type="range" data-k="ay" min="0" max="1" step="0.01" value="0.71" aria-label="Ey amplitude"></label>
+    <label class="bd-sl"><span>phase of E<sub>y</sub> relative to E<sub>x</sub>, δ <b data-v="d"></b></span><input type="range" data-k="d" min="-1" max="1" step="0.005" value="0" aria-label="relative phase"></label>
+  </div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="e" aria-hidden="true"></canvas><span class="bd-tag">tip of E in the x–y plane (wave coming towards you)</span></div>
+    <div class="bd-scope tall"><canvas data-c="t" aria-hidden="true"></canvas><span class="bd-tag">E<sub>x</sub>(t) and E<sub>y</sub>(t) over one period</span></div>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>state <b data-o="st">–</b></span><span>Jones vector <b data-o="j">–</b></span><span>orientation ψ <b data-o="psi">–</b></span><span>axial ratio <b data-o="ar">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdPolar'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); }, ph = 0;
+  var S = BD.bind(root, { ax: { fmt: function (x) { return x.toFixed(2); } }, ay: { fmt: function (x) { return x.toFixed(2); } }, d: { fmt: function (x) { return (x).toFixed(2) + 'π'; } } }, function () { draw(); });
+  BD.seg(root, 'pre', function (v) {
+    var p = { lin: [0.71, 0.71, 0], rc: [0.71, 0.71, 0.5], ell: [0.9, 0.45, 0.3] }[v];
+    ['ax', 'ay', 'd'].forEach(function (k, i) { var el = q('[data-k="' + k + '"]'); el.value = p[i]; el.dispatchEvent(new Event('input')); });
+  });
+  function draw() {
+    var ax = S.ax, ay = S.ay, d = S.d * Math.PI;
+    var dv = BD.setup(q('[data-c="e"]')), g = dv.g, cx = dv.w / 2, cy = dv.h / 2 + 8, R = Math.min(dv.w, dv.h - 30) * 0.4;
+    g.strokeStyle = BD.C.grid; g.beginPath(); g.moveTo(cx - R * 1.15, cy); g.lineTo(cx + R * 1.15, cy); g.moveTo(cx, cy - R * 1.15); g.lineTo(cx, cy + R * 1.15); g.stroke();
+    g.fillStyle = BD.C.axis; g.fillText('x', cx + R * 1.15 + 4, cy + 3); g.fillText('y', cx - 3, cy - R * 1.15 - 4);
+    g.strokeStyle = BD.C.gold; g.lineWidth = 1.8; g.beginPath();
+    for (var i = 0; i <= 200; i++) { var w = 2 * Math.PI * i / 200, x = ax * Math.cos(w), y = ay * Math.cos(w + d); if (i) g.lineTo(cx + R * x, cy - R * y); else g.moveTo(cx + R * x, cy - R * y); }
+    g.stroke(); g.lineWidth = 1;
+    var ex = ax * Math.cos(ph), ey = ay * Math.cos(ph + d);
+    g.strokeStyle = BD.C.blue; g.lineWidth = 2; g.beginPath(); g.moveTo(cx, cy); g.lineTo(cx + R * ex, cy - R * ey); g.stroke(); g.lineWidth = 1;
+    g.fillStyle = BD.C.white; g.beginPath(); g.arc(cx + R * ex, cy - R * ey, 3.5, 0, 7); g.fill();
+    // time traces
+    var d2 = BD.setup(q('[data-c="t"]')), f = BD.frame(d2, { x: [0, 1], y: [-1.1, 1.1], pad: { l: 26, b: 22 }, xt: [[0, '0'], [0.5, 'T/2'], [1, 'T']], yt: [[0, '0']] });
+    var ts = [], xs = [], ys = [];
+    for (i = 0; i <= 200; i++) { var tt = i / 200; ts.push(tt); xs.push(ax * Math.cos(2 * Math.PI * tt)); ys.push(ay * Math.cos(2 * Math.PI * tt + d)); }
+    BD.line(f, ts, xs, BD.C.blue, 1.6); BD.line(f, ts, ys, BD.C.green, 1.6);
+    BD.vline(f, (ph / (2 * Math.PI)) % 1, BD.C.dim, [2, 3]);
+    d2.g.fillStyle = BD.C.blue; d2.g.fillText('E_x', f.p.l + 6, f.p.t + 12); d2.g.fillStyle = BD.C.green; d2.g.fillText('E_y', f.p.l + 36, f.p.t + 12);
+    // ellipse parameters
+    var psi = 0.5 * Math.atan2(2 * ax * ay * Math.cos(d), ax * ax - ay * ay), s2 = 2 * ax * ay * Math.sin(d) / (ax * ax + ay * ay + 1e-12);
+    var chi = 0.5 * Math.asin(Math.max(-1, Math.min(1, s2))), arat = Math.abs(Math.tan(chi));
+    var st, hand = Math.sin(d) > 0 ? 'clockwise' : 'counter-clockwise';   // E = x ax cos(wt) + y ay cos(wt + d), viewed facing the oncoming wave
+    if (ax < 0.02 || ay < 0.02 || Math.abs(Math.sin(d)) < 0.01) st = 'linear';
+    else if (Math.abs(ax - ay) < 0.02 && Math.abs(Math.abs(S.d) - 0.5) < 0.01) st = 'circular';
+    else st = 'elliptical';
+    q('[data-o="st"]').textContent = st;
+    var nrm = Math.sqrt(ax * ax + ay * ay) || 1;
+    q('[data-o="j"]').textContent = '[' + (ax / nrm).toFixed(2) + ', ' + (ay / nrm).toFixed(2) + ' e^{j' + S.d.toFixed(2) + 'π}]';
+    q('[data-o="psi"]').textContent = (psi * 180 / Math.PI).toFixed(1) + '°';
+    q('[data-o="ar"]').textContent = st === 'linear' ? '0 (a line)' : arat.toFixed(2);
+    var c = 'Any polarisation is the sum of two orthogonal components with some amplitude ratio and relative phase δ. In phase (δ = 0 or π) they give a line; a quarter-period apart with equal amplitudes, a circle; anything else, an ellipse. ';
+    if (st !== 'linear') c += 'Seen by a receiver looking back at the source, this field turns ' + hand + '. Whether that is called left- or right-handed differs between optics and engineering texts, so always say which convention you use. ';
+    c += 'A single-mode fibre changes δ and the amplitude ratio as it bends and warms, which is why a chip with polarisation-dependent couplers needs the devices of Chapter 14.';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  var run = true, last = 0;
+  function tick(tsm) { if (!run) return; if (last) ph += Math.min(0.05, (tsm - last) / 1000) * 2.2; last = tsm; draw(); requestAnimationFrame(tick); }
+  BD.observe(root, draw);
+  if (window.IntersectionObserver) new IntersectionObserver(function (es) { es.forEach(function (e) { var was = run; run = e.isIntersecting; if (run && !was) { last = 0; requestAnimationFrame(tick); } }); }).observe(root);
+  requestAnimationFrame(tick);
+})();
+</script>

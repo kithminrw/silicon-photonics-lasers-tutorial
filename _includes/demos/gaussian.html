@@ -1,0 +1,92 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdGauss" role="group" aria-label="Interactive demo: a Gaussian beam focused by a lens into a fibre">
+  <div class="bd-head"><span>// try it · gaussian beam, lens and fibre</span>
+    <span class="bd-seg" role="group" aria-label="Receiving fibre"><button type="button" data-fib="10.4" aria-pressed="true">SMF-28 (MFD 10.4 µm)</button><button type="button" data-fib="4" aria-pressed="false">UHNA (4 µm)</button><button type="button" data-fib="2.5" aria-pressed="false">lensed (2.5 µm)</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>source waist w<sub>0</sub> <b data-v="w0"></b></span><input type="range" data-k="w0" min="0.5" max="8" step="0.05" value="1.5" aria-label="source waist"></label>
+    <label class="bd-sl"><span>lens focal length f <b data-v="f"></b></span><input type="range" data-k="f" min="20" max="400" step="1" value="100" aria-label="focal length"></label>
+    <label class="bd-sl"><span>source-to-lens distance d<sub>1</sub> <b data-v="d1"></b></span><input type="range" data-k="d1" min="30" max="600" step="1" value="130" aria-label="lens distance"></label>
+    <label class="bd-sl"><span>fibre position after lens d<sub>2</sub> <b data-v="d2"></b></span><input type="range" data-k="d2" min="20" max="1500" step="1" value="430" aria-label="fibre distance"></label>
+    <label class="bd-sl"><span>lateral fibre offset Δx <b data-v="dx"></b></span><input type="range" data-k="dx" min="0" max="12" step="0.05" value="0" aria-label="lateral offset"></label>
+  </div>
+  <div class="bd-scope tall"><canvas data-c="b" aria-hidden="true"></canvas><span class="bd-tag">beam radius w(z) at 1550 nm (vertical axis stretched)</span></div>
+  <div class="bd-scope short"><canvas data-c="e" aria-hidden="true"></canvas><span class="bd-tag">coupling into the fibre against lateral offset</span></div>
+  <div class="bd-read" aria-live="polite"><span>z<sub>R</sub> <b data-o="zr">–</b></span><span>divergence <b data-o="div">–</b></span><span>image waist <b data-o="w2">–</b></span><span>at d<sub>2</sub> = <b data-o="z2">–</b></span><span>coupling <b data-o="eta">–</b></span><span>1 dB offset <b data-o="tol">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdGauss'); if (!root || !window.BD) return;
+  var lam = 1.55, wf = 5.2, q = function (s) { return root.querySelector(s); };
+  var um = function (x) { return x.toFixed(x < 10 ? 2 : 0) + ' µm'; };
+  var S = BD.bind(root, { w0: { fmt: um }, f: { fmt: um }, d1: { fmt: um }, d2: { fmt: um }, dx: { fmt: um } }, function () { draw(); });
+  BD.seg(root, 'fib', function (v) { wf = parseFloat(v) / 2; draw(); });
+  // complex helpers for the q-parameter: q = [re, im]
+  function cdiv(a, b) { var d = b[0] * b[0] + b[1] * b[1]; return [(a[0] * b[0] + a[1] * b[1]) / d, (a[1] * b[0] - a[0] * b[1]) / d]; }
+  function wR(qq) {          // beam radius and curvature from 1/q = 1/R - j lambda/(pi w^2)
+    var inv = cdiv([1, 0], qq), w = Math.sqrt(-lam / (Math.PI * inv[1]));
+    return { w: w, R: Math.abs(inv[0]) < 1e-12 ? Infinity : 1 / inv[0] };
+  }
+  // 1D field overlap of a curved Gaussian (w1, R1) with a flat Gaussian (w2) offset by d, numerically
+  function eta1(w1, R1, w2, d) {
+    var k = 2 * Math.PI / lam, xm = 4 * Math.max(w1, w2) + d, n = 801, h = 2 * xm / (n - 1), re = 0, im = 0, p1 = 0, p2 = 0;
+    for (var i = 0; i < n; i++) {
+      var x = -xm + i * h, a1 = Math.exp(-x * x / (w1 * w1)), ph = isFinite(R1) ? -k * x * x / (2 * R1) : 0, a2 = Math.exp(-(x - d) * (x - d) / (w2 * w2));
+      re += a1 * Math.cos(ph) * a2; im += a1 * Math.sin(ph) * a2; p1 += a1 * a1; p2 += a2 * a2;
+    }
+    return (re * re + im * im) / (p1 * p2);
+  }
+  function draw() {
+    var zR = Math.PI * S.w0 * S.w0 / lam, q0 = [S.d1, zR];                  // q at the lens (source waist at z = 0)
+    var qa = cdiv(q0, [1 - q0[0] / S.f, -q0[1] / S.f]);                     // thin lens: q' = q / (1 - q/f)
+    var waistPos = -qa[0], zR2 = qa[1], w2 = Math.sqrt(zR2 * lam / Math.PI); // new waist after the lens
+    var qf = [qa[0] + S.d2, qa[1]], bf = wR(qf);
+    var eta = eta1(bf.w, bf.R, wf, S.dx) * eta1(bf.w, bf.R, wf, 0);
+    var eta0 = eta1(bf.w, bf.R, wf, 0) * eta1(bf.w, bf.R, wf, 0);
+    // ---- beam envelope
+    var zEnd = S.d1 + Math.max(S.d2, waistPos) * 1.15 + 20, wmax = 0, zs = [], ws = [];
+    for (var k = 0; k <= 500; k++) {
+      var z = zEnd * k / 500, w;
+      if (z <= S.d1) w = S.w0 * Math.sqrt(1 + Math.pow(z / zR, 2)); else w = wR([qa[0] + (z - S.d1), qa[1]]).w;
+      zs.push(z); ws.push(w); wmax = Math.max(wmax, w);
+    }
+    wmax = Math.max(wmax, wf) * 1.15;
+    var d = BD.setup(q('[data-c="b"]')), f = BD.frame(d, { x: [0, zEnd], y: [-wmax, wmax], pad: { l: 46, b: 22 },
+      xt: [[0, '0'], [S.d1, 'lens'], [S.d1 + S.d2, 'fibre']], yt: [[-wmax / 1.15, '−' + wmax.toFixed(0)], [0, '0 µm'], [wmax / 1.15, wmax.toFixed(0)]] });
+    var g = d.g; f.clipIn(); g.beginPath();
+    for (k = 0; k <= 500; k++) g.lineTo(f.X(zs[k]), f.Y(ws[k]));
+    for (k = 500; k >= 0; k--) g.lineTo(f.X(zs[k]), f.Y(-ws[k]));
+    g.closePath(); g.fillStyle = 'rgba(224,184,90,.22)'; g.fill(); f.clipOut();
+    BD.line(f, zs, ws, BD.C.gold, 1.6); BD.line(f, zs, ws.map(function (v) { return -v; }), BD.C.gold, 1.6);
+    BD.vline(f, S.d1, BD.C.blue, [2, 2]);
+    // lens glyph and fibre core
+    g.strokeStyle = BD.C.blue; g.lineWidth = 2; g.beginPath(); g.ellipse(f.X(S.d1), f.Y(0), 4, (f.Y(-wmax * 0.9) - f.Y(wmax * 0.9)) / 2, 0, 0, 7); g.stroke(); g.lineWidth = 1;
+    var xf = f.X(S.d1 + S.d2); g.fillStyle = 'rgba(127,224,160,.25)'; g.fillRect(xf, f.Y(S.dx + wf), d.w - f.p.r - xf, f.Y(S.dx - wf) - f.Y(S.dx + wf));
+    g.strokeStyle = BD.C.green; g.strokeRect(xf, f.Y(S.dx + wf), d.w - f.p.r - xf, f.Y(S.dx - wf) - f.Y(S.dx + wf));
+    if (waistPos > 0) BD.vline(f, S.d1 + waistPos, BD.C.teal, [4, 3], 'image waist');
+    // ---- coupling against offset
+    var d2 = BD.setup(q('[data-c="e"]')), xmax = Math.max(3 * Math.sqrt(bf.w * bf.w + wf * wf) / 2, 2), f2 = BD.frame(d2, { x: [0, xmax], y: [-10, 0], pad: { l: 46, b: 22 },
+      xt: [[0, '0'], [xmax / 2, (xmax / 2).toFixed(1)], [xmax, xmax.toFixed(1) + ' µm']], yt: [[-10, '−10'], [-5, '−5'], [0, '0 dB']] });
+    var xs = [], es = [];
+    for (k = 0; k <= 120; k++) { var dd = xmax * k / 120; xs.push(dd); es.push(10 * Math.log10(eta1(bf.w, bf.R, wf, dd) * eta1(bf.w, bf.R, wf, 0))); }
+    BD.line(f2, xs, es, BD.C.blue, 2);
+    BD.hline(f2, 10 * Math.log10(eta0) - 1, BD.C.dim, [3, 3], '1 dB below peak');
+    BD.dot(f2, Math.min(S.dx, xmax), 10 * Math.log10(eta), BD.C.gold, 4);
+    var tol = NaN; for (k = 1; k <= 120; k++) if (es[k] < 10 * Math.log10(eta0) - 1) { tol = xs[k]; break; }
+    // ---- readouts
+    q('[data-o="zr"]').textContent = um(zR);
+    q('[data-o="div"]').textContent = (lam / (Math.PI * S.w0) * 180 / Math.PI).toFixed(1) + '° (half angle)';
+    q('[data-o="w2"]').textContent = waistPos > 0 ? um(w2) + ' at ' + um(waistPos) : 'virtual';
+    q('[data-o="z2"]').textContent = 'w ' + um(bf.w);
+    var eo = q('[data-o="eta"]'); eo.textContent = (100 * eta).toFixed(0) + ' % (' + (10 * Math.log10(eta)).toFixed(2) + ' dB)'; eo.className = eta > 0.8 ? 'ok' : eta < 0.4 ? 'bad' : '';
+    q('[data-o="tol"]').textContent = isFinite(tol) ? '± ' + um(tol) : '> ' + um(xmax);
+    var c = 'A thin lens images the source waist to a new waist; the fibre collects the most light when it sits at that waist and the two spot sizes match. ';
+    if (waistPos > 0 && Math.abs(S.d2 - waistPos) > 2 * zR2) c += '<b>The fibre is far from the image waist</b>: move d<sub>2</sub> towards ' + um(waistPos) + '. ';
+    else if (Math.abs(w2 / wf - 1) > 0.5) c += 'The image waist (' + um(w2) + ') does not match the fibre mode (' + um(wf) + '): change f or d<sub>1</sub> to change the magnification. ';
+    else c += 'Spot sizes and position match well. ';
+    c += 'The 1 dB offset tolerance grows with the spot size: large spots are easy to align, which is one reason fibre-to-chip couplers expand the mode.';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

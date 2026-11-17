@@ -1,0 +1,84 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdGc" role="group" aria-label="Interactive demo: phase matching of a grating coupler">
+  <div class="bd-head"><span>// try it · grating coupler phase matching (220 nm SOI, 70 nm etch, TE)</span>
+    <span class="bd-seg" role="group" aria-label="Top cladding"><button type="button" data-clad="1.444" aria-pressed="true">oxide clad</button><button type="button" data-clad="1.0" aria-pressed="false">air clad</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>grating period Λ <b data-v="P"></b></span><input type="range" data-k="P" min="0.5" max="0.8" step="0.001" value="0.607" aria-label="period"></label>
+    <label class="bd-sl"><span>fill factor (unetched fraction) <b data-v="ff"></b></span><input type="range" data-k="ff" min="0.2" max="0.9" step="0.01" value="0.5" aria-label="fill factor"></label>
+    <label class="bd-sl"><span>fibre angle θ (in air) <b data-v="th"></b></span><input type="range" data-k="th" min="-5" max="25" step="0.1" value="8" aria-label="fibre angle"></label>
+  </div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="k" aria-hidden="true"></canvas><span class="bd-tag">wavevector diagram at the centre wavelength</span></div>
+    <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">relative coupling against wavelength</span></div>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>grating n<sub>eff</sub> <b data-o="ne">–</b></span><span>centre wavelength <b data-o="lc">–</b></span><span>1 dB bandwidth <b data-o="bw">–</b></span><span>angle in cladding <b data-o="tc">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdGc'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); }, nc = 1.444;
+  // slab effective indices (TE, 1550 nm) of the unetched 220 nm and etched 150 nm silicon, and their group indices
+  var nHi = 2.848, nLo = 2.539, ngHi = 3.58, ngLo = 3.40, w0 = 5.2, lam0 = 1.55;   // from the slab solver of Chapter 5
+  var S = BD.bind(root, {
+    P: { fmt: function (x) { return (1000 * x).toFixed(0) + ' nm'; } }, ff: { fmt: function (x) { return (100 * x).toFixed(0) + ' %'; } },
+    th: { fmt: function (x) { return x.toFixed(1) + '°'; } }
+  }, function () { draw(); });
+  BD.seg(root, 'clad', function (v) { nc = parseFloat(v); draw(); });
+  function neff(lam) {   // averaged index of the grating section with first-order dispersion
+    var hi = nHi - (ngHi - nHi) * (lam - lam0) / lam0, lo = nLo - (ngLo - nLo) * (lam - lam0) / lam0;
+    return S.ff * hi + (1 - S.ff) * lo;
+  }
+  // angle of the first diffracted order in air (Snell through a flat top cladding): sin(theta_air) = neff - lambda/Lambda
+  function sAir(lam) { return neff(lam) - lam / S.P; }
+  function draw() {
+    var st = Math.sin(S.th * Math.PI / 180), lc = lam0;
+    for (var it = 0; it < 30; it++) lc = S.P * (neff(lc) - st);   // phase matching: lambda = Lambda (neff - sin theta)
+    // coupling against wavelength: Gaussian angular overlap with the fibre mode (in air), peak normalised
+    var xs = [], ys = [], l0 = lc - 0.08, l1 = lc + 0.08, bw = [];
+    for (var i = 0; i <= 400; i++) {
+      var l = l0 + (l1 - l0) * i / 400, s = sAir(l), eta;
+      if (Math.abs(s) >= 1) eta = 1e-6; else { var dth = Math.asin(s) - S.th * Math.PI / 180; eta = Math.exp(-Math.pow(Math.PI * w0 * dth / l, 2)); }
+      xs.push(l); ys.push(10 * Math.log10(Math.max(eta, 1e-6)));
+      if (eta > Math.pow(10, -0.1)) bw.push(l);
+    }
+    var bw1 = bw.length ? bw[bw.length - 1] - bw[0] : 0;
+    // ---- wavevector diagram (in units of k0)
+    var dv = BD.setup(q('[data-c="k"]')), g = dv.g, cx = dv.w / 2, cy = dv.h / 2 + 10, sc = Math.min(dv.w / 7.4, (dv.h - 30) / 7.6);
+    var ne = neff(lc), K = lc / S.P;
+    function circ(r, col, dash, label) { g.strokeStyle = col; g.setLineDash(dash || []); g.beginPath(); g.arc(cx, cy, r * sc, 0, 2 * Math.PI); g.stroke(); g.setLineDash([]); if (label) { g.fillStyle = col; g.fillText(label, cx + r * sc * 0.72 + 4, cy - r * sc * 0.72); } }
+    g.fillStyle = 'rgba(127,184,240,.07)'; g.fillRect(0, cy, dv.w, dv.h - cy);
+    g.strokeStyle = BD.C.axis; g.beginPath(); g.moveTo(8, cy); g.lineTo(dv.w - 8, cy); g.stroke();
+    circ(nc, BD.C.blue, null, 'n_clad'); circ(1.444, BD.C.dim, [3, 3]); circ(3.476, BD.C.dim, [2, 4], 'Si substrate');
+    function arrow(x0, y0, x1, y1, col, w) {
+      g.strokeStyle = col; g.fillStyle = col; g.lineWidth = w || 2; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke();
+      var a = Math.atan2(y1 - y0, x1 - x0); g.beginPath(); g.moveTo(x1, y1); g.lineTo(x1 - 8 * Math.cos(a - 0.4), y1 - 8 * Math.sin(a - 0.4)); g.lineTo(x1 - 8 * Math.cos(a + 0.4), y1 - 8 * Math.sin(a + 0.4)); g.fill(); g.lineWidth = 1;
+    }
+    var bx = cx - 3.4 * sc;
+    arrow(bx, cy + 6, bx + ne * sc, cy + 6, BD.C.gold); g.fillStyle = BD.C.gold; g.fillText('β/k₀ = ' + ne.toFixed(2), bx + 4, cy + 20);
+    arrow(bx + ne * sc, cy - 6, bx + (ne - K) * sc, cy - 6, BD.C.red); g.fillStyle = BD.C.red; g.fillText('−K = −λ/Λ', bx + (ne - K / 2) * sc - 20, cy - 12);
+    var kx = ne - K;
+    if (Math.abs(kx) < nc) { var kz = Math.sqrt(nc * nc - kx * kx); arrow(cx, cy, cx + kx * sc, cy - kz * sc, BD.C.green); g.fillStyle = BD.C.green; g.fillText('to fibre', cx + kx * sc + 6, cy - kz * sc); }
+    if (Math.abs(kx) < 1.444) { var kz2 = Math.sqrt(1.444 * 1.444 - kx * kx); arrow(cx, cy, cx + kx * sc, cy + kz2 * sc, 'rgba(127,224,160,.45)', 1.5); g.fillStyle = BD.C.dim; g.fillText('into the BOX', cx + kx * sc + 6, cy + kz2 * sc); }
+    g.strokeStyle = BD.C.white; g.setLineDash([2, 3]); g.beginPath(); g.moveTo(cx + kx * sc, cy - 3.6 * sc); g.lineTo(cx + kx * sc, cy + 3.6 * sc); g.stroke(); g.setLineDash([]);
+    // ---- spectrum
+    var d2 = BD.setup(q('[data-c="s"]')), f = BD.frame(d2, { x: [l0, l1], y: [-12, 0.5], pad: { l: 40, b: 22 },
+      xt: [[l0, (1000 * l0).toFixed(0)], [lc, (1000 * lc).toFixed(0) + ' nm'], [l1, (1000 * l1).toFixed(0)]], yt: [[-12, '−12'], [-6, '−6'], [-1, '−1'], [0, '0 dB']] });
+    d2.g.fillStyle = 'rgba(224,184,90,.1)'; d2.g.fillRect(f.X(1.53), f.p.t, f.X(1.565) - f.X(1.53), d2.h - f.p.t - f.p.b);
+    d2.g.fillStyle = 'rgba(233,208,143,.7)'; d2.g.fillText('C band', f.X(1.532), d2.h - f.p.b - 6);
+    BD.line(f, xs, ys, BD.C.blue, 2); BD.hline(f, -1, BD.C.dim, [3, 3]);
+    var tcl = Math.asin(Math.min(1, st / nc)) * 180 / Math.PI;
+    q('[data-o="ne"]').textContent = ne.toFixed(3);
+    q('[data-o="lc"]').textContent = (1000 * lc).toFixed(1) + ' nm';
+    q('[data-o="bw"]').textContent = (1000 * bw1).toFixed(0) + ' nm';
+    q('[data-o="tc"]').textContent = tcl.toFixed(1) + '°';
+    var c = 'Phase matching, λ = Λ(n<sub>eff</sub> − sin θ), sets the centre wavelength: a longer period or a higher fill factor moves it up, a steeper fibre moves it down. ';
+    if (Math.abs(S.th) < 1) c += '<b>Near-vertical coupling</b> also satisfies the condition for the backward direction, so the second-order Bragg reflection sends light back into the waveguide; that is why fibres are tilted by about 8–12°. ';
+    c += 'The bandwidth comes from the fibre\'s angular acceptance: as the wavelength changes, the diffracted beam swings away from the fibre axis. ';
+    c += 'Part of the light always goes down into the BOX; the reflection from the silicon substrate decides whether it returns in phase, which is why the BOX thickness matters.';
+    c += ' <i>Averaged-index model: the grating index is taken as the fill-factor average of the 220 nm and 150 nm slab indices. A full simulation of a real 70 nm-etch coupler puts the period nearer 630 nm (Lab 6). Peak efficiency is not modelled (Section 15.7).</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

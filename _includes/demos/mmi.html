@@ -1,0 +1,89 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdMmi" role="group" aria-label="Interactive demo: self-imaging in a multimode interference coupler">
+  <div class="bd-head"><span>// try it · MMI self-imaging (2D effective-index model)</span>
+    <span class="bd-seg" role="group" aria-label="Snap the length to an image"><button type="button" data-snap="0" aria-pressed="true">free length</button><button type="button" data-snap="1" aria-pressed="false">1 × 2 (3L<sub>π</sub>/8)</button><button type="button" data-snap="2" aria-pressed="false">2 × 2 (3L<sub>π</sub>/2)</button><button type="button" data-snap="3" aria-pressed="false">single image (3L<sub>π</sub>)</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>MMI width W <b data-v="W"></b></span><input type="range" data-k="W" min="2" max="12" step="0.05" value="6" aria-label="width"></label>
+    <label class="bd-sl"><span>MMI length L <b data-v="L"></b></span><input type="range" data-k="L" min="1" max="400" step="0.1" value="35.3" aria-label="length"></label>
+    <label class="bd-sl"><span>input offset from centre <b data-v="x0"></b></span><input type="range" data-k="x0" min="0" max="3" step="0.01" value="0" aria-label="input offset"></label>
+    <label class="bd-sl"><span>wavelength λ <b data-v="lam"></b></span><input type="range" data-k="lam" min="1.5" max="1.6" step="0.001" value="1.55" aria-label="wavelength"></label>
+  </div>
+  <div class="bd-scope tall"><canvas data-c="m" aria-hidden="true"></canvas><span class="bd-tag">intensity in the multimode section (top view, length compressed)</span></div>
+  <div class="bd-scope short"><canvas data-c="o" aria-hidden="true"></canvas><span class="bd-tag">intensity across the output end</span></div>
+  <div class="bd-read" aria-live="polite"><span>guided modes <b data-o="n">–</b></span><span>beat length L<sub>π</sub> <b data-o="lp">–</b></span><span>1 × 2 length <b data-o="l12">–</b></span><span>power in upper / lower half <b data-o="ud">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdMmi'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); }, snap = 0;
+  // effective-index model of a 220 nm Si MMI in oxide: slab index nr, cladding nc, TE
+  var nr = 2.85, nc = 1.444, win = 0.9;   // input waveguide mode ~ Gaussian with 0.9 um waist (tapered access)
+  var S = BD.bind(root, {
+    W: { fmt: function (x) { return x.toFixed(2) + ' µm'; } }, L: { fmt: function (x) { return x.toFixed(1) + ' µm'; } },
+    x0: { fmt: function (x) { return x.toFixed(2) + ' µm'; } }, lam: { fmt: function (x) { return (1000 * x).toFixed(1) + ' nm'; } }
+  }, function (k) { if (k !== 'L') applySnap(); draw(); });
+  function geom(lam) {
+    var We = S.W + (lam / Math.PI) * Math.pow(nc / nr, 2 * 0) / Math.sqrt(nr * nr - nc * nc);   // TE: sigma = 0
+    var Lp = 4 * nr * We * We / (3 * lam), N = Math.floor(2 * We * Math.sqrt(nr * nr - nc * nc) / lam);
+    return { We: We, Lp: Lp, N: Math.max(N, 1) };
+  }
+  function applySnap() {
+    if (!snap) return; var G = geom(S.lam), L = [0, 3 * G.Lp / 8, 3 * G.Lp / 2, 3 * G.Lp][snap];
+    var el = q('[data-k="L"]'); el.max = Math.max(400, Math.ceil(L * 1.05)); el.value = L; el.dispatchEvent(new Event('input'));
+  }
+  BD.seg(root, 'snap', function (v) { snap = +v; if (snap === 1) { q('[data-k="x0"]').value = 0; q('[data-k="x0"]').dispatchEvent(new Event('input')); } applySnap(); draw(); });
+  // modes of the ideal multimode section: sin((nu+1) pi x / We), x in [0, We]; beta_nu = k nr - (nu+1)^2 pi lam / (4 nr We^2)
+  function fieldAt(z, coef, G, lam, xs) {
+    var re = new Float64Array(xs.length), im = new Float64Array(xs.length);
+    for (var v = 0; v < coef.length; v++) {
+      var dph = (v + 1) * (v + 1) * Math.PI * lam / (4 * nr * G.We * G.We) * z, cr = coef[v] * Math.cos(dph), ci = coef[v] * Math.sin(dph);
+      for (var i = 0; i < xs.length; i++) { var s = Math.sin((v + 1) * Math.PI * xs[i] / G.We); re[i] += cr * s; im[i] += ci * s; }
+    }
+    var I = new Float64Array(xs.length); for (i = 0; i < xs.length; i++) I[i] = re[i] * re[i] + im[i] * im[i];
+    return I;
+  }
+  function draw() {
+    var lam = S.lam, G = geom(lam), L = S.L, nx = 160, xs = [];
+    for (var i = 0; i < nx; i++) xs.push(G.We * (i + 0.5) / nx);
+    var xc = G.We / 2 + S.x0, coef = [];
+    for (var v = 0; v < G.N; v++) {           // overlap of the input Gaussian with each mode
+      var c = 0; for (i = 0; i < nx; i++) c += Math.exp(-Math.pow((xs[i] - xc) / win, 2)) * Math.sin((v + 1) * Math.PI * xs[i] / G.We);
+      coef.push(c * 2 / nx);
+    }
+    // ---- intensity map
+    var dv = BD.setup(q('[data-c="m"]')), g = dv.g, padL = 8, padR = 8, padT = 22, padB = 8, wpx = dv.w - padL - padR, hpx = dv.h - padT - padB;
+    var cols = Math.min(320, Math.floor(wpx / 2)), img = g.createImageData(cols, nx), maxI = 0, cache = [];
+    for (var cI = 0; cI < cols; cI++) { var I = fieldAt(L * (cI + 0.5) / cols, coef, G, lam, xs); cache.push(I); for (i = 0; i < nx; i++) maxI = Math.max(maxI, I[i]); }
+    for (cI = 0; cI < cols; cI++) for (i = 0; i < nx; i++) {
+      var t = Math.pow(cache[cI][i] / maxI, 0.6), p = 4 * ((nx - 1 - i) * cols + cI);
+      img.data[p] = 20 + 235 * Math.min(1, t * 1.3); img.data[p + 1] = 30 + 180 * t; img.data[p + 2] = 60 + 60 * t; img.data[p + 3] = 255;
+    }
+    var off = document.createElement('canvas'); off.width = cols; off.height = nx; off.getContext('2d').putImageData(img, 0, 0);
+    g.imageSmoothingEnabled = true; g.drawImage(off, padL, padT, wpx, hpx);
+    g.strokeStyle = BD.C.axis; g.strokeRect(padL, padT, wpx, hpx);
+    // guide marks at the 1x2 output positions (+-We/4)
+    g.fillStyle = BD.C.dim; g.fillText('input', padL + 4, padT + hpx * (1 - xc / G.We) - 6);
+    [[3 / 8, '3Lπ/8'], [3 / 4, '3Lπ/4'], [3 / 2, '3Lπ/2'], [3, '3Lπ']].forEach(function (m) {
+      var zz = m[0] * G.Lp; if (zz <= L) { var X = padL + wpx * zz / L; g.strokeStyle = 'rgba(255,255,255,.35)'; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(X, padT); g.lineTo(X, padT + hpx); g.stroke(); g.setLineDash([]); g.fillStyle = BD.C.dim; g.fillText(m[1], X + 3, padT + 10); }
+    });
+    // ---- output cross-section
+    var Iout = cache[cols - 1], xo = xs.map(function (x) { return x - G.We / 2; }), Io = Array.prototype.map.call(Iout, function (v) { return v / maxI; });
+    var d2 = BD.setup(q('[data-c="o"]')), f2 = BD.frame(d2, { x: [-G.We / 2, G.We / 2], y: [0, 1.05], pad: { l: 30, b: 22 },
+      xt: [[-G.We / 4, '−W/4'], [0, '0'], [G.We / 4, 'W/4']], yt: [[0, '0'], [1, 'max']] });
+    BD.line(f2, xo, Io, BD.C.gold, 2);
+    var up = 0, dn = 0; Iout.forEach(function (v, k) { if (xs[k] > G.We / 2) up += v; else dn += v; });
+    // ---- readouts
+    q('[data-o="n"]').textContent = G.N;
+    q('[data-o="lp"]').textContent = G.Lp.toFixed(1) + ' µm';
+    q('[data-o="l12"]').textContent = (3 * G.Lp / 8).toFixed(1) + ' µm';
+    q('[data-o="ud"]').textContent = (100 * up / (up + dn)).toFixed(0) + ' / ' + (100 * dn / (up + dn)).toFixed(0) + ' %';
+    var cap = 'The input excites many modes of the wide section; because their propagation constants are spaced quadratically, they rephase at regular lengths and form images of the input. ';
+    if (S.x0 < 0.05) cap += 'A centred input excites only the even modes (the odd ones have zero overlap), so images appear four times sooner: a 1 × 2 splitter needs only 3L<sub>π</sub>/8.';
+    else cap += 'An off-centre input excites odd and even modes, and the light snakes across the guide: a mirrored image at 3L<sub>π</sub>, two-fold images at 3L<sub>π</sub>/2 — the basis of the 2 × 2 MMI.';
+    cap += ' L<sub>π</sub> grows with the square of the width, so a wide MMI is long and its images move with wavelength.';
+    q('[data-o="cap"]').innerHTML = cap;
+  }
+  BD.observe(root, draw);
+})();
+</script>

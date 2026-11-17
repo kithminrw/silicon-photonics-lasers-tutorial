@@ -1,0 +1,28 @@
+// Open-Photonics dark colour scheme ("Wafer"): cyan and amber accents and light-blue links on a
+// near-black indigo page. Compiled into assets/css/just-the-docs-wafer-dark.css, which the dark
+// mode button (_includes/header_custom.html) switches to. Component colours are in custom/custom.scss.
+$color-scheme: dark;
+$wf-night: #0a0d16;
+$wf-night-d: #070910;
+$wf-night-l: #141b28;
+$wf-text: #c3cbd9;
+$wf-heading: #e8edf6;
+$wf-link: #6cc4f2;
+$wf-muted: #939fb4;
+$wf-line: #1d2535;
+
+$body-background-color: $wf-night;
+$body-heading-color: $wf-heading;
+$body-text-color: $wf-text;
+$link-color: $wf-link;
+$nav-child-link-color: $wf-muted;
+$sidebar-color: $wf-night-d;
+$base-button-color: $wf-night-l;
+$btn-primary-color: #0b7a85;
+$code-background-color: $wf-night-d;
+$code-linenumber-color: $wf-muted;
+$feedback-color: darken($sidebar-color, 3%);
+$table-background-color: $wf-night;
+$search-background-color: $wf-night-l;
+$search-result-preview-color: $wf-muted;
+$border-color: $wf-line;

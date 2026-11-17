@@ -1,0 +1,441 @@
+[
+ {
+  "pdk": "SiEPIC EBeam PDK",
+  "platform": "220 nm SOI, 1550 nm, electron-beam lithography",
+  "pdk_url": "https://github.com/SiEPIC/SiEPIC_EBeam_PDK",
+  "via": "ubcpdk (gdsfactory)",
+  "licence": "MIT",
+  "cell": "ebeam_y_1550",
+  "title": "Y-branch splitter",
+  "designers": "Y. Zhang, S. Yang, A. E.-J. Lim, G.-Q. Lo, C. Galland, T. Baehr-Jones and M. Hochberg",
+  "refs": [
+   "zhang2013"
+  ],
+  "blurb": "A 50/50 splitter whose taper shape was optimised by particle-swarm optimisation in 3D FDTD; about 0.3 dB insertion loss.",
+  "slug": "siepic-ybranch",
+  "file": "siepic-ybranch.glb",
+  "size_um": [
+   14.8,
+   6.0
+  ],
+  "height_um": 0.22,
+  "layers": {
+   "core": {
+    "colour": "#9eb2cc",
+    "thickness_um": 0.22,
+    "zmin_um": 0.0,
+    "material": "si"
+   }
+  },
+  "kb": 93
+ },
+ {
+  "pdk": "SiEPIC EBeam PDK",
+  "platform": "220 nm SOI, 1550 nm, electron-beam lithography",
+  "pdk_url": "https://github.com/SiEPIC/SiEPIC_EBeam_PDK",
+  "via": "ubcpdk (gdsfactory)",
+  "licence": "MIT",
+  "cell": "ebeam_gc_te1550",
+  "title": "Focusing sub-wavelength grating coupler (TE, 1550 nm)",
+  "designers": "Yun Wang, Lukas Chrostowski et al. (UBC)",
+  "refs": [
+   "wang2014gc"
+  ],
+  "blurb": "A fully etched, focusing grating coupler whose teeth are sub-wavelength gratings, so a single etch gives a high efficiency and low back-reflection.",
+  "slug": "siepic-gc-te1550",
+  "file": "siepic-gc-te1550.glb",
+  "size_um": [
+   32.54,
+   20.23
+  ],
+  "height_um": 0.22,
+  "layers": {
+   "core": {
+    "colour": "#9eb2cc",
+    "thickness_um": 0.22,
+    "zmin_um": 0.0,
+    "material": "si"
+   }
+  },
+  "kb": 913
+ },
+ {
+  "pdk": "SiEPIC EBeam PDK",
+  "platform": "220 nm SOI, 1550 nm, electron-beam lithography",
+  "pdk_url": "https://github.com/SiEPIC/SiEPIC_EBeam_PDK",
+  "via": "ubcpdk (gdsfactory)",
+  "licence": "MIT",
+  "cell": "ebeam_bdc_te1550",
+  "title": "Broadband directional coupler",
+  "designers": "Zeqin Lu, Han Yun, Yun Wang, Zhitian Chen, Fan Zhang, Nicolas A. F. Jaeger and Lukas Chrostowski",
+  "refs": [
+   "lu2015bdc"
+  ],
+  "blurb": "A 3 dB coupler made of two waveguides of different widths, whose phase control flattens the split ratio over a wide band.",
+  "slug": "siepic-bdc",
+  "file": "siepic-bdc.glb",
+  "size_um": [
+   70.75,
+   5.2
+  ],
+  "height_um": 0.22,
+  "layers": {
+   "core": {
+    "colour": "#9eb2cc",
+    "thickness_um": 0.22,
+    "zmin_um": 0.0,
+    "material": "si"
+   }
+  },
+  "kb": 53
+ },
+ {
+  "pdk": "SiEPIC EBeam PDK",
+  "platform": "220 nm SOI, 1550 nm, electron-beam lithography",
+  "pdk_url": "https://github.com/SiEPIC/SiEPIC_EBeam_PDK",
+  "via": "ubcpdk (gdsfactory)",
+  "licence": "MIT",
+  "cell": "ebeam_adiabatic_te1550",
+  "title": "Adiabatic 3 dB coupler",
+  "designers": "Han Yun et al. (UBC)",
+  "refs": [
+   "yun2013adiabatic"
+  ],
+  "blurb": "A 2 × 2 splitter that converts the input mode slowly into the even or odd supermode, so its split ratio barely depends on wavelength.",
+  "slug": "siepic-adiabatic",
+  "file": "siepic-adiabatic.glb",
+  "size_um": [
+   195.8,
+   3.53
+  ],
+  "height_um": 0.22,
+  "layers": {
+   "core": {
+    "colour": "#9eb2cc",
+    "thickness_um": 0.22,
+    "zmin_um": 0.0,
+    "material": "si"
+   }
+  },
+  "kb": 35
+ },
+ {
+  "pdk": "SiEPIC EBeam PDK",
+  "platform": "220 nm SOI, 1550 nm, electron-beam lithography",
+  "pdk_url": "https://github.com/SiEPIC/SiEPIC_EBeam_PDK",
+  "via": "ubcpdk (gdsfactory)",
+  "licence": "MIT",
+  "cell": "ebeam_crossing4",
+  "title": "Waveguide crossing",
+  "designers": "Wei Shi (UBC, 2011), after P. Sanchis et al.",
+  "refs": [
+   "sanchis2009"
+  ],
+  "blurb": "Elliptical mode expanders widen the mode before the crossing so it diffracts less; under 0.2 dB loss and below −40 dB crosstalk.",
+  "slug": "siepic-crossing",
+  "file": "siepic-crossing.glb",
+  "size_um": [
+   9.6,
+   9.6
+  ],
+  "height_um": 0.22,
+  "layers": {
+   "core": {
+    "colour": "#9eb2cc",
+    "thickness_um": 0.22,
+    "zmin_um": 0.0,
+    "material": "si"
+   }
+  },
+  "kb": 7
+ },
+ {
+  "pdk": "SiEPIC EBeam PDK",
+  "platform": "220 nm SOI, 1550 nm, electron-beam lithography",
+  "pdk_url": "https://github.com/SiEPIC/SiEPIC_EBeam_PDK",
+  "via": "ubcpdk (gdsfactory)",
+  "licence": "MIT",
+  "cell": "ring_single_heater",
+  "title": "Ring resonator with a TiN heater",
+  "designers": "gdsfactory ubcpdk contributors (parametric cell)",
+  "refs": [
+   "ubcpdk",
+   "bogaerts2012"
+  ],
+  "blurb": "An all-pass ring drawn by the PDK's parametric cell, with a titanium-nitride heater above it for thermal tuning and metal routing to its pads.",
+  "slug": "siepic-ring-heater",
+  "file": "siepic-ring-heater.glb",
+  "size_um": [
+   28.0,
+   24.71
+  ],
+  "height_um": 2.5,
+  "layers": {
+   "core": {
+    "colour": "#9eb2cc",
+    "thickness_um": 0.22,
+    "zmin_um": 0.0,
+    "material": "si"
+   },
+   "heater": {
+    "colour": "#cc8c3f",
+    "thickness_um": 0.75,
+    "zmin_um": 1.1,
+    "material": "TiN"
+   },
+   "metal2": {
+    "colour": "#d3d8e0",
+    "thickness_um": 0.7,
+    "zmin_um": 1.8,
+    "material": "Aluminum"
+   }
+  },
+  "kb": 128
+ },
+ {
+  "pdk": "CORNERSTONE PDK",
+  "pdk_url": "https://github.com/gdsfactory/cspdk",
+  "via": "cspdk (gdsfactory)",
+  "licence": "MIT",
+  "platform": "220 nm SOI (strip and rib)",
+  "cell": "grating_coupler_rectangular_rib",
+  "title": "Shallow-etch grating coupler (Si 220 nm)",
+  "designers": "CORNERSTONE platform cells, gdsfactory implementation",
+  "refs": [
+   "cspdk"
+  ],
+  "blurb": "A rectangular grating partially etched into the 220 nm film, sitting on the 100 nm slab of a rib waveguide.",
+  "slug": "cs-si220-gc-rib",
+  "file": "cs-si220-gc-rib.glb",
+  "size_um": [
+   402.0,
+   20.0
+  ],
+  "height_um": 0.22,
+  "layers": {
+   "core": {
+    "colour": "#9eb2cc",
+    "thickness_um": 0.22,
+    "zmin_um": 0.0,
+    "material": "Si"
+   },
+   "grating": {
+    "colour": "#849ec1",
+    "thickness_um": 0.15,
+    "zmin_um": 0.0,
+    "material": "Si"
+   },
+   "slab": {
+    "colour": "#778ead",
+    "thickness_um": 0.1,
+    "zmin_um": 0.0,
+    "material": "Si"
+   }
+  },
+  "kb": 72
+ },
+ {
+  "pdk": "CORNERSTONE PDK",
+  "pdk_url": "https://github.com/gdsfactory/cspdk",
+  "via": "cspdk (gdsfactory)",
+  "licence": "MIT",
+  "platform": "220 nm SOI (strip and rib)",
+  "cell": "mmi2x2_rib",
+  "title": "2 × 2 MMI coupler, rib waveguides (Si 220 nm)",
+  "designers": "CORNERSTONE platform cells, gdsfactory implementation",
+  "refs": [
+   "cspdk"
+  ],
+  "blurb": "A multimode-interference coupler in rib waveguides; the 100 nm slab around the ridge is the partial etch.",
+  "slug": "cs-si220-mmi2x2-rib",
+  "file": "cs-si220-mmi2x2-rib.glb",
+  "size_um": [
+   94.8,
+   16.0
+  ],
+  "height_um": 0.22,
+  "layers": {
+   "core": {
+    "colour": "#9eb2cc",
+    "thickness_um": 0.22,
+    "zmin_um": 0.0,
+    "material": "Si"
+   },
+   "slab": {
+    "colour": "#778ead",
+    "thickness_um": 0.1,
+    "zmin_um": 0.0,
+    "material": "Si"
+   }
+  },
+  "kb": 6
+ },
+ {
+  "pdk": "CORNERSTONE PDK",
+  "pdk_url": "https://github.com/gdsfactory/cspdk",
+  "via": "cspdk (gdsfactory)",
+  "licence": "MIT",
+  "platform": "300 nm silicon nitride",
+  "cell": "mmi1x2",
+  "title": "1 × 2 MMI splitter (SiN 300 nm)",
+  "designers": "CORNERSTONE platform cells, gdsfactory implementation",
+  "refs": [
+   "cspdk"
+  ],
+  "blurb": "The same building block in 300 nm silicon nitride: the lower index contrast makes everything wider and longer.",
+  "slug": "cs-sin300-mmi1x2",
+  "file": "cs-sin300-mmi1x2.glb",
+  "size_um": [
+   164.7,
+   12.0
+  ],
+  "height_um": 0.3,
+  "layers": {
+   "nitride": {
+    "colour": "#dba84c",
+    "thickness_um": 0.3,
+    "zmin_um": 0.0,
+    "material": "SiN"
+   }
+  },
+  "kb": 3
+ },
+ {
+  "pdk": "CORNERSTONE PDK",
+  "pdk_url": "https://github.com/gdsfactory/cspdk",
+  "via": "cspdk (gdsfactory)",
+  "licence": "MIT",
+  "platform": "300 nm silicon nitride",
+  "cell": "grating_coupler_elliptical",
+  "title": "Elliptical grating coupler (SiN 300 nm)",
+  "designers": "CORNERSTONE platform cells, gdsfactory implementation",
+  "refs": [
+   "cspdk"
+  ],
+  "blurb": "A focusing grating coupler in silicon nitride.",
+  "slug": "cs-sin300-gc",
+  "file": "cs-sin300-gc.glb",
+  "size_um": [
+   61.83,
+   44.19
+  ],
+  "height_um": 0.3,
+  "layers": {
+   "nitride": {
+    "colour": "#dba84c",
+    "thickness_um": 0.3,
+    "zmin_um": 0.0,
+    "material": "SiN"
+   }
+  },
+  "kb": 169
+ },
+ {
+  "pdk": "Luxtelligence LNOI400 PDK",
+  "pdk_url": "https://github.com/Luxtelligence/lxt_pdk_gf",
+  "via": "lnoi400 (gdsfactory)",
+  "licence": "MIT",
+  "platform": "thin-film lithium niobate on insulator (LNOI)",
+  "cell": "directional_coupler_balanced",
+  "title": "Directional coupler (TFLN)",
+  "designers": "Luxtelligence PDK cells, gdsfactory implementation",
+  "refs": [
+   "lxtpdk"
+  ],
+  "blurb": "Two lithium niobate ridge waveguides brought close together over a shared 200 nm slab.",
+  "slug": "lxt-dc",
+  "file": "lxt-dc.glb",
+  "size_um": [
+   132.92,
+   40.6
+  ],
+  "height_um": 0.4,
+  "layers": {
+   "slab": {
+    "colour": "#ed8c9e",
+    "thickness_um": 0.2,
+    "zmin_um": 0.0,
+    "material": "ln"
+   },
+   "ridge": {
+    "colour": "#ed8c9e",
+    "thickness_um": 0.2,
+    "zmin_um": 0.2,
+    "material": "ln"
+   }
+  },
+  "kb": 118
+ },
+ {
+  "pdk": "Luxtelligence LNOI400 PDK",
+  "pdk_url": "https://github.com/Luxtelligence/lxt_pdk_gf",
+  "via": "lnoi400 (gdsfactory)",
+  "licence": "MIT",
+  "platform": "thin-film lithium niobate on insulator (LNOI)",
+  "cell": "mmi2x2_optimized1550",
+  "title": "2 × 2 MMI coupler (TFLN)",
+  "designers": "Luxtelligence PDK cells, gdsfactory implementation",
+  "refs": [
+   "lxtpdk"
+  ],
+  "blurb": "A multimode-interference coupler etched halfway into a 400 nm lithium niobate film, so the ridge sits on a 200 nm slab.",
+  "slug": "lxt-mmi2x2",
+  "file": "lxt-mmi2x2.glb",
+  "size_um": [
+   126.5,
+   13.5
+  ],
+  "height_um": 0.4,
+  "layers": {
+   "slab": {
+    "colour": "#ed8c9e",
+    "thickness_um": 0.2,
+    "zmin_um": 0.0,
+    "material": "ln"
+   },
+   "ridge": {
+    "colour": "#ed8c9e",
+    "thickness_um": 0.2,
+    "zmin_um": 0.2,
+    "material": "ln"
+   }
+  },
+  "kb": 5
+ },
+ {
+  "pdk": "Luxtelligence LNOI400 PDK",
+  "pdk_url": "https://github.com/Luxtelligence/lxt_pdk_gf",
+  "via": "lnoi400 (gdsfactory)",
+  "licence": "MIT",
+  "platform": "thin-film lithium niobate on insulator (LNOI)",
+  "cell": "gc_focusing_1550",
+  "title": "Focusing grating coupler (TFLN)",
+  "designers": "Luxtelligence PDK cells, gdsfactory implementation",
+  "refs": [
+   "lxtpdk"
+  ],
+  "blurb": "A focusing grating coupler in thin-film lithium niobate.",
+  "slug": "lxt-gc",
+  "file": "lxt-gc.glb",
+  "size_um": [
+   88.06,
+   66.11
+  ],
+  "height_um": 0.4,
+  "layers": {
+   "slab": {
+    "colour": "#ed8c9e",
+    "thickness_um": 0.2,
+    "zmin_um": 0.0,
+    "material": "ln"
+   },
+   "ridge": {
+    "colour": "#ed8c9e",
+    "thickness_um": 0.2,
+    "zmin_um": 0.2,
+    "material": "ln"
+   }
+  },
+  "kb": 305
+ }
+]

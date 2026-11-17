@@ -1,0 +1,145 @@
+# References, numbered in this order. Cite with {% include cite.html keys="key1,key2" %}.
+# Add new entries at the end so existing numbers do not change.
+# Only cite works; never copy their text or figures. Open-access and open-source items are marked.
+
+# ---- textbooks
+- key: chrostowski2015
+  text: "Lukas Chrostowski and Michael Hochberg. *Silicon Photonics Design: From Devices to Systems*. Cambridge University Press, 2015. <https://www.cambridge.org/core/books/silicon-photonics-design/BF3CF13E8542BCE67FD2BBC7104ECEAB>"
+- key: salehteich
+  text: "Bahaa E. A. Saleh and Malvin C. Teich. *Fundamentals of Photonics*, 3rd edition. Wiley, 2019."
+- key: okamoto
+  text: "Katsunari Okamoto. *Fundamentals of Optical Waveguides*, 3rd edition. Academic Press, 2021."
+- key: coldren
+  text: "Larry A. Coldren, Scott W. Corzine and Milan L. Mašanović. *Diode Lasers and Photonic Integrated Circuits*, 2nd edition. Wiley, 2012."
+- key: siegman
+  text: "Anthony E. Siegman. *Lasers*. University Science Books, 1986."
+- key: yariv
+  text: "Amnon Yariv and Pochi Yeh. *Photonics: Optical Electronics in Modern Communications*, 6th edition. Oxford University Press, 2007."
+- key: reedbook
+  text: "Graham T. Reed and Andrew P. Knights. *Silicon Photonics: An Introduction*. Wiley, 2004."
+- key: snyderlove
+  text: "Allan W. Snyder and John D. Love. *Optical Waveguide Theory*. Chapman and Hall, 1983."
+
+# ---- courses and open teaching material
+- key: phot1x
+  text: "Lukas Chrostowski et al. *Silicon Photonics Design, Fabrication and Data Analysis* (UBCx Phot1x), online course on edX. <https://www.edx.org/learn/engineering/university-of-british-columbia-silicon-photonics-design-fabrication-and-data-ana>"
+- key: aimacademy
+  text: "AIM Photonics Academy. *Online courses* and the *Integrated Photonics Simulation Library*. <https://www.aimphotonics.com/online-courses>"
+- key: vmlab
+  text: "MIT Virtual Manufacturing Lab and AIM Photonics Academy. *Integrated photonics simulations and learning games* (ETOP 2023 workshop). Simulation library: <https://www.aimphotonics.com/simulation-library>"
+- key: elec413
+  text: "SiEPIC program, University of British Columbia. *UBC ELEC 413 Semiconductor Lasers: design submissions and measurement data* (MIT licence). <https://github.com/SiEPIC/UBC-ELEC413-2025Fall>"
+- key: mustafash
+  text: "Mustafa Hammood. *Browser tools for photonics: waveguide mode solver, ring resonator designer, Poincaré sphere*. <https://mustafa.sh/>"
+
+# ---- open PDKs and design tools
+- key: openebl
+  text: "Mustafa Hammood, Sudip Shekhar and Lukas Chrostowski. “SiEPIC openEBL: remote silicon photonic design-fabrication-testing enabled by open-source process design kits and design tools.” *2025 IEEE Conference on Education and Training in Optics and Photonics (ETOP)*, Glasgow, 2025. doi:10.1109/ETOP64842.2025.11030682"
+- key: ebeampdk
+  text: "Lukas Chrostowski and contributors. *SiEPIC EBeam PDK & Library, for SiEPIC-Tools and KLayout* (MIT licence). <https://github.com/SiEPIC/SiEPIC_EBeam_PDK>"
+- key: siepictools
+  text: "Lukas Chrostowski and contributors. *SiEPIC-Tools: integrated optics functionality for KLayout* (MIT licence). <https://github.com/SiEPIC/SiEPIC-Tools>"
+- key: gdsfactory
+  text: "Joaquin Matres et al. *gdsfactory: a Python library for designing chips (photonics, analog, quantum, MEMS)* (MIT licence). <https://github.com/gdsfactory/gdsfactory>"
+- key: ubcpdk
+  text: "gdsfactory contributors. *ubcpdk: the SiEPIC EBeam PDK for gdsfactory* (MIT licence). <https://github.com/gdsfactory/ubc>"
+- key: cspdk
+  text: "gdsfactory contributors. *cspdk: the CORNERSTONE photonics PDK for gdsfactory* (MIT licence). <https://github.com/gdsfactory/cspdk>"
+- key: vttpdk
+  text: "gdsfactory contributors. *Open-source photonics PDK for VTT's 3 µm SOI platform* (MIT licence). <https://github.com/gdsfactory/vtt>"
+- key: lxtpdk
+  text: "Luxtelligence and gdsfactory contributors. *lxt_pdk_gf: gdsfactory implementation of the Luxtelligence thin-film lithium niobate PDK* (MIT licence). <https://github.com/gdsfactory/lxt_pdk_gf>"
+- key: klayout
+  text: "Matthias Köfferlein. *KLayout: a high-performance layout viewer and editor*. <https://www.klayout.de>"
+- key: sax
+  text: "Floris Laporte et al. *SAX: S-parameter based frequency-domain circuit simulations and optimisation with JAX* (Apache-2.0). <https://github.com/flaport/sax>"
+- key: meep
+  text: "Ardavan F. Oskooi, David Roundy, Mihai Ibanescu, Peter Bermel, J. D. Joannopoulos and Steven G. Johnson. “MEEP: a flexible free-software package for electromagnetic simulations by the FDTD method.” *Computer Physics Communications*, 181(3):687–702, 2010."
+- key: siepiclab
+  text: "SiEPIC program. *SiEPIClab: Python code for automated silicon photonics probe stations*. <https://github.com/SiEPIC/SiEPIClab>"
+- key: shuksan
+  text: "SiEPIC program. *SiEPICfab Shuksan PDK: the SiEPICfab laser-integration MPW run* (MIT licence). <https://github.com/SiEPIC/SiEPICfab_Shuksan_PDK>"
+- key: modelviewer
+  text: "Google. *&lt;model-viewer&gt;: a web component for interactive 3D models* (Apache-2.0). <https://modelviewer.dev>"
+
+# ---- reviews and roadmaps (open access where noted)
+- key: shekhar2024
+  text: "Sudip Shekhar, Wim Bogaerts, Lukas Chrostowski, John E. Bowers, Michael Hochberg, Richard Soref and Bhavin J. Shastri. “Roadmapping the next generation of silicon photonics.” *Nature Communications*, 15:751, 2024. Open access."
+- key: siew2021
+  text: "Shawn Yohanes Siew et al. “Review of silicon photonics technology and platform development.” *Journal of Lightwave Technology*, 39(13):4374–4389, 2021. Open access."
+- key: hochberg2013
+  text: "Michael Hochberg, Nicholas C. Harris, Ran Ding et al. “Silicon photonics: the next fabless semiconductor industry.” *IEEE Solid-State Circuits Magazine*, 5(1):48–58, 2013."
+- key: blumenthal2018
+  text: "Daniel J. Blumenthal, René Heideman, Douwe Geuzebroek, Arne Leinse and Chris Roeloffzen. “Silicon nitride in silicon photonics.” *Proceedings of the IEEE*, 106(12):2209–2231, 2018. Open access."
+- key: zhu2021
+  text: "Di Zhu et al. “Integrated photonics on thin-film lithium niobate.” *Advances in Optics and Photonics*, 13(2):242–352, 2021."
+- key: abel2019
+  text: "Stefan Abel et al. “Large Pockels effect in micro- and nanostructured barium titanate integrated on silicon.” *Nature Materials*, 18:42–47, 2019."
+- key: komljenovic2016
+  text: "Tin Komljenovic et al. “Heterogeneous silicon photonic integrated circuits.” *Journal of Lightwave Technology*, 34(1):20–35, 2016."
+- key: bogaerts2012
+  text: "Wim Bogaerts et al. “Silicon microring resonators.” *Laser & Photonics Reviews*, 6(1):47–73, 2012."
+- key: reed2010
+  text: "Graham T. Reed, Goran Mashanovich, Frederic Y. Gardes and David J. Thomson. “Silicon optical modulators.” *Nature Photonics*, 4:518–526, 2010."
+- key: michel2010
+  text: "Jurgen Michel, Jifeng Liu and Lionel C. Kimerling. “High-performance Ge-on-Si photodetectors.” *Nature Photonics*, 4:527–534, 2010."
+- key: liang2010
+  text: "Di Liang and John E. Bowers. “Recent progress in lasers on silicon.” *Nature Photonics*, 4:511–517, 2010."
+- key: zhou2015
+  text: "Zhiping Zhou, Bing Yin and Jurgen Michel. “On-chip light sources for silicon photonics.” *Light: Science & Applications*, 4:e358, 2015. Open access."
+
+# ---- classic papers behind specific chapters
+- key: soref1987
+  text: "Richard A. Soref and Brian R. Bennett. “Electrooptical effects in silicon.” *IEEE Journal of Quantum Electronics*, 23(1):123–129, 1987."
+- key: kogelnik1966
+  text: "Herwig Kogelnik and Tingye Li. “Laser beams and resonators.” *Applied Optics*, 5(10):1550–1567, 1966."
+- key: soldano1995
+  text: "Lucas B. Soldano and Erik C. M. Pennings. “Optical multi-mode interference devices based on self-imaging: principles and applications.” *Journal of Lightwave Technology*, 13(4):615–627, 1995."
+- key: payne1994
+  text: "F. P. Payne and J. P. R. Lacey. “A theoretical analysis of scattering loss from planar optical waveguides.” *Optical and Quantum Electronics*, 26:977–986, 1994."
+- key: henry1982
+  text: "Charles H. Henry. “Theory of the linewidth of semiconductor lasers.” *IEEE Journal of Quantum Electronics*, 18(2):259–264, 1982."
+- key: yariv1973
+  text: "Amnon Yariv. “Coupled-mode theory for guided-wave optics.” *IEEE Journal of Quantum Electronics*, 9(9):919–933, 1973."
+- key: zhang2013
+  text: "Yi Zhang, Shuyu Yang, Andy Eu-Jin Lim, Guo-Qiang Lo, Christophe Galland, Tom Baehr-Jones and Michael Hochberg. “A compact and low loss Y-junction for submicron silicon waveguide.” *Optics Express*, 21(1):1310–1316, 2013. Open access."
+- key: lindenmann2012
+  text: "Nicole Lindenmann et al. “Photonic wire bonding: a novel concept for chip-scale interconnects.” *Optics Express*, 20(16):17667–17677, 2012. Open access."
+- key: shi2012
+  text: "Wei Shi, Ting Kai Chang, Han Yun, Wen Zhang, Yun Wang, Nicolas A. F. Jaeger and Lukas Chrostowski. “Differential measurement of transmission losses of integrated optical components using waveguide ring resonators.” *Proc. SPIE 8412, Photonics North*, 2012."
+- key: wang2018tfln
+  text: "Cheng Wang et al. “Integrated lithium niobate electro-optic modulators operating at CMOS-compatible voltages.” *Nature*, 562:101–104, 2018."
+- key: xiang2021
+  text: "Chao Xiang et al. “High-performance lasers for fully integrated silicon nitride photonics.” *Nature Communications*, 12:6650, 2021. Open access."
+
+# ---- papers behind the PDK devices in the 3D gallery
+- key: wang2014gc
+  text: "Yun Wang, Xu Wang, Jonas Flueckiger, Han Yun, Wei Shi, Richard Bojko, Nicolas A. F. Jaeger and Lukas Chrostowski. “Focusing sub-wavelength grating couplers with low back reflections for rapid prototyping of silicon photonic circuits.” *Optics Express*, 22(17):20652–20662, 2014. Open access."
+- key: lu2015bdc
+  text: "Zeqin Lu, Han Yun, Yun Wang, Zhitian Chen, Fan Zhang, Nicolas A. F. Jaeger and Lukas Chrostowski. “Broadband silicon photonic directional coupler using asymmetric-waveguide based phase control.” *Optics Express*, 23(3):3795–3808, 2015. Open access."
+- key: yun2013adiabatic
+  text: "Han Yun, Wei Shi, Yun Wang, Lukas Chrostowski and Nicolas A. F. Jaeger. “2×2 adiabatic 3-dB coupler on silicon-on-insulator rib waveguides.” *Proc. SPIE 8915, Photonics North*, 89150V, 2013."
+- key: sanchis2009
+  text: "Pablo Sanchis, Pieter Dumon, Wim Bogaerts, Dries Van Thourhout, Roel Baets et al. “Highly efficient crossing structure for silicon-on-insulator waveguides.” *Optics Letters*, 34(18):2760–2762, 2009."
+
+# ---- added with the Part I chapters
+- key: sun2015
+  text: "Chen Sun et al. “Single-chip microprocessor that communicates directly using light.” *Nature*, 528:534–538, 2015."
+- key: itug694
+  text: "ITU-T. *Recommendation G.694.1: Spectral grids for WDM applications: DWDM frequency grid*. International Telecommunication Union."
+- key: itug652
+  text: "ITU-T. *Recommendation G.652: Characteristics of a single-mode optical fibre and cable*. International Telecommunication Union."
+- key: malitson1965
+  text: "I. H. Malitson. “Interspecimen comparison of the refractive index of fused silica.” *Journal of the Optical Society of America*, 55(10):1205–1209, 1965."
+- key: li1980
+  text: "H. H. Li. “Refractive index of silicon and germanium and its wavelength and temperature derivatives.” *Journal of Physical and Chemical Reference Data*, 9(3):561–658, 1980."
+- key: luke2015
+  text: "Kevin Luke, Yoshitomo Okawachi, Michael R. E. Lamont, Alexander L. Gaeta and Michal Lipson. “Broadband mid-infrared frequency comb generation in a Si₃N₄ microresonator.” *Optics Letters*, 40(21):4823–4826, 2015."
+- key: zelmon1997
+  text: "David E. Zelmon, David L. Small and Dieter Jundt. “Infrared corrected Sellmeier coefficients for congruently grown lithium niobate and 5 mol.% magnesium oxide-doped lithium niobate.” *Journal of the Optical Society of America B*, 14(12):3319–3322, 1997."
+- key: marcuse1977
+  text: "Dietrich Marcuse. “Loss analysis of single-mode fiber splices.” *Bell System Technical Journal*, 56(5):703–718, 1977."
+- key: gloge1971
+  text: "D. Gloge. “Weakly guiding fibers.” *Applied Optics*, 10(10):2252–2258, 1971."
+- key: abramowitz
+  text: "Milton Abramowitz and Irene A. Stegun, eds. *Handbook of Mathematical Functions*. National Bureau of Standards, 1964."

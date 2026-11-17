@@ -1,0 +1,56 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdPacket" role="group" aria-label="Interactive demo: phase and group velocity of a wave packet">
+  <div class="bd-head"><span>// try it · phase velocity and group velocity</span>
+    <span class="bd-controls" style="margin:0"><button type="button" class="bd-toggle" data-act="run" aria-pressed="true">running</button><button type="button" class="bd-btn" data-act="reset">restart</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>phase index n <b data-v="n"></b></span><input type="range" data-k="n" min="1" max="4" step="0.01" value="2.44" aria-label="phase index"></label>
+    <label class="bd-sl"><span>group index n<sub>g</sub> <b data-v="ng"></b></span><input type="range" data-k="ng" min="1" max="5" step="0.01" value="4.2" aria-label="group index"></label>
+    <label class="bd-sl"><span>group-velocity dispersion (spreading) <b data-v="gvd"></b></span><input type="range" data-k="gvd" min="0" max="1" step="0.01" value="0" aria-label="dispersion"></label>
+  </div>
+  <div class="bd-scope tall"><canvas data-c="p" aria-hidden="true"></canvas><span class="bd-tag">field along the waveguide (distance in wavelengths of vacuum light)</span></div>
+  <div class="bd-read" aria-live="polite"><span>v<sub>p</sub> = c/n <b data-o="vp">–</b></span><span>v<sub>g</sub> = c/n<sub>g</sub> <b data-o="vg">–</b></span><span>delay of 1 cm <b data-o="t">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdPacket'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); }, t = 0, run = true, last = 0, X = 60;
+  var S = BD.bind(root, { n: { fmt: function (x) { return x.toFixed(2); } }, ng: { fmt: function (x) { return x.toFixed(2); } }, gvd: { fmt: function (x) { return x.toFixed(2); } } },
+    function () { draw(); });
+  BD.toggle(q('[data-act="run"]'), function (on) { run = on; q('[data-act="run"]').textContent = on ? 'running' : 'paused'; if (on) { last = 0; requestAnimationFrame(tick); } });
+  q('[data-act="reset"]').addEventListener('click', function () { t = 0; draw(); });
+  function draw() {
+    // units: vacuum wavelength = 1, c = 1. Envelope starts at x = 8 with rms width 3; time advances so the envelope crosses in ~10 s
+    var vp = 1 / S.n, vg = 1 / S.ng, k = 2 * Math.PI * S.n, s0 = 3, sig = s0 * Math.sqrt(1 + Math.pow(S.gvd * 6 * t / (s0 * s0), 2)), amp = Math.sqrt(s0 / sig);
+    var xc = 8 + vg * t, xcrest = 8 + vp * t;
+    var dv = BD.setup(q('[data-c="p"]')), f = BD.frame(dv, { x: [0, X], y: [-1.15, 1.15], pad: { l: 26, b: 22 }, xt: [[0, '0'], [20, '20'], [40, '40'], [60, '60 λ₀']], yt: [[0, '0']] });
+    var xs = [], ys = [], env = [], envn = [];
+    for (var i = 0; i <= 1600; i++) {
+      var x = X * i / 1600, e = amp * Math.exp(-Math.pow(x - xc, 2) / (2 * sig * sig));
+      xs.push(x); env.push(e); envn.push(-e); ys.push(e * Math.cos(k * (x - xcrest)));
+    }
+    BD.line(f, xs, env, 'rgba(224,184,90,.6)', 1.2, [4, 3]); BD.line(f, xs, envn, 'rgba(224,184,90,.6)', 1.2, [4, 3]);
+    BD.line(f, xs, ys, BD.C.blue, 1.5);
+    // mark one crest (moves at vp, wraps inside the packet) and the envelope peak (moves at vg)
+    var lam = 1 / S.n, off = ((xcrest - xc) % lam + lam) % lam, xcr = xc + off - (off > lam / 2 ? lam : 0);
+    BD.dot(f, xc, 0, BD.C.gold, 4);
+    if (xcr > 0 && xcr < X) BD.dot(f, xcr, amp * Math.exp(-Math.pow(xcr - xc, 2) / (2 * sig * sig)), BD.C.red, 4);
+    dv.g.fillStyle = BD.C.gold; dv.g.fillText('● envelope (v_g)', f.p.l + 6, f.p.t + 12); dv.g.fillStyle = BD.C.red; dv.g.fillText('● one crest (v_p)', f.p.l + 120, f.p.t + 12);
+    q('[data-o="vp"]').textContent = (vp).toFixed(3) + ' c';
+    q('[data-o="vg"]').textContent = (vg).toFixed(3) + ' c';
+    q('[data-o="t"]').textContent = (S.ng * 0.01 / 3e8 * 1e12).toFixed(0) + ' ps';
+    var c = 'The crests travel at the phase velocity c/n, the envelope (and the energy and information) at the group velocity c/n<sub>g</sub>. ';
+    if (S.ng > S.n + 0.05) c += 'Here n<sub>g</sub> > n, so the crests run forward through the packet, appearing at its tail and vanishing at its head. This is the normal case in silicon waveguides, where n ≈ 2.4 but n<sub>g</sub> ≈ 4.2.';
+    else if (S.ng < S.n - 0.05) c += 'With n<sub>g</sub> < n the crests slip backwards through the envelope.';
+    else c += 'With n<sub>g</sub> = n there is no dispersion and the crests ride with the envelope.';
+    if (S.gvd > 0.05) c += ' Group-velocity dispersion makes different frequencies travel at different speeds, so the packet spreads and its peak drops.';
+    q('[data-o="cap"]').innerHTML = c;
+    if (xc - 3 * sig > X) t = 0;
+  }
+  function tick(ts) { if (!run) return; if (last) t += Math.min(0.05, (ts - last) / 1000) * 3; last = ts; draw(); requestAnimationFrame(tick); }
+  BD.observe(root, draw);
+  // animate only while visible
+  if (window.IntersectionObserver) new IntersectionObserver(function (es) { es.forEach(function (e) { var was = run; if (!e.isIntersecting) run = false; else if (q('[data-act="run"]').getAttribute('aria-pressed') === 'true') { run = true; if (!was) { last = 0; requestAnimationFrame(tick); } } }); }).observe(root);
+  requestAnimationFrame(tick);
+})();
+</script>

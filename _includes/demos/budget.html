@@ -1,0 +1,63 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdBudget" role="group" aria-label="Interactive demo: optical power budget of the reference link, one wavelength">
+  <div class="bd-head"><span>// try it · power budget of one wavelength of the reference link</span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>laser power in the waveguide <b data-v="pl"></b></span><input type="range" data-k="pl" min="-3" max="15" step="0.5" value="10" aria-label="laser power"></label>
+    <label class="bd-sl"><span>ring modulator insertion loss <b data-v="mod"></b></span><input type="range" data-k="mod" min="0" max="8" step="0.1" value="3" aria-label="modulator loss"></label>
+    <label class="bd-sl"><span>other rings + routing (TX) <b data-v="rt"></b></span><input type="range" data-k="rt" min="0" max="4" step="0.1" value="0.8" aria-label="transmitter routing loss"></label>
+    <label class="bd-sl"><span>fibre coupler loss (each) <b data-v="gc"></b></span><input type="range" data-k="gc" min="0.5" max="8" step="0.1" value="3" aria-label="coupler loss"></label>
+    <label class="bd-sl"><span>fibre length (0.2 dB/km + 2 × 0.5 dB connectors) <b data-v="km"></b></span><input type="range" data-k="km" min="0" max="20" step="0.1" value="2" aria-label="fibre length"></label>
+    <label class="bd-sl"><span>demux ring + routing (RX) <b data-v="dx"></b></span><input type="range" data-k="dx" min="0" max="5" step="0.1" value="1.5" aria-label="receiver routing loss"></label>
+    <label class="bd-sl"><span>receiver sensitivity (average power) <b data-v="sens"></b></span><input type="range" data-k="sens" min="-20" max="-4" step="0.5" value="-12" aria-label="sensitivity"></label>
+    <label class="bd-sl"><span>laser wall-plug efficiency <b data-v="wpe"></b></span><input type="range" data-k="wpe" min="0.05" max="0.4" step="0.01" value="0.15" aria-label="wall plug efficiency"></label>
+  </div>
+  <div class="bd-scope tall"><canvas data-c="w" aria-hidden="true"></canvas><span class="bd-tag">optical power after each block (dBm)</span></div>
+  <div class="bd-read" aria-live="polite"><span>total loss <b data-o="loss">–</b></span><span>received <b data-o="rx">–</b></span><span>margin <b data-o="m">–</b></span><span>laser electrical power <b data-o="pe">–</b></span><span>laser energy per bit (50 Gb/s) <b data-o="eb">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdBudget'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); }, db = function (x) { return x.toFixed(1) + ' dB'; };
+  var S = BD.bind(root, {
+    pl: { fmt: function (x) { return x.toFixed(1) + ' dBm (' + Math.pow(10, x / 10).toFixed(1) + ' mW)'; } },
+    mod: { fmt: db }, rt: { fmt: db }, gc: { fmt: db }, km: { fmt: function (x) { return x.toFixed(1) + ' km'; } }, dx: { fmt: db },
+    sens: { fmt: function (x) { return x.toFixed(1) + ' dBm'; } }, wpe: { fmt: function (x) { return (100 * x).toFixed(0) + ' %'; } }
+  }, function () { draw(); });
+  function draw() {
+    var steps = [['laser', 0], ['modulator', -S.mod], ['rings + routing', -S.rt], ['TX coupler', -S.gc], ['fibre', -(0.2 * S.km + 1.0)],
+                 ['RX coupler', -S.gc], ['demux', -S.dx]];
+    var lev = [], p = S.pl; steps.forEach(function (s) { p += s[1]; lev.push(p); });
+    var rx = lev[lev.length - 1], margin = rx - S.sens, loss = S.pl - rx;
+    var ymin = Math.min(S.sens - 3, rx - 3, -20), ymax = Math.max(S.pl + 2, 0);
+    var d = BD.setup(q('[data-c="w"]')), n = steps.length, f = BD.frame(d, { x: [-0.5, n - 0.5], y: [ymin, ymax], pad: { l: 44, b: 34 },
+      yt: [[ymin, ymin.toFixed(0)], [0, '0 dBm'], [ymax, ymax.toFixed(0)]] }), g = d.g;
+    var bw = (f.X(1) - f.X(0)) * 0.6;
+    for (var i = 0; i < n; i++) {
+      var top = i ? lev[i - 1] : lev[0], bot = lev[i], x = f.X(i);
+      if (i === 0) { g.fillStyle = BD.C.gold; g.fillRect(x - bw / 2, f.Y(lev[0]), bw, f.Y(ymin) - f.Y(lev[0])); }
+      else { g.fillStyle = 'rgba(240,138,106,.75)'; g.fillRect(x - bw / 2, f.Y(top), bw, Math.max(1, f.Y(bot) - f.Y(top)));
+             g.strokeStyle = BD.C.dim; g.setLineDash([2, 2]); g.beginPath(); g.moveTo(f.X(i - 1) + bw / 2, f.Y(top)); g.lineTo(x - bw / 2, f.Y(top)); g.stroke(); g.setLineDash([]); }
+      g.fillStyle = BD.C.axis; g.textAlign = 'center'; g.fillText(steps[i][0], x, d.h - f.p.b + 13);
+      g.fillStyle = BD.C.white; g.fillText(lev[i].toFixed(1), x, f.Y(lev[i]) + (i ? 12 : -4));
+    }
+    g.textAlign = 'left';
+    BD.hline(f, S.sens, BD.C.green, [5, 4], 'receiver sensitivity');
+    // margin bracket at the right
+    var xm = f.X(n - 1) + bw / 2 + 6; g.strokeStyle = margin >= 3 ? BD.C.green : BD.C.red; g.lineWidth = 2;
+    g.beginPath(); g.moveTo(xm, f.Y(rx)); g.lineTo(xm, f.Y(S.sens)); g.stroke(); g.lineWidth = 1;
+    var pe = Math.pow(10, S.pl / 10) / S.wpe;   // mW electrical
+    q('[data-o="loss"]').textContent = loss.toFixed(1) + ' dB';
+    q('[data-o="rx"]').textContent = rx.toFixed(1) + ' dBm';
+    var mo = q('[data-o="m"]'); mo.textContent = margin.toFixed(1) + ' dB'; mo.className = margin >= 3 ? 'ok' : 'bad';
+    q('[data-o="pe"]').textContent = pe.toFixed(1) + ' mW';
+    q('[data-o="eb"]').textContent = (pe * 1e-3 / 50e9 * 1e12).toFixed(2) + ' pJ/bit';
+    var c = 'In decibels a link budget is a subtraction: received power = laser power − the sum of every loss. ';
+    if (margin < 0) c += '<b>The link does not close</b>: the received power is below the receiver sensitivity. Cut a loss (the couplers are the usual suspects) or add laser power.';
+    else if (margin < 3) c += '<b>The margin is thin</b>: penalties from extinction ratio, crosstalk, ageing and temperature will use it up.';
+    else c += 'The link closes with ' + margin.toFixed(1) + ' dB to spare. Margin is energy: every 3 dB you give back halves the laser power, and with it the largest single term of the link\'s energy per bit.';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

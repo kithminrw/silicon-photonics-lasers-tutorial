@@ -1,0 +1,112 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdLaser" role="group" aria-label="Interactive demo: rate-equation model of a Fabry–Pérot laser">
+  <div class="bd-head"><span>// try it · Fabry–Pérot laser, InGaAsP MQW at 1550 nm</span>
+    <span class="bd-seg" role="group" aria-label="Rear facet"><button type="button" data-hr="0" aria-pressed="true">cleaved both ends</button><button type="button" data-hr="1" aria-pressed="false">HR-coated rear (90 %)</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>drive current I <b data-v="I"></b></span><input type="range" data-k="I" min="0" max="120" step="0.5" value="40" aria-label="current"></label>
+    <label class="bd-sl"><span>cavity length L <b data-v="L"></b></span><input type="range" data-k="L" min="100" max="1500" step="10" value="400" aria-label="cavity length"></label>
+    <label class="bd-sl"><span>front-facet reflectivity R<sub>1</sub> <b data-v="R"></b></span><input type="range" data-k="R" min="0.02" max="0.95" step="0.01" value="0.32" aria-label="reflectivity"></label>
+    <label class="bd-sl"><span>temperature T <b data-v="T"></b></span><input type="range" data-k="T" min="10" max="95" step="1" value="25" aria-label="temperature"></label>
+  </div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="li" aria-hidden="true"></canvas><span class="bd-tag">L–I: front-facet power against current</span></div>
+    <div class="bd-scope tall"><canvas data-c="tr" aria-hidden="true"></canvas><span class="bd-tag">switch-on: current stepped from 0 to I at t = 0</span></div>
+  </div>
+  <div class="bd-scope short"><canvas data-c="sp" aria-hidden="true"></canvas><span class="bd-tag">optical spectrum: longitudinal modes under the gain curve</span></div>
+  <div class="bd-read" aria-live="polite"><span>I<sub>th</sub> <b data-o="ith">–</b></span><span>slope <b data-o="se">–</b></span><span>η<sub>d</sub> <b data-o="ed">–</b></span><span>α<sub>m</sub> <b data-o="am">–</b></span><span>τ<sub>p</sub> <b data-o="tp">–</b></span><span>mode spacing <b data-o="dl">–</b></span><span>P at I <b data-o="p">–</b></span><span>f<sub>r</sub> <b data-o="fr">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdLaser'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); }, hr = 0;
+  // material and waveguide (illustrative textbook values; units cm, s)
+  var c = 3e10, ng = 3.6, vg = c / ng, hv = 1.2398 / 1.55 * 1.602e-19, qe = 1.602e-19;
+  var w = 2e-4, dAct = 0.05e-4, Gam = 0.06, eta_i = 0.8, alpha_i = 15, g0 = 1500, Ntr0 = 2e18, T0 = 60, eps = 2e-17, beta = 1e-4;
+  var A = 1e8, B = 1e-10, Cc = 3e-29;
+  var S = BD.bind(root, {
+    I: { fmt: function (x) { return x.toFixed(1) + ' mA'; } }, L: { fmt: function (x) { return x.toFixed(0) + ' µm'; } },
+    R: { fmt: function (x) { return (100 * x).toFixed(0) + ' %'; } }, T: { fmt: function (x) { return x.toFixed(0) + ' °C'; } }
+  }, function () { draw(); });
+  BD.seg(root, 'hr', function (v) { hr = +v; draw(); });
+  function model() {
+    var L = S.L * 1e-4, R1 = S.R, R2 = hr ? 0.9 : S.R, V = L * w * dAct;
+    var am = Math.log(1 / (R1 * R2)) / (2 * L), tp = 1 / (vg * (alpha_i + am)), Ntr = Ntr0 * Math.exp((S.T - 25) / T0);
+    var gth = (alpha_i + am) / Gam, Nth = Ntr * Math.exp(gth / g0);
+    var F1 = (1 - R1) / ((1 - R1) + Math.sqrt(R1 / R2) * (1 - R2));        // fraction of the output leaving the front facet
+    return { L: L, V: V, am: am, tp: tp, Ntr: Ntr, gth: gth, Nth: Nth, F1: F1 };
+  }
+  function Rrec(N) { return A * N + B * N * N + Cc * N * N * N; }
+  function gain(N, Sp, M) { return g0 * Math.log(Math.max(N, 1e10) / M.Ntr) / (1 + eps * Sp); }
+  function Pout(Sp, M) { return Sp * M.V / Gam * vg * M.am * hv * M.F1; }   // W from the front facet
+  function draw() {
+    var M = model(), Imax = 120e-3, Ith = qe * M.V / eta_i * Rrec(M.Nth);
+    // ---- steady-state L-I, parametric in N below its clamped value (gain compression neglected here)
+    var Is = [], Ps = [];
+    for (var k = 0; k <= 300; k++) {
+      var x = Math.pow(10, -0.2 - 7 * k / 300), N = M.Nth * (1 - x), gN = g0 * Math.log(N / M.Ntr);
+      var Sp = Gam * beta * B * N * N / (1 / M.tp - Gam * vg * gN);
+      var I = qe * M.V / eta_i * (Rrec(N) + vg * gN * Sp);
+      if (I > Imax * 1.05) break; Is.push(I * 1e3); Ps.push(Pout(Sp, M) * 1e3);
+    }
+    var pI = Ps.length > 1 ? Ps[Ps.length - 1] : 1, pmax = Math.max(pI * 1.1, 1);
+    var dv = BD.setup(q('[data-c="li"]')), f = BD.frame(dv, { x: [0, 120], y: [0, pmax], pad: { l: 42, b: 22 },
+      xt: [[0, '0'], [40, '40'], [80, '80'], [120, '120 mA']], yt: [[0, '0'], [pmax / 2, (pmax / 2).toFixed(1)], [pmax, pmax.toFixed(1) + ' mW']] });
+    BD.line(f, Is, Ps, BD.C.gold, 2); BD.vline(f, Ith * 1e3, BD.C.dim, [3, 3], 'I_th');
+    var Pnow = 0; for (k = 1; k < Is.length; k++) if (Is[k] >= S.I) { var t0 = (S.I - Is[k - 1]) / (Is[k] - Is[k - 1]); Pnow = Ps[k - 1] + t0 * (Ps[k] - Ps[k - 1]); break; }
+    if (S.I >= Is[Is.length - 1]) Pnow = Ps[Ps.length - 1];
+    BD.dot(f, S.I, Pnow, BD.C.white, 4);
+    // ---- transient (RK4), current stepped from 0 to I
+    var Iop = S.I * 1e-3, dt = 0.5e-12, tEnd = 4e-9, N0 = 1e17, S0 = 1, ts = [], Pt = [], Nt = [], Pmx = 1e-6;
+    function deriv(N, Sp) {
+      var gN = gain(N, Sp, M);
+      return [eta_i * Iop / (qe * M.V) - Rrec(N) - vg * gN * Sp, Gam * vg * gN * Sp - Sp / M.tp + Gam * beta * B * N * N];
+    }
+    var N_ = N0, S_ = S0, nsteps = Math.round(tEnd / dt);
+    for (var s = 0; s <= nsteps; s++) {
+      if (s % 8 === 0) { var Pw = Pout(S_, M) * 1e3; ts.push(s * dt * 1e9); Pt.push(Pw); Nt.push(N_ / M.Nth); Pmx = Math.max(Pmx, Pw); }
+      var k1 = deriv(N_, S_), k2 = deriv(N_ + dt / 2 * k1[0], S_ + dt / 2 * k1[1]), k3 = deriv(N_ + dt / 2 * k2[0], S_ + dt / 2 * k2[1]), k4 = deriv(N_ + dt * k3[0], S_ + dt * k3[1]);
+      N_ += dt / 6 * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]); S_ += dt / 6 * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1]); if (S_ < 0) S_ = 0;
+    }
+    var d2 = BD.setup(q('[data-c="tr"]')), f2 = BD.frame(d2, { x: [0, 4], y: [0, Pmx * 1.08], pad: { l: 42, b: 22 },
+      xt: [[0, '0'], [1, '1'], [2, '2'], [3, '3'], [4, '4 ns']], yt: [[0, '0'], [Pmx, Pmx.toFixed(1) + ' mW']] });
+    BD.line(f2, ts, Nt.map(function (v) { return v * Pmx * 0.5; }), BD.C.teal, 1.2, [4, 3]);
+    BD.line(f2, ts, Pt, BD.C.gold, 1.8);
+    d2.g.fillStyle = BD.C.teal; d2.g.fillText('carrier density (N/N_th, half scale)', f2.p.l + 6, d2.h - f2.p.b - 6);
+    // ---- spectrum: mode amplitudes from a multimode steady state around the gain peak
+    var lamP = 1.55 + 0.0005 * (S.T - 25), dlam = 1.55 * 1.55 / (2 * ng * S.L), Dg = 0.03, d3 = BD.setup(q('[data-c="sp"]'));
+    var f3 = BD.frame(d3, { x: [lamP - 0.02, lamP + 0.02], y: [-50, 2], pad: { l: 42, b: 22 },
+      xt: [[lamP - 0.02, (1000 * (lamP - 0.02)).toFixed(0)], [lamP, (1000 * lamP).toFixed(1) + ' nm'], [lamP + 0.02, (1000 * (lamP + 0.02)).toFixed(0)]], yt: [[-50, '−50'], [-25, '−25'], [0, '0 dB']] });
+    var Nop = Math.min(N_, M.Nth), gp = g0 * Math.log(Nop / M.Ntr), base = Math.max(1 / M.tp - Gam * vg * gp, 1e6), lines = [];
+    var mm = [];
+    var lam0m = Math.round((lamP - 0.0003) / dlam) * dlam;    // a cavity mode near (not exactly at) the gain peak
+    for (var j = -40; j <= 40; j++) {
+      var lm = lam0m + j * dlam; if (Math.abs(lm - lamP) > 0.02) continue;
+      var den = base + Gam * vg * gp * Math.pow((lm - lamP) / Dg, 2), Sm = Gam * beta * B * Nop * Nop / den;
+      mm.push([lm, Sm]);
+    }
+    var smax = 0; mm.forEach(function (p) { smax = Math.max(smax, p[1]); });
+    mm.forEach(function (p) { var y = 10 * Math.log10(p[1] / smax); d3.g.strokeStyle = BD.C.blue; d3.g.lineWidth = 2; d3.g.beginPath(); d3.g.moveTo(f3.X(p[0]), f3.Y(-50)); d3.g.lineTo(f3.X(p[0]), f3.Y(Math.max(y, -50))); d3.g.stroke(); });
+    d3.g.lineWidth = 1;
+    var smsr = NaN; if (mm.length > 2) { var sorted = mm.map(function (p) { return p[1]; }).sort(function (a, b) { return b - a; }); smsr = 10 * Math.log10(sorted[0] / sorted[1]); }
+    // ---- readouts
+    var se = eta_i * M.am / (alpha_i + M.am) * hv / qe * M.F1;
+    q('[data-o="ith"]').textContent = (Ith * 1e3).toFixed(1) + ' mA';
+    q('[data-o="se"]').textContent = se.toFixed(3) + ' W/A';
+    q('[data-o="ed"]').textContent = (100 * eta_i * M.am / (alpha_i + M.am)).toFixed(0) + ' %';
+    q('[data-o="am"]').textContent = M.am.toFixed(1) + ' /cm';
+    q('[data-o="tp"]').textContent = (M.tp * 1e12).toFixed(2) + ' ps';
+    q('[data-o="dl"]').textContent = (dlam * 1e3).toFixed(2) + ' nm';
+    q('[data-o="p"]').textContent = Pnow.toFixed(2) + ' mW';
+    var Sop = Pnow * 1e-3 / (M.V / Gam * vg * M.am * hv * M.F1), fr = S.I * 1e-3 > Ith ? Math.sqrt(vg * g0 / M.Nth * Sop / M.tp) / (2 * Math.PI) : NaN;
+    q('[data-o="fr"]').textContent = isFinite(fr) ? (fr / 1e9).toFixed(1) + ' GHz' : 'below threshold';
+    var cap;
+    if (S.I * 1e-3 < Ith) cap = '<b>Below threshold</b>: the gain has not reached the losses, so the output is weak spontaneous emission spread over many modes. Raise the current past ' + (Ith * 1e3).toFixed(1) + ' mA.';
+    else cap = 'Above threshold the carrier density clamps at N<sub>th</sub> and every extra electron becomes a photon, so the L–I curve turns into a straight line with slope η<sub>d</sub>hν/q. The switch-on shows a delay while the carriers build up, then relaxation oscillations at about ' + (fr / 1e9).toFixed(1) + ' GHz as photons and carriers trade energy. ';
+    cap += ' A shorter cavity or a less reflective facet raises the mirror loss: higher threshold, higher slope. Heating raises the transparency density (T<sub>0</sub> = ' + T0 + ' K here), so the threshold climbs exponentially. ';
+    if (isFinite(smsr)) cap += 'A Fabry–Pérot laser keeps several modes alive (side-mode suppression ≈ ' + smsr.toFixed(0) + ' dB here); Chapter 26 shows how gratings and rings pick one.';
+    q('[data-o="cap"]').innerHTML = cap;
+  }
+  BD.observe(root, draw);
+})();
+</script>

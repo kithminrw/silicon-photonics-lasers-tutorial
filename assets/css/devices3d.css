@@ -1,0 +1,24 @@
+/* PDK Devices in 3D (devices-3d.md): model-viewer cards in the navy demo-panel style */
+.d3-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:1rem 0 0.5rem;font:500 0.8rem "IBM Plex Mono",monospace;}
+.d3-toolbar span{color:#57647a;text-transform:uppercase;letter-spacing:.08em;font-size:.72rem;}
+.d3-toolbar button,.d3-legend button{font:inherit;font-size:.74rem;border:1px solid #c9d2e0;background:#fff;color:#172036;border-radius:30px;padding:3px 11px;cursor:pointer;}
+.d3-toolbar button[aria-pressed="true"]{background:#0b7a85;border-color:#0b7a85;color:#fff;}
+.d3-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(19rem,1fr));gap:1.1rem;margin:1rem 0 2rem;}
+.main-content figure.d3-card{margin:0;text-align:left;border:1px solid #e1e6ef;border-radius:10px;overflow:hidden;background:#fff;display:flex;flex-direction:column;}
+.d3-view{width:100%;height:260px;background:radial-gradient(120% 100% at 30% 20%,#1d3f6b 0%,#0c2340 60%,#081a30 100%);--poster-color:transparent;}
+.d3-poster{position:absolute;inset:0;margin:auto;width:fit-content;height:fit-content;font:500 .8rem "IBM Plex Mono",monospace;color:#d7e6f7;background:rgba(255,255,255,.08);border:1px solid rgba(140,190,240,.45);border-radius:30px;padding:6px 14px;cursor:pointer;}
+.main-content figure.d3-card figcaption{margin:0;padding:.7rem .85rem .85rem;max-width:none;display:flex;flex-direction:column;gap:.35rem;font-size:.86rem;}
+.d3-title{font-family:"Spectral",Georgia,serif;font-size:1.05rem;color:#172036;}
+.d3-meta{font:500 .72rem "IBM Plex Mono",monospace;color:#57647a;}
+.d3-meta code{font-size:.72rem;background:none;border:0;padding:0;}
+.d3-credit{font-size:.8rem;color:#3a4459;}
+.d3-legend{display:flex;flex-wrap:wrap;gap:5px;margin-top:.2rem;font-family:"IBM Plex Mono",monospace;}
+.d3-legend button i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:-1px;}
+.d3-legend button[aria-pressed="false"]{opacity:.45;text-decoration:line-through;}
+.d3-legend .d3-reset{margin-left:auto;border-style:dashed;}
+html[data-theme="dark"] .main-content figure.d3-card{background:#10151f;border-color:#1d2535;}
+html[data-theme="dark"] .d3-title{color:#e8edf6;}
+html[data-theme="dark"] .d3-meta,html[data-theme="dark"] .d3-toolbar span{color:#939fb4;}
+html[data-theme="dark"] .d3-credit{color:#a4afc2;}
+html[data-theme="dark"] .d3-toolbar button,html[data-theme="dark"] .d3-legend button{background:#141b28;border-color:#243149;color:#c3cbd9;}
+html[data-theme="dark"] .d3-toolbar button[aria-pressed="true"]{background:#0b7a85;border-color:#0b7a85;color:#fff;}

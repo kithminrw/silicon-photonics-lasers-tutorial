@@ -1,0 +1,25 @@
+// Open-Photonics light colour scheme ("Wafer"): deep indigo headings, waveguide-teal accents and
+// blue links on a white page. Component colours are in custom/custom.scss.
+$color-scheme: light;
+$wf-ink: #172036;
+$wf-teal: #0b7a85;
+$wf-link: #2556b8;
+$wf-text: #1a2030;
+$wf-muted: #57647a;
+$wf-line: #e1e6ef;
+$wf-soft: #f4f6fa;
+
+$body-background-color: #ffffff;
+$body-heading-color: $wf-ink;
+$body-text-color: $wf-text;
+$link-color: $wf-link;
+$nav-child-link-color: $wf-muted;
+$sidebar-color: $wf-soft;
+$base-button-color: #f7f7f7;
+$btn-primary-color: $wf-teal;
+$code-background-color: #f3f5f9;
+$feedback-color: darken($sidebar-color, 3%);
+$table-background-color: #ffffff;
+$search-background-color: #ffffff;
+$search-result-preview-color: $wf-muted;
+$border-color: $wf-line;

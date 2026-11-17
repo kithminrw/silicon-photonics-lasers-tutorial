@@ -1,0 +1,62 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdDc" role="group" aria-label="Interactive demo: power exchange in a directional coupler">
+  <div class="bd-head"><span>// try it · directional coupler (500 × 220 nm Si strips)</span>
+    <span class="bd-seg" role="group" aria-label="Polarisation"><button type="button" data-pol="TE" aria-pressed="true">TE</button><button type="button" data-pol="TM" aria-pressed="false">TM</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>gap g <b data-v="g"></b></span><input type="range" data-k="g" min="0.1" max="0.5" step="0.005" value="0.2" aria-label="gap"></label>
+    <label class="bd-sl"><span>coupling length L <b data-v="L"></b></span><input type="range" data-k="L" min="0" max="80" step="0.1" value="12.5" aria-label="length"></label>
+    <label class="bd-sl"><span>wavelength λ <b data-v="lam"></b></span><input type="range" data-k="lam" min="1.5" max="1.6" step="0.001" value="1.55" aria-label="wavelength"></label>
+  </div>
+  <div class="bd-scope tall"><canvas data-c="z" aria-hidden="true"></canvas><span class="bd-tag">power in each waveguide along the coupler</span></div>
+  <div class="bd-scope short"><canvas data-c="l" aria-hidden="true"></canvas><span class="bd-tag">cross-coupled power against wavelength</span></div>
+  <div class="bd-read" aria-live="polite"><span>Δn (even − odd) <b data-o="dn">–</b></span><span>cross-over length L<sub>x</sub> <b data-o="lx">–</b></span><span>split (cross / through) <b data-o="k">–</b></span><span>50/50 at L = <b data-o="l50">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdDc'); if (!root || !window.BD) return;
+  var pol = 'TE', q = function (s) { return root.querySelector(s); };
+  var S = BD.bind(root, {
+    g: { fmt: function (x) { return (1000 * x).toFixed(0) + ' nm'; } }, L: { fmt: function (x) { return x.toFixed(1) + ' µm'; } },
+    lam: { fmt: function (x) { return (1000 * x).toFixed(1) + ' nm'; } }
+  }, function () { draw(); });
+  BD.seg(root, 'pol', function (v) { pol = v; draw(); });
+  // Illustrative supermode model: dn = dn0 (lam/1.55)^p exp(-gamma(lam) (g - 0.2)), gamma ~ evanescent decay rate.
+  // Anchored to L_x ~ 30 um at 200 nm gap for TE; TM couples more strongly. Use a mode solver for a real design.
+  var M = { TE: { dn0: 0.0258, gam: 8.0, p: 1.6 }, TM: { dn0: 0.075, gam: 5.6, p: 1.2 } };
+  var LB = 2.5;   // extra effective coupling length contributed by the bends at each end (um)
+  function dn(g, lam) { var m = M[pol]; return m.dn0 * Math.pow(lam / 1.55, m.p) * Math.exp(-m.gam * (1.55 / lam) * (g - 0.2)); }
+  function cross(L, g, lam) { var lx = lam / (2 * dn(g, lam)); return Math.pow(Math.sin(Math.PI * (L + LB) / (2 * lx)), 2); }
+  function draw() {
+    var g = S.g, lam = S.lam, L = S.L, d = dn(g, lam), lx = lam / (2 * d), k = cross(L, g, lam);
+    // ---- along the coupler
+    var dv = BD.setup(q('[data-c="z"]')), zmax = Math.max(80, L * 1.1), f = BD.frame(dv, { x: [0, zmax], y: [-0.05, 1.05], pad: { l: 40, b: 22 },
+      xt: [[0, '0'], [zmax / 2, (zmax / 2).toFixed(0)], [zmax, zmax.toFixed(0) + ' µm']], yt: [[0, '0'], [0.5, '0.5'], [1, '1']] });
+    var zs = [], p1 = [], p2 = [];
+    for (var i = 0; i <= 400; i++) { var z = zmax * i / 400, c = Math.pow(Math.sin(Math.PI * (z + LB) / (2 * lx)), 2); zs.push(z); p1.push(1 - c); p2.push(c); }
+    var gg = dv.g; gg.fillStyle = 'rgba(127,184,240,.08)'; gg.fillRect(f.X(0), f.p.t, f.X(L) - f.X(0), dv.h - f.p.t - f.p.b);
+    BD.line(f, zs, p1, BD.C.gold, 2); BD.line(f, zs, p2, BD.C.blue, 2);
+    BD.vline(f, L, BD.C.white, [4, 3], 'end of coupler');
+    gg.fillStyle = BD.C.gold; gg.fillText('input (through) guide', f.p.l + 6, f.p.t + 12); gg.fillStyle = BD.C.blue; gg.fillText('coupled (cross) guide', f.p.l + 150, f.p.t + 12);
+    // ---- against wavelength
+    var dl = BD.setup(q('[data-c="l"]')), f2 = BD.frame(dl, { x: [1.5, 1.6], y: [0, 1], pad: { l: 40, b: 22 },
+      xt: [[1.5, '1500'], [1.55, '1550'], [1.6, '1600 nm']], yt: [[0, '0'], [0.5, '0.5'], [1, '1']] });
+    var ls = [], ks = [];
+    for (i = 0; i <= 200; i++) { var lm = 1.5 + 0.1 * i / 200; ls.push(lm); ks.push(cross(L, g, lm)); }
+    BD.line(f2, ls, ks, BD.C.blue, 2); BD.hline(f2, 0.5, BD.C.dim, [3, 3]); BD.dot(f2, lam, k, BD.C.gold, 4);
+    // ---- readouts
+    q('[data-o="dn"]').textContent = d.toFixed(4);
+    q('[data-o="lx"]').textContent = lx.toFixed(1) + ' µm';
+    q('[data-o="k"]').textContent = (100 * k).toFixed(0) + ' / ' + (100 * (1 - k)).toFixed(0) + ' %';
+    var l50 = lx / 2 - LB; q('[data-o="l50"]').textContent = l50 > 0 ? l50.toFixed(1) + ' µm' : 'shorter than the bends';
+    var slope = Math.abs(cross(L, g, lam + 0.01) - cross(L, g, lam - 0.01)) / 20;
+    var c = 'The two supermodes travel with slightly different indices, so the power beats between the guides with period 2L<sub>x</sub>, where L<sub>x</sub> = λ/(2Δn). ';
+    c += 'The coupling falls about exponentially with the gap, because it comes from the evanescent tails. ';
+    if (Math.abs(k - 0.5) < 0.05) c += 'This is a 3 dB coupler at ' + (1000 * lam).toFixed(0) + ' nm, but it drifts by about ' + (100 * slope).toFixed(1) + ' % per nm: a broadband 3 dB coupler needs the asymmetric or adiabatic designs of Section 9.5.';
+    else c += 'The bends at each end add about ' + LB + ' µm of effective coupling length, which is why a 50/50 coupler is shorter than L<sub>x</sub>/2. ';
+    c += ' <i>Illustrative model fitted to typical 500 × 220 nm strip waveguides; use a mode solver for a real design.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

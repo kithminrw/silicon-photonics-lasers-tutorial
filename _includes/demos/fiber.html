@@ -1,0 +1,91 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdFiber" role="group" aria-label="Interactive demo: guided modes of a step-index optical fibre">
+  <div class="bd-head"><span>// try it · step-index fibre: LP modes and mode-field diameter</span>
+    <span class="bd-seg" role="group" aria-label="Preset"><button type="button" data-pre="smf" aria-pressed="true">standard SMF</button><button type="button" data-pre="uhna" aria-pressed="false">high-NA fibre</button><button type="button" data-pre="mmf" aria-pressed="false">few-mode</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>core radius a <b data-v="a"></b></span><input type="range" data-k="a" min="0.8" max="12" step="0.05" value="4.1" aria-label="core radius"></label>
+    <label class="bd-sl"><span>numerical aperture NA <b data-v="na"></b></span><input type="range" data-k="na" min="0.05" max="0.35" step="0.001" value="0.123" aria-label="numerical aperture"></label>
+    <label class="bd-sl"><span>wavelength λ <b data-v="lam"></b></span><input type="range" data-k="lam" min="0.6" max="1.7" step="0.005" value="1.55" aria-label="wavelength"></label>
+  </div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="b" aria-hidden="true"></canvas><span class="bd-tag">normalised propagation constant b against V</span></div>
+    <div class="bd-scope tall"><canvas data-c="f" aria-hidden="true"></canvas><span class="bd-tag">LP01 field: exact (solid) and Gaussian fit (dashed)</span></div>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>V <b data-o="v">–</b></span><span>guided LP modes <b data-o="m">–</b></span><span>single-mode cut-off λ<sub>c</sub> <b data-o="lc">–</b></span><span>MFD (Marcuse) <b data-o="mfd">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdFiber'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  var S = BD.bind(root, { a: { fmt: function (x) { return x.toFixed(2) + ' µm'; } }, na: { fmt: function (x) { return x.toFixed(3); } }, lam: { fmt: function (x) { return (1000 * x).toFixed(0) + ' nm'; } } }, function () { draw(); });
+  BD.seg(root, 'pre', function (v) {
+    var p = { smf: [4.1, 0.123, 1.55], uhna: [1.25, 0.35, 1.55], mmf: [8, 0.2, 1.55] }[v];
+    ['a', 'na', 'lam'].forEach(function (k, i) { var el = q('[data-k="' + k + '"]'); el.value = p[i]; el.dispatchEvent(new Event('input')); });
+  });
+  // Bessel functions: J_n by its power series (fine for x < 15), K_0 and K_1 by the Abramowitz & Stegun 9.8 polynomials, higher K_n by recurrence
+  function J(n, x) { var s = 0, t = Math.pow(x / 2, n); for (var i = 1; i <= n; i++) t /= i; for (var k = 0; k < 60; k++) { s += t; t *= -(x * x / 4) / ((k + 1) * (k + 1 + n)); if (Math.abs(t) < 1e-17 * Math.abs(s) && k > 5) break; } return s; }
+  function Jn(n, x) { return n < 0 ? (n % 2 ? -J(-n, x) : J(-n, x)) : J(n, x); }
+  function I0(x) { var t = (x / 3.75) * (x / 3.75); return 1 + t * (3.5156229 + t * (3.0899424 + t * (1.2067492 + t * (0.2659732 + t * (0.0360768 + t * 0.0045813))))); }
+  function I1(x) { var t = (x / 3.75) * (x / 3.75); return x * (0.5 + t * (0.87890594 + t * (0.51498869 + t * (0.15084934 + t * (0.02658733 + t * (0.00301532 + t * 0.00032411)))))); }
+  function K0(x) {
+    if (x <= 2) { var y = x * x / 4; return -Math.log(x / 2) * I0(x) + (-0.57721566 + y * (0.42278420 + y * (0.23069756 + y * (0.03488590 + y * (0.00262698 + y * (0.00010750 + y * 0.0000074)))))); }
+    var z = 2 / x; return Math.exp(-x) / Math.sqrt(x) * (1.25331414 + z * (-0.07832358 + z * (0.02189568 + z * (-0.01062446 + z * (0.00587872 + z * (-0.00251540 + z * 0.00053208))))));
+  }
+  function K1(x) {
+    if (x <= 2) { var y = x * x / 4; return Math.log(x / 2) * I1(x) + (1 / x) * (1 + y * (0.15443144 + y * (-0.67278579 + y * (-0.18156897 + y * (-0.01919402 + y * (-0.00110404 + y * (-0.00004686))))))); }
+    var z = 2 / x; return Math.exp(-x) / Math.sqrt(x) * (1.25331414 + z * (0.23498619 + z * (-0.03655620 + z * (0.01504268 + z * (-0.00780353 + z * (0.00325614 + z * (-0.00068245)))))));
+  }
+  function Kn(n, x) { n = Math.abs(n); if (n === 0) return K0(x); var km = K0(x), k = K1(x); for (var i = 1; i < n; i++) { var kp = km + 2 * i / x * k; km = k; k = kp; } return k; }
+  // weakly guiding LP_lm modes: u J_{l-1}(u) K_l(w) + w K_{l-1}(w) J_l(u) = 0 with u^2 + w^2 = V^2
+  function G(l, u, V) { var w = Math.sqrt(Math.max(V * V - u * u, 1e-12)); return u * Jn(l - 1, u) * Kn(l, w) + w * Kn(l - 1, w) * Jn(l, u); }
+  function modes(V) {
+    var out = [];
+    for (var l = 0; l <= 4; l++) {
+      var N = 240, prev = G(l, 1e-4, V), m = 0;
+      for (var i = 1; i <= N; i++) {
+        var u = V * (i / N) * 0.99999, g = G(l, u, V);
+        if (isFinite(g) && isFinite(prev) && g * prev < 0) {
+          var lo = V * ((i - 1) / N) * 0.99999, hi = u, glo = prev;
+          for (var it = 0; it < 40; it++) { var mid = (lo + hi) / 2, gm = G(l, mid, V); if (gm * glo < 0) hi = mid; else { lo = mid; glo = gm; } }
+          var uu = (lo + hi) / 2; m++; out.push({ l: l, m: m, u: uu, b: 1 - uu * uu / (V * V) });
+        }
+        prev = g;
+      }
+    }
+    return out.sort(function (a, b) { return b.b - a.b; });
+  }
+  // b-V curves, computed once
+  var curves = {}; (function () { for (var k = 1; k <= 90; k++) { var V = 0.2 + 7.8 * k / 90; modes(V).forEach(function (md) { var key = 'LP' + md.l + md.m; (curves[key] = curves[key] || { x: [], y: [] }); curves[key].x.push(V); curves[key].y.push(md.b); }); } })();
+  var COL = { LP01: BD.C.gold, LP11: BD.C.blue, LP21: BD.C.green, LP02: BD.C.red, LP31: BD.C.teal, LP12: BD.C.white, LP41: BD.C.dim, LP22: BD.C.dim, LP03: BD.C.dim };
+  function draw() {
+    var V = 2 * Math.PI * S.a * S.na / S.lam, ms = modes(V);
+    var dv = BD.setup(q('[data-c="b"]')), f = BD.frame(dv, { x: [0, 8], y: [0, 1], pad: { l: 32, b: 22 }, xt: [[0, '0'], [2.405, '2.405'], [4, '4'], [6, '6'], [8, '8']], yt: [[0, '0'], [0.5, '0.5'], [1, '1']] });
+    Object.keys(curves).forEach(function (k) { BD.line(f, curves[k].x, curves[k].y, COL[k] || BD.C.dim, k === 'LP01' ? 2 : 1.3); });
+    BD.vline(f, Math.min(V, 7.99), BD.C.white, [3, 3], 'V');
+    ms.forEach(function (md) { if (V < 8) BD.dot(f, V, md.b, COL['LP' + md.l + md.m] || BD.C.dim, 3.5); });
+    dv.g.fillStyle = BD.C.gold; dv.g.fillText('LP01', f.X(0.9), f.Y(0.62));
+    if (curves.LP11) { dv.g.fillStyle = BD.C.blue; dv.g.fillText('LP11', f.X(4.2), f.Y(0.5)); }
+    // field of LP01 against radius, and the Marcuse Gaussian
+    var md0 = ms[0], w0 = S.a * (0.65 + 1.619 * Math.pow(V, -1.5) + 2.879 * Math.pow(V, -6)), rmax = Math.max(3 * w0, 1.6 * S.a);
+    var d2 = BD.setup(q('[data-c="f"]')), f2 = BD.frame(d2, { x: [0, rmax], y: [0, 1.05], pad: { l: 32, b: 22 }, xt: [[0, '0'], [S.a, 'a'], [rmax, rmax.toFixed(1) + ' µm']], yt: [[0, '0'], [1, '1']] });
+    d2.g.fillStyle = 'rgba(224,184,90,.10)'; d2.g.fillRect(f2.X(0), f2.p.t, f2.X(S.a) - f2.X(0), d2.h - f2.p.t - f2.p.b);
+    if (md0) {
+      var u = md0.u, w = Math.sqrt(V * V - u * u), rs = [], ex = [], ga = [];
+      for (var i = 0; i <= 200; i++) { var r = rmax * i / 200, R = r / S.a; rs.push(r); ex.push(R <= 1 ? Jn(0, u * R) / Jn(0, 0) : Jn(0, u) / Jn(0, 0) * K0(w * R) / K0(w)); ga.push(Math.exp(-r * r / (w0 * w0))); }
+      BD.line(f2, rs, ex, BD.C.gold, 2); BD.line(f2, rs, ga, BD.C.blue, 1.5, [5, 3]);
+      BD.vline(f2, w0, BD.C.blue, [2, 3], 'w');
+    }
+    var lc = 2 * Math.PI * S.a * S.na / 2.405;
+    q('[data-o="v"]').textContent = V.toFixed(3);
+    q('[data-o="m"]').textContent = ms.length ? ms.map(function (m) { return 'LP' + m.l + m.m; }).join(', ') : 'none';
+    q('[data-o="lc"]').textContent = (1000 * lc).toFixed(0) + ' nm';
+    q('[data-o="mfd"]').textContent = (2 * w0).toFixed(2) + ' µm';
+    var c = 'A step-index fibre guides one mode, LP01, while V = 2πa·NA/λ is below 2.405, the first zero of J₀. ';
+    if (V < 2.405) c += 'This fibre is single-mode here. ' + (V < 1.5 ? '<b>V is small</b>: the mode spreads far into the cladding, the MFD grows and the fibre becomes sensitive to bends.' : 'Its LP01 mode is close to a Gaussian, which is why Gaussian-beam overlaps (Section 3.5) predict fibre coupling so well.');
+    else c += '<b>Several modes are guided</b> (' + ms.length + '); light launched into this fibre can split between them and arrive at different times.';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

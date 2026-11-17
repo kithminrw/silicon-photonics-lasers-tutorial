@@ -1,0 +1,110 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdSlab" role="group" aria-label="Interactive demo: guided modes of an asymmetric slab waveguide">
+  <div class="bd-head"><span>// try it · slab waveguide mode solver</span>
+    <span class="bd-seg" role="group" aria-label="Polarisation"><button type="button" data-pol="TE" aria-pressed="true">TE</button><button type="button" data-pol="TM" aria-pressed="false">TM</button></span></div>
+  <div class="bd-head" style="margin-top:-4px"><span>preset</span>
+    <span class="bd-seg" role="group" aria-label="Material preset"><button type="button" data-pre="si" aria-pressed="true">Si / SiO₂</button><button type="button" data-pre="sin" aria-pressed="false">SiN / SiO₂</button><button type="button" data-pre="ln" aria-pressed="false">LN / SiO₂</button><button type="button" data-pre="inp" aria-pressed="false">InGaAsP / InP</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>core thickness d <b data-v="d"></b></span><input type="range" data-k="d" min="0.02" max="2" step="0.005" value="0.22" aria-label="thickness"></label>
+    <label class="bd-sl"><span>wavelength λ <b data-v="lam"></b></span><input type="range" data-k="lam" min="0.4" max="2" step="0.005" value="1.55" aria-label="wavelength"></label>
+    <label class="bd-sl"><span>core index n<sub>1</sub> <b data-v="n1"></b></span><input type="range" data-k="n1" min="1.5" max="3.6" step="0.005" value="3.476" aria-label="core index"></label>
+    <label class="bd-sl"><span>substrate index n<sub>2</sub> <b data-v="n2"></b></span><input type="range" data-k="n2" min="1" max="3.4" step="0.005" value="1.444" aria-label="substrate index"></label>
+    <label class="bd-sl"><span>cover index n<sub>3</sub> <b data-v="n3"></b></span><input type="range" data-k="n3" min="1" max="3.4" step="0.005" value="1.444" aria-label="cover index"></label>
+  </div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="f" aria-hidden="true"></canvas><span class="bd-tag">mode fields across the slab (core shaded)</span></div>
+    <div class="bd-scope tall"><canvas data-c="n" aria-hidden="true"></canvas><span class="bd-tag">effective index against thickness</span></div>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>guided modes <b data-o="m">–</b></span><span>n<sub>eff</sub> (fundamental) <b data-o="ne">–</b></span><span>power in core <b data-o="g">–</b></span><span>decay into cover <b data-o="dc">–</b></span><span>single-mode below <b data-o="sm">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdSlab'); if (!root || !window.BD) return;
+  var pol = 'TE', q = function (s) { return root.querySelector(s); };
+  var PRE = { si: [3.476, 1.444, 1.444, 0.22, 1.55], sin: [1.99, 1.444, 1.444, 0.4, 1.55], ln: [2.21, 1.444, 1.444, 0.4, 1.55], inp: [3.36, 3.17, 3.17, 0.5, 1.55] };
+  var S = BD.bind(root, {
+    d: { fmt: function (x) { return (1000 * x).toFixed(0) + ' nm'; } }, lam: { fmt: function (x) { return (1000 * x).toFixed(0) + ' nm'; } },
+    n1: { fmt: function (x) { return x.toFixed(3); } }, n2: { fmt: function (x) { return x.toFixed(3); } }, n3: { fmt: function (x) { return x.toFixed(3); } }
+  }, function () { draw(); });
+  BD.seg(root, 'pol', function (v) { pol = v; draw(); });
+  BD.seg(root, 'pre', function (v) {
+    var p = PRE[v], keys = ['n1', 'n2', 'n3', 'd', 'lam'];
+    keys.forEach(function (k, i) { var el = q('[data-k="' + k + '"]'); el.value = p[i]; el.dispatchEvent(new Event('input')); });
+  });
+  // transverse-resonance function: F(neff) = kappa d - atan(p2/kappa) - atan(p3/kappa); mode m where F = m pi
+  function F(ne, n1, n2, n3, d, k0, tm) {
+    var ka = k0 * Math.sqrt(Math.max(n1 * n1 - ne * ne, 1e-18)), g2 = k0 * Math.sqrt(Math.max(ne * ne - n2 * n2, 0)), g3 = k0 * Math.sqrt(Math.max(ne * ne - n3 * n3, 0));
+    var p2 = tm ? g2 * n1 * n1 / (n2 * n2) : g2, p3 = tm ? g3 * n1 * n1 / (n3 * n3) : g3;
+    return ka * d - Math.atan(p2 / ka) - Math.atan(p3 / ka);
+  }
+  function modes(n1, n2, n3, d, lam, tm) {
+    var k0 = 2 * Math.PI / lam, lo = Math.max(n2, n3) + 1e-9, hi = n1 - 1e-9, out = [];
+    if (hi <= lo) return out;
+    var Flo = F(lo, n1, n2, n3, d, k0, tm);
+    for (var m = 0; m < 40 && Flo > m * Math.PI; m++) {
+      var a = lo, b = hi;
+      for (var it = 0; it < 60; it++) { var c = (a + b) / 2; if (F(c, n1, n2, n3, d, k0, tm) > m * Math.PI) a = c; else b = c; }
+      out.push((a + b) / 2);
+    }
+    return out;
+  }
+  // field profile (Ey for TE, Hy for TM) of the mode with index ne, on points xs (core from 0 to d)
+  function field(ne, n1, n2, n3, d, lam, tm, xs) {
+    var k0 = 2 * Math.PI / lam, ka = k0 * Math.sqrt(n1 * n1 - ne * ne), g2 = k0 * Math.sqrt(ne * ne - n2 * n2), g3 = k0 * Math.sqrt(ne * ne - n3 * n3);
+    var p2 = tm ? g2 * n1 * n1 / (n2 * n2) : g2, ed = Math.cos(ka * d) + p2 / ka * Math.sin(ka * d);
+    return xs.map(function (x) {
+      if (x < 0) return Math.exp(g2 * x);
+      if (x <= d) return Math.cos(ka * x) + p2 / ka * Math.sin(ka * x);
+      return ed * Math.exp(-g3 * (x - d));
+    });
+  }
+  var COL = [BD.C.gold, BD.C.blue, BD.C.green, BD.C.red, BD.C.teal, BD.C.white];
+  function draw() {
+    var n1 = S.n1, n2 = S.n2, n3 = S.n3, d = S.d, lam = S.lam, tm = pol === 'TM', ms = modes(n1, n2, n3, d, lam, tm);
+    // ---- fields
+    var span = Math.max(d * 3, 1.2 * lam), x0 = d / 2 - span / 2, x1 = d / 2 + span / 2, xs = [];
+    for (var i = 0; i <= 400; i++) xs.push(x0 + (x1 - x0) * i / 400);
+    var dv = BD.setup(q('[data-c="f"]')), f = BD.frame(dv, { x: [x0, x1], y: [-1.15, 1.15], pad: { l: 30, b: 22 },
+      xt: [[0, '0'], [d, (1000 * d).toFixed(0) + ' nm']], yt: [[0, '0']] }), g = dv.g;
+    g.fillStyle = 'rgba(224,184,90,.12)'; g.fillRect(f.X(0), f.p.t, f.X(d) - f.X(0), dv.h - f.p.t - f.p.b);
+    g.fillStyle = BD.C.dim; g.fillText('n₂', f.X(x0) + 6, dv.h - f.p.b - 6); g.textAlign = 'right'; g.fillText('n₃', f.X(x1) - 6, dv.h - f.p.b - 6); g.textAlign = 'left';
+    var gam = NaN, dcov = NaN;
+    ms.slice(0, 6).forEach(function (ne, m) {
+      var e = field(ne, n1, n2, n3, d, lam, tm, xs), mx = 0; e.forEach(function (v) { mx = Math.max(mx, Math.abs(v)); });
+      BD.line(f, xs, e.map(function (v) { return v / mx; }), COL[m], m === 0 ? 2.2 : 1.4);
+      if (m === 0) {   // confinement from |field|^2 on a fine grid
+        var xx = [], N = 2000; for (var k = 0; k <= N; k++) xx.push(-6 * lam + (d + 12 * lam) * k / N);
+        var ee = field(ne, n1, n2, n3, d, lam, tm, xx), tot = 0, core = 0;
+        ee.forEach(function (v, k) { var x = xx[k], nn = x < 0 ? n2 : x <= d ? n1 : n3, w = tm ? v * v / (nn * nn) : v * v; tot += w; if (x >= 0 && x <= d) core += w; });
+        gam = core / tot; dcov = 1 / (2 * Math.PI / lam * Math.sqrt(ne * ne - n3 * n3));
+      }
+    });
+    // ---- neff against thickness
+    var dmax = Math.max(2 * d, 0.6), dn = BD.setup(q('[data-c="n"]')), nlo = Math.max(n2, n3), f2 = BD.frame(dn, { x: [0, dmax], y: [nlo, n1], pad: { l: 42, b: 22 },
+      xt: [[0, '0'], [dmax / 2, (500 * dmax).toFixed(0)], [dmax, (1000 * dmax).toFixed(0) + ' nm']], yt: [[nlo, nlo.toFixed(2)], [n1, n1.toFixed(2)]] });
+    var curves = [], dsm = NaN;
+    for (var k2 = 1; k2 <= 120; k2++) {
+      var dd = dmax * k2 / 120, mm = modes(n1, n2, n3, dd, lam, tm);
+      mm.forEach(function (ne, m) { (curves[m] = curves[m] || { x: [], y: [] }).x.push(dd); curves[m].y.push(ne); });
+      if (!isFinite(dsm) && mm.length >= 2) dsm = dd;
+    }
+    curves.slice(0, 6).forEach(function (c, m) { BD.line(f2, c.x, c.y, COL[m], m === 0 ? 2 : 1.3); });
+    BD.vline(f2, d, BD.C.dim, [3, 3]);
+    ms.slice(0, 6).forEach(function (ne, m) { BD.dot(f2, d, ne, COL[m], 3.5); });
+    // ---- readouts
+    q('[data-o="m"]').textContent = ms.length + ' ' + pol + (ms.length ? ' (' + pol + '0' + (ms.length > 1 ? '–' + pol + (ms.length - 1) : '') + ')' : '');
+    q('[data-o="ne"]').textContent = ms.length ? ms[0].toFixed(4) : 'none';
+    q('[data-o="g"]').textContent = isFinite(gam) ? (100 * gam).toFixed(0) + ' %' : '–';
+    q('[data-o="dc"]').textContent = isFinite(dcov) ? (1000 * dcov).toFixed(0) + ' nm' : '–';
+    q('[data-o="sm"]').textContent = isFinite(dsm) ? '≈ ' + (1000 * dsm).toFixed(0) + ' nm' : '> ' + (1000 * dmax).toFixed(0) + ' nm';
+    var c;
+    if (!ms.length) c = '<b>No guided mode.</b> With an asymmetric slab (n₂ ≠ n₃) the fundamental mode has a cut-off: make the core thicker or the indices more symmetric.';
+    else if (ms.length === 1) c = 'One guided mode: the slab is single-mode. ' + (gam < 0.6 ? 'Much of the power travels in the claddings, which suits evanescent sensing and coupling but makes the mode sensitive to roughness and to the substrate.' : 'Most of the power is in the core.');
+    else c = ms.length + ' guided modes. Mode m has m nodes in the core and a lower effective index; each one cuts off as the core thins. Single-mode operation needs d below about ' + (isFinite(dsm) ? (1000 * dsm).toFixed(0) + ' nm' : '–') + ' at this wavelength.';
+    if (tm && ms.length) c += ' TM modes are less confined than TE in a high-contrast slab: the normal field jumps by (n₁/n₂)² at each interface.';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

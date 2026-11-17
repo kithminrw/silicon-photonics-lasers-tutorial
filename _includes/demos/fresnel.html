@@ -1,0 +1,92 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdFresnel" role="group" aria-label="Interactive demo: reflection, refraction and total internal reflection at an interface">
+  <div class="bd-head"><span>// try it · light at an interface</span>
+    <span class="bd-seg" role="group" aria-label="Polarisation"><button type="button" data-pol="s" aria-pressed="true">s (TE)</button><button type="button" data-pol="p" aria-pressed="false">p (TM)</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>incident-side index n<sub>1</sub> <b data-v="n1"></b></span><input type="range" data-k="n1" min="1" max="3.6" step="0.01" value="3.48" aria-label="n1"></label>
+    <label class="bd-sl"><span>far-side index n<sub>2</sub> <b data-v="n2"></b></span><input type="range" data-k="n2" min="1" max="3.6" step="0.01" value="1.44" aria-label="n2"></label>
+    <label class="bd-sl"><span>angle of incidence θ<sub>1</sub> <b data-v="th"></b></span><input type="range" data-k="th" min="0" max="89.5" step="0.1" value="30" aria-label="angle"></label>
+  </div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="ray" aria-hidden="true"></canvas><span class="bd-tag">rays (line width ∝ power) and the field beyond the interface</span></div>
+    <div class="bd-scope tall"><canvas data-c="rt" aria-hidden="true"></canvas><span class="bd-tag">reflected power R against angle</span></div>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>R <b data-o="R">–</b></span><span>T <b data-o="T">–</b></span><span>θ<sub>c</sub> <b data-o="tc">–</b></span><span>θ<sub>B</sub> <b data-o="tb">–</b></span><span>decay length at 1550 nm <b data-o="dp">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdFresnel'); if (!root || !window.BD) return;
+  var pol = 's', q = function (s) { return root.querySelector(s); };
+  var S = BD.bind(root, {
+    n1: { fmt: function (x) { return x.toFixed(2); } },
+    n2: { fmt: function (x) { return x.toFixed(2); } },
+    th: { fmt: function (x) { return x.toFixed(1) + '°'; } }
+  }, function () { draw(); });
+  BD.seg(root, 'pol', function (v) { pol = v; draw(); });
+  // power reflectance for polarisation p ('s' or 'p'), angle a (rad); 1 beyond the critical angle
+  function refl(n1, n2, a, p) {
+    var s1 = n1 * Math.sin(a) / n2; if (s1 >= 1) return 1;
+    var ci = Math.cos(a), ct = Math.sqrt(1 - s1 * s1), r;
+    r = p === 's' ? (n1 * ci - n2 * ct) / (n1 * ci + n2 * ct) : (n2 * ci - n1 * ct) / (n2 * ci + n1 * ct);
+    return r * r;
+  }
+  function draw() {
+    var n1 = S.n1, n2 = S.n2, a = S.th * Math.PI / 180, R = refl(n1, n2, a, pol), tir = n1 * Math.sin(a) >= n2;
+    var tc = n1 > n2 ? Math.asin(n2 / n1) * 180 / Math.PI : NaN, tb = Math.atan(n2 / n1) * 180 / Math.PI;
+    // ---- ray picture
+    var d = BD.setup(q('[data-c="ray"]')), g = d.g, cx = d.w / 2, cy = d.h / 2 + 8, L = Math.min(d.w, d.h) * 0.42;
+    g.fillStyle = 'rgba(127,184,240,' + (0.05 + 0.08 * (n1 - 1)) + ')'; g.fillRect(0, 0, d.w, cy);
+    g.fillStyle = 'rgba(127,184,240,' + (0.05 + 0.08 * (n2 - 1)) + ')'; g.fillRect(0, cy, d.w, d.h - cy);
+    g.strokeStyle = BD.C.dim; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(cx, 18); g.lineTo(cx, d.h - 4); g.stroke(); g.setLineDash([]);
+    g.strokeStyle = BD.C.axis; g.beginPath(); g.moveTo(0, cy); g.lineTo(d.w, cy); g.stroke();
+    g.fillStyle = BD.C.axis; g.fillText('n₁ = ' + n1.toFixed(2), 8, cy - 8); g.fillText('n₂ = ' + n2.toFixed(2), 8, cy + 16);
+    function ray(ang, len, w, col, fromC) {
+      var x = cx + Math.sin(ang) * len, y = cy - Math.cos(ang) * len;
+      g.strokeStyle = col; g.lineWidth = Math.max(0.6, w); g.beginPath();
+      if (fromC) { g.moveTo(cx, cy); g.lineTo(x, y); } else { g.moveTo(x, y); g.lineTo(cx, cy); }
+      g.stroke(); g.lineWidth = 1;
+    }
+    ray(-a, L, 4, BD.C.gold, false);                 // incident (from upper left)
+    ray(a, L, 4 * R, BD.C.blue, true);               // reflected (upper right)
+    if (!tir) {
+      var at = Math.asin(n1 * Math.sin(a) / n2);
+      ray(Math.PI - at, L, 4 * (1 - R), BD.C.green, true);   // transmitted (lower right)
+    } else {
+      // evanescent field: intensity decays as exp(-2 z / d), drawn over 3 decay lengths
+      var k0 = 2 * Math.PI / 1.55, kap = k0 * Math.sqrt(n1 * n1 * Math.sin(a) * Math.sin(a) - n2 * n2), dp = 1 / kap;
+      var px = (d.h - cy - 8) / Math.max(3 * dp, 0.05);
+      for (var yy = 0; yy < d.h - cy; yy += 2) {
+        var I = Math.exp(-2 * (yy / px) / dp);
+        g.fillStyle = 'rgba(127,224,160,' + (0.55 * I).toFixed(3) + ')'; g.fillRect(cx - 70, cy + yy, 140, 2);
+      }
+      g.fillStyle = BD.C.green; g.fillText('evanescent field', cx + 76, cy + 16);
+    }
+    // ---- R against angle
+    var d2 = BD.setup(q('[data-c="rt"]')), f = BD.frame(d2, { x: [0, 90], y: [0, 1], xt: [[0, '0°'], [30, '30°'], [60, '60°'], [90, '90°']],
+      yt: [[0, '0'], [0.5, '0.5'], [1, '1']], pad: { l: 34 } });
+    var xs = [], rs = [], rp = [];
+    for (var k = 0; k <= 360; k++) { var t = 89.99 * k / 360, ar = t * Math.PI / 180; xs.push(t); rs.push(refl(n1, n2, ar, 's')); rp.push(refl(n1, n2, ar, 'p')); }
+    BD.line(f, xs, rs, pol === 's' ? BD.C.blue : BD.C.dim, pol === 's' ? 2 : 1.2);
+    BD.line(f, xs, rp, pol === 'p' ? BD.C.blue : BD.C.dim, pol === 'p' ? 2 : 1.2, [5, 3]);
+    if (isFinite(tc)) BD.vline(f, tc, BD.C.green, [4, 3], 'θc');
+    BD.vline(f, tb, BD.C.teal, [2, 3], 'θB');
+    BD.dot(f, S.th, R, BD.C.gold, 4);
+    d2.g.fillStyle = BD.C.dim; d2.g.textAlign = 'right'; d2.g.fillText('solid s · dashed p', d2.w - f.p.r - 6, d2.h - f.p.b - 8); d2.g.textAlign = 'left';
+    // ---- readouts
+    q('[data-o="R"]').textContent = (100 * R).toFixed(1) + ' %';
+    q('[data-o="T"]').textContent = (100 * (1 - R)).toFixed(1) + ' %';
+    q('[data-o="tc"]').textContent = isFinite(tc) ? tc.toFixed(1) + '°' : 'none (n₁ ≤ n₂)';
+    q('[data-o="tb"]').textContent = tb.toFixed(1) + '°';
+    var dpo = q('[data-o="dp"]');
+    if (tir) { var kk = 2 * Math.PI / 1550 * Math.sqrt(n1 * n1 * Math.sin(a) * Math.sin(a) - n2 * n2); dpo.textContent = (1 / kk).toFixed(0) + ' nm (field)'; }
+    else dpo.textContent = '–';
+    var c;
+    if (tir) c = 'Beyond the critical angle all the power is reflected, yet the field does not stop at the interface: it decays exponentially into the low-index side. <b>This is how a waveguide confines light</b>, and the evanescent tail is what couplers, sensors and losses all interact with.';
+    else if (Math.abs(S.th - tb) < 1 && pol === 'p') c = 'At Brewster\'s angle the p-polarised reflection vanishes, which is why polarisers and laser windows are tilted.';
+    else c = 'Below the critical angle part of the light escapes. At normal incidence R = ((n₁ − n₂)/(n₁ + n₂))²: about 30 % for silicon against air, 17 % for silicon against oxide.';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>
