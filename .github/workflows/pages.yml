@@ -1,6 +1,6 @@
 # Build the Jekyll (just-the-docs) site and deploy it to GitHub Pages.
-# Served at https://www.kithminrw.com/photonics-tutorial/ (repository photonics-tutorial; the user site
-# carries the custom domain). The Pages source must be "GitHub Actions" in the repository settings.
+# Served at https://www.kithminrw.com/silicon-photonics-lasers-tutorial/ (the user site carries the
+# custom domain). The Pages source is "GitHub Actions" in the repository settings.
 name: Deploy site to GitHub Pages
 
 # Deploys on every push to main; it can also be run by hand from the Actions tab.

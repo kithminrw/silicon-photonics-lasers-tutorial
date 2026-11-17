@@ -104,6 +104,35 @@
     if (window.ResizeObserver) new ResizeObserver(go).observe(root); else window.addEventListener('resize', go);
     return go;
   }
+  /* ---- geometry views (top views and cross-sections that redraw with the sliders) */
+  var GEO = { si: '#9db3cc', sin: '#e0b060', ln: '#ee9aaa', ox: 'rgba(160,200,240,.13)', heat: '#e08a3a', metal: '#d8dce4',
+              glow: 'rgba(255,214,120,', edge: 'rgba(215,230,247,.6)' };
+  function nice(v) { var e = Math.pow(10, Math.floor(Math.log10(v))), m = v / e; return (m >= 5 ? 5 : m >= 2 ? 2 : 1) * e; }
+  function scalebar(g, x, y, pxPerUm, maxPx) {   // a 1-2-5 scale bar no longer than maxPx, labelled in um or nm
+    var um = nice(maxPx / pxPerUm), px = um * pxPerUm, lab = um >= 1 ? um + ' µm' : Math.round(um * 1000) + ' nm';
+    g.strokeStyle = C.white; g.lineWidth = 1.5; g.beginPath(); g.moveTo(x, y); g.lineTo(x + px, y);
+    g.moveTo(x, y - 3); g.lineTo(x, y + 3); g.moveTo(x + px, y - 3); g.lineTo(x + px, y + 3); g.stroke(); g.lineWidth = 1;
+    g.fillStyle = C.white; g.textAlign = 'center'; g.fillText(lab, x + px / 2, y - 5); g.textAlign = 'left';
+  }
+  function dim(g, x0, y0, x1, y1, label, col, off) {   // dimension line with arrowheads and a label
+    col = col || C.gold; off = off || 0; g.strokeStyle = col; g.fillStyle = col; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke();
+    var a = Math.atan2(y1 - y0, x1 - x0), L = Math.hypot(x1 - x0, y1 - y0), h = Math.min(5, L / 3);
+    [[x0, y0, a + Math.PI], [x1, y1, a]].forEach(function (p) { g.beginPath(); g.moveTo(p[0], p[1]);
+      g.lineTo(p[0] - h * Math.cos(p[2] - 0.45), p[1] - h * Math.sin(p[2] - 0.45)); g.lineTo(p[0] - h * Math.cos(p[2] + 0.45), p[1] - h * Math.sin(p[2] + 0.45)); g.fill(); });
+    if (label) { g.textAlign = 'center'; var mx = (x0 + x1) / 2, my = (y0 + y1) / 2; var dx = -Math.sin(a), dy = Math.cos(a), o = off || -7;
+      g.fillText(label, mx + dx * o, my + dy * o + 3); g.textAlign = 'left'; }
+  }
+  function wg(g, pts, widthPx, col) {   // a waveguide drawn as a thick polyline
+    g.strokeStyle = col || GEO.si; g.lineWidth = Math.max(1.2, widthPx); g.lineCap = 'butt'; g.lineJoin = 'round';
+    g.beginPath(); pts.forEach(function (p, i) { if (i) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); }); g.stroke(); g.lineWidth = 1; g.lineCap = 'butt';
+  }
+  function sbend(x0, y0, x1, y1, n) {   // points of a cosine S-bend from (x0,y0) to (x1,y1)
+    var pts = []; n = n || 24; for (var i = 0; i <= n; i++) { var t = i / n; pts.push([x0 + (x1 - x0) * t, y0 + (y1 - y0) * (1 - Math.cos(Math.PI * t)) / 2]); } return pts;
+  }
+  function label(g, s, x, y, col, align) { g.fillStyle = col || C.axis; g.textAlign = align || 'left'; g.fillText(s, x, y); g.textAlign = 'left'; }
+
   window.BD = { C: C, setup: setup, frame: frame, line: line, hline: hline, vline: vline, dot: dot, logticks: logticks,
-                eng: eng, fft: fft, gauss: gauss, rng: rng, bind: bind, seg: seg, toggle: toggle, observe: observe };
+                eng: eng, fft: fft, gauss: gauss, rng: rng, bind: bind, seg: seg, toggle: toggle, observe: observe,
+                GEO: GEO, nice: nice, scalebar: scalebar, dim: dim, wg: wg, sbend: sbend, label: label };
 })();

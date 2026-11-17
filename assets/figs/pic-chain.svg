@@ -21,7 +21,7 @@
   <rect class="blk" x="306" y="56" width="66" height="54" rx="5"/><text class="tx" x="339" y="78">Coupler</text><text class="ch" x="339" y="94">Ch 15–17</text>
   <path class="wg" d="M96 83H116"/><path class="wg" d="M202 83H222"/><path class="wg" d="M286 83H304"/>
   <!-- fibre -->
-  <path class="wg" d="M372 83 C 386 83 390 62 402 62 S 418 104 430 104 S 446 83 463 83"/>
+  <path class="wg" d="M372 83 C 384 83 387 62 397 62 S 410 104 420 104 S 434 83 444 83 L 463 83"/>
   <text class="ch" x="416" y="130">fibre · Ch 3</text>
   <!-- receiver chip -->
   <rect class="chip" x="456" y="22" width="356" height="120" rx="8"/>
@@ -32,6 +32,6 @@
   <path class="wg" d="M532 83H552"/><path class="wg" d="M624 83H644"/>
   <!-- foundations underneath -->
   <rect class="bar" x="8" y="156" width="804" height="24" rx="4"/><text class="bt" x="410" y="172">waveguides, bends, couplers, interferometers, rings and gratings · Ch 5–13 (on electromagnetic foundations, Ch 2–4)</text>
-  <rect class="bar" x="8" y="188" width="804" height="24" rx="4"/><text class="bt" x="410" y="204">fabrication, design flow and open PDKs, testing, data analysis · Ch 29–33</text>
-  <rect class="bar" x="8" y="220" width="804" height="24" rx="4"/><text class="bt" x="410" y="236">the link budget, transceivers and applications · Ch 34–35</text>
+  <rect class="bar" x="8" y="188" width="804" height="24" rx="4"/><text class="bt" x="410" y="204">fabrication, design flow and open PDKs, testing, data analysis · Ch 29–32</text>
+  <rect class="bar" x="8" y="220" width="804" height="24" rx="4"/><text class="bt" x="410" y="236">the link budget, transceivers and applications · Ch 33–34</text>
 </svg>

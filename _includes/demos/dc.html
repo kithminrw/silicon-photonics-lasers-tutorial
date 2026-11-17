@@ -7,6 +7,7 @@
     <label class="bd-sl"><span>coupling length L <b data-v="L"></b></span><input type="range" data-k="L" min="0" max="80" step="0.1" value="12.5" aria-label="length"></label>
     <label class="bd-sl"><span>wavelength λ <b data-v="lam"></b></span><input type="range" data-k="lam" min="1.5" max="1.6" step="0.001" value="1.55" aria-label="wavelength"></label>
   </div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top view (glow ∝ power; gap magnified) and the cross-section to scale</span></div>
   <div class="bd-scope tall"><canvas data-c="z" aria-hidden="true"></canvas><span class="bd-tag">power in each waveguide along the coupler</span></div>
   <div class="bd-scope short"><canvas data-c="l" aria-hidden="true"></canvas><span class="bd-tag">cross-coupled power against wavelength</span></div>
   <div class="bd-read" aria-live="polite"><span>Δn (even − odd) <b data-o="dn">–</b></span><span>cross-over length L<sub>x</sub> <b data-o="lx">–</b></span><span>split (cross / through) <b data-o="k">–</b></span><span>50/50 at L = <b data-o="l50">–</b></span></div>
@@ -44,6 +45,30 @@
     var ls = [], ks = [];
     for (i = 0; i <= 200; i++) { var lm = 1.5 + 0.1 * i / 200; ls.push(lm); ks.push(cross(L, g, lm)); }
     BD.line(f2, ls, ks, BD.C.blue, 2); BD.hline(f2, 0.5, BD.C.dim, [3, 3]); BD.dot(f2, lam, k, BD.C.gold, 4);
+    // ---- geometry: top view along the coupler, and the two 500 x 220 nm strips in cross-section
+    (function () {
+      var dv2 = BD.setup(q('[data-c="g"]')), gg = dv2.g, Lb = 15, off = 3, leftW = dv2.w * 0.68, top = 30, bot = dv2.h - 24;
+      var sx = (leftW - 30) / (L + 2 * Lb), sy = (bot - top) / (2 * off + 2), X = function (z) { return 15 + z * sx; }, yc = (top + bot) / 2;
+      var yg = g / 2 + 0.25, Y = function (y) { return yc - y * sy; };   // guide centres at +-(g/2 + w/2) in the coupler
+      var path = function (sgn) { return BD.sbend(X(0), Y(sgn * (off + yg)), X(Lb), Y(sgn * yg), 18).concat([[X(Lb + L), Y(sgn * yg)]]).concat(BD.sbend(X(Lb + L), Y(sgn * yg), X(2 * Lb + L), Y(sgn * (off + yg)), 18)); };
+      BD.wg(gg, path(1), Math.max(2, 0.5 * sy)); BD.wg(gg, path(-1), Math.max(2, 0.5 * sy));
+      for (var i = 0; i < 60; i++) {   // power glow along the straight section
+        var z = L * (i + 0.5) / 60, c = Math.pow(Math.sin(Math.PI * (z + LB) / (2 * lx)), 2);
+        gg.fillStyle = BD.GEO.glow + (0.9 * (1 - c)).toFixed(2) + ')'; gg.fillRect(X(Lb + z - L / 120), Y(yg) - 2, L / 60 * sx + 1, 4);
+        gg.fillStyle = BD.GEO.glow + (0.9 * c).toFixed(2) + ')'; gg.fillRect(X(Lb + z - L / 120), Y(-yg) - 2, L / 60 * sx + 1, 4);
+      }
+      BD.label(gg, 'in', 2, Y(off + yg) - 6, BD.C.white);
+      BD.label(gg, 'through ' + (100 * (1 - k)).toFixed(0) + ' %', leftW - 4, Y(off + yg) - 6, BD.C.gold, 'right');
+      BD.label(gg, 'cross ' + (100 * k).toFixed(0) + ' %', leftW - 4, Y(-off - yg) + 14, BD.C.blue, 'right');
+      BD.dim(gg, X(Lb), bot + 12, X(Lb + L), bot + 12, 'L = ' + L.toFixed(1) + ' µm', BD.C.gold, -6);
+      // cross-section to scale
+      var cx0 = leftW + 12, cw = dv2.w - cx0 - 8, cs = Math.min(cw / (1.0 + g + 0.6), (bot - top) / 1.0), ccx = cx0 + cw / 2, base = yc + 0.15 * cs;
+      gg.fillStyle = BD.GEO.ox; gg.fillRect(cx0, top, cw, bot - top);
+      gg.fillStyle = BD.GEO.si; gg.fillRect(ccx - (g / 2 + 0.5) * cs, base - 0.22 * cs, 0.5 * cs, 0.22 * cs); gg.fillRect(ccx + g / 2 * cs, base - 0.22 * cs, 0.5 * cs, 0.22 * cs);
+      BD.dim(gg, ccx - g / 2 * cs, base - 0.32 * cs, ccx + g / 2 * cs, base - 0.32 * cs, (1000 * g).toFixed(0) + ' nm', BD.C.gold, -6);
+      BD.label(gg, 'cross-section', cx0 + 4, top + 12, BD.C.dim);
+      BD.scalebar(gg, cx0 + 6, bot - 6, cs, cw * 0.4);
+    })();
     // ---- readouts
     q('[data-o="dn"]').textContent = d.toFixed(4);
     q('[data-o="lx"]').textContent = lx.toFixed(1) + ' µm';

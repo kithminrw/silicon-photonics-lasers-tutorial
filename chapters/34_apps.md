@@ -1,12 +1,12 @@
 ---
-title: "35. Beyond Datacom: Sensing, LiDAR, Quantum and Computing"
+title: "34. Beyond Datacom: Sensing, LiDAR, Quantum and Computing"
 parent: "Part VIII · Systems and Applications"
-nav_order: 35
-permalink: /part-8/ch35/
-chapter: 35
+nav_order: 34
+permalink: /part-8/ch34/
+chapter: 34
 ---
 
-# <span class="chapnum">Chapter 35</span>Beyond Datacom: Sensing, LiDAR, Quantum and Computing
+# <span class="chapnum">Chapter 34</span>Beyond Datacom: Sensing, LiDAR, Quantum and Computing
 
 The same building blocks make biosensors, beam steerers, quantum processors and optical neural networks.
 {: .chapterlead }
@@ -31,27 +31,27 @@ What changes when the chip is a sensor, a beam steerer or a processor instead of
 
 </div>
 
-## <span class="secnum">35.1</span>Biosensing with evanescent fields
+## <span class="secnum">34.1</span>Biosensing with evanescent fields
 
 Bulk and surface sensitivity, limit of detection.
 
-## <span class="secnum">35.2</span>LiDAR and optical phased arrays
+## <span class="secnum">34.2</span>LiDAR and optical phased arrays
 
 FMCW ranging and beam steering.
 
-## <span class="secnum">35.3</span>Quantum photonics
+## <span class="secnum">34.3</span>Quantum photonics
 
 Photon-pair sources, interferometer meshes and single-photon detectors.
 
-## <span class="secnum">35.4</span>Photonic computing
+## <span class="secnum">34.4</span>Photonic computing
 
 MZI meshes, multiply–accumulate engines and neuromorphic photonics.
 
-## <span class="secnum">35.5</span>Microwave photonics and frequency combs
+## <span class="secnum">34.5</span>Microwave photonics and frequency combs
 
 Combs, filters and RF links.
 
-## <span class="secnum">35.6</span>Visible and mid-infrared photonics
+## <span class="secnum">34.6</span>Visible and mid-infrared photonics
 
 SiN, AlN and other platforms beyond the telecom bands.
 

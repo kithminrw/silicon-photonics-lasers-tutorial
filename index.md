@@ -14,7 +14,7 @@ permalink: /
       <a class="btn btn-primary mr-2" href="{% link preface.md %}">Start reading</a>
       <a class="btn mr-2" href="{% link course-map.md %}">See the course map</a>
       <a class="btn mr-2" href="{% link devices-3d.md %}">PDK devices in 3D</a>
-      <a class="btn" href="https://github.com/kithminrw/photonics-tutorial">Source on GitHub</a>
+      <a class="btn" href="https://github.com/kithminrw/silicon-photonics-lasers-tutorial">Source on GitHub</a>
     </p>
   </div>
 </div>
@@ -24,15 +24,14 @@ permalink: /
   <div><b>3.48 / 1.44</b><span>index of Si and SiO₂ at 1550 nm</span></div>
   <div><b>1310 · 1550</b><span>O and C bands (nm)</span></div>
   <div><b>127 µm</b><span>fibre-array pitch</span></div>
-  <div><b>≈ 80 pm/K</b><span>thermal drift of a Si ring</span></div>
-  <div><b>35</b><span>chapters in eight parts</span></div>
+  <div><b>34</b><span>chapters in eight parts</span></div>
 </div>
 
 A photonic integrated circuit does with light what an electronic chip does with charge: it generates, routes, filters, modulates and detects signals, on a wafer, in volume. This tutorial builds that picture from the ground up. Every concept follows the same pattern: a short derivation, a worked example with real numbers, an interactive demo you can play with, and a *what this means for your design* box. Where the open process design kits allow it, you can turn the real device over in 3D.
 
 <figure class="chain-figure">
   <img src="{{ '/assets/figs/pic-chain.svg' | relative_url }}" alt="The building blocks of a photonic link, from laser to photodetector, with the chapters that cover each">
-  <figcaption>The blocks of a photonic link and the chapters that cover each. The reference link of Chapters 1 and 34 is a four-wavelength version of this chain.</figcaption>
+  <figcaption>The blocks of a photonic link and the chapters that cover each. The reference link of Chapters 1 and 33 is a four-wavelength version of this chain.</figcaption>
 </figure>
 
 ## What is inside
@@ -44,8 +43,9 @@ A photonic integrated circuit does with light what an electronic chip does with 
   <div class="card"><span class="card-label">Part IV · Ch 15–17 <span class="status status-outline">outline</span></span><h3><a href="{% link parts/part-4.md %}">Coupling and packaging</a></h3><p>Grating and edge couplers, fibre arrays, photonic wire bonds and packaging.</p></div>
   <div class="card"><span class="card-label">Part V · Ch 18–21 <span class="status status-outline">outline</span></span><h3><a href="{% link parts/part-5.md %}">Active devices</a></h3><p>Thermo-optic tuning, electro-optic effects in each platform, modulators, photodetectors and receivers.</p></div>
   <div class="card"><span class="card-label">Part VI · Ch 22–28 <span class="status status-outline">outline</span></span><h3><a href="{% link parts/part-6.md %}">Lasers and amplifiers</a></h3><p>Gain from first principles, the Fabry–Pérot laser and its rate equations, noise and linewidth, tunable lasers, lasers on silicon and SOAs.</p></div>
-  <div class="card"><span class="card-label">Part VII · Ch 29–33 <span class="status status-outline">outline</span></span><h3><a href="{% link parts/part-7.md %}">Fabrication, testing and data</a></h3><p>Fabrication and its variations, the design flow and open PDKs, test setups, data analysis and twelve hands-on labs.</p></div>
-  <div class="card"><span class="card-label">Part VIII · Ch 34–35 <span class="status status-outline">outline</span></span><h3><a href="{% link parts/part-8.md %}">Systems and applications</a></h3><p>Optical links and transceivers, and the sensing, LiDAR, quantum and computing systems built from the same blocks.</p></div>
+  <div class="card"><span class="card-label">Part VII · Ch 29–32 <span class="status status-outline">outline</span></span><h3><a href="{% link parts/part-7.md %}">Fabrication, testing and data</a></h3><p>Fabrication and its variations, the design flow and open PDKs, test setups and data analysis.</p></div>
+  <div class="card"><span class="card-label">Part VIII · Ch 33–34 <span class="status status-outline">outline</span></span><h3><a href="{% link parts/part-8.md %}">Systems and applications</a></h3><p>Optical links and transceivers, and the sensing, LiDAR, quantum and computing systems built from the same blocks.</p></div>
+  <div class="card"><span class="card-label">Labs · 12 <span class="status status-outline">planned</span></span><h3><a href="{% link labs.md %}">Hands-on labs</a></h3><p>Simulate devices with free solvers, lay out and submit an openEBL chip, analyse real measurements, and model lasers and the reference link.</p></div>
   <div class="card"><span class="card-label">Gallery and appendices</span><h3><a href="{% link devices-3d.md %}">PDK devices in 3D</a></h3><p>Devices from the SiEPIC EBeam, CORNERSTONE and Luxtelligence open PDKs, with credit to their designers; plus formulas, constants, a glossary and a directory of open tools.</p></div>
 </div>
 
@@ -57,6 +57,6 @@ Each chapter has one or more demos that run in the browser with no installation:
 
 The tutorial's organisation draws on the open teaching material of the field, above all Chrostowski and Hochberg's *Silicon Photonics Design* and the UBC edX course built around it, the SiEPIC openEBL design–fabrication–test cycle, the AIM Photonics Academy courses and the open PDKs of SiEPIC and gdsfactory. It cites these works and links to them; it does not copy them. Every source is on the [References]({% link references.md %}) page.
 
-**How this tutorial is made.** It is being developed with the help of AI tools, and this draft may contain mistakes. If you spot one, please open a [GitHub issue](https://github.com/kithminrw/photonics-tutorial/issues), and we will correct it.
+**How this tutorial is made.** It is being developed with the help of AI tools, and this draft may contain mistakes. If you spot one, please open a [GitHub issue](https://github.com/kithminrw/silicon-photonics-lasers-tutorial/issues), and we will correct it.
 
 This is a living draft (v0.1, November 2026): Part I (Chapters 1–4) is written, the rest of the outline is in place, seventeen interactive demos and the 3D gallery work, and the remaining chapters are being written part by part.

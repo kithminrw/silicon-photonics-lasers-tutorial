@@ -7,6 +7,7 @@
     <label class="bd-sl"><span>numerical aperture NA <b data-v="na"></b></span><input type="range" data-k="na" min="0.05" max="0.35" step="0.001" value="0.123" aria-label="numerical aperture"></label>
     <label class="bd-sl"><span>wavelength λ <b data-v="lam"></b></span><input type="range" data-k="lam" min="0.6" max="1.7" step="0.005" value="1.55" aria-label="wavelength"></label>
   </div>
+  <div class="bd-scope short"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: fibre cross-section to scale, LP01 intensity and its mode-field diameter</span></div>
   <div class="bd-row">
     <div class="bd-scope tall"><canvas data-c="b" aria-hidden="true"></canvas><span class="bd-tag">normalised propagation constant b against V</span></div>
     <div class="bd-scope tall"><canvas data-c="f" aria-hidden="true"></canvas><span class="bd-tag">LP01 field: exact (solid) and Gaussian fit (dashed)</span></div>
@@ -76,6 +77,21 @@
       BD.line(f2, rs, ex, BD.C.gold, 2); BD.line(f2, rs, ga, BD.C.blue, 1.5, [5, 3]);
       BD.vline(f2, w0, BD.C.blue, [2, 3], 'w');
     }
+    // ---- geometry: core, LP01 intensity, MFD circle; the 125 um cladding extends beyond the view
+    (function () {
+      var dv2 = BD.setup(q('[data-c="g"]')), gg = dv2.g, R = Math.max(2.2 * w0, 1.6 * S.a), sc = (dv2.h - 34) / (2 * R), cx = dv2.w * 0.35, cy = 22 + (dv2.h - 34) / 2;
+      gg.fillStyle = 'rgba(160,200,240,.12)'; gg.fillRect(0, 18, dv2.w, dv2.h - 18);
+      var gr = gg.createRadialGradient(cx, cy, 0, cx, cy, 2.5 * w0 * sc);
+      for (var i = 0; i <= 10; i++) { var r = 2.5 * w0 * i / 10; gr.addColorStop(i / 10, 'rgba(255,214,120,' + (0.85 * Math.exp(-2 * r * r / (w0 * w0))).toFixed(3) + ')'); }
+      gg.fillStyle = gr; gg.beginPath(); gg.arc(cx, cy, 2.5 * w0 * sc, 0, 7); gg.fill();
+      gg.strokeStyle = BD.GEO.si; gg.lineWidth = 2; gg.beginPath(); gg.arc(cx, cy, S.a * sc, 0, 7); gg.stroke(); gg.lineWidth = 1;
+      gg.strokeStyle = BD.C.gold; gg.setLineDash([4, 3]); gg.beginPath(); gg.arc(cx, cy, w0 * sc, 0, 7); gg.stroke(); gg.setLineDash([]);
+      var tx = cx + R * sc + 20;
+      BD.label(gg, 'core: 2a = ' + (2 * S.a).toFixed(1) + ' µm (solid circle)', tx, cy - 14, BD.C.axis);
+      BD.label(gg, 'MFD = ' + (2 * w0).toFixed(1) + ' µm (dashed)', tx, cy + 2, BD.C.gold);
+      BD.label(gg, 'cladding Ø 125 µm, beyond the view', tx, cy + 18, BD.C.dim);
+      BD.scalebar(gg, dv2.w - 100, dv2.h - 8, sc, 70);
+    })();
     var lc = 2 * Math.PI * S.a * S.na / 2.405;
     q('[data-o="v"]').textContent = V.toFixed(3);
     q('[data-o="m"]').textContent = ms.length ? ms.map(function (m) { return 'LP' + m.l + m.m; }).join(', ') : 'none';

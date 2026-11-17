@@ -7,22 +7,22 @@ description: >-
 theme: just-the-docs
 
 # The Pages workflow passes the real base path, so these only matter for local builds.
-# Served by GitHub Pages at https://www.kithminrw.com/photonics-tutorial/ : the repository is named
-# photonics-tutorial and the account's user site carries the custom domain www.kithminrw.com.
+# Served by GitHub Pages at https://www.kithminrw.com/silicon-photonics-lasers-tutorial/ (the account's
+# user site carries the custom domain www.kithminrw.com, so project sites appear under it).
 url: https://www.kithminrw.com
-baseurl: /photonics-tutorial
+baseurl: /silicon-photonics-lasers-tutorial
 
 favicon_ico: "/favicon.ico"
 color_scheme: wafer
 
 aux_links:
   "GitHub":
-    - "https://github.com/kithminrw/photonics-tutorial"
+    - "https://github.com/kithminrw/silicon-photonics-lasers-tutorial"
 aux_links_new_tab: false
 
 nav_external_links:
   - title: Source on GitHub
-    url: https://github.com/kithminrw/photonics-tutorial
+    url: https://github.com/kithminrw/silicon-photonics-lasers-tutorial
 
 search_enabled: true
 search:
@@ -40,7 +40,7 @@ back_to_top_text: "Back to top"
 
 gh_edit_link: true
 gh_edit_link_text: "Edit this page on GitHub"
-gh_edit_repository: "https://github.com/kithminrw/photonics-tutorial"
+gh_edit_repository: "https://github.com/kithminrw/silicon-photonics-lasers-tutorial"
 gh_edit_branch: "main"
 gh_edit_view_mode: "edit"
 

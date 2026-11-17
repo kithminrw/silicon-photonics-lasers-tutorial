@@ -37,7 +37,7 @@
   <g transform="translate(332,124)"><rect class="gc" x="0" y="0" width="3" height="24"/><rect class="gc" x="6" y="-2" width="3" height="28"/><rect class="gc" x="12" y="-4" width="3" height="32"/><rect class="gc" x="18" y="-6" width="3" height="36"/></g>
   <text class="s" x="345" y="186" text-anchor="middle">grating</text><text class="s" x="345" y="198" text-anchor="middle">coupler</text>
   <!-- fibre -->
-  <path class="wg ar" d="M356 136 C374 136 380 104 396 104 S420 168 438 168 S464 136 480 136"/>
+  <path class="wg ar" d="M356 136 C370 136 375 104 389 104 S410 168 425 168 S448 136 458 136 L 480 136"/>
   <text class="tb" x="418" y="222" text-anchor="middle">2 km SMF</text>
   <text class="s" x="418" y="236" text-anchor="middle">0.2 dB/km + connectors</text>
   <!-- receiver -->

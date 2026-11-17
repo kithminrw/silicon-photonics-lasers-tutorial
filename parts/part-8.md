@@ -17,5 +17,5 @@ Everything together: optical links and transceivers, and the sensing, LiDAR, qua
 
 ## Chapters in this part
 
-- [34. Optical Links and Transceivers]({% link chapters/34_links.md %})
-- [35. Beyond Datacom: Sensing, LiDAR, Quantum and Computing]({% link chapters/35_apps.md %})
+- [33. Optical Links and Transceivers]({% link chapters/33_links.md %})
+- [34. Beyond Datacom: Sensing, LiDAR, Quantum and Computing]({% link chapters/34_apps.md %})

@@ -8,6 +8,7 @@
     <label class="bd-sl"><span>input offset from centre <b data-v="x0"></b></span><input type="range" data-k="x0" min="0" max="3" step="0.01" value="0" aria-label="input offset"></label>
     <label class="bd-sl"><span>wavelength λ <b data-v="lam"></b></span><input type="range" data-k="lam" min="1.5" max="1.6" step="0.001" value="1.55" aria-label="wavelength"></label>
   </div>
+  <div class="bd-scope short"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top view of the MMI (width drawn larger than the length scale)</span></div>
   <div class="bd-scope tall"><canvas data-c="m" aria-hidden="true"></canvas><span class="bd-tag">intensity in the multimode section (top view, length compressed)</span></div>
   <div class="bd-scope short"><canvas data-c="o" aria-hidden="true"></canvas><span class="bd-tag">intensity across the output end</span></div>
   <div class="bd-read" aria-live="polite"><span>guided modes <b data-o="n">–</b></span><span>beat length L<sub>π</sub> <b data-o="lp">–</b></span><span>1 × 2 length <b data-o="l12">–</b></span><span>power in upper / lower half <b data-o="ud">–</b></span></div>
@@ -73,6 +74,26 @@
       xt: [[-G.We / 4, '−W/4'], [0, '0'], [G.We / 4, 'W/4']], yt: [[0, '0'], [1, 'max']] });
     BD.line(f2, xo, Io, BD.C.gold, 2);
     var up = 0, dn = 0; Iout.forEach(function (v, k) { if (xs[k] > G.We / 2) up += v; else dn += v; });
+    // ---- geometry: top view; length to scale, width magnified so it stays visible
+    (function () {
+      var dg = BD.setup(q('[data-c="g"]')), g = dg.g, Lio = Math.min(Math.max(0.22 * L, 8), 60), wA = 1.5;
+      var sx = (dg.w - 30) / (L + 2 * Lio), top = 26, bot = dg.h - 22, sy = Math.min((bot - top) / (S.W + 2), 22), k = sy / sx;
+      var x0 = 15, X = function (z) { return x0 + z * sx; }, yc = (top + bot) / 2, Y = function (y) { return yc - y * sy; };
+      g.fillStyle = BD.GEO.ox; g.fillRect(0, top - 4, dg.w, bot - top + 8);
+      g.fillStyle = BD.GEO.si;
+      g.fillRect(X(0), Y(S.x0 + wA / 2), Lio * sx, wA * sy);                       // input access waveguide
+      g.fillRect(X(Lio), Y(S.W / 2), L * sx, S.W * sy);                             // multimode section
+      [S.W / 4, -S.W / 4].forEach(function (yo) { g.fillRect(X(Lio + L), Y(yo + wA / 2), Lio * sx, wA * sy); });   // output ports at +-W/4
+      g.fillStyle = BD.GEO.glow + '0.9)'; g.beginPath(); g.arc(X(0) + 3, Y(S.x0), 3, 0, 7); g.fill();
+      BD.dim(g, X(Lio + 0.1 * L), Y(S.W / 2), X(Lio + 0.1 * L), Y(-S.W / 2), 'W = ' + S.W.toFixed(1) + ' µm', '#172036', 10);
+      g.textAlign = 'left';
+      BD.dim(g, X(Lio), bot + 10, X(Lio + L), bot + 10, 'L = ' + L.toFixed(1) + ' µm', BD.C.gold, -6);
+      var tot = up + dn;
+      BD.label(g, 'upper ' + (100 * up / tot).toFixed(0) + ' %', dg.w - 6, Y(S.W / 4 + wA / 2) - 4, BD.C.white, 'right');
+      BD.label(g, 'lower ' + (100 * dn / tot).toFixed(0) + ' %', dg.w - 6, Y(-S.W / 4 - wA / 2) + 12, BD.C.white, 'right');
+      BD.label(g, 'input', X(0), Y(S.x0 - wA / 2) + 12, BD.C.gold);
+      if (k > 1.05) BD.label(g, 'width drawn ×' + k.toFixed(1), dg.w - 6, top - 8, BD.C.dim, 'right');
+    })();
     // ---- readouts
     q('[data-o="n"]').textContent = G.N;
     q('[data-o="lp"]').textContent = G.Lp.toFixed(1) + ' µm';

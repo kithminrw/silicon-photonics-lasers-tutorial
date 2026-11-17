@@ -7,6 +7,7 @@
     <label class="bd-sl"><span>fill factor (unetched fraction) <b data-v="ff"></b></span><input type="range" data-k="ff" min="0.2" max="0.9" step="0.01" value="0.5" aria-label="fill factor"></label>
     <label class="bd-sl"><span>fibre angle θ (in air) <b data-v="th"></b></span><input type="range" data-k="th" min="-5" max="25" step="0.1" value="8" aria-label="fibre angle"></label>
   </div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: side view of the grating to scale, with the fibre at angle θ</span></div>
   <div class="bd-row">
     <div class="bd-scope tall"><canvas data-c="k" aria-hidden="true"></canvas><span class="bd-tag">wavevector diagram at the centre wavelength</span></div>
     <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">relative coupling against wavelength</span></div>
@@ -67,6 +68,33 @@
     d2.g.fillStyle = 'rgba(224,184,90,.1)'; d2.g.fillRect(f.X(1.53), f.p.t, f.X(1.565) - f.X(1.53), d2.h - f.p.t - f.p.b);
     d2.g.fillStyle = 'rgba(233,208,143,.7)'; d2.g.fillText('C band', f.X(1.532), d2.h - f.p.b - 6);
     BD.line(f, xs, ys, BD.C.blue, 2); BD.hline(f, -1, BD.C.dim, [3, 3]);
+    // ---- geometry: cross-section of the shallow-etched grating and the tilted fibre
+    (function () {
+      var dv2 = BD.setup(q('[data-c="g"]')), gg = dv2.g, nT = 9, sc = (dv2.w * 0.62) / (nT * S.P + 1.2), base = dv2.h - 34, x0 = 14 + 1.2 * sc;
+      var tSi = 0.22, etch = 0.07;
+      gg.fillStyle = BD.GEO.ox; gg.fillRect(0, base, dv2.w, dv2.h - base);
+      if (nc > 1.2) { gg.fillStyle = 'rgba(160,200,240,.07)'; gg.fillRect(0, 22, dv2.w, base - 22); }
+      gg.fillStyle = BD.GEO.si; gg.fillRect(14, base - tSi * sc, 1.2 * sc, tSi * sc);   // input waveguide
+      for (var i = 0; i < nT; i++) {
+        var xa = x0 + i * S.P * sc;
+        gg.fillRect(xa, base - tSi * sc, S.ff * S.P * sc, tSi * sc);                                     // tooth
+        gg.fillRect(xa + S.ff * S.P * sc, base - (tSi - etch) * sc, (1 - S.ff) * S.P * sc + 0.5, (tSi - etch) * sc);   // etched groove
+      }
+      var xg = x0 + nT * S.P * sc; gg.fillRect(xg, base - (tSi - etch) * sc, dv2.w * 0.05, (tSi - etch) * sc);
+      BD.dim(gg, x0, base + 12, x0 + S.P * sc, base + 12, 'Λ = ' + (1000 * S.P).toFixed(0) + ' nm', BD.C.gold, 10);
+      BD.label(gg, 'fill ' + (100 * S.ff).toFixed(0) + ' %, 70 nm etch', x0 + 2 * S.P * sc, base + 26, BD.C.axis);
+      // fibre: axis tilted by theta (in air) from the normal, aimed at the grating centre
+      var xc = x0 + nT * S.P * sc / 2, th = S.th * Math.PI / 180, Lf = Math.max(40, base - 70), ux = Math.sin(th), uy = -Math.cos(th);
+      var fx = xc + ux * Lf, fy = base + uy * Lf, half = Math.min(4.5 * sc, 60);
+      gg.save(); gg.beginPath(); gg.rect(0, 22, dv2.w, dv2.h - 22); gg.clip(); gg.translate(fx, fy); gg.rotate(th); gg.fillStyle = 'rgba(127,184,240,.15)'; gg.fillRect(-half * 1.6, -60, 3.2 * half, 60);
+      gg.fillStyle = 'rgba(127,184,240,.35)'; gg.fillRect(-half / 1.7, -60, 2 * half / 1.7, 60); gg.restore();
+      gg.strokeStyle = BD.C.green; gg.setLineDash([4, 3]); gg.beginPath(); gg.moveTo(xc, base - tSi * sc); gg.lineTo(fx, fy); gg.stroke(); gg.setLineDash([]);
+      gg.strokeStyle = BD.C.dim; gg.beginPath(); gg.moveTo(xc, base - tSi * sc); gg.lineTo(xc, fy); gg.stroke();
+      BD.label(gg, 'fibre, θ = ' + S.th.toFixed(1) + '°', fx + 10, fy + 14, BD.C.white);
+      BD.label(gg, nc > 1.2 ? 'oxide cladding' : 'air', dv2.w - 8, 34, BD.C.dim, 'right');
+      BD.label(gg, 'BOX', dv2.w - 8, dv2.h - 6, BD.C.dim, 'right');
+      BD.scalebar(gg, dv2.w - 110, base - 40, sc, 80);
+    })();
     var tcl = Math.asin(Math.min(1, st / nc)) * 180 / Math.PI;
     q('[data-o="ne"]').textContent = ne.toFixed(3);
     q('[data-o="lc"]').textContent = (1000 * lc).toFixed(1) + ' nm';

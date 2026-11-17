@@ -37,7 +37,7 @@ The **[PDK devices in 3D]({% link devices-3d.md %})** page shows real devices fr
 
 **Your first chip** is a passive chip in 220 nm SOI at 1550 nm with grating couplers on a 127 µm pitch, of the kind made in the SiEPIC openEBL runs {% include cite.html keys="openebl" %}. The labs lay it out, verify it and analyse the measurements, so that you go through a whole design–fabrication–test cycle with free tools.
 
-**The reference link** is a four-wavelength WDM transmitter and receiver: lasers, modulators, a multiplexer, a fibre, a demultiplexer and photodetectors. Chapter 1 sets its draft targets, Parts V and VI design its active blocks, and Chapter 34 closes its power budget.
+**The reference link** is a four-wavelength WDM transmitter and receiver: lasers, modulators, a multiplexer, a fibre, a demultiplexer and photodetectors. Chapter 1 sets its draft targets, Parts V and VI design its active blocks, and Chapter 33 closes its power budget.
 
 ## Reading paths
 

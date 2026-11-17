@@ -260,7 +260,7 @@ Demos: ○ SOA
 
 ## Part VII · Fabrication, Testing and Data Analysis
 
-How photonic chips are made and verified: fabrication and its variations, the design flow and open PDKs, test setups, data analysis, and the hands-on labs.
+How photonic chips are made and verified: fabrication and its variations, the design flow and open PDKs, test setups and data analysis.
 
 ### [29. Fabrication]({% link chapters/29_fab.md %})
 
@@ -294,24 +294,26 @@ Demos: ○ Virtual test bench
 
 Demos: ○ Ring-fit playground; ○ Cutback fit
 
-### [33. Hands-On Labs]({% link chapters/33_labs.md %})
-
 ## Part VIII · Systems and Applications
 
 Everything together: optical links and transceivers, and the sensing, LiDAR, quantum and computing systems built from the same blocks.
 
-### [34. Optical Links and Transceivers]({% link chapters/34_links.md %})
+### [33. Optical Links and Transceivers]({% link chapters/33_links.md %})
 
 *Does the reference link close, and what does each block contribute?*
 
-34.1 Link architectures · 34.2 Power budget and penalties · 34.3 WDM transceivers · 34.4 Coherent transceivers · 34.5 Energy per bit · 34.6 Co-packaged optics · 34.7 The reference link, block by block
+33.1 Link architectures · 33.2 Power budget and penalties · 33.3 WDM transceivers · 33.4 Coherent transceivers · 33.5 Energy per bit · 33.6 Co-packaged optics · 33.7 The reference link, block by block
 
 Demos: ○ Link budget
 
-### [35. Beyond Datacom: Sensing, LiDAR, Quantum and Computing]({% link chapters/35_apps.md %})
+### [34. Beyond Datacom: Sensing, LiDAR, Quantum and Computing]({% link chapters/34_apps.md %})
 
 *What changes when the chip is a sensor, a beam steerer or a processor instead of a transceiver?*
 
-35.1 Biosensing with evanescent fields · 35.2 LiDAR and optical phased arrays · 35.3 Quantum photonics · 35.4 Photonic computing · 35.5 Microwave photonics and frequency combs · 35.6 Visible and mid-infrared photonics
+34.1 Biosensing with evanescent fields · 34.2 LiDAR and optical phased arrays · 34.3 Quantum photonics · 34.4 Photonic computing · 34.5 Microwave photonics and frequency combs · 34.6 Visible and mid-infrared photonics
 
 Demos: ○ Ring biosensor; ○ Optical phased array
+
+## Hands-On Labs
+
+Twelve labs in three tracks, using free tools only: simulate (mode solvers, FDTD, circuit models), make (lay out, verify and submit an openEBL chip, then analyse its measurements), and lasers and links (rate equations, a Vernier laser, the reference-link budget). See [the labs page]({% link labs.md %}).

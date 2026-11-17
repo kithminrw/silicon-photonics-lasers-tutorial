@@ -78,7 +78,7 @@ Photonic integrated circuits (PICs) are now in several markets, each pulling the
 
 - **Data-centre transceivers and AI clusters.** Pluggable modules convert electrical lanes to light over hundreds of metres to a few kilometres of fibre at 400 Gb/s, 800 Gb/s and beyond. Clusters of AI accelerators need far more bandwidth between chips than copper can deliver at acceptable power, which is driving optics into the package (co-packaged optics, Chapter 17).
 - **Coherent telecom.** Long-haul and metro links encode data in the amplitude and phase of light in two polarisations and recover it with a local oscillator and digital signal processing. They need low-loss IQ modulators and narrow-linewidth tunable lasers (Chapters 20 and 26).
-- **LiDAR and free-space beam steering.** Frequency-modulated continuous-wave (FMCW) LiDAR measures distance and velocity from the beat between transmitted and received light; optical phased arrays steer the beam without moving parts (Chapter 35).
+- **LiDAR and free-space beam steering.** Frequency-modulated continuous-wave (FMCW) LiDAR measures distance and velocity from the beat between transmitted and received light; optical phased arrays steer the beam without moving parts (Chapter 34).
 - **Sensing.** The evanescent field of a waveguide resonator responds to molecules binding at its surface, giving label-free biosensors; the same idea detects gases and measures rotation and strain.
 - **Quantum photonics.** Photon-pair sources, large interferometer meshes and single-photon detectors on a chip are a route to quantum communication and computing.
 - **Photonic computing.** Meshes of interferometers perform matrix multiplication at the speed of light, with the electronics around them as the bottleneck.
@@ -166,7 +166,7 @@ The fibre couplers usually dominate a short link's budget: two grating couplers 
   <figcaption><span class="capnum">Figure 1.2.</span> <strong>The reference link.</strong> Four wavelengths on the 400 GHz ITU grid near 1550 nm, each carrying 50 Gb/s NRZ, share one waveguide and one fibre. On the receiver, four drop rings demultiplex the channels onto germanium photodiodes and transimpedance amplifiers.</figcaption>
 </figure>
 
-**Table 1.3. Draft targets of the reference link.** Set here, checked block by block, and closed in Chapter 34.
+**Table 1.3. Draft targets of the reference link.** Set here, checked block by block, and closed in Chapter 33.
 {: .tabcaption #tab-1-3 }
 
 | Quantity | Draft target | Set or met in |
@@ -181,8 +181,8 @@ The fibre couplers usually dominate a short link's budget: two grating couplers 
 | Demultiplexer | crosstalk from neighbouring channels ≤ −20 dB; drop loss ≤ 1 dB | Ch 12, 14 |
 | Receiver | sensitivity ≤ −12 dBm average power at 50 Gb/s | Ch 21 |
 | Temperature | rings held on their channels from 20 to 70 °C | Ch 18 |
-| Link margin | ≥ 3 dB after all penalties | Ch 34 |
-| Energy | ≤ 5 pJ/bit for the whole link, including laser wall-plug power, drivers, receivers and heaters | Ch 34 |
+| Link margin | ≥ 3 dB after all penalties | Ch 33 |
+| Energy | ≤ 5 pJ/bit for the whole link, including laser wall-plug power, drivers, receivers and heaters | Ch 33 |
 
 The 400 GHz spacing (about 3.2 nm) is wide enough that ring filters with a free spectral range above the 9.6 nm span of the four channels separate them cleanly, and it leaves room for the thermal drift that the heaters must correct. At 80 pm/K, a 50 K temperature change moves a silicon ring by 4 nm, more than one channel spacing: thermal control is not optional.
 

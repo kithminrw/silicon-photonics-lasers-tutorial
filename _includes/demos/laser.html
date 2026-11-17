@@ -8,6 +8,7 @@
     <label class="bd-sl"><span>front-facet reflectivity R<sub>1</sub> <b data-v="R"></b></span><input type="range" data-k="R" min="0.02" max="0.95" step="0.01" value="0.32" aria-label="reflectivity"></label>
     <label class="bd-sl"><span>temperature T <b data-v="T"></b></span><input type="range" data-k="T" min="10" max="95" step="1" value="25" aria-label="temperature"></label>
   </div>
+  <div class="bd-scope short"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: the Fabry–Pérot cavity in side view (length to scale against 1.5 mm)</span></div>
   <div class="bd-row">
     <div class="bd-scope tall"><canvas data-c="li" aria-hidden="true"></canvas><span class="bd-tag">L–I: front-facet power against current</span></div>
     <div class="bd-scope tall"><canvas data-c="tr" aria-hidden="true"></canvas><span class="bd-tag">switch-on: current stepped from 0 to I at t = 0</span></div>
@@ -89,6 +90,27 @@
     mm.forEach(function (p) { var y = 10 * Math.log10(p[1] / smax); d3.g.strokeStyle = BD.C.blue; d3.g.lineWidth = 2; d3.g.beginPath(); d3.g.moveTo(f3.X(p[0]), f3.Y(-50)); d3.g.lineTo(f3.X(p[0]), f3.Y(Math.max(y, -50))); d3.g.stroke(); });
     d3.g.lineWidth = 1;
     var smsr = NaN; if (mm.length > 2) { var sorted = mm.map(function (p) { return p[1]; }).sort(function (a, b) { return b - a; }); smsr = 10 * Math.log10(sorted[0] / sorted[1]); }
+    // ---- geometry: cavity length to scale, facet reflectivities, glow ~ photon density, output arrow ~ power
+    (function () {
+      var dv2 = BD.setup(q('[data-c="g"]')), gg = dv2.g, x0 = 40, xmax = dv2.w - 120, sx = (xmax - x0) / 1500, Lp = S.L * sx, yc = dv2.h / 2 + 8;
+      var R1 = S.R, R2 = hr ? 0.9 : S.R;
+      gg.fillStyle = 'rgba(201,194,176,.55)'; gg.fillRect(x0, yc - 22, Lp, 44);                          // InP chip
+      var lit = Math.min(1, Pnow / 20);
+      gg.fillStyle = 'rgba(142,127,90,1)'; gg.fillRect(x0, yc - 4, Lp, 8);                               // active layer
+      gg.fillStyle = BD.GEO.glow + (0.15 + 0.8 * lit).toFixed(2) + ')'; gg.fillRect(x0, yc - 3, Lp, 6);
+      gg.fillStyle = 'rgba(215,230,247,' + (0.3 + 0.7 * R2).toFixed(2) + ')'; gg.fillRect(x0 - 3 - 6 * R2, yc - 22, 3 + 6 * R2, 44);   // rear facet
+      gg.fillStyle = 'rgba(215,230,247,' + (0.3 + 0.7 * R1).toFixed(2) + ')'; gg.fillRect(x0 + Lp, yc - 22, 3 + 6 * R1, 44);         // front facet
+      if (Pnow > 0.01) {
+        var w = 1 + Math.min(8, Pnow / 3), xa = x0 + Lp + 12, xb = xa + 60;
+        gg.strokeStyle = BD.C.gold; gg.lineWidth = w; gg.beginPath(); gg.moveTo(xa, yc); gg.lineTo(xb - 6, yc); gg.stroke(); gg.lineWidth = 1;
+        gg.fillStyle = BD.C.gold; gg.beginPath(); gg.moveTo(xb + 4, yc); gg.lineTo(xb - 8, yc - 6 - w / 2); gg.lineTo(xb - 8, yc + 6 + w / 2); gg.fill();
+        BD.label(gg, Pnow.toFixed(1) + ' mW', xa, yc - 10 - w / 2, BD.C.gold);
+      }
+      BD.dim(gg, x0, yc + 32, x0 + Lp, yc + 32, 'L = ' + S.L.toFixed(0) + ' µm', BD.C.gold, -6);
+      BD.label(gg, 'R₂ ' + (100 * R2).toFixed(0) + ' %' + (hr ? ' (HR)' : ''), x0 - 10, yc - 28, BD.C.axis);
+      BD.label(gg, 'R₁ ' + (100 * R1).toFixed(0) + ' %', x0 + Lp - 10, yc - 28, BD.C.axis);
+      BD.label(gg, 'active layer: glow ∝ output power', x0 + Lp + 12, yc + 22, BD.C.dim);
+    })();
     // ---- readouts
     var se = eta_i * M.am / (alpha_i + M.am) * hv / qe * M.F1;
     q('[data-o="ith"]').textContent = (Ith * 1e3).toFixed(1) + ' mA';

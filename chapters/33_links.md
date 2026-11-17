@@ -1,12 +1,12 @@
 ---
-title: "34. Optical Links and Transceivers"
+title: "33. Optical Links and Transceivers"
 parent: "Part VIII · Systems and Applications"
-nav_order: 34
-permalink: /part-8/ch34/
-chapter: 34
+nav_order: 33
+permalink: /part-8/ch33/
+chapter: 33
 ---
 
-# <span class="chapnum">Chapter 34</span>Optical Links and Transceivers
+# <span class="chapnum">Chapter 33</span>Optical Links and Transceivers
 
 Everything comes together in a link: laser, modulator, multiplexer, fibre, demultiplexer, detector, and the budget that connects them.
 {: .chapterlead }
@@ -31,31 +31,31 @@ Does the reference link close, and what does each block contribute?
 
 </div>
 
-## <span class="secnum">34.1</span>Link architectures
+## <span class="secnum">33.1</span>Link architectures
 
 IM-DD and coherent; parallel single-mode against WDM.
 
-## <span class="secnum">34.2</span>Power budget and penalties
+## <span class="secnum">33.2</span>Power budget and penalties
 
 Sensitivity, extinction-ratio and crosstalk penalties, margin.
 
-## <span class="secnum">34.3</span>WDM transceivers
+## <span class="secnum">33.3</span>WDM transceivers
 
 CWDM4 and FR4-style transceivers and ring-based DWDM.
 
-## <span class="secnum">34.4</span>Coherent transceivers
+## <span class="secnum">33.4</span>Coherent transceivers
 
 IQ modulators, local oscillators and DSP in brief.
 
-## <span class="secnum">34.5</span>Energy per bit
+## <span class="secnum">33.5</span>Energy per bit
 
 Where the picojoules go, including the laser.
 
-## <span class="secnum">34.6</span>Co-packaged optics
+## <span class="secnum">33.6</span>Co-packaged optics
 
 Integration with switch and accelerator chips.
 
-## <span class="secnum">34.7</span>The reference link, block by block
+## <span class="secnum">33.7</span>The reference link, block by block
 
 Closing the budget set in Chapter 1.
 

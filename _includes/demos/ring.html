@@ -5,11 +5,12 @@
     <span class="bd-seg" role="group" aria-label="Span"><button type="button" data-span="wide" aria-pressed="true">several FSRs</button><button type="button" data-span="zoom" aria-pressed="false">zoom on one</button></span></div>
   <div class="bd-sliders">
     <label class="bd-sl"><span>radius R <b data-v="R"></b></span><input type="range" data-k="R" min="3" max="60" step="0.1" value="10" aria-label="radius"></label>
-    <label class="bd-sl"><span>power coupling κ² (each coupler) <b data-v="k"></b></span><input type="range" data-k="k" min="0" max="100" step="0.1" value="45" aria-label="power coupling"></label>
+    <label class="bd-sl"><span>coupling gap g (each coupler) <b data-v="g"></b></span><input type="range" data-k="g" min="0.08" max="0.6" step="0.005" value="0.25" aria-label="coupling gap"></label>
     <label class="bd-sl"><span>propagation loss <b data-v="a"></b></span><input type="range" data-k="a" min="0" max="100" step="0.1" value="45" aria-label="loss"></label>
   </div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top view to scale; the inset magnifies the coupling gap</span></div>
   <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">transmission (dB) against wavelength</span></div>
-  <div class="bd-read" aria-live="polite"><span>FSR <b data-o="fsr">–</b></span><span>FWHM <b data-o="fw">–</b></span><span>loaded Q <b data-o="ql">–</b></span><span>intrinsic Q <b data-o="qi">–</b></span><span>extinction <b data-o="er">–</b></span><span>finesse <b data-o="fi">–</b></span><span>build-up |E<sub>ring</sub>/E<sub>in</sub>|² <b data-o="bu">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>κ² <b data-o="k2">–</b></span><span>FSR <b data-o="fsr">–</b></span><span>FWHM <b data-o="fw">–</b></span><span>loaded Q <b data-o="ql">–</b></span><span>intrinsic Q <b data-o="qi">–</b></span><span>extinction <b data-o="er">–</b></span><span>finesse <b data-o="fi">–</b></span><span>build-up |E<sub>ring</sub>/E<sub>in</sub>|² <b data-o="bu">–</b></span></div>
   <p class="bd-caption" data-o="cap"></p>
 </div>
 <script>
@@ -19,13 +20,16 @@
   var neff0 = 2.44, ng = 4.2, lam0 = 1.55;
   var S = BD.bind(root, {
     R: { fmt: function (x) { return x.toFixed(1) + ' µm'; } },
-    k: { map: function (v) { return 1e-3 * Math.pow(10, 2.7 * v / 100); }, fmt: function (x) { return (100 * x).toFixed(x < 0.01 ? 2 : 1) + ' %'; } },
+    g: { fmt: function (x) { return (1000 * x).toFixed(0) + ' nm'; } },
     a: { map: function (v) { return 0.3 * Math.pow(10, 2 * v / 100); }, fmt: function (x) { return x.toFixed(x < 10 ? 2 : 0) + ' dB/cm'; } }
   }, function () { draw(); });
   BD.seg(root, 'cfg', function (v) { cfg = v; draw(); });
   BD.seg(root, 'span', function (v) { zoom = v === 'zoom'; draw(); });
+  // Point coupler between a ring and a straight bus (500 x 220 nm Si, TE): the supermode model of the Chapter 9 demo
+  // (L_x ~ 30 um at 200 nm gap), integrated along the curved gap g + z^2/(2R): L_eff = sqrt(2 pi R / gamma).
+  function kappa2(R, g) { var dn = 0.0258 * Math.exp(-8.0 * (g - 0.2)), lx = lam0 / (2 * dn), leff = Math.sqrt(2 * Math.PI * R / 8.0), kk = Math.sin(Math.min(Math.PI / 2, Math.PI * leff / (2 * lx))); return kk * kk; }
   function draw() {
-    var L = 2 * Math.PI * S.R, alpha = S.a * 100 / 4.343, a = Math.exp(-alpha * L * 1e-6 / 2), t1 = Math.sqrt(1 - S.k), t2 = cfg === 'ad' ? t1 : 1;
+    var K = kappa2(S.R, S.g), L = 2 * Math.PI * S.R, alpha = S.a * 100 / 4.343, a = Math.exp(-alpha * L * 1e-6 / 2), t1 = Math.sqrt(1 - K), t2 = cfg === 'ad' ? t1 : 1;
     var fsr = lam0 * lam0 / (ng * L), m0 = Math.round(neff0 * L / lam0);
     // resonance nearest 1550 nm, accounting for dispersion
     var lres = (function () { var x = neff0 * L / m0; for (var i = 0; i < 20; i++) { var ne = neff0 - (ng - neff0) * (x - lam0) / lam0; x = ne * L / m0; } return x; })();
@@ -47,10 +51,36 @@
     BD.line(f, xs, tp, BD.C.gold, 1.9);
     dv.g.fillStyle = BD.C.gold; dv.g.fillText('through', f.p.l + 6, f.p.t + 12);
     if (cfg === 'ad') { dv.g.fillStyle = BD.C.blue; dv.g.fillText('drop', f.p.l + 62, f.p.t + 12); }
+    // ---- geometry: ring and bus(es) to scale, with a magnified inset of the gap
+    (function () {
+      var dg = BD.setup(q('[data-c="g"]')), g = dg.g, ad = cfg === 'ad', wW = 0.5, cc = S.R + S.g + wW;   // centre-to-centre ring/bus
+      var leftW = dg.w * 0.6, top = 24, bot = dg.h - 14, spanY = 2 * cc + (ad ? 0 : wW) + 4, spanX = 2 * S.R + 24;
+      var sc = Math.min((bot - top) / spanY, (leftW - 30) / spanX), cx = leftW / 2, cy = ad ? (top + bot) / 2 : top + (S.R + 2) * sc;
+      var glow = Math.min(1, Math.log10(Math.max((1 - t1 * t1) / Math.pow(1 - ra, 2), 1)) / 3);
+      g.strokeStyle = 'rgba(255,214,120,' + (0.15 + 0.5 * glow).toFixed(2) + ')'; g.lineWidth = Math.max(6, wW * sc + 6); g.beginPath(); g.arc(cx, cy, S.R * sc, 0, 7); g.stroke();
+      g.strokeStyle = BD.GEO.si; g.lineWidth = Math.max(1.5, wW * sc); g.beginPath(); g.arc(cx, cy, S.R * sc, 0, 7); g.stroke(); g.lineWidth = 1;
+      var yb = cy + cc * sc; BD.wg(g, [[10, yb], [leftW - 10, yb]], Math.max(1.5, wW * sc));
+      BD.label(g, 'in →', 10, yb - 6, BD.C.white); BD.label(g, 'through', leftW - 10, yb - 6, BD.C.gold, 'right');
+      if (ad) { var yt = cy - cc * sc; BD.wg(g, [[10, yt], [leftW - 10, yt]], Math.max(1.5, wW * sc)); BD.label(g, '← drop', 10, yt - 6, BD.C.blue); }
+      BD.dim(g, cx, cy, cx + S.R * sc * 0.707, cy - S.R * sc * 0.707, 'R = ' + S.R.toFixed(1) + ' µm', BD.C.gold, -10);
+      BD.scalebar(g, 16, dg.h - 6, sc, Math.min(80, leftW / 3));
+      // inset: a 3 um wide window around the coupling point, magnified
+      var ix = leftW + 14, iw = dg.w - ix - 10, ih = bot - top, M = Math.min(iw / 3.2, ih / (wW * 2 + S.g + 1.2));
+      g.strokeStyle = BD.C.grid; g.strokeRect(ix, top, iw, ih); g.save(); g.beginPath(); g.rect(ix, top, iw, ih); g.clip();
+      var icx = ix + iw / 2, ibus = top + ih * 0.66, Rp = S.R * M;
+      g.fillStyle = BD.GEO.si; g.fillRect(ix, ibus - wW / 2 * M, iw, wW * M);
+      var ccy = ibus - (S.g + wW) * M - Rp;   // ring centre far above; draw its bottom arc
+      g.strokeStyle = BD.GEO.si; g.lineWidth = wW * M; g.beginPath(); g.arc(icx, ccy, Rp, Math.PI / 2 - 3.6 / S.R, Math.PI / 2 + 3.6 / S.R); g.stroke(); g.lineWidth = 1;
+      g.restore();
+      var y1 = ibus - wW / 2 * M, y0 = y1 - S.g * M;
+      BD.dim(g, icx + 18, y0, icx + 18, y1, 'g = ' + (1000 * S.g).toFixed(0) + ' nm', BD.C.gold, -40);
+      BD.label(g, '×' + (M / sc).toFixed(0) + ' (500 nm wide waveguides)', ix + 4, top + 12, BD.C.dim);
+    })();
     // ---- readouts
     var tmin = (t2 * t2 * a * a - 2 * t1 * t2 * a + t1 * t1) / Math.pow(1 - ra, 2);
     var Ql = lres / fw, Qi = 2 * Math.PI * ng / (lres * 1e-6 * alpha);
     var bu = (1 - t1 * t1) / Math.pow(1 - ra, 2);
+    q('[data-o="k2"]').textContent = (100 * K).toFixed(K < 0.01 ? 2 : 1) + ' %';
     q('[data-o="fsr"]').textContent = (1000 * fsr).toFixed(2) + ' nm';
     q('[data-o="fw"]').textContent = fw * 1e6 < 1000 ? (fw * 1e6).toFixed(fw * 1e6 < 10 ? 2 : 1) + ' pm' : (fw * 1e3).toFixed(2) + ' nm';
     q('[data-o="ql"]').textContent = BD.eng(Ql).replace(' ', '');
@@ -65,7 +95,7 @@
       else c = '<b>Over-coupled</b> (t < a): the coupler dominates, the resonance broadens and the dip shallows again.';
       c += ' From the through port alone, under- and over-coupling with swapped t and a give the same spectrum, which is why Chapter 32 needs more than one measurement to separate them.';
     } else c = 'In the add-drop ring the drop port peaks where the through port dips; with equal couplers and no loss the drop would take all the power on resonance. Loss lowers the drop peak and leaves a residual dip at the through port.';
-    c += ' The FSR falls as 1/R, while the intrinsic Q depends only on the loss: about ' + BD.eng(Qi).replace(' ', '') + ' at ' + S.a.toFixed(1) + ' dB/cm.';
+    c += ' A narrower gap couples more (κ² is computed from the illustrative coupler model of the Chapter 9 demo). The FSR falls as 1/R, while the intrinsic Q depends only on the loss: about ' + BD.eng(Qi).replace(' ', '') + ' at ' + S.a.toFixed(1) + ' dB/cm.';
     q('[data-o="cap"]').innerHTML = c;
   }
   BD.observe(root, draw);

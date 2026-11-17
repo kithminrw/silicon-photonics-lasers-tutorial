@@ -9,6 +9,7 @@
     <label class="bd-sl"><span>phase shifter on the long arm <b data-v="ph"></b></span><input type="range" data-k="ph" min="0" max="2" step="0.01" value="0" aria-label="phase shift"></label>
     <label class="bd-sl"><span>waveguide loss <b data-v="a"></b></span><input type="range" data-k="a" min="0" max="20" step="0.1" value="3" aria-label="loss"></label>
   </div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top view (line width ∝ power at 1550 nm)</span></div>
   <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">transmission against wavelength</span></div>
   <div class="bd-read" aria-live="polite"><span>FSR <b data-o="fsr">–</b></span><span>extinction (bar port) <b data-o="er">–</b></span><span>n<sub>g</sub> <b>4.20</b></span><span>excess loss <b data-o="il">–</b></span></div>
   <p class="bd-caption" data-o="cap"></p>
@@ -48,6 +49,39 @@
     BD.line(f, xs, c.map(tr), BD.C.blue, 1.6);
     BD.line(f, xs, b.map(tr), BD.C.gold, 1.6);
     dv.g.fillStyle = BD.C.gold; dv.g.fillText('bar', f.p.l + 6, f.p.t + 12); dv.g.fillStyle = BD.C.blue; dv.g.fillText('cross', f.p.l + 36, f.p.t + 12);
+    // ---- geometry: two 2x2 couplers, a straight upper arm and a lower arm with a delay loop of depth dL/2
+    (function () {
+      var dg = BD.setup(q('[data-c="g"]')), g = dg.g, Lb = 25, Lc = 20, sep = 24, D = S.dL / 2, wl = 20;
+      var xs = [0, Lb, Lb + Lc, 2 * Lb + Lc], xS = xs[3], xE = xS + L0, Xt = xE + 2 * Lb + Lc + 30;
+      var sx = (dg.w - 110) / Xt, top = 30, avail = dg.h - top - 18, sy = Math.min(sx, avail / (sep + D + 6)), k = sy / sx;
+      var X = function (x) { return 12 + x * sx; }, Y = function (y) { return top + 6 + (sep / 2 - y) * sy; };
+      var r = mzi(lam0), pu = 1 - S.k1, pl = S.k1, w = function (p) { return 1.6 + 5 * p; };
+      function coupler(x0, upIn, loIn, upOut, loOut) {   // S-bends in, straight coupling section, S-bends out
+        var g0 = 0.6;
+        [[1, upIn, upOut], [-1, loIn, loOut]].forEach(function (a) {   // input half drawn with the input power, output half with the output power
+          BD.wg(g, BD.sbend(X(x0), Y(a[0] * sep / 2), X(x0 + Lb), Y(a[0] * g0), 16).concat([[X(x0 + Lb + Lc / 2), Y(a[0] * g0)]]), w(a[1]));
+          BD.wg(g, [[X(x0 + Lb + Lc / 2), Y(a[0] * g0)], [X(x0 + Lb + Lc), Y(a[0] * g0)]].concat(BD.sbend(X(x0 + Lb + Lc), Y(a[0] * g0), X(x0 + 2 * Lb + Lc), Y(a[0] * sep / 2), 16)), w(a[2]));
+        });
+      }
+      coupler(0, 1, 0.04, pu, pl);
+      BD.wg(g, [[X(xS), Y(sep / 2)], [X(xE), Y(sep / 2)]], w(pu));
+      var xm = (xS + xE) / 2;
+      BD.wg(g, [[X(xS), Y(-sep / 2)], [X(xm - wl / 2), Y(-sep / 2)], [X(xm - wl / 2), Y(-sep / 2 - D)], [X(xm + wl / 2), Y(-sep / 2 - D)], [X(xm + wl / 2), Y(-sep / 2)], [X(xE), Y(-sep / 2)]], w(pl));
+      var ht = 0.25 + 0.65 * (S.ph % 2) / 2;   // heater on the long arm, brighter for more phase
+      g.fillStyle = 'rgba(224,138,58,' + ht.toFixed(2) + ')'; g.fillRect(X(xS + 8), Y(-sep / 2) - 5, 50 * sx, 10);
+      if (dg.w > 520) BD.label(g, 'heater ' + S.ph.toFixed(2) + 'π', X(xS + 8), Y(-sep / 2) + 16, BD.C.gold);
+      coupler(xE, pu, pl, r[0], r[1]);
+      var roomy = dg.w > 520;   // on narrow screens keep only the essential labels
+      if (roomy) { BD.label(g, 'κ² ' + (100 * S.k1).toFixed(0) + ' %', X(Lb), Y(sep / 2) - 8, BD.C.axis); BD.label(g, 'κ² ' + (100 * S.k2).toFixed(0) + ' %', X(xE + Lb), Y(sep / 2) - 8, BD.C.axis); }
+      var xo = X(xE + 2 * Lb + Lc) + 4;
+      BD.label(g, 'bar ' + (100 * r[0]).toFixed(0) + ' %', xo, Y(sep / 2) + 3, BD.C.gold);
+      BD.label(g, 'cross ' + (100 * r[1]).toFixed(0) + ' %', xo, Y(-sep / 2) + 3, BD.C.blue);
+      BD.label(g, 'in', 2, Y(sep / 2) - 6, BD.C.white);
+      if (D > 1) BD.dim(g, X(xm + wl / 2) + 10, Y(-sep / 2), X(xm + wl / 2) + 10, Y(-sep / 2 - D), 'ΔL/2 = ' + D.toFixed(1) + ' µm', BD.C.gold, -44);
+      if (roomy) BD.label(g, 'short arm L = ' + L0 + ' µm', X(xm) - 50, Y(sep / 2) - 8, BD.C.axis);
+      BD.scalebar(g, dg.w - 96, dg.h - 8, sx, 60);
+      if (k < 0.98) BD.label(g, 'vertical ×' + k.toFixed(2), dg.w - 8, top - 10, BD.C.dim, 'right');
+    })();
     var fsr = S.dL > 0 ? lam0 * lam0 / (ng * S.dL) : Infinity;
     q('[data-o="fsr"]').textContent = isFinite(fsr) ? (1000 * fsr).toFixed(2) + ' nm' : '∞ (balanced)';
     var er = 10 * Math.log10(bmax / Math.max(bmin, 1e-9));
