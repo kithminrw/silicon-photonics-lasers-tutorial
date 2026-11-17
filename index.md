@@ -6,7 +6,6 @@ permalink: /
 ---
 
 <div class="hero">
-  <div class="hero-cover"><a href="{% link preface.md %}"><img src="{{ '/assets/images/cover.svg' | relative_url }}" alt="Cover of the Open-Photonics Tutorial: Silicon Photonics and Lasers, from Waveguides to Tested Chips"></a></div>
   <div class="hero-text">
     <p class="eyebrow">Open-Photonics · Si · SiN · TFLN · BTO · InP</p>
     <h1>Silicon Photonics and Lasers, from Waveguides to Tested Chips</h1>

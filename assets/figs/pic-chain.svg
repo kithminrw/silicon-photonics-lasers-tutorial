@@ -21,9 +21,7 @@
   <rect class="blk" x="306" y="56" width="66" height="54" rx="5"/><text class="tx" x="339" y="78">Coupler</text><text class="ch" x="339" y="94">Ch 15–17</text>
   <path class="wg" d="M96 83H116"/><path class="wg" d="M202 83H222"/><path class="wg" d="M286 83H304"/>
   <!-- fibre -->
-  <path d="M372 83 C 400 83, 405 60, 420 60 S 440 106, 455 106 S 470 83, 448 83" fill="none" stroke="none"/>
-  <path class="wg" d="M372 83 C 395 83 395 62 410 62 S 425 104 440 104 S 455 83 446 83" style="marker-end:none"/>
-  <path class="wg" d="M446 83H462"/>
+  <path class="wg" d="M372 83 C 386 83 390 62 402 62 S 418 104 430 104 S 446 83 463 83"/>
   <text class="ch" x="416" y="130">fibre · Ch 3</text>
   <!-- receiver chip -->
   <rect class="chip" x="456" y="22" width="356" height="120" rx="8"/>
