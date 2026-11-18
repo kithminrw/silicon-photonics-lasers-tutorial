@@ -1,0 +1,81 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdSoa" role="group" aria-label="Interactive demo: a semiconductor optical amplifier">
+  <div class="bd-head"><span>// try it · semiconductor optical amplifier: gain, saturation and noise figure</span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>input power (in the waveguide) <b data-v="pin"></b></span><input type="range" data-k="pin" min="-30" max="10" step="0.1" value="-15" aria-label="input power"></label>
+    <label class="bd-sl"><span>length <b data-v="L"></b></span><input type="range" data-k="L" min="200" max="2000" step="10" value="1000" aria-label="length"></label>
+    <label class="bd-sl"><span>small-signal modal gain Γg₀ (drive) <b data-v="g"></b></span><input type="range" data-k="g" min="5" max="60" step="0.5" value="35" aria-label="modal gain"></label>
+    <label class="bd-sl"><span>saturation power <b data-v="ps"></b></span><input type="range" data-k="ps" min="3" max="40" step="0.5" value="12" aria-label="saturation power"></label>
+  </div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top view (length to scale against 2 mm, width stretched), angled facets, light growing along the amplifier</span></div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="c" aria-hidden="true"></canvas><span class="bd-tag">gain against output power</span></div>
+    <div class="bd-scope tall"><canvas data-c="z" aria-hidden="true"></canvas><span class="bd-tag">power and local gain along the amplifier</span></div>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>small-signal gain <b data-o="g0">–</b></span><span>gain now <b data-o="gn">–</b></span><span>output power at −3 dB <b data-o="psat">–</b></span><span>noise figure <b data-o="nf">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdSoa'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  var AI = 5, NSP = 2, NZ = 200;   // internal loss (1/cm), population-inversion factor
+  var S = BD.bind(root, { pin: { fmt: function (x) { return x.toFixed(1) + ' dBm'; } }, L: { fmt: function (x) { return x.toFixed(0) + ' µm'; } },
+    g: { fmt: function (x) { return x.toFixed(1) + ' /cm'; } }, ps: { fmt: function (x) { return x.toFixed(1) + ' mW'; } } }, function () { draw(); });
+  function run(PinmW) {   // integrate dP/dz = (G0/(1+P/Ps) - ai) P along the length
+    var L = S.L * 1e-4, dz = L / NZ, P = PinmW, zs = [0], Ps = [P], gs = [S.g / (1 + P / S.ps)];
+    for (var i = 0; i < NZ; i++) {
+      var f = function (p) { return (S.g / (1 + p / S.ps) - AI) * p; };
+      var k1 = f(P), k2 = f(P + dz / 2 * k1), k3 = f(P + dz / 2 * k2), k4 = f(P + dz * k3); P += dz / 6 * (k1 + 2 * k2 + 2 * k3 + k4);
+      zs.push((i + 1) * dz * 1e4); Ps.push(P); gs.push(S.g / (1 + P / S.ps));
+    }
+    return { out: P, zs: zs, Ps: Ps, gs: gs };
+  }
+  function draw() {
+    var pin = Math.pow(10, S.pin / 10), r = run(pin), G = r.out / pin, G0 = run(1e-6).out / 1e-6;
+    // output power where the gain has dropped by 3 dB
+    var lo = -40, hi = 25; for (var it = 0; it < 50; it++) { var m = (lo + hi) / 2, pp = Math.pow(10, m / 10); if (run(pp).out / pp > G0 / 2) lo = m; else hi = m; }
+    var p3 = Math.pow(10, lo / 10) * G0 / 2;
+    var gav = S.g, nf = 10 * Math.log10(2 * NSP * (G - 1) / G * gav / Math.max(0.1, gav - AI));
+    // ---- geometry: angled SOA, power along it
+    (function () {
+      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, x0 = 70, sc = (dv.w - 150) / 2000, len = S.L * sc, cy = dv.h / 2 + 4, tilt = Math.tan(8 * Math.PI / 180) * 8;
+      g.fillStyle = BD.GEO.ox; g.fillRect(0, 18, dv.w, dv.h - 18);
+      var pmax = Math.max.apply(null, r.Ps);
+      for (var i = 0; i < NZ; i++) {
+        var xa = x0 + r.zs[i] * sc, xb = x0 + r.zs[i + 1] * sc, a = 0.15 + 0.8 * r.Ps[i] / pmax;
+        g.fillStyle = 'rgba(255,214,120,' + a.toFixed(3) + ')'; g.fillRect(xa, cy - 5 - tilt * (r.zs[i] / S.L - 0.5), xb - xa + 0.6, 10);
+      }
+      g.strokeStyle = BD.C.white; g.strokeRect(x0, cy - 7 - tilt * 0.5, len, 14 + tilt);
+      g.strokeStyle = 'rgba(255,255,255,.7)'; g.lineWidth = 2;
+      g.beginPath(); g.moveTo(x0 - 4, cy - 14); g.lineTo(x0 + 4, cy + 14); g.stroke(); g.beginPath(); g.moveTo(x0 + len - 4, cy - 14); g.lineTo(x0 + len + 4, cy + 14); g.stroke(); g.lineWidth = 1;
+      BD.label(g, 'in ' + S.pin.toFixed(1) + ' dBm', 6, cy + 4, BD.C.axis); BD.label(g, 'out ' + (10 * Math.log10(r.out)).toFixed(1) + ' dBm', x0 + len + 10, cy + 4, BD.C.gold);
+      BD.label(g, 'angled, AR-coated facets', x0 + len / 2, cy - 18, BD.C.dim, 'center');
+      BD.label(g, '0', x0, dv.h - 4, BD.C.dim); BD.label(g, '2 mm', x0 + 2000 * sc, dv.h - 4, BD.C.dim, 'right');
+      g.strokeStyle = BD.C.dim; g.beginPath(); g.moveTo(x0, dv.h - 14); g.lineTo(x0 + 2000 * sc, dv.h - 14); g.stroke();
+    })();
+    // ---- gain against output power
+    var xs = [], ys = []; for (var k = 0; k <= 120; k++) { var pd = -35 + 45 * k / 120, pw = Math.pow(10, pd / 10), rr = run(pw); xs.push(10 * Math.log10(rr.out)); ys.push(10 * Math.log10(rr.out / pw)); }
+    var gt = Math.ceil((10 * Math.log10(G0) + 3) / 5) * 5, d2 = BD.setup(q('[data-c="c"]')), f2 = BD.frame(d2, { x: [-20, 25], y: [0, Math.max(10, gt)], pad: { l: 40, b: 22, t: 30 },
+      xt: [[-20, '−20'], [-10, '−10'], [0, '0'], [10, '10'], [20, '20 dBm']], yt: [[0, '0'], [Math.max(10, gt) / 2, (Math.max(10, gt) / 2).toFixed(0)], [Math.max(10, gt), Math.max(10, gt) + ' dB']] });
+    BD.line(f2, xs, ys, BD.C.blue, 2); BD.hline(f2, 10 * Math.log10(G0) - 3, BD.C.dim, [3, 3], '−3 dB'); BD.dot(f2, 10 * Math.log10(r.out), 10 * Math.log10(G), BD.C.white, 4.5);
+    // ---- along z
+    var d3 = BD.setup(q('[data-c="z"]')), pm = Math.max.apply(null, r.Ps), f3 = BD.frame(d3, { x: [0, S.L], y: [0, 1.05], pad: { l: 34, b: 22, t: 30 },
+      xt: [[0, '0'], [S.L, S.L.toFixed(0) + ' µm']], yt: [[0, '0'], [1, 'max']] });
+    BD.line(f3, r.zs, r.Ps.map(function (p) { return p / pm; }), BD.C.gold, 2);
+    BD.line(f3, r.zs, r.gs.map(function (gg) { return gg / S.g; }), BD.C.green, 1.6, [4, 3]);
+    d3.g.fillStyle = BD.C.gold; d3.g.fillText('power (max ' + pm.toFixed(1) + ' mW)', 40, 44); d3.g.fillStyle = BD.C.green; d3.g.fillText('local gain / Γg₀', 40, 58);
+    // ---- readouts
+    q('[data-o="g0"]').textContent = (10 * Math.log10(G0)).toFixed(1) + ' dB';
+    q('[data-o="gn"]').textContent = (10 * Math.log10(G)).toFixed(1) + ' dB';
+    q('[data-o="psat"]').textContent = (10 * Math.log10(p3)).toFixed(1) + ' dBm';
+    q('[data-o="nf"]').textContent = isFinite(nf) ? nf.toFixed(1) + ' dB' : '–';
+    var c = 'At low input the gain is exponential in the length, e<sup>(Γg₀ − α<sub>i</sub>)L</sup>. As the output grows, stimulated emission uses up carriers faster than the current replaces them and the gain saturates, first near the output end. ';
+    if (G < G0 / 2) c += '<b>Saturated:</b> the gain is more than 3 dB below its small-signal value; a booster amplifier runs here on purpose, a pre-amplifier must not. ';
+    c += 'The noise figure can never be below 3 dB for a high-gain amplifier: spontaneous emission adds noise even with full inversion (n<sub>sp</sub> = 1), and real SOAs, with n<sub>sp</sub> ≈ 2 and internal loss, sit at 5–7 dB before any coupling loss. ';
+    c += ' <i>Homogeneous saturation along the length (Γg₀/(1 + P/P<sub>sat</sub>)), α<sub>i</sub> = 5 /cm, n<sub>sp</sub> = 2; powers in the waveguide, so add the coupling losses at each end.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

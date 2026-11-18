@@ -1,0 +1,82 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdRingFit" role="group" aria-label="Interactive demo: fitting a measured ring resonance">
+  <div class="bd-head"><span>// try it · fit a noisy all-pass resonance (10 µm ring): loss, coupling and their ambiguity</span>
+    <span class="bd-controls" style="margin:0"><button type="button" class="bd-btn" data-act="new">new noise</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>true propagation loss <b data-v="lo"></b></span><input type="range" data-k="lo" min="-0.5" max="1.3" step="0.01" value="0.3" aria-label="true loss"></label>
+    <label class="bd-sl"><span>true power coupling κ² <b data-v="k"></b></span><input type="range" data-k="k" min="-3.3" max="-1.3" step="0.01" value="-2.3" aria-label="true coupling"></label>
+    <label class="bd-sl"><span>measurement noise <b data-v="n"></b></span><input type="range" data-k="n" min="0" max="5" step="0.1" value="1" aria-label="noise"></label>
+  </div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="d" aria-hidden="true"></canvas><span class="bd-tag">data and the best fit</span></div>
+    <div class="bd-scope tall"><canvas data-c="m" aria-hidden="true"></canvas><span class="bd-tag">misfit χ² over loss and coupling (darker = better)</span></div>
+  </div>
+  <div class="bd-scope short"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: the two rings that fit the data equally well (top view, gap drawn larger)</span></div>
+  <div class="bd-read" aria-live="polite"><span>solution A (under-coupled) <b data-o="a">–</b></span><span>solution B (over-coupled) <b data-o="b">–</b></span><span>truth <b data-o="t">–</b></span><span>loaded Q <b data-o="q">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdRingFit'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  var R = 10, L = 2 * Math.PI * R * 1e-4, NG = 4.18, LAM = 1550, FSR = LAM * LAM / (NG * 2 * Math.PI * R * 1000), seed = 3;   // L in cm, FSR in nm
+  var S = BD.bind(root, { lo: { fmt: function (x) { return Math.pow(10, x).toFixed(2) + ' dB/cm'; } }, k: { fmt: function (x) { return (100 * Math.pow(10, x)).toFixed(2) + ' %'; } }, n: { fmt: function (x) { return x.toFixed(1) + ' %'; } } }, function () { draw(); });
+  q('[data-act="new"]').addEventListener('click', function () { seed = (seed * 17 + 5) % 9001; draw(); });
+  function aOf(dBcm) { return Math.exp(-dBcm / 4.343 * L / 2); }
+  function T(dl, a, t) { var c = Math.cos(2 * Math.PI * dl / FSR); return (a * a - 2 * a * t * c + t * t) / (1 - 2 * a * t * c + a * a * t * t); }
+  function draw() {
+    var a0 = aOf(Math.pow(10, S.lo)), k2 = Math.pow(10, S.k), t0 = Math.sqrt(1 - k2), fw = (1 - a0 * t0) * LAM * LAM / (Math.PI * NG * L * 1e7 * Math.sqrt(a0 * t0));   // nm
+    var span = Math.max(0.02, 4 * fw), xs = [], ys = [], rnd = BD.rng(seed);
+    for (var i = 0; i <= 240; i++) { var dl = -span + 2 * span * i / 240, u1 = Math.max(1e-9, rnd()), u2 = rnd(), z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+      xs.push(dl); ys.push(T(dl, a0, t0) + S.n / 100 * z); }
+    // grid over log(loss) and log(kappa^2); the resonance centre is fixed (it is easy to find) and the baseline is 1
+    var NL = 70, NK = 70, chi = [], best = { v: 1e99 }, bestU = { v: 1e99 }, bestO = { v: 1e99 };
+    for (var p = 0; p < NL; p++) for (var r = 0; r < NK; r++) {
+      var lo = -0.7 + 2.2 * p / (NL - 1), kk = -3.6 + 2.6 * r / (NK - 1), a = aOf(Math.pow(10, lo)), t = Math.sqrt(1 - Math.pow(10, kk)), s = 0;
+      for (i = 0; i < xs.length; i += 2) { var e = ys[i] - T(xs[i], a, t); s += e * e; }
+      chi.push(s); var o = { v: s, lo: lo, kk: kk, a: a, t: t };
+      if (s < best.v) best = o; if (t > a && s < bestU.v) bestU = o; if (t < a && s < bestO.v) bestO = o;
+    }
+    // ---- data and fit
+    var d1 = BD.setup(q('[data-c="d"]')), f1 = BD.frame(d1, { x: [-span, span], y: [Math.min(0, Math.min.apply(null, ys)) - 0.05, 1.1], pad: { l: 36, b: 22, t: 30 },
+      xt: [[-span, (-1000 * span).toFixed(0)], [0, '0'], [span, '+' + (1000 * span).toFixed(0) + ' pm']], yt: [[0, '0'], [0.5, '0.5'], [1, '1']] });
+    xs.forEach(function (x, j) { if (j % 2 === 0) BD.dot(f1, x, ys[j], 'rgba(127,184,240,.7)', 1.8); });
+    var fx = [], fy = []; for (i = 0; i <= 300; i++) { var x = -span + 2 * span * i / 300; fx.push(x); fy.push(T(x, best.a, best.t)); }
+    BD.line(f1, fx, fy, BD.C.gold, 2);
+    // ---- chi^2 map
+    var d2 = BD.setup(q('[data-c="m"]')), f2 = BD.frame(d2, { x: [-0.7, 1.5], y: [-3.6, -1.0], pad: { l: 46, b: 22, t: 30 },
+      xt: [[-0.5, '0.3'], [0, '1'], [0.5, '3'], [1, '10'], [1.5, '30 dB/cm']], yt: [[-3, '0.1 %'], [-2, '1 %'], [-1, '10 %']] });
+    var cmax = Math.log(Math.max.apply(null, chi) + 1e-9), cmin = Math.log(best.v + 1e-9);
+    for (p = 0; p < NL; p++) for (r = 0; r < NK; r++) {
+      var v = (Math.log(chi[p * NK + r] + 1e-9) - cmin) / (cmax - cmin), lo2 = -0.7 + 2.2 * p / (NL - 1), kk2 = -3.6 + 2.6 * r / (NK - 1);
+      d2.g.fillStyle = 'rgba(224,184,90,' + (0.9 * Math.pow(1 - v, 3)).toFixed(3) + ')';
+      d2.g.fillRect(f2.X(lo2 - 1.1 / (NL - 1)), f2.Y(kk2 + 1.3 / (NK - 1)), f2.X(lo2 + 1.1 / (NL - 1)) - f2.X(lo2 - 1.1 / (NL - 1)) + 0.5, f2.Y(kk2 - 1.3 / (NK - 1)) - f2.Y(kk2 + 1.3 / (NK - 1)) + 0.5);
+    }
+    // critical-coupling line a = t
+    var cx = [], cy = []; for (i = 0; i <= 60; i++) { var lo3 = -0.7 + 2.2 * i / 60, a3 = aOf(Math.pow(10, lo3)); cx.push(lo3); cy.push(Math.log10(1 - a3 * a3)); }
+    BD.line(f2, cx, cy, BD.C.dim, 1, [4, 3]); d2.g.fillStyle = BD.C.dim; d2.g.fillText('critical coupling (a = t)', f2.X(0.4), f2.Y(-1.25));
+    BD.dot(f2, S.lo, S.k, BD.C.white, 5); BD.dot(f2, bestU.lo, bestU.kk, BD.C.blue, 4); BD.dot(f2, bestO.lo, bestO.kk, BD.C.red, 4);
+    // ---- the two rings
+    (function () {
+      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, y = dv.h / 2 + 8;
+      [[bestU, dv.w * 0.27, BD.C.blue, 'A: under-coupled'], [bestO, dv.w * 0.73, BD.C.red, 'B: over-coupled']].forEach(function (z) {
+        var o = z[0], cx2 = z[1], Rp = 22, gap = 3 + 14 * (1 - (Math.log10(1 - o.t * o.t) + 3.6) / 2.6);
+        g.strokeStyle = BD.GEO.si; g.lineWidth = 3; g.beginPath(); g.arc(cx2, y - gap / 2 - 2, Rp, 0, 2 * Math.PI); g.stroke();
+        g.beginPath(); g.moveTo(cx2 - 70, y + Rp - gap / 2 + gap); g.lineTo(cx2 + 70, y + Rp - gap / 2 + gap); g.stroke(); g.lineWidth = 1;
+        BD.label(g, z[3], cx2 - 70, 34, z[2]);
+        BD.label(g, Math.pow(10, o.lo).toFixed(1) + ' dB/cm, κ² ' + (100 * (1 - o.t * o.t)).toFixed(2) + ' %', cx2 + Rp + 8, y - 4, BD.C.axis);
+      });
+    })();
+    var fmt = function (o) { return Math.pow(10, o.lo).toFixed(2) + ' dB/cm, κ² ' + (100 * (1 - o.t * o.t)).toFixed(2) + ' %'; };
+    q('[data-o="a"]').textContent = fmt(bestU); q('[data-o="b"]').textContent = fmt(bestO);
+    q('[data-o="t"]').textContent = Math.pow(10, S.lo).toFixed(2) + ' dB/cm, κ² ' + (100 * k2).toFixed(2) + ' %';
+    q('[data-o="q"]').textContent = (LAM / fw).toFixed(0);
+    var c = 'The all-pass response is symmetric in a and t: swap the round-trip loss and the coupling and the spectrum is the same. The misfit map therefore has two valleys mirrored about the critical-coupling line, and one spectrum cannot tell an under-coupled ring (A) from an over-coupled one (B). ';
+    c += 'Fitting gives both; deciding which is right needs more information: rings with different gaps (the coupling changes, the loss does not), an add-drop ring, or the phase response (Chapter 12). ';
+    if (S.n > 2.5) c += 'With this much noise the valleys broaden, and the extracted loss carries a wide error bar. ';
+    c += ' <i>Grid fit with the resonance centre and baseline known; real data also need the coupler envelope removed first (Section 32.2).</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

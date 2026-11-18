@@ -1,0 +1,81 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdLevels" role="group" aria-label="Interactive demo: population inversion in two-, three- and four-level systems">
+  <div class="bd-head"><span>// try it · pumping two-, three- and four-level systems (steady state)</span>
+    <span class="bd-seg" role="group" aria-label="System"><button type="button" data-sys="2" aria-pressed="false">two-level</button><button type="button" data-sys="3" aria-pressed="true">three-level</button><button type="button" data-sys="4" aria-pressed="false">four-level</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>pump rate W<sub>p</sub> / A<sub>21</sub> <b data-v="p"></b></span><input type="range" data-k="p" min="-2" max="2" step="0.01" value="0.3" aria-label="pump rate"></label>
+    <label class="bd-sl"><span>signal (stimulated rate / A<sub>21</sub>) <b data-v="s"></b></span><input type="range" data-k="s" min="-3" max="1.5" step="0.01" value="-3" aria-label="signal"></label>
+  </div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">energy levels, populations and rates</span></div>
+    <div class="bd-scope tall"><canvas data-c="p" aria-hidden="true"></canvas><span class="bd-tag">inversion (N₂ − N₁)/N against pump rate</span></div>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>upper level N₂/N <b data-o="n2">–</b></span><span>lower level N₁/N <b data-o="n1">–</b></span><span>inversion <b data-o="inv">–</b></span><span>gain or loss <b data-o="g">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdLevels'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  var sys = 3;
+  var S = BD.bind(root, { p: { fmt: function (x) { return Math.pow(10, x).toPrecision(2); } }, s: { fmt: function (x) { return Math.pow(10, x).toPrecision(2); } } }, function () { draw(); });
+  BD.seg(root, 'sys', function (v) { sys = +v; draw(); });
+  // steady-state populations (fractions of N), rates normalised to A21; Ws is the stimulated rate of the signal
+  function pops(Wp, Ws, n) {
+    if (n === 2) { var n2 = (Wp + Ws) / (2 * (Wp + Ws) + 1); return { n1: 1 - n2, n2: n2, lev: [1 - n2, n2] }; }
+    if (n === 3) {                       // pump 1 -> 3, fast 3 -> 2, laser 2 -> 1 (the ground state)
+      var a = Wp + Ws, b = 1 + Ws, n2b = a / (a + b); return { n1: 1 - n2b, n2: n2b, lev: [1 - n2b, n2b, 0] };
+    }
+    var n2c = Wp / (Wp + 1 + Ws * 0);     // four-level: pump 0 -> 3, fast 3 -> 2, laser 2 -> 1, fast 1 -> 0 (N1 ~ 0)
+    var n2d = Wp / (Wp + 1 + Ws), n1d = 0.01 * n2d; return { n1: n1d, n2: n2d, lev: [1 - n2d - n1d, n1d, n2d, 0] };
+  }
+  function draw() {
+    var Wp = Math.pow(10, S.p), Ws = S.s > -2.99 ? Math.pow(10, S.s) : 0, P = pops(Wp, Ws, sys), inv = P.n2 - P.n1;
+    // ---- level diagram
+    (function () {
+      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, n = sys === 2 ? 2 : sys === 3 ? 3 : 4, x0 = 40, x1 = dv.w * 0.62, top = 40, bot = dv.h - 26;
+      var ys = n === 2 ? [bot, top + 30] : n === 3 ? [bot, top + 50, top] : [bot, bot - 50, top + 50, top];
+      var names = n === 2 ? ['1', '2'] : n === 3 ? ['1 (ground, lower laser level)', '2 (upper laser level)', '3 (pump band)'] : ['0 (ground)', '1 (lower laser level)', '2 (upper laser level)', '3 (pump band)'];
+      for (var i = 0; i < n; i++) {
+        g.strokeStyle = BD.C.white; g.lineWidth = 2; g.beginPath(); g.moveTo(x0, ys[i]); g.lineTo(x1, ys[i]); g.stroke(); g.lineWidth = 1;
+        var w = (x1 - x0) * Math.min(1, P.lev[i]); g.fillStyle = 'rgba(224,184,90,.55)'; g.fillRect(x0, ys[i] - 9, w, 8);
+        BD.label(g, names[i] + '  ' + (100 * P.lev[i]).toFixed(1) + ' %', x1 + 8, ys[i] + 4, BD.C.axis);
+      }
+      function arrow(xa, ya, xb, yb, col, wd, lab) {
+        g.strokeStyle = col; g.fillStyle = col; g.lineWidth = Math.max(1, wd); g.beginPath(); g.moveTo(xa, ya); g.lineTo(xb, yb); g.stroke();
+        var an = Math.atan2(yb - ya, xb - xa); g.beginPath(); g.moveTo(xb, yb); g.lineTo(xb - 8 * Math.cos(an - 0.4), yb - 8 * Math.sin(an - 0.4)); g.lineTo(xb - 8 * Math.cos(an + 0.4), yb - 8 * Math.sin(an + 0.4)); g.fill(); g.lineWidth = 1;
+        if (lab) BD.label(g, lab, xa + 6, (ya + yb) / 2, col);
+      }
+      var lw = function (r) { return 1 + 2.5 * Math.log10(1 + 10 * r); };
+      if (n === 2) { arrow(x0 + 30, ys[0] - 4, x0 + 30, ys[1] + 4, BD.C.blue, lw(Wp), 'pump'); arrow(x0 + 110, ys[1] + 4, x0 + 110, ys[0] - 4, BD.C.red, lw(P.n2), 'spontaneous'); }
+      else if (n === 3) { arrow(x0 + 30, ys[0] - 4, x0 + 30, ys[2] + 4, BD.C.blue, lw(Wp * P.n1), 'pump'); arrow(x0 + 80, ys[2] + 4, x0 + 80, ys[1] - 4, BD.C.dim, 1.5, 'fast');
+        arrow(x0 + 150, ys[1] + 4, x0 + 150, ys[0] - 4, BD.C.red, lw(P.n2 * (1 + Ws)), 'laser transition'); }
+      else { arrow(x0 + 30, ys[0] - 4, x0 + 30, ys[3] + 4, BD.C.blue, lw(Wp * P.lev[0]), 'pump'); arrow(x0 + 80, ys[3] + 4, x0 + 80, ys[2] - 4, BD.C.dim, 1.5, 'fast');
+        arrow(x0 + 150, ys[2] + 4, x0 + 150, ys[1] - 4, BD.C.red, lw(P.n2 * (1 + Ws)), 'laser transition'); arrow(x0 + 220, ys[1] + 4, x0 + 220, ys[0] - 4, BD.C.dim, 1.5, 'fast'); }
+    })();
+    // ---- inversion against pump for the three systems
+    var d2 = BD.setup(q('[data-c="p"]')), f2 = BD.frame(d2, { x: [0.01, 100], y: [-1, 1], xlog: true, pad: { l: 40, b: 22, t: 30 },
+      xt: [[0.01, '0.01'], [0.1, '0.1'], [1, '1'], [10, '10'], [100, '100']], yt: [[-1, '−1'], [0, '0'], [1, '+1']] });
+    BD.hline(f2, 0, BD.C.dim, [3, 3], 'transparency');
+    [2, 3, 4].forEach(function (n, i) {
+      var xs = [], ys = []; for (var k = 0; k <= 200; k++) { var w = Math.pow(10, -2 + 4 * k / 200), pp = pops(w, Ws, n); xs.push(w); ys.push(pp.n2 - pp.n1); }
+      var col = [BD.C.red, BD.C.gold, BD.C.green][i]; BD.line(f2, xs, ys, col, n === sys ? 2.4 : 1.1);
+      d2.g.fillStyle = col; d2.g.fillText(n + '-level', d2.w - 70, d2.h - 70 + 14 * i);
+    });
+    BD.dot(f2, Wp, inv, BD.C.white, 4.5);
+    // ---- readouts and caption
+    q('[data-o="n2"]').textContent = (100 * P.n2).toFixed(1) + ' %';
+    q('[data-o="n1"]').textContent = (100 * P.n1).toFixed(1) + ' %';
+    q('[data-o="inv"]').textContent = (100 * inv).toFixed(1) + ' %';
+    q('[data-o="g"]').textContent = inv > 0.001 ? 'gain' : inv < -0.001 ? 'absorption' : 'transparent';
+    var c;
+    if (sys === 2) c = 'In a two-level system the pump stimulates emission as readily as absorption, so at best the two levels become equally full: <b>no inversion, whatever the pump</b>. ';
+    else if (sys === 3) c = 'In a three-level system the laser\'s lower level is the ground state, so more than half of all the atoms must be pumped up before the medium even becomes transparent: the pump must beat spontaneous emission, W<sub>p</sub> > A<sub>21</sub>. Erbium in glass at 1530 nm behaves like this. ';
+    else c = 'In a four-level system the lower laser level empties quickly, so any pumping gives inversion; this is why four-level systems lase easily. A semiconductor behaves more like this, with the bands playing the levels. ';
+    if (Ws > 0.05 && sys > 2) c += 'A strong signal stimulates emission and pulls the inversion down: <b>gain saturation</b>, the reason an amplifier\'s gain falls at high power. ';
+    c += ' <i>Rate equations normalised to the spontaneous rate A<sub>21</sub>; fast decays treated as instantaneous.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

@@ -1,0 +1,116 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdGainSpec" role="group" aria-label="Interactive demo: the gain spectrum of a semiconductor">
+  <div class="bd-head"><span>// try it · semiconductor gain from parabolic bands (InGaAsP-like, band gap at 1550 nm)</span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>carrier density N = P <b data-v="N"></b></span><input type="range" data-k="N" min="0.3" max="6" step="0.02" value="2.5" aria-label="carrier density"></label>
+    <label class="bd-sl"><span>temperature <b data-v="T"></b></span><input type="range" data-k="T" min="250" max="380" step="1" value="300" aria-label="temperature"></label>
+  </div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">band diagram E(k): filled states and quasi-Fermi levels</span></div>
+    <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">material gain (+) or absorption (−) against wavelength</span></div>
+  </div>
+  <div class="bd-scope"><canvas data-c="p" aria-hidden="true"></canvas><span class="bd-tag">peak gain against carrier density, at this temperature</span></div>
+  <div class="bd-read" aria-live="polite"><span>quasi-Fermi separation − E<sub>g</sub> <b data-o="df">–</b></span><span>peak gain <b data-o="gp">–</b></span><span>peak wavelength <b data-o="lp">–</b></span><span>transparency density <b data-o="nt">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdGainSpec'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  // same model as figsrc/ch23_gain.py
+  var HB = 1.054571817e-34, QE = 1.602176634e-19, M0 = 9.1093837e-31, KB = 1.380649e-23, C = 2.99792458e8, E0 = 8.8541878e-12;
+  var EG0 = 0.80, DEGDT = -3.5e-4, ME = 0.045, MV = 0.46, EP = 25, NR = 3.5, TAU = 1e-13, MR = ME * MV / (ME + MV);
+  // Fermi-Dirac integral F_1/2 on a table, for inversion
+  var ETA = [], F = [];
+  var DE = 0.2;
+  for (var e = -30; e <= 60.001; e += DE) { var s = 0, xm = Math.max(40, e + 40); for (var x = 0.01; x < xm; x += 0.02) s += Math.sqrt(x) / (1 + Math.exp(x - e)); ETA.push(e); F.push(2 / Math.sqrt(Math.PI) * s * 0.02); }
+  function etaOf(n, m, T) {
+    var Nc = 2 * Math.pow(m * M0 * KB * T / (2 * Math.PI * HB * HB), 1.5) / 1e6, u = n / Nc, lo = 0, hi = F.length - 1;
+    while (hi - lo > 1) { var mid = (lo + hi) >> 1; if (F[mid] < u) lo = mid; else hi = mid; }
+    return ETA[lo] + (u - F[lo]) / (F[hi] - F[lo]) * DE;
+  }
+  var NX = 360, EX = [], PRE = Math.PI * QE * QE * HB / (NR * C * E0 * M0 * M0) * (M0 / 6 * EP * QE), GAM = HB / TAU / QE;
+  function spectrum(N, T, Es) {
+    var Eg = EG0 + DEGDT * (T - 300), kT = KB * T / QE, ec = etaOf(N, ME, T), ev = etaOf(N, MV, T), dEx = 0.45 / NX, base = [], out = [];
+    for (var i = 0; i < NX; i++) {
+      var d = (i + 0.5) * dEx, rho = (1 / (2 * Math.PI * Math.PI)) * Math.pow(2 * MR * M0 / (HB * HB), 1.5) * Math.sqrt(d * QE);
+      var fc = 1 / (1 + Math.exp((MR / ME) * d / kT - ec)), fh = 1 / (1 + Math.exp((MR / MV) * d / kT - ev));
+      base.push(PRE * rho * (fc + fh - 1));
+    }
+    for (var j = 0; j < Es.length; j++) {
+      var acc = 0;
+      for (i = 0; i < NX; i++) { var ex = Eg + (i + 0.5) * dEx; acc += base[i] * (GAM / Math.PI) / ((Es[j] - ex) * (Es[j] - ex) + GAM * GAM); }
+      out.push(acc * dEx / (Es[j] * QE) / 100);
+    }
+    return { g: out, Eg: Eg, ec: ec, ev: ev, kT: kT, dF: Eg + (ec + ev) * kT };
+  }
+  function peak(N, T) {
+    var Eg = EG0 + DEGDT * (T - 300), Es = []; for (var i = 0; i <= 90; i++) Es.push(Eg + 0.25 * i / 90);
+    var r = spectrum(N, T, Es), j = 0; for (i = 1; i < Es.length; i++) if (r.g[i] > r.g[j]) j = i;
+    return { g: r.g[j], E: Es[j] };
+  }
+  var S = BD.bind(root, { N: { fmt: function (x) { return x.toFixed(2) + ' × 10¹⁸ cm⁻³'; } }, T: { fmt: function (x) { return x.toFixed(0) + ' K (' + (x - 273).toFixed(0) + ' °C)'; } } }, function () { draw(); });
+  function draw() {
+    var N = S.N * 1e18, T = S.T, Eg = EG0 + DEGDT * (T - 300), Es = [];
+    for (var i = 0; i <= 220; i++) Es.push(Eg - 0.04 + 0.26 * i / 220);
+    var r = spectrum(N, T, Es), pk = peak(N, T);
+    // transparency density at this temperature
+    var lo = 1e17, hi = 6e18; for (var it = 0; it < 22; it++) { var mid = Math.sqrt(lo * hi); if (peak(mid, T).g < 0) lo = mid; else hi = mid; }
+    var ntr = Math.sqrt(lo * hi);
+    // ---- band diagram
+    (function () {
+      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, cx = dv.w / 2, ecY = dv.h * 0.42, evY = dv.h * 0.70, sc = (evY - ecY) / Eg * 0.9, kmax = dv.w * 0.42;
+      var Y = function (E) { return evY - (E) * (evY - ecY) / Eg; };   // energy above the valence-band edge -> y
+      var efc = Eg + r.ec * r.kT, efv = -r.ev * r.kT;                  // eV above the VB edge
+      // conduction band: E = Eg + hbar^2k^2/2me ; valence: E = -hbar^2k^2/2mv  (k in arbitrary units)
+      function curve(sign, m) {
+        g.beginPath();
+        for (var px = -kmax; px <= kmax; px += 2) { var kk = px / kmax, E = sign > 0 ? Eg + 0.6 * kk * kk * (0.05 / m) : -0.6 * kk * kk * (0.05 / m) * 1.0; var yy = Y(E); if (px === -kmax) g.moveTo(cx + px, yy); else g.lineTo(cx + px, yy); }
+        g.stroke();
+      }
+      // filled electrons up to Efc, holes down to Efv (Fermi smearing drawn as alpha)
+      for (var px = -kmax; px <= kmax; px += 3) {
+        var kk = px / kmax, Ec = Eg + 0.6 * kk * kk * (0.05 / ME), Ev = -0.6 * kk * kk * (0.05 / MV);
+        var fe = 1 / (1 + Math.exp((Ec - efc) / r.kT)), fhh = 1 / (1 + Math.exp((efv - Ev) / r.kT));
+        g.fillStyle = 'rgba(127,184,240,' + (0.85 * fe).toFixed(3) + ')'; if (Y(Ec) > 22) g.fillRect(cx + px - 1.5, Y(Ec) - 5, 3, 5);
+        g.fillStyle = 'rgba(240,138,106,' + (0.85 * fhh).toFixed(3) + ')'; if (Y(Ev) < dv.h - 4) g.fillRect(cx + px - 1.5, Y(Ev), 3, 5);
+      }
+      g.strokeStyle = BD.C.white; g.lineWidth = 1.6; curve(1, ME); curve(-1, MV); g.lineWidth = 1;
+      g.setLineDash([5, 4]); g.strokeStyle = BD.C.blue; g.beginPath(); g.moveTo(10, Y(efc)); g.lineTo(dv.w - 10, Y(efc)); g.stroke();
+      g.strokeStyle = BD.C.red; g.beginPath(); g.moveTo(10, Y(efv)); g.lineTo(dv.w - 10, Y(efv)); g.stroke(); g.setLineDash([]);
+      BD.label(g, 'E_Fc', dv.w - 12, Y(efc) - 4, BD.C.blue, 'right'); BD.label(g, 'E_Fv', dv.w - 12, Y(efv) + 12, BD.C.red, 'right');
+      // the gain-peak transition
+      var dpk = pk.E - Eg, kk2 = Math.sqrt(Math.max(0, dpk * (MR / ME) / (0.6 * 0.05 / ME))), xp = cx + kk2 * kmax;
+      g.strokeStyle = BD.C.gold; g.fillStyle = BD.C.gold; g.lineWidth = 2; g.beginPath(); g.moveTo(xp, Y(Eg + dpk * MR / ME)); g.lineTo(xp, Y(-dpk * MR / MV)); g.stroke(); g.lineWidth = 1;
+      BD.label(g, 'peak gain ' + (1239.84 / pk.E).toFixed(0) + ' nm', xp + 6, (Y(Eg) + Y(0)) / 2, BD.C.gold);
+      BD.label(g, 'conduction band (electrons)', 10, 36, BD.C.blue); BD.label(g, 'valence band (holes)', 10, dv.h - 8, BD.C.red);
+      BD.label(g, 'E_g = ' + Eg.toFixed(3) + ' eV', cx + 6, (Y(Eg) + Y(0)) / 2 + 16, BD.C.axis);
+    })();
+    // ---- gain spectrum against wavelength
+    var lam = Es.map(function (E) { return 1239.84 / E; }), d2 = BD.setup(q('[data-c="s"]'));
+    var f2 = BD.frame(d2, { x: [1239.84 / (Eg + 0.22), 1239.84 / (Eg - 0.04)], y: [-4500, 2500], pad: { l: 48, b: 22, t: 30 },
+      xt: [[1300, '1300'], [1400, '1400'], [1500, '1500'], [1600, '1600'], [1700, '1700 nm']], yt: [[-4000, '−4000'], [-2000, '−2000'], [0, '0'], [2000, '2000 /cm']] });
+    BD.hline(f2, 0, BD.C.dim, [3, 3]);
+    d2.g.fillStyle = 'rgba(127,224,160,.10)'; var xa = f2.X(1239.84 / r.dF), xb = f2.X(1239.84 / Eg); if (r.dF > Eg) d2.g.fillRect(Math.min(xa, xb), f2.p.t, Math.abs(xb - xa), d2.h - f2.p.t - f2.p.b);
+    BD.line(f2, lam, r.g, BD.C.gold, 2); BD.dot(f2, 1239.84 / pk.E, Math.max(-4500, pk.g), BD.C.white, 4);
+    d2.g.fillStyle = BD.C.green; d2.g.fillText('E_g < hν < E_Fc − E_Fv', 54, 44);
+    // ---- peak gain against N
+    var d3 = BD.setup(q('[data-c="p"]')), f3 = BD.frame(d3, { x: [0.3, 6], y: [-500, 2500], pad: { l: 48, b: 22, t: 26 },
+      xt: [[1, '1'], [2, '2'], [3, '3'], [4, '4'], [5, '5'], [6, '6 × 10¹⁸ cm⁻³']], yt: [[0, '0'], [1000, '1000'], [2000, '2000 /cm']] });
+    var ns = [], gs = []; for (i = 0; i <= 45; i++) { var nn = 0.3 + 5.7 * i / 45; ns.push(nn); gs.push(Math.max(-500, peak(nn * 1e18, T).g)); }
+    BD.hline(f3, 0, BD.C.dim, [3, 3]); BD.line(f3, ns, gs, BD.C.blue, 2); BD.dot(f3, S.N, Math.max(-500, pk.g), BD.C.white, 4.5); BD.vline(f3, ntr / 1e18, BD.C.green, [3, 3], 'N_tr');
+    // ---- readouts and caption
+    q('[data-o="df"]').textContent = (1000 * (r.dF - Eg)).toFixed(0) + ' meV';
+    q('[data-o="gp"]').textContent = pk.g.toFixed(0) + ' /cm';
+    q('[data-o="lp"]').textContent = (1239.84 / pk.E).toFixed(0) + ' nm';
+    q('[data-o="nt"]').textContent = (ntr / 1e18).toFixed(2) + ' × 10¹⁸ cm⁻³';
+    var c = 'Injected electrons fill the bottom of the conduction band and holes the top of the valence band, up to the quasi-Fermi levels. Photons between E<sub>g</sub> and E<sub>Fc</sub> − E<sub>Fv</sub> are amplified (the Bernard–Duraffourg condition, shaded); above that window the material still absorbs. ';
+    if (pk.g < 0) c += 'Here the density is below transparency (' + (ntr / 1e18).toFixed(2) + ' × 10¹⁸ cm⁻³): the material still absorbs everywhere. ';
+    else c += 'More carriers widen the window, so the gain grows and its peak moves to shorter wavelengths (band filling). ';
+    if (T > 320) c += 'Heat smears the Fermi functions, so more carriers are needed for the same gain, and the gap shrinks, moving everything to longer wavelengths (about 0.5 nm/K). ';
+    c += ' <i>Bulk, parabolic bands, one valence band, k-conserving transitions with 6.6 meV Lorentzian broadening (figsrc/ch23_gain.py); no band-gap renormalisation, which would shift the spectrum to longer wavelengths by a few tens of meV. The band diagram\'s curvatures are exaggerated.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

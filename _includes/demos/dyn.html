@@ -1,0 +1,89 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdDyn" role="group" aria-label="Interactive demo: modulation response, intensity noise and linewidth of a laser">
+  <div class="bd-head"><span>// try it · laser dynamics: modulation response, RIN and linewidth (same laser as Chapter 24)</span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>bias current <b data-v="I"></b></span><input type="range" data-k="I" min="22" max="120" step="0.5" value="50" aria-label="bias current"></label>
+    <label class="bd-sl"><span>cavity length <b data-v="L"></b></span><input type="range" data-k="L" min="150" max="1000" step="10" value="400" aria-label="cavity length"></label>
+    <label class="bd-sl"><span>linewidth-enhancement factor α <b data-v="a"></b></span><input type="range" data-k="a" min="0" max="7" step="0.1" value="4" aria-label="alpha factor"></label>
+  </div>
+  <div class="bd-scope short"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: the cavity in side view (length to scale against 1 mm), DC bias plus RF drive</span></div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="h" aria-hidden="true"></canvas><span class="bd-tag">small-signal modulation response</span></div>
+    <div class="bd-scope tall"><canvas data-c="r" aria-hidden="true"></canvas><span class="bd-tag">relative intensity noise</span></div>
+  </div>
+  <div class="bd-scope"><canvas data-c="w" aria-hidden="true"></canvas><span class="bd-tag">Schawlow–Townes–Henry linewidth against output power</span></div>
+  <div class="bd-read" aria-live="polite"><span>f<sub>r</sub> <b data-o="fr">–</b></span><span>3 dB bandwidth <b data-o="f3">–</b></span><span>RIN peak <b data-o="rin">–</b></span><span>linewidth <b data-o="lw">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdDyn'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  var c = 3e10, ng = 3.6, vg = c / ng, hv = 1.2398 / 1.55 * 1.602e-19, qe = 1.602e-19;       // the parameters of the Chapter 24 demo (cm, s)
+  var w = 2e-4, dAct = 0.05e-4, Gam = 0.06, eta = 0.8, ai = 15, g0 = 1500, Ntr = 2e18, eps = 2e-17, R = 0.32, nsp = 1.8;
+  var A = 1e8, B = 1e-10, Cc = 3e-29;
+  var S = BD.bind(root, { I: { fmt: function (x) { return x.toFixed(1) + ' mA'; } }, L: { fmt: function (x) { return x.toFixed(0) + ' µm'; } }, a: { fmt: function (x) { return x.toFixed(1); } } }, function () { draw(); });
+  function op(Ima, Lum, alpha) {
+    var L = Lum * 1e-4, V = L * w * dAct, am = Math.log(1 / (R * R)) / (2 * L), tp = 1 / (vg * (ai + am)), gth = (ai + am) / Gam, Nth = Ntr * Math.exp(gth / g0);
+    var Ith = qe * V / eta * (A * Nth + B * Nth * Nth + Cc * Nth * Nth * Nth), I = Ima * 1e-3;
+    if (I <= Ith * 1.01) return { below: true, Ith: Ith };
+    var Sp = Gam * tp * eta * (I - Ith) / (qe * V), a = g0 / Nth, tdn = 1 / (A + 2 * B * Nth + 3 * Cc * Nth * Nth);
+    var wr2 = vg * a * Sp / (tp * (1 + eps * Sp)), K = 4 * Math.PI * Math.PI * (tp + eps / (vg * a)), fr = Math.sqrt(wr2) / (2 * Math.PI), gam = K * fr * fr + 1 / tdn;
+    var Np = Sp * V / Gam, P = Np * hv * vg * am, Rsp = vg * (ai + am) * nsp, lw = Rsp * (1 + alpha * alpha) / (4 * Math.PI * Np);
+    return { Ith: Ith, fr: fr, gam: gam, wr2: wr2, K: K, P: P, Np: Np, Rsp: Rsp, tdn: tdn, lw: lw, L: L, am: am };
+  }
+  function H2(o, f) { var wv = 2 * Math.PI * f; return o.wr2 * o.wr2 / (Math.pow(o.wr2 - wv * wv, 2) + wv * wv * o.gam * o.gam); }
+  function rin(o, f) { var wv = 2 * Math.PI * f, gN = 1 / o.tdn; return 4 * o.Rsp * (gN * gN + wv * wv) / (o.Np * (Math.pow(o.wr2 - wv * wv, 2) + wv * wv * o.gam * o.gam)) + 2 * hv / o.P; }
+  function f3(o) { var lo = 1e8, hi = 2e11; if (H2(o, hi) > 0.5) return hi; for (var i = 0; i < 60; i++) { var m = Math.sqrt(lo * hi); if (H2(o, m) > 0.5) lo = m; else hi = m; } return lo; }
+  function draw() {
+    var o = op(S.I, S.L, S.a);
+    // ---- geometry
+    (function () {
+      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, sc = (dv.w - 140) / 1000, x0 = 60, len = S.L * sc, y = dv.h / 2 + 6;
+      g.fillStyle = 'rgba(157,179,204,.35)'; g.fillRect(x0, y - 10, len, 20);
+      g.fillStyle = 'rgba(224,184,90,.55)'; g.fillRect(x0, y - 2, len, 4);
+      g.fillStyle = BD.GEO.metal; g.fillRect(x0, y - 16, len, 5);
+      g.fillStyle = BD.C.white; g.fillRect(x0 - 3, y - 12, 3, 24); g.fillRect(x0 + len, y - 12, 3, 24);
+      g.strokeStyle = BD.C.gold; g.beginPath();
+      for (var x = 0; x <= 60; x++) { var xx = x0 + len + 6 + x, yy = y + 6 * Math.sin(x / 4) * (o.below ? 0.1 : 1); if (x) g.lineTo(xx, yy); else g.moveTo(xx, yy); }
+      g.stroke();
+      BD.label(g, 'I = ' + S.I.toFixed(0) + ' mA + RF', x0 + len / 2, y - 22, BD.C.axis, 'center');
+      BD.label(g, 'L = ' + S.L.toFixed(0) + ' µm', x0 + len / 2, y + 26, BD.C.gold, 'center');
+      BD.label(g, '0', x0, dv.h - 4, BD.C.dim); BD.label(g, '1 mm', x0 + 1000 * sc, dv.h - 4, BD.C.dim, 'right');
+      g.strokeStyle = BD.C.dim; g.beginPath(); g.moveTo(x0, dv.h - 14); g.lineTo(x0 + 1000 * sc, dv.h - 14); g.stroke();
+    })();
+    var d2 = BD.setup(q('[data-c="h"]')), f2 = BD.frame(d2, { x: [0, 40e9], y: [-20, 12], pad: { l: 40, b: 22, t: 30 },
+      xt: [[0, '0'], [10e9, '10'], [20e9, '20'], [30e9, '30'], [40e9, '40 GHz']], yt: [[-20, '−20'], [-10, '−10'], [-3, '−3'], [0, '0'], [10, '10 dB']] });
+    var d3 = BD.setup(q('[data-c="r"]')), f3f = BD.frame(d3, { x: [0, 40e9], y: [-170, -110], pad: { l: 48, b: 22, t: 30 },
+      xt: [[0, '0'], [10e9, '10'], [20e9, '20'], [30e9, '30'], [40e9, '40 GHz']], yt: [[-170, '−170'], [-150, '−150'], [-130, '−130'], [-110, '−110 dB/Hz']] });
+    var d4 = BD.setup(q('[data-c="w"]')), f4 = BD.frame(d4, { x: [0.1, 30], y: [0.1, 100], xlog: true, ylog: true, pad: { l: 48, b: 22, t: 26 },
+      xt: [[0.1, '0.1'], [1, '1'], [10, '10 mW']], yt: [[0.1, '0.1'], [1, '1'], [10, '10'], [100, '100 MHz']] });
+    if (o.below) {
+      ['fr', 'f3', 'rin', 'lw'].forEach(function (k) { q('[data-o="' + k + '"]').textContent = '–'; });
+      q('[data-o="cap"]').innerHTML = 'Below threshold (' + (o.Ith * 1e3).toFixed(1) + ' mA for this length): raise the bias.'; return;
+    }
+    BD.hline(f2, -3, BD.C.dim, [3, 3]);
+    [0.5, 1, 2].forEach(function (m, i) {
+      var oo = op(o.Ith * 1e3 + (S.I - o.Ith * 1e3) * m, S.L, S.a); if (oo.below) return;
+      var xs = [], ys = [], rs = []; for (var k = 0; k <= 200; k++) { var f = 40e9 * k / 200 + 1e6; xs.push(f); ys.push(10 * Math.log10(H2(oo, f))); rs.push(10 * Math.log10(rin(oo, f))); }
+      var col = m === 1 ? BD.C.gold : 'rgba(170,205,240,.35)';
+      BD.line(f2, xs, ys, col, m === 1 ? 2.2 : 1); BD.line(f3f, xs, rs, m === 1 ? BD.C.red : 'rgba(170,205,240,.35)', m === 1 ? 2.2 : 1);
+    });
+    d2.g.fillStyle = BD.C.dim; d2.g.fillText('faint: half and twice the current above threshold', 46, d2.h - 30);
+    // linewidth against power at this length and alpha
+    var ps = [], ls = []; for (var k2 = 1; k2 <= 120; k2++) { var oo2 = op(o.Ith * 1e3 * (1 + 0.04 * k2), S.L, S.a); if (!oo2.below) { ps.push(oo2.P * 1e3 * 0.5); ls.push(oo2.lw / 1e6); } }
+    BD.line(f4, ps, ls, BD.C.blue, 2); BD.dot(f4, o.P * 1e3 * 0.5, o.lw / 1e6, BD.C.white, 4.5);
+    var fb = f3(o), rmax = -999; for (var k3 = 1; k3 <= 400; k3++) rmax = Math.max(rmax, 10 * Math.log10(rin(o, 40e9 * k3 / 400)));
+    q('[data-o="fr"]').textContent = (o.fr / 1e9).toFixed(1) + ' GHz';
+    q('[data-o="f3"]').textContent = (fb / 1e9).toFixed(1) + ' GHz';
+    q('[data-o="rin"]').textContent = rmax.toFixed(0) + ' dB/Hz';
+    q('[data-o="lw"]').textContent = (o.lw / 1e6).toFixed(2) + ' MHz at ' + (o.P * 1e3 * 0.5).toFixed(1) + ' mW per facet';
+    var cmsg = 'The relaxation oscillation, at f<sub>r</sub> ∝ √(I − I<sub>th</sub>), is where carriers and photons trade energy back and forth: the response peaks there and the noise too. ';
+    cmsg += 'More current raises f<sub>r</sub>, but also the damping (K-factor ' + (o.K * 1e12).toFixed(0) + ' ps), which caps the bandwidth near 2π√2/K = ' + (2 * Math.PI * Math.SQRT2 / o.K / 1e9).toFixed(0) + ' GHz. ';
+    cmsg += 'A shorter cavity has a shorter photon lifetime and a higher f<sub>r</sub>. The linewidth falls as 1/P and grows as 1 + α²: with α = ' + S.a.toFixed(1) + ' it is ' + (1 + S.a * S.a).toFixed(0) + ' times the Schawlow–Townes value. ';
+    cmsg += ' <i>Small-signal rate equations with gain compression (ε = 2 × 10⁻¹⁷ cm³); RIN from a simplified Langevin model plus the shot-noise floor; n<sub>sp</sub> = 1.8.</i>';
+    q('[data-o="cap"]').innerHTML = cmsg;
+  }
+  BD.observe(root, draw);
+})();
+</script>

@@ -202,23 +202,23 @@ Demos: ● Photodiode bandwidth · ● Receiver sensitivity
 
 From the physics of gain to working lasers: emission and gain in semiconductors, the Fabry–Pérot laser and its rate equations, noise and linewidth, tunable and narrow-linewidth lasers, lasers on silicon, and semiconductor optical amplifiers.
 
-### [22. Light Meets Matter: Absorption, Emission and Gain]({% link chapters/22_emission.md %})
+### [22. Light Meets Matter: Absorption, Emission and Gain]({% link chapters/22_emission.md %}) <span class="status status-written">written</span>
 
 *What does it take for a material to amplify light?*
 
 22.1 Photons and energy levels · 22.2 Absorption and emission · 22.3 Population inversion and gain · 22.4 Lineshape and gain spectrum · 22.5 Direct and indirect bandgaps
 
-Demos: ○ Level-system model
+Demos: ● Level-system model
 
-### [23. Semiconductor Gain Media]({% link chapters/23_gain.md %})
+### [23. Semiconductor Gain Media]({% link chapters/23_gain.md %}) <span class="status status-written">written</span>
 
 *How many carriers does it take to reach gain, and where is the gain peak?*
 
 23.1 Bands, density of states and occupation · 23.2 Quasi-Fermi levels and the condition for gain · 23.3 The gain spectrum · 23.4 Heterostructures, quantum wells and quantum dots · 23.5 Material systems for 1310 and 1550 nm · 23.6 Recombination
 
-Demos: ○ Gain spectrum
+Demos: ● Gain spectrum
 
-### [24. The Fabry–Pérot Laser and the Rate Equations]({% link chapters/24_fp.md %})
+### [24. The Fabry–Pérot Laser and the Rate Equations]({% link chapters/24_fp.md %}) <span class="status status-written">written</span>
 
 *What sets a laser's threshold current and slope efficiency?*
 
@@ -226,15 +226,15 @@ Demos: ○ Gain spectrum
 
 Demos: ● Laser rate equations
 
-### [25. Laser Dynamics, Noise and Linewidth]({% link chapters/25_dynamics.md %})
+### [25. Laser Dynamics, Noise and Linewidth]({% link chapters/25_dynamics.md %}) <span class="status status-written">written</span>
 
 *How fast can you modulate a laser directly, and how narrow is its line?*
 
 25.1 Small-signal modulation · 25.2 Chirp and the α-factor · 25.3 Relative intensity noise · 25.4 Phase noise and linewidth · 25.5 Optical feedback · 25.6 Narrowing the linewidth
 
-Demos: ○ Modulation response and RIN; ○ Linewidth
+Demos: ● Modulation response, RIN and linewidth
 
-### [26. Single-Frequency and Tunable Lasers]({% link chapters/26_tunable.md %})
+### [26. Single-Frequency and Tunable Lasers]({% link chapters/26_tunable.md %}) <span class="status status-written">written</span>
 
 *How do two rings select one lasing mode over a 40 nm range?*
 
@@ -242,77 +242,77 @@ Demos: ○ Modulation response and RIN; ○ Linewidth
 
 Demos: ● Vernier ring laser
 
-### [27. Lasers on Silicon]({% link chapters/27_lasersonsi.md %})
+### [27. Lasers on Silicon]({% link chapters/27_lasersonsi.md %}) <span class="status status-written">written</span>
 
 *Which integration approach for which volume and performance?*
 
 27.1 Why the light source is the hard part · 27.2 External and flip-chip lasers · 27.3 Heterogeneous integration · 27.4 Micro-transfer printing · 27.5 Monolithic growth · 27.6 Thermal and reliability · 27.7 Open laser-integration projects
 
-Demos: ○ III–V/Si taper; ○ Self-heating
+Demos: ● III–V/Si supermodes
 
-### [28. Semiconductor Optical Amplifiers]({% link chapters/28_soa.md %})
+### [28. Semiconductor Optical Amplifiers]({% link chapters/28_soa.md %}) <span class="status status-written">written</span>
 
 *How much gain, at what output power and noise figure?*
 
 28.1 From laser to amplifier · 28.2 Gain and saturation · 28.3 Noise figure · 28.4 Dynamics and patterning · 28.5 Polarisation and reflections · 28.6 SOAs in photonic circuits · 28.7 Erbium and other amplifiers
 
-Demos: ○ SOA
+Demos: ● SOA gain and noise figure
 
 ## Part VII · Fabrication, Testing and Data Analysis
 
 How photonic chips are made and verified: fabrication and its variations, the design flow and open PDKs, test setups and data analysis.
 
-### [29. Fabrication]({% link chapters/29_fab.md %})
+### [29. Fabrication]({% link chapters/29_fab.md %}) <span class="status status-written">written</span>
 
 *How do nanometre variations turn into nanometre wavelength shifts?*
 
 29.1 SOI wafers · 29.2 Lithography · 29.3 Etching and cladding · 29.4 Doping, metals and germanium · 29.5 Other platforms · 29.6 Process variation · 29.7 Design for manufacturing · 29.8 Access
 
-Demos: ○ Wafer-map Monte Carlo; ○ Lithography smoothing
+Demos: ● Wafer-map Monte Carlo
 
-### [30. Design Flow and Open PDKs]({% link chapters/30_flow.md %})
+### [30. Design Flow and Open PDKs]({% link chapters/30_flow.md %}) <span class="status status-written">written</span>
 
 *What happens between a simulation and a manufacturable layout?*
 
 30.1 The design flow · 30.2 Process design kits · 30.3 Layout with KLayout and SiEPIC-Tools · 30.4 Layout as code with gdsfactory · 30.5 Component simulation · 30.6 Circuit simulation · 30.7 Verification · 30.8 Tape-out through openEBL
 
-Demos: ○ S-matrix circuit simulator
+Demos: ● Circuit simulator
 
-### [31. Testing Photonic Chips]({% link chapters/31_testing.md %})
+### [31. Testing Photonic Chips]({% link chapters/31_testing.md %}) <span class="status status-written">written</span>
 
 *How do you trust a measured spectrum?*
 
 31.1 The passive test setup · 31.2 Automated testing and design for test · 31.3 Calibration and de-embedding · 31.4 Testing active devices · 31.5 Testing lasers · 31.6 High-speed testing · 31.7 Wafer-scale testing
 
-Demos: ○ Virtual test bench
+Demos: ● Virtual test bench
 
-### [32. Data Analysis]({% link chapters/32_analysis.md %})
+### [32. Data Analysis]({% link chapters/32_analysis.md %}) <span class="status status-written">written</span>
 
 *How do you extract physical parameters, with error bars, from measured spectra?*
 
 32.1 Data formats and open datasets · 32.2 Calibrating out the grating couplers · 32.3 Propagation loss by cutback · 32.4 Group index from interferometers and rings · 32.5 Fitting ring resonances · 32.6 Bragg-grating parameters · 32.7 Statistics across a wafer · 32.8 Back to compact models
 
-Demos: ○ Ring-fit playground; ○ Cutback fit
+Demos: ● Ring-fit playground
 
 ## Part VIII · Systems and Applications
 
 Everything together: optical links and transceivers, and the sensing, LiDAR, quantum and computing systems built from the same blocks.
 
-### [33. Optical Links and Transceivers]({% link chapters/33_links.md %})
+### [33. Optical Links and Transceivers]({% link chapters/33_links.md %}) <span class="status status-written">written</span>
 
 *Does the reference link close, and what does each block contribute?*
 
 33.1 Link architectures · 33.2 Power budget and penalties · 33.3 WDM transceivers · 33.4 Coherent transceivers · 33.5 Energy per bit · 33.6 Co-packaged optics · 33.7 The reference link, block by block
 
-Demos: ○ Link budget
+Demos: ● Link budget
 
-### [34. Beyond Datacom: Sensing, LiDAR, Quantum and Computing]({% link chapters/34_apps.md %})
+### [34. Beyond Datacom: Sensing, LiDAR, Quantum and Computing]({% link chapters/34_apps.md %}) <span class="status status-written">written</span>
 
 *What changes when the chip is a sensor, a beam steerer or a processor instead of a transceiver?*
 
 34.1 Biosensing with evanescent fields · 34.2 LiDAR and optical phased arrays · 34.3 Quantum photonics · 34.4 Photonic computing · 34.5 Microwave photonics and frequency combs · 34.6 Visible and mid-infrared photonics
 
-Demos: ○ Ring biosensor; ○ Optical phased array
+Demos: ● Ring biosensor · ● Optical phased array
 
 ## Hands-On Labs
 

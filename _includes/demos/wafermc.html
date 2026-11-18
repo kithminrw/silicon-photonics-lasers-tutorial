@@ -1,0 +1,91 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdWafer" role="group" aria-label="Interactive demo: process variation across a wafer and its effect on ring resonances">
+  <div class="bd-head"><span>// try it · wafer-map Monte Carlo: thickness and width variation become ring-resonance shifts</span>
+    <span class="bd-controls" style="margin:0"><button type="button" class="bd-btn" data-act="new">new wafer</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>silicon thickness range across the wafer <b data-v="t"></b></span><input type="range" data-k="t" min="0" max="20" step="0.5" value="6" aria-label="thickness range"></label>
+    <label class="bd-sl"><span>width range across the wafer <b data-v="w"></b></span><input type="range" data-k="w" min="0" max="20" step="0.5" value="6" aria-label="width range"></label>
+    <label class="bd-sl"><span>random width variation σ (die to die) <b data-v="r"></b></span><input type="range" data-k="r" min="0" max="5" step="0.1" value="1.5" aria-label="random width"></label>
+  </div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: 200 mm wafer, dies coloured by the ring-resonance shift</span></div>
+    <div class="bd-scope tall"><canvas data-c="h" aria-hidden="true"></canvas><span class="bd-tag">distribution of the resonance shift over the dies</span></div>
+  </div>
+  <div class="bd-scope short"><canvas data-c="x" aria-hidden="true"></canvas><span class="bd-tag">cross-section of the waveguide: nominal (outline) and the worst die (filled), to scale</span></div>
+  <div class="bd-read" aria-live="polite"><span>σ of the shift <b data-o="s">–</b></span><span>full range <b data-o="rg">–</b></span><span>dies within ±1 nm <b data-o="y">–</b></span><span>heater power for the worst die <b data-o="p">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdWafer'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  var DW = 0.6, DT = 1.4, ETA = 0.18;   // nm of resonance shift per nm of width and of thickness (Chapter 6, femwell); heater nm/mW (Chapter 18)
+  var seed = 11, dies = [];
+  var S = BD.bind(root, { t: { fmt: function (x) { return x.toFixed(1) + ' nm'; } }, w: { fmt: function (x) { return x.toFixed(1) + ' nm'; } }, r: { fmt: function (x) { return x.toFixed(1) + ' nm'; } } }, function () { draw(); });
+  function layout() {
+    var rnd = BD.rng(seed); dies = [];
+    var tilt = rnd() * 2 * Math.PI, bow = rnd() < 0.5 ? 1 : -1;
+    for (var i = -5; i <= 4; i++) for (var j = -5; j <= 4; j++) {
+      var x = (i + 0.5) * 20, y = (j + 0.5) * 20; if (Math.hypot(Math.abs(x) + 10, Math.abs(y) + 10) > 100) continue;
+      var r2 = (x * x + y * y) / 1e4, ang = Math.atan2(y, x);
+      // smooth patterns: a radial bowl plus a tilt for thickness; a radial term with the opposite sign plus a tilt for width (lithography dose)
+      var tn = bow * (r2 - 0.4) + 0.35 * Math.hypot(x, y) / 100 * Math.cos(ang - tilt);
+      var wn = -0.8 * (r2 - 0.4) + 0.5 * Math.hypot(x, y) / 100 * Math.sin(ang + tilt);
+      var u1 = Math.max(1e-9, rnd()), u2 = rnd(), z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+      dies.push({ x: x, y: y, tn: tn, wn: wn, z: z });
+    }
+  }
+  q('[data-act="new"]').addEventListener('click', function () { seed = (seed * 7 + 13) % 9973; layout(); draw(); });
+  function shifts() {
+    var tns = dies.map(function (d) { return d.tn; }), wns = dies.map(function (d) { return d.wn; });
+    var tr = Math.max.apply(null, tns) - Math.min.apply(null, tns), wr = Math.max.apply(null, wns) - Math.min.apply(null, wns);
+    return dies.map(function (d) { var dt = S.t * d.tn / tr, dw = S.w * d.wn / wr + S.r * d.z; return { dt: dt, dw: dw, dl: DT * dt + DW * dw }; });
+  }
+  function col(v, m) { var t = Math.max(-1, Math.min(1, v / m)); return t > 0 ? 'rgba(240,' + Math.round(170 - 90 * t) + ',' + Math.round(110 - 60 * t) + ',' + (0.35 + 0.6 * t).toFixed(2) + ')' : 'rgba(' + Math.round(127 + 30 * t) + ',' + Math.round(184 + 20 * t) + ',240,' + (0.35 - 0.6 * t).toFixed(2) + ')'; }
+  function draw() {
+    var sh = shifts(), dl = sh.map(function (s) { return s.dl; }), mean = dl.reduce(function (a, b) { return a + b; }, 0) / dl.length;
+    var c0 = dl.map(function (v) { return v - mean; }), sd = Math.sqrt(c0.reduce(function (a, b) { return a + b * b; }, 0) / c0.length);
+    var mx = Math.max(1, Math.max.apply(null, c0.map(Math.abs))), worst = 0; c0.forEach(function (v, i) { if (Math.abs(v) > Math.abs(c0[worst])) worst = i; });
+    // ---- wafer map
+    (function () {
+      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, R = Math.min(dv.w, dv.h - 30) / 2 - 6, cx = dv.w / 2, cy = 24 + (dv.h - 24) / 2, sc = R / 100;
+      g.fillStyle = 'rgba(157,179,204,.12)'; g.beginPath(); g.arc(cx, cy, R, 0, 2 * Math.PI); g.fill(); g.strokeStyle = BD.C.axis; g.stroke();
+      g.fillStyle = '#0e1420'; g.fillRect(cx - 8, cy + R - 3, 16, 6);   // notch
+      dies.forEach(function (d, i) {
+        g.fillStyle = col(c0[i], mx); g.fillRect(cx + (d.x - 9.3) * sc, cy - (d.y + 9.3) * sc, 18.6 * sc, 18.6 * sc);
+        if (i === worst) { g.strokeStyle = BD.C.white; g.lineWidth = 2; g.strokeRect(cx + (d.x - 9.3) * sc, cy - (d.y + 9.3) * sc, 18.6 * sc, 18.6 * sc); g.lineWidth = 1; }
+      });
+      BD.label(g, '20 mm dies', 8, 36, BD.C.dim); BD.label(g, 'blue: blue-shifted   red: red-shifted', 8, dv.h - 6, BD.C.dim);
+    })();
+    // ---- histogram
+    var nb = 21, edges = [], cnt = [], lo = -mx, hi = mx; for (var b = 0; b < nb; b++) { edges.push(lo + (hi - lo) * b / nb); cnt.push(0); }
+    c0.forEach(function (v) { cnt[Math.min(nb - 1, Math.floor((v - lo) / (hi - lo) * nb))]++; });
+    var d2 = BD.setup(q('[data-c="h"]')), f2 = BD.frame(d2, { x: [lo, hi], y: [0, Math.max.apply(null, cnt) * 1.15], pad: { l: 30, b: 22, t: 30 },
+      xt: [[lo, lo.toFixed(1)], [0, '0'], [hi, '+' + hi.toFixed(1) + ' nm']], yt: [[0, '0']] });
+    cnt.forEach(function (n, k) { d2.g.fillStyle = col(edges[k] + (hi - lo) / nb / 2, mx); d2.g.fillRect(f2.X(edges[k]) + 1, f2.Y(n), f2.X(edges[k] + (hi - lo) / nb) - f2.X(edges[k]) - 2, f2.Y(0) - f2.Y(n)); });
+    BD.vline(f2, -1, BD.C.dim, [3, 3]); BD.vline(f2, 1, BD.C.dim, [3, 3], '±1 nm');
+    // ---- cross-section, nominal 500 x 220 nm against the worst die
+    (function () {
+      var dv = BD.setup(q('[data-c="x"]')), g = dv.g, sc = Math.min((dv.w - 40) / 1.2, (dv.h - 34) / 0.4), cx = dv.w / 2, base = dv.h - 12, s = sh[worst];
+      g.fillStyle = BD.GEO.ox; g.fillRect(0, 18, dv.w, dv.h - 18);
+      var w = 0.5 + s.dw / 1000, t = 0.22 + s.dt / 1000;
+      g.fillStyle = BD.GEO.si; g.fillRect(cx - w / 2 * sc, base - t * sc, w * sc, t * sc);
+      g.strokeStyle = BD.C.white; g.setLineDash([4, 3]); g.strokeRect(cx - 0.25 * sc, base - 0.22 * sc, 0.5 * sc, 0.22 * sc); g.setLineDash([]);
+      BD.label(g, 'worst die: ' + (500 + s.dw).toFixed(1) + ' × ' + (220 + s.dt).toFixed(1) + ' nm', cx + 0.32 * sc, base - 0.12 * sc, BD.C.white);
+      BD.label(g, 'nominal 500 × 220 nm (dashed)', 10, 36, BD.C.dim);
+      BD.scalebar(g, dv.w - 100, 34, sc, 80);
+    })();
+    var within = c0.filter(function (v) { return Math.abs(v) <= 1; }).length / c0.length;
+    q('[data-o="s"]').textContent = sd.toFixed(2) + ' nm';
+    q('[data-o="rg"]').textContent = (Math.max.apply(null, c0) - Math.min.apply(null, c0)).toFixed(1) + ' nm';
+    q('[data-o="y"]').textContent = (100 * within).toFixed(0) + ' %';
+    q('[data-o="p"]').textContent = ((Math.max.apply(null, c0) - Math.min.apply(null, c0)) / ETA).toFixed(0) + ' mW';
+    var c = 'A ring\'s resonance moves by about 1.4 nm per nanometre of silicon thickness and 0.6 nm per nanometre of width (Chapter 6), so a few nanometres of variation across a wafer spread the resonances by several nanometres: more than a WDM channel spacing. ';
+    c += 'Smooth patterns (the film thickness, the lithography dose) dominate over 200 mm; random die-to-die variation adds to them. ';
+    c += 'Every ring must be tuned by its heater, and a heater only red-shifts, so the bluest die sets the design offset and the full spread sets the heater power: about ' + ((Math.max.apply(null, c0) - Math.min.apply(null, c0)) / ETA).toFixed(0) + ' mW at 0.18 nm/mW. ';
+    c += ' <i>Illustrative wafer patterns; shifts are relative to the wafer mean; within-die variation and the coupling gaps are left out.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  layout(); BD.observe(root, draw);
+})();
+</script>

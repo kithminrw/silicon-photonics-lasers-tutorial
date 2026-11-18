@@ -1,0 +1,73 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdLink" role="group" aria-label="Interactive demo: the reference link's power and energy budget">
+  <div class="bd-head"><span>// try it · the reference link, block by block: 4 × 50 Gb/s NRZ over 2 km</span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>laser power in the waveguide <b data-v="pl"></b></span><input type="range" data-k="pl" min="0" max="16" step="0.5" value="10" aria-label="laser power"></label>
+    <label class="bd-sl"><span>grating-coupler loss (each) <b data-v="gc"></b></span><input type="range" data-k="gc" min="1" max="6" step="0.1" value="3" aria-label="grating coupler loss"></label>
+    <label class="bd-sl"><span>ring-modulator insertion loss <b data-v="rm"></b></span><input type="range" data-k="rm" min="1" max="6" step="0.1" value="3" aria-label="modulator loss"></label>
+    <label class="bd-sl"><span>fibre length <b data-v="km"></b></span><input type="range" data-k="km" min="0.1" max="20" step="0.1" value="2" aria-label="fibre length"></label>
+    <label class="bd-sl"><span>receiver sensitivity <b data-v="sen"></b></span><input type="range" data-k="sen" min="-20" max="-6" step="0.1" value="-11.6" aria-label="sensitivity"></label>
+    <label class="bd-sl"><span>laser wall-plug efficiency <b data-v="wp"></b></span><input type="range" data-k="wp" min="5" max="40" step="1" value="15" aria-label="wall-plug efficiency"></label>
+    <label class="bd-sl"><span>heater power per ring <b data-v="ht"></b></span><input type="range" data-k="ht" min="0" max="30" step="0.5" value="20" aria-label="heater power"></label>
+  </div>
+  <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: the link, with the optical power after each block (one wavelength)</span></div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="m" aria-hidden="true"></canvas><span class="bd-tag">margin: received power against sensitivity plus penalties</span></div>
+    <div class="bd-scope tall"><canvas data-c="e" aria-hidden="true"></canvas><span class="bd-tag">energy per bit, where the picojoules go</span></div>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>received power <b data-o="rx">–</b></span><span>margin after penalties <b data-o="mg">–</b></span><span>energy per bit <b data-o="e">–</b></span><span>targets <b data-o="ok">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdLink'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  var RATE = 200e9, PEN = [['extinction (in sensitivity)', 0], ['crosstalk', 0.5], ['thermal drift and locking', 1.0], ['ageing and temperature', 1.0]];
+  var S = BD.bind(root, { pl: { fmt: function (x) { return '+' + x.toFixed(1) + ' dBm'; } }, gc: { fmt: function (x) { return x.toFixed(1) + ' dB'; } }, rm: { fmt: function (x) { return x.toFixed(1) + ' dB'; } },
+    km: { fmt: function (x) { return x.toFixed(1) + ' km'; } }, sen: { fmt: function (x) { return x.toFixed(1) + ' dBm'; } }, wp: { fmt: function (x) { return x.toFixed(0) + ' %'; } }, ht: { fmt: function (x) { return x.toFixed(1) + ' mW'; } } }, function () { draw(); });
+  function draw() {
+    var blocks = [['laser', -S.pl], ['ring modulator', S.rm], ['other rings, routing', 0.8], ['TX grating coupler', S.gc], ['fibre ' + S.km.toFixed(1) + ' km', 0.2 * S.km], ['2 connectors', 1.0],
+      ['RX grating coupler', S.gc], ['demux ring, routing', 1.5]];
+    var p = 0, levels = [];
+    blocks.forEach(function (b, i) { p = i === 0 ? S.pl : p - b[1]; levels.push(p); });
+    var prx = levels[levels.length - 1], pen = PEN.reduce(function (a, b) { return a + b[1]; }, 0), margin = prx - S.sen - pen;
+    // energy per bit (whole link, 4 lanes): lasers at wall plug, drivers, modulators, TIAs and decision, heaters
+    var lasers = 4 * Math.pow(10, S.pl / 10) * 1e-3 / (S.wp / 100), E = [['lasers (wall plug)', lasers / RATE * 1e12], ['heaters (8 rings)', 8 * S.ht * 1e-3 / RATE * 1e12], ['TIAs and decision', 1.0], ['modulator drivers', 0.5], ['ring modulators', 0.02]];
+    var etot = E.reduce(function (a, b) { return a + b[1]; }, 0);
+    // ---- geometry: blocks along the link with power levels
+    (function () {
+      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, n = blocks.length, x0 = 30, x1 = dv.w - 30, w = (x1 - x0) / n, top = 54, bot = dv.h - 50;
+      var Y = function (dbm) { return top + (bot - top) * (12 - dbm) / 30; };
+      g.fillStyle = 'rgba(157,179,204,.10)'; g.fillRect(x0, top - 30, w * 3 + w * 0.9, 18); g.fillRect(x0 + w * 6, top - 30, w * 2 - 4, 18);
+      BD.label(g, 'transmitter chip', x0 + 6, top - 17, BD.C.dim); BD.label(g, 'receiver chip', x0 + w * 6 + 6, top - 17, BD.C.dim); BD.label(g, 'fibre', x0 + w * 4.5, top - 17, BD.C.dim, 'center');
+      g.strokeStyle = BD.C.gold; g.lineWidth = 2; g.beginPath();
+      levels.forEach(function (lv, i) { var xa = x0 + i * w, xb = xa + w; if (i === 0) g.moveTo(xa, Y(lv)); else g.lineTo(xa, Y(lv)); g.lineTo(xb, Y(lv)); }); g.stroke(); g.lineWidth = 1;
+      levels.forEach(function (lv, i) { var xa = x0 + i * w; BD.label(g, lv.toFixed(1), xa + w / 2, Y(lv) - 6, BD.C.white, 'center'); BD.label(g, blocks[i][0], xa + w / 2, dv.h - 30 + (i % 2) * 12, BD.C.axis, 'center'); });
+      g.strokeStyle = BD.C.red; g.setLineDash([4, 3]); g.beginPath(); g.moveTo(x0, Y(S.sen + pen)); g.lineTo(x1, Y(S.sen + pen)); g.stroke(); g.setLineDash([]);
+      BD.label(g, 'sensitivity + penalties ' + (S.sen + pen).toFixed(1) + ' dBm', x1, Y(S.sen + pen) + 12, BD.C.red, 'right');
+      BD.label(g, 'dBm', 6, top, BD.C.dim);
+    })();
+    // ---- margin bars
+    var d2 = BD.setup(q('[data-c="m"]')), f2 = BD.frame(d2, { x: [0, 4], y: [-22, 4], pad: { l: 40, b: 22, t: 30 }, xt: [], yt: [[-20, '−20'], [-10, '−10'], [0, '0 dBm']] }), g2 = d2.g;
+    function bar(x, y0, y1, col, lab) { g2.fillStyle = col; g2.fillRect(f2.X(x - 0.3), f2.Y(Math.max(y0, y1)), f2.X(x + 0.3) - f2.X(x - 0.3), Math.abs(f2.Y(y0) - f2.Y(y1))); BD.label(g2, lab, f2.X(x), d2.h - 8, BD.C.axis, 'center'); }
+    bar(0.6, -22, prx, 'rgba(127,224,160,.6)', 'received'); bar(1.6, -22, S.sen, 'rgba(240,138,106,.6)', 'sensitivity');
+    bar(2.6, S.sen, S.sen + pen, 'rgba(224,184,90,.6)', 'penalties'); bar(3.4, S.sen + pen, prx, margin > 0 ? 'rgba(127,224,160,.9)' : 'rgba(240,80,80,.9)', 'margin');
+    // ---- energy per bit
+    var d3 = BD.setup(q('[data-c="e"]')), f3 = BD.frame(d3, { x: [0, Math.max(6, Math.ceil(etot + 0.5))], y: [0, E.length], pad: { l: 120, b: 22, t: 30 }, xt: [[0, '0'], [5, '5 pJ/bit']], yt: [] }), g3 = d3.g;
+    E.forEach(function (e, i) { g3.fillStyle = 'rgba(127,184,240,.7)'; g3.fillRect(f3.X(0), f3.Y(E.length - i - 0.25), f3.X(e[1]) - f3.X(0), f3.Y(E.length - i - 0.75) - f3.Y(E.length - i - 0.25));
+      BD.label(g3, e[0], 116, f3.Y(E.length - i - 0.5) + 3, BD.C.axis, 'right'); BD.label(g3, e[1].toFixed(2), f3.X(e[1]) + 4, f3.Y(E.length - i - 0.5) + 3, BD.C.white); });
+    BD.vline(f3, 5, BD.C.red, [4, 3], 'target');
+    // ---- readouts and caption
+    q('[data-o="rx"]').textContent = prx.toFixed(1) + ' dBm';
+    q('[data-o="mg"]').textContent = margin.toFixed(1) + ' dB';
+    q('[data-o="e"]').textContent = etot.toFixed(2) + ' pJ/bit';
+    q('[data-o="ok"]').textContent = (margin >= 0 ? 'budget closes' : 'budget fails') + ', ' + (etot <= 5 ? 'energy met' : 'energy over');
+    var c = 'Each block subtracts its loss in decibels; what reaches the receiver must exceed its sensitivity plus penalties for crosstalk, drift and ageing (the extinction-ratio penalty is already inside the −11.6 dBm of Chapter 21). ';
+    c += 'The lasers dominate the energy: ' + (Math.pow(10, S.pl / 10)).toFixed(0) + ' mW of light per lane at ' + S.wp.toFixed(0) + ' % wall-plug efficiency costs ' + E[0][1].toFixed(2) + ' pJ/bit, so every decibel of margin can be traded for laser power. ';
+    if (margin < 0) c += '<b>The budget does not close:</b> lower a loss, raise the laser power, or improve the receiver (FEC buys about 3 dB). ';
+    c += ' <i>Per-lane losses from Chapters 1, 15, 18, 20 and 21; driver, TIA and decision energies are typical round numbers, and serialisers are not counted.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

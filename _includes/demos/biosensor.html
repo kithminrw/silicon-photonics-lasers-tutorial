@@ -1,0 +1,64 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdBio" role="group" aria-label="Interactive demo: a ring-resonator biosensor">
+  <div class="bd-head"><span>// try it · ring biosensor in water: resonance shift and limit of detection (femwell sensitivities)</span>
+    <span class="bd-seg" role="group" aria-label="Polarisation"><button type="button" data-pl="TE" aria-pressed="true">TE</button><button type="button" data-pl="TM" aria-pressed="false">TM</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>change of the fluid's index <b data-v="dn"></b></span><input type="range" data-k="dn" min="0" max="20" step="0.1" value="5" aria-label="index change"></label>
+    <label class="bd-sl"><span>loaded Q <b data-v="Q"></b></span><input type="range" data-k="Q" min="3" max="6" step="0.01" value="4.3" aria-label="Q"></label>
+    <label class="bd-sl"><span>resonance-tracking noise σ <b data-v="s"></b></span><input type="range" data-k="s" min="0.1" max="10" step="0.1" value="1" aria-label="tracking noise"></label>
+  </div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: cross-section in water, with the evanescent field reaching the fluid (to scale)</span></div>
+    <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">resonance before (blue) and after (gold) the index change</span></div>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>bulk sensitivity <b data-o="S">–</b></span><span>resonance shift <b data-o="sh">–</b></span><span>linewidth <b data-o="fw">–</b></span><span>limit of detection (3σ) <b data-o="lod">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdBio'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  // figsrc/ch34_sensor.py: 500 x 220 nm strip, oxide below, water (1.318) above, 1550 nm
+  var P = { TE: { S: 54, neff: 2.4263, ng: 4.235 }, TM: { S: 206, neff: 1.7031, ng: 3.740 } }, NW = 1.318, K0 = 2 * Math.PI / 1.55;
+  var pl = 'TE';
+  var S = BD.bind(root, { dn: { fmt: function (x) { return x.toFixed(1) + ' × 10⁻⁴ RIU'; } }, Q: { fmt: function (x) { return Math.round(Math.pow(10, x)).toLocaleString('en'); } }, s: { fmt: function (x) { return x.toFixed(1) + ' pm'; } } }, function () { draw(); });
+  BD.seg(root, 'pl', function (v) { pl = v; draw(); });
+  function draw() {
+    var M = P[pl], Q = Math.pow(10, S.Q), fw = 1550 / Q * 1000, sh = M.S * S.dn * 1e-4 * 1000, lod = 3 * S.s / (M.S * 1000);   // pm, pm, RIU
+    var gam = K0 * Math.sqrt(M.neff * M.neff - NW * NW);   // decay constant into the water, 1/um
+    // ---- cross-section with an approximate field (exponential tails into water and oxide)
+    (function () {
+      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, sc = Math.min((dv.w - 20) / 2.4, (dv.h - 40) / 1.4), cx = dv.w / 2, base = 24 + (dv.h - 30) * 0.62;
+      var X = function (x) { return cx + x * sc; }, Y = function (y) { return base - y * sc; };
+      g.fillStyle = 'rgba(127,184,240,.10)'; g.fillRect(0, 20, dv.w, base - 20); g.fillStyle = BD.GEO.ox; g.fillRect(0, base, dv.w, dv.h - base);
+      var gs = gam * (pl === 'TE' ? 1 : 1.15), gv = gam * (pl === 'TE' ? 1.6 : 0.85);   // TE spreads sideways, TM up and down
+      for (var px = -1.2; px <= 1.2; px += 0.02) for (var py = -0.5; py <= 0.9; py += 0.02) {
+        var dx = Math.max(0, Math.abs(px) - 0.25), dy = py > 0.22 ? py - 0.22 : (py < 0 ? -py : 0);
+        var inside = Math.abs(px) <= 0.25 && py >= 0 && py <= 0.22, v = inside ? 1 : Math.exp(-2 * (gs * dx + gv * dy)) * (pl === 'TM' && !inside && py > 0.22 ? 1.4 : 1);
+        if (v < 0.03) continue; g.fillStyle = 'rgba(255,214,120,' + Math.min(0.85, 0.85 * v).toFixed(3) + ')'; g.fillRect(X(px), Y(py + 0.02), 0.02 * sc + 0.5, 0.02 * sc + 0.5);
+      }
+      g.strokeStyle = BD.C.white; g.strokeRect(X(-0.25), Y(0.22), 0.5 * sc, 0.22 * sc);
+      BD.label(g, 'water (analyte), n = 1.318', 8, 36, BD.C.blue); BD.label(g, 'oxide', 8, dv.h - 6, BD.C.dim);
+      BD.label(g, 'field decays in ' + (1000 / gam).toFixed(0) + ' nm (1/γ)', X(0.3), Y(0.5), BD.C.gold);
+      BD.scalebar(g, dv.w - 100, 36, sc, 80);
+    })();
+    // ---- resonance before and after
+    var span = Math.max(3 * fw, 1.5 * sh + 2 * fw), d2 = BD.setup(q('[data-c="s"]')), f2 = BD.frame(d2, { x: [-span / 2, span], y: [0, 1.05], pad: { l: 30, b: 22, t: 30 },
+      xt: [[-span / 2, (-span / 2).toFixed(0)], [0, '0'], [span, '+' + span.toFixed(0) + ' pm']], yt: [[0, '0'], [1, '1']] });
+    var xs = [], a = [], b = []; for (var i = 0; i <= 400; i++) { var x = -span / 2 + 1.5 * span * i / 400; xs.push(x); a.push(1 - 0.9 / (1 + Math.pow(2 * x / fw, 2))); b.push(1 - 0.9 / (1 + Math.pow(2 * (x - sh) / fw, 2))); }
+    BD.line(f2, xs, a, BD.C.blue, 1.8); BD.line(f2, xs, b, BD.C.gold, 2);
+    // ---- readouts and caption
+    q('[data-o="S"]').textContent = M.S + ' nm/RIU';
+    q('[data-o="sh"]').textContent = sh.toFixed(1) + ' pm';
+    q('[data-o="fw"]').textContent = fw.toFixed(1) + ' pm';
+    q('[data-o="lod"]').textContent = lod.toExponential(1) + ' RIU';
+    var c = 'Molecules or a change in the fluid alter the index the evanescent field sees, and the resonance moves by S × Δn. ';
+    c += pl === 'TE' ? 'TE light is tightly confined in the silicon: only 0.15 of a change in the water\'s index appears in its effective index, so S = 54 nm/RIU. ' : 'TM light reaches much further into the water above the strip: half of a change in the water\'s index (0.50) appears in its effective index, giving S = 206 nm/RIU, about four times TE. ';
+    c += 'What matters is not the shift alone but the shift against the noise in tracking the resonance: the limit of detection is 3σ/S. A higher Q gives a narrower dip, which can be tracked more precisely, so σ falls with Q and with the signal-to-noise ratio. ';
+    if (sh < fw / 2) c += 'Here the shift is smaller than half the linewidth: it is still measurable, by fitting the resonance (Chapter 32). ';
+    c += ' <i>Bulk sensitivities computed with femwell; the field picture is a sketch of the exponential tails.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

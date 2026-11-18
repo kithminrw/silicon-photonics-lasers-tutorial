@@ -1,0 +1,90 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdCircuit" role="group" aria-label="Interactive demo: a small circuit simulator built from compact models">
+  <div class="bd-head"><span>// try it · circuit simulation from compact models: couplers and delays in a chain</span>
+    <span class="bd-seg" role="group" aria-label="Circuit"><button type="button" data-ck="mzi" aria-pressed="true">MZI</button><button type="button" data-ck="lat2" aria-pressed="false">2-stage lattice</button><button type="button" data-ck="lat3" aria-pressed="false">3-stage lattice</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>arm-length difference ΔL <b data-v="dl"></b></span><input type="range" data-k="dl" min="20" max="200" step="1" value="100" aria-label="delta L"></label>
+    <label class="bd-sl"><span>coupler 1 power coupling <b data-v="k1"></b></span><input type="range" data-k="k1" min="0" max="1" step="0.01" value="0.5" aria-label="coupler 1"></label>
+    <label class="bd-sl"><span>coupler 2 power coupling <b data-v="k2"></b></span><input type="range" data-k="k2" min="0" max="1" step="0.01" value="0.5" aria-label="coupler 2"></label>
+    <label class="bd-sl"><span>coupler 3 power coupling <b data-v="k3"></b></span><input type="range" data-k="k3" min="0" max="1" step="0.01" value="0.5" aria-label="coupler 3"></label>
+  </div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: the layout drawn from the netlist (top view, delays not to scale)</span></div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">transmission to the two outputs</span></div>
+    <div class="bd-scope tall" style="overflow:auto"><pre data-o="net" style="margin:0;padding:26px 10px 8px;font:10.5px/1.45 'IBM Plex Mono',monospace;color:rgba(170,205,240,.85);white-space:pre"></pre><span class="bd-tag">netlist (instances, models and connections)</span></div>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>FSR <b data-o="fsr">–</b></span><span>bar port at 1550 nm <b data-o="b">–</b></span><span>cross port at 1550 nm <b data-o="x">–</b></span><span>flat-top width (−1 dB) <b data-o="ft">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdCircuit'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  var N0 = 2.446, NG = 4.18, L0 = 1.55;   // femwell compact model of the 500 x 220 nm strip (Chapter 6)
+  var ck = 'mzi';
+  var S = BD.bind(root, { dl: { fmt: function (x) { return x.toFixed(0) + ' µm'; } }, k1: { fmt: function (x) { return (100 * x).toFixed(0) + ' %'; } },
+    k2: { fmt: function (x) { return (100 * x).toFixed(0) + ' %'; } }, k3: { fmt: function (x) { return (100 * x).toFixed(0) + ' %'; } } }, function () { draw(); });
+  BD.seg(root, 'ck', function (v) { ck = v; draw(); });
+  function chain() {   // list of elements: couplers (power coupling) and delays (extra length in the upper arm, um)
+    if (ck === 'mzi') return [['dc', S.k1], ['dl', S.dl], ['dc', S.k2]];
+    if (ck === 'lat2') return [['dc', S.k1], ['dl', S.dl], ['dc', S.k2], ['dl', 2 * S.dl], ['dc', S.k3]];
+    return [['dc', S.k1], ['dl', S.dl], ['dc', S.k2], ['dl', S.dl], ['dc', S.k3], ['dl', 2 * S.dl], ['dc', S.k1]];
+  }
+  function neff(l) { return N0 - (NG - N0) * (l - L0) / L0; }
+  function cmul(a, b) { return [a[0] * b[0] - a[1] * b[1], a[0] * b[1] + a[1] * b[0]]; }
+  function apply(M, v) { return [[cmul(M[0][0], v[0])[0] + cmul(M[0][1], v[1])[0], cmul(M[0][0], v[0])[1] + cmul(M[0][1], v[1])[1]], [cmul(M[1][0], v[0])[0] + cmul(M[1][1], v[1])[0], cmul(M[1][0], v[0])[1] + cmul(M[1][1], v[1])[1]]]; }
+  function response(l) {   // field vector (upper, lower), light launched into the upper input
+    var v = [[1, 0], [0, 0]], beta = 2 * Math.PI * neff(l) / l;
+    chain().forEach(function (e) {
+      if (e[0] === 'dc') { var k = Math.sqrt(e[1]), t = Math.sqrt(1 - e[1]); v = apply([[[t, 0], [0, -k]], [[0, -k], [t, 0]]], v); }
+      else { var ph = -beta * e[1]; v = [cmul(v[0], [Math.cos(ph), Math.sin(ph)]), v[1]]; }
+    });
+    return [v[0][0] * v[0][0] + v[0][1] * v[0][1], v[1][0] * v[1][0] + v[1][1] * v[1][1]];   // bar (upper), cross (lower)
+  }
+  function draw() {
+    var C = chain();
+    // ---- layout from the netlist
+    (function () {
+      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, n = C.length, x0 = 30, x1 = dv.w - 30, step = (x1 - x0) / (n + 1), yu = dv.h / 2 - 16, yl = dv.h / 2 + 22;
+      var up = [[x0 - 20, yu]], lo = [[x0 - 20, yl]], x = x0;
+      C.forEach(function (e, i) {
+        var xa = x0 + step * (i + 0.5), xb = xa + step;
+        if (e[0] === 'dc') { up.push([xa, yu], [xa + step * 0.25, yu + 14], [xb - step * 0.25, yu + 14], [xb, yu]); lo.push([xa, yl], [xa + step * 0.25, yl - 14], [xb - step * 0.25, yl - 14], [xb, yl]);
+          BD.label(g, 'dc' + (i / 2 + 1) + ' ' + (100 * e[1]).toFixed(0) + '%', (xa + xb) / 2, yl + 26, BD.C.gold, 'center'); }
+        else { var h = 8 + 26 * Math.min(1, e[1] / 400); up.push([xa, yu], [xa + 6, yu - h], [xb - 6, yu - h], [xb, yu]); lo.push([xa, yl], [xb, yl]);
+          BD.label(g, '+' + e[1].toFixed(0) + ' µm', (xa + xb) / 2, yu - h - 6, BD.C.axis, 'center'); }
+      });
+      up.push([x1 + 20, yu]); lo.push([x1 + 20, yl]);
+      BD.wgr(g, up, 3, BD.GEO.si, 8); BD.wgr(g, lo, 3, BD.GEO.si, 8);
+      BD.label(g, 'in', x0 - 24, yu - 6, BD.C.axis); BD.label(g, 'bar', x1 + 4, yu - 6, BD.C.blue); BD.label(g, 'cross', x1 + 4, yl + 14, BD.C.red);
+    })();
+    // ---- spectrum
+    var l0 = 1.53, l1 = 1.57, xs = [], b = [], x = [];
+    for (var i = 0; i <= 800; i++) { var l = l0 + (l1 - l0) * i / 800, r = response(l); xs.push(l * 1000); b.push(10 * Math.log10(Math.max(r[0], 1e-5))); x.push(10 * Math.log10(Math.max(r[1], 1e-5))); }
+    var d2 = BD.setup(q('[data-c="s"]')), f2 = BD.frame(d2, { x: [1530, 1570], y: [-40, 2], pad: { l: 40, b: 22, t: 30 },
+      xt: [[1530, '1530'], [1550, '1550'], [1570, '1570 nm']], yt: [[-40, '−40'], [-20, '−20'], [-3, '−3'], [0, '0 dB']] });
+    BD.line(f2, xs, b, BD.C.blue, 1.8); BD.line(f2, xs, x, BD.C.red, 1.8);
+    // flat-top: width of the cross-port passband around its maximum within -1 dB
+    var im = 0; for (i = 0; i < x.length; i++) if (x[i] > x[im] && xs[i] > 1545 && xs[i] < 1555) im = i;
+    var a = im, c = im; while (a > 0 && x[a] > x[im] - 1) a--; while (c < x.length - 1 && x[c] > x[im] - 1) c++;
+    // ---- netlist text (SAX/gdsfactory style)
+    var lines = ['instances:'], k = 0, prev = 'in';
+    C.forEach(function (e, j) { if (e[0] === 'dc') { k++; lines.push('  dc' + k + ':  coupler(coupling=' + e[1].toFixed(2) + ')'); } else lines.push('  dl' + (j + 1) / 2 + ':  delay(length=' + e[1].toFixed(0) + 'um, neff=2.446, ng=4.18)'); });
+    lines.push('connections:'); var names = []; k = 0; C.forEach(function (e, j) { if (e[0] === 'dc') { k++; names.push('dc' + k); } else names.push('dl' + (j + 1) / 2); });
+    for (i = 1; i < names.length; i++) lines.push('  ' + names[i - 1] + ',out -> ' + names[i] + ',in');
+    lines.push('ports:', '  in:    ' + names[0] + ',in0', '  bar:   ' + names[names.length - 1] + ',out0', '  cross: ' + names[names.length - 1] + ',out1');
+    q('[data-o="net"]').textContent = lines.join('\n');
+    var r0 = response(1.55);
+    q('[data-o="fsr"]').textContent = (1550 * 1550 / (NG * S.dl * 1000)).toFixed(2) + ' nm';
+    q('[data-o="b"]').textContent = (10 * Math.log10(Math.max(r0[0], 1e-5))).toFixed(1) + ' dB';
+    q('[data-o="x"]').textContent = (10 * Math.log10(Math.max(r0[1], 1e-5))).toFixed(1) + ' dB';
+    q('[data-o="ft"]').textContent = (xs[c] - xs[a]).toFixed(2) + ' nm';
+    var cap = 'Each block is a compact model: a coupler is a 2 × 2 matrix [[t, −jκ], [−jκ, t]], a delay a phase e<sup>−jβΔL</sup> with β from the femwell effective index and its dispersion. The circuit\'s response is their product, evaluated at each wavelength: the same thing SAX or a commercial circuit simulator does with full S-matrices. ';
+    if (ck === 'mzi') cap += 'Two 50 % couplers and a delay make a sinusoidal filter with FSR = λ²/(n<sub>g</sub>ΔL). ';
+    else cap += 'Lattice filters cascade delays of ΔL and 2ΔL; the right coupling ratios flatten the passband and steepen its edges, like a higher-order digital filter: try about 78 %, 84 % and 70 % for the 2-stage lattice, which gives a 2.9 nm flat top (within 1 dB) against 1.7 nm for a plain MZI, with a −20 dB stop band. ';
+    cap += ' <i>Lossless, reflectionless couplers with wavelength-independent coupling; the netlist text mimics the style of gdsfactory and SAX.</i>';
+    q('[data-o="cap"]').innerHTML = cap;
+  }
+  BD.observe(root, draw);
+})();
+</script>

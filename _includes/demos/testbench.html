@@ -1,0 +1,88 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdBench" role="group" aria-label="Interactive demo: a virtual passive test bench">
+  <div class="bd-head"><span>// try it · virtual test bench: sweep a tunable laser through grating couplers and a ring</span>
+    <span class="bd-seg" role="group" aria-label="View"><button type="button" data-vw="raw" aria-pressed="true">raw detector power</button><button type="button" data-vw="cal" aria-pressed="false">calibrated (minus loopback)</button></span>
+    <span class="bd-controls" style="margin:0"><button type="button" class="bd-btn" data-act="sweep">sweep again</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>laser power <b data-v="p"></b></span><input type="range" data-k="p" min="-10" max="10" step="0.5" value="0" aria-label="laser power"></label>
+    <label class="bd-sl"><span>polarisation error <b data-v="pol"></b></span><input type="range" data-k="pol" min="0" max="80" step="1" value="10" aria-label="polarisation error"></label>
+    <label class="bd-sl"><span>grating-coupler reflection <b data-v="r"></b></span><input type="range" data-k="r" min="-40" max="-10" step="0.5" value="-20" aria-label="reflection"></label>
+    <label class="bd-sl"><span>averaged sweeps <b data-v="n"></b></span><input type="range" data-k="n" min="1" max="32" step="1" value="1" aria-label="averages"></label>
+  </div>
+  <div class="bd-scope short"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: the setup, laser to detector, with the chip's two test structures</span></div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">measured spectrum, 1500–1600 nm</span></div>
+    <div class="bd-scope tall"><canvas data-c="z" aria-hidden="true"></canvas><span class="bd-tag">zoom on one resonance near 1550 nm</span></div>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>peak power received <b data-o="pk">–</b></span><span>noise floor <b data-o="nf">–</b></span><span>fringe ripple <b data-o="rp">–</b></span><span>measured extinction <b data-o="er">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdBench'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  var NE = 2.446, NG = 4.18, R = 10, A = 0.99855, T = 0.9974, GC = -4.5, BW = 30, FLOOR = -75, LGC = 500;   // ring of Chapter 12 (300 nm gap); GC peak loss and 1 dB bandwidth; floor dBm; GC spacing um
+  var vw = 'raw', seed = 5;
+  var S = BD.bind(root, { p: { fmt: function (x) { return x.toFixed(1) + ' dBm'; } }, pol: { fmt: function (x) { return x.toFixed(0) + '°'; } },
+    r: { fmt: function (x) { return x.toFixed(1) + ' dB'; } }, n: { fmt: function (x) { return x.toFixed(0); } } }, function () { draw(); });
+  BD.seg(root, 'vw', function (v) { vw = v; draw(); });
+  q('[data-act="sweep"]').addEventListener('click', function () { seed = (seed * 31 + 7) % 10007; draw(); });
+  function gc(l) { var d = (l - 1550) / BW; return Math.pow(10, GC / 10) * Math.exp(-0.921 * d * d); }   // peak GC dB, Gaussian 1 dB down at +-BW/2
+  function ring(l) { var phi = 2 * Math.PI * (NE - (NG - NE) * (l - 1550) / 1550) * 2 * Math.PI * R * 1000 / l, c = Math.cos(phi); return (A * A - 2 * A * T * c + T * T) / (1 - 2 * A * T * c + A * A * T * T); }
+  function fringe(l) { var r = Math.pow(10, S.r / 20), x = r * r, ph = 4 * Math.PI * NG * LGC * 1000 / l; return 1 / (1 + x * x - 2 * x * Math.cos(ph)) * (1 - x) * (1 - x); }
+  function measure(l, withRing, rnd) {
+    var pin = Math.pow(10, S.p / 10), pol = Math.pow(Math.cos(S.pol * Math.PI / 180), 2);   // only the TE part couples
+    var sig = pin * pol * gc(l) * gc(l) * fringe(l) * (withRing ? ring(l) : 1);
+    var nfl = Math.pow(10, FLOOR / 10), acc = 0;
+    for (var k = 0; k < S.n; k++) { var u1 = Math.max(1e-9, rnd()), u2 = rnd(), z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2); acc += Math.max(1e-12, sig * (1 + 0.01 * z) + nfl * (1 + z)); }
+    return acc / S.n;
+  }
+  function draw() {
+    var rnd = BD.rng(seed), xs = [], dev = [], loop = [], zx = [], zd = [], zl = [];
+    for (var i = 0; i <= 2000; i++) { var l = 1500 + 100 * i / 2000; xs.push(l); dev.push(measure(l, true, rnd)); loop.push(measure(l, false, rnd)); }
+    for (i = 0; i <= 600; i++) { var lz = 1549 + 2.5 * i / 600; zx.push(lz); zd.push(measure(lz, true, rnd)); zl.push(measure(lz, false, rnd)); }
+    var dbm = function (v) { return 10 * Math.log10(v) + 0; };
+    // ---- setup schematic
+    (function () {
+      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, y = dv.h / 2 + 6, bx = function (x, w, lab, col) { g.strokeStyle = col || BD.C.axis; g.strokeRect(x, y - 11, w, 22); BD.label(g, lab, x + w / 2, y + 4, col || BD.C.axis, 'center'); };
+      bx(10, 80, 'tunable laser', BD.C.gold); bx(110, 70, 'pol. ctrl', BD.C.axis); bx(dv.w - 90, 80, 'detector', BD.C.green);
+      g.strokeStyle = BD.C.gold; g.beginPath(); g.moveTo(90, y); g.lineTo(110, y); g.moveTo(180, y); g.lineTo(205, y); g.stroke();
+      var cx0 = 210, cx1 = dv.w - 110; g.fillStyle = 'rgba(157,179,204,.12)'; g.fillRect(cx0, y - 22, cx1 - cx0, 44); BD.label(g, 'chip', cx0 + 4, y - 26, BD.C.dim);
+      // GC - ring - GC and the loopback
+      g.strokeStyle = BD.GEO.si; g.lineWidth = 2; g.beginPath(); g.moveTo(cx0 + 20, y - 8); g.lineTo(cx1 - 20, y - 8); g.stroke();
+      g.beginPath(); g.arc((cx0 + cx1) / 2, y - 16, 7, 0, 2 * Math.PI); g.stroke();
+      g.beginPath(); g.moveTo(cx0 + 20, y + 10); g.lineTo(cx1 - 20, y + 10); g.stroke(); g.lineWidth = 1;
+      ['GC', 'GC'].forEach(function (t, k) { var xx = k ? cx1 - 26 : cx0 + 14; g.fillStyle = 'rgba(224,184,90,.6)'; g.fillRect(xx, y - 12, 12, 8); g.fillRect(xx, y + 6, 12, 8); });
+      BD.label(g, 'device: GC → ring → GC', (cx0 + cx1) / 2 + 12, y - 12, BD.C.axis); BD.label(g, 'loopback: GC → GC', (cx0 + cx1) / 2, y + 22, BD.C.axis, 'center');
+      g.strokeStyle = BD.C.gold; g.beginPath(); g.moveTo(cx1, y); g.lineTo(dv.w - 90, y); g.stroke();
+      BD.label(g, 'polarisation off by ' + S.pol.toFixed(0) + '°', 110, y - 18, S.pol > 20 ? BD.C.red : BD.C.dim);
+    })();
+    // ---- spectra
+    var ys = vw === 'raw' ? dev.map(dbm) : dev.map(function (d, k) { return dbm(d) - dbm(loop[k]); });
+    var zy = vw === 'raw' ? zd.map(dbm) : zd.map(function (d, k) { return dbm(d) - dbm(zl[k]); });
+    var yr = vw === 'raw' ? [FLOOR - 5, S.p + 2] : [-25, 3];
+    var d2 = BD.setup(q('[data-c="s"]')), f2 = BD.frame(d2, { x: [1500, 1600], y: yr, pad: { l: 46, b: 22, t: 30 }, xt: [[1500, '1500'], [1550, '1550'], [1600, '1600 nm']],
+      yt: vw === 'raw' ? [[FLOOR, FLOOR + ''], [-40, '−40'], [-20, '−20'], [0, '0 dBm']] : [[-20, '−20'], [-10, '−10'], [0, '0 dB']] });
+    if (vw === 'raw') BD.line(f2, xs, loop.map(dbm), 'rgba(127,224,160,.5)', 1);
+    BD.line(f2, xs, ys, BD.C.blue, 1);
+    var d3 = BD.setup(q('[data-c="z"]')), f3 = BD.frame(d3, { x: [1549, 1551.5], y: vw === 'raw' ? [Math.min.apply(null, zy) - 2, Math.max.apply(null, zy) + 1] : [-25, 3], pad: { l: 46, b: 22, t: 30 },
+      xt: [[1549, '1549'], [1550, '1550'], [1551, '1551 nm']], yt: vw === 'raw' ? [] : [[-20, '−20'], [-10, '−10'], [0, '0 dB']] });
+    BD.line(f3, zx, zy, BD.C.blue, 1.4);
+    // ---- readouts
+    var pk = Math.max.apply(null, loop.map(dbm)), r = Math.pow(10, S.r / 20), x = r * r, rip = 20 * Math.log10((1 + x) / (1 - x));
+    var zmin = Math.min.apply(null, zy), zmax = Math.max.apply(null, zy);
+    q('[data-o="pk"]').textContent = pk.toFixed(1) + ' dBm';
+    q('[data-o="nf"]').textContent = (FLOOR - 5 * Math.log10(S.n)).toFixed(0) + ' dBm';
+    q('[data-o="rp"]').textContent = rip.toFixed(2) + ' dB p-p';
+    q('[data-o="er"]').textContent = (zmax - zmin).toFixed(1) + ' dB';
+    var c = 'The raw spectrum is the device response multiplied by two grating-coupler envelopes (−4.5 dB each, 30 nm 1 dB bandwidth), Fabry–Pérot fringes between the couplers, and a polarisation factor; at the edges of the band the signal sinks towards the detector\'s noise floor. ';
+    if (vw === 'cal') c += 'Dividing by the loopback, measured on the same chip, removes the couplers\' envelope and leaves the ring\'s own response; what the loopback cannot remove is noise and any difference between the two paths. ';
+    if (S.pol > 25) c += '<b>The polarisation is off:</b> only cos² of the light couples into the TE grating, so the whole spectrum drops by ' + (-10 * Math.log10(Math.pow(Math.cos(S.pol * Math.PI / 180), 2))).toFixed(1) + ' dB; set the polarisation controller for maximum power first. ';
+    if (S.r > -18) c += 'Strong coupler reflections make fringes that can be mistaken for resonances, or hide shallow ones. ';
+    c += 'Averaging sweeps lowers the noise floor but not the systematic errors.';
+    c += ' <i>Simulated: the 10 µm ring of Table 12.1 (300 nm gap), 500 µm between couplers, 1 % power noise and a −75 dBm detector floor.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

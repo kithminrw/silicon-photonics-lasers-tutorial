@@ -7,19 +7,21 @@ across the **Si, SiN, thin-film LiNbO₃ (TFLN), BaTiO₃ (BTO) and InP** platfo
 
 **Read it online:** <https://www.kithminrw.com/silicon-photonics-lasers-tutorial/>
 
-> **Status: draft v0.1 (November 2026).** Parts I–V are written; the other parts are detailed outlines that
+> **Status: draft v0.1 (November 2026).** All eight parts are written; the other parts are detailed outlines that
 > are being filled in. Corrections are very welcome (see [Contributing](#contributing)).
 
 ## What makes it different
 
 - **Interactive demos in every chapter.** Small physical models that run in the browser with no
-  installation: change a slider and watch the light. Thirty are built so far, including a slab-waveguide
+  installation: change a slider and watch the light. Forty-two are built so far, including a slab-waveguide
   mode solver, exact fibre LP modes, Fresnel reflection and evanescent fields, Gaussian-beam coupling,
   directional couplers, MMI self-imaging, Mach–Zehnder interferometers, ring resonators, Bragg gratings by
   transfer matrix, grating-coupler phase matching and efficiency budget, an inverse-taper edge coupler from
   femwell modes, Gaussian alignment tolerances, a fibre-array alignment game, heater cross-sections
   with computed temperature maps, ring locking, a PN depletion phase shifter, MZM eye diagrams, a ring
-  modulator, photodiode bandwidth, receiver sensitivity, a laser rate-equation
+  modulator, photodiode bandwidth, receiver sensitivity, level systems, semiconductor gain spectra, laser
+  dynamics and linewidth, III–V/Si supermodes, an SOA, a wafer-map Monte Carlo, a circuit simulator, a virtual
+  test bench, ring fitting, the full link budget, a biosensor, an optical phased array, a laser rate-equation
   simulator and a Vernier tunable laser.
 - **Real devices in 3D.** Devices from open process design kits (SiEPIC EBeam, CORNERSTONE, Luxtelligence
   TFLN) extruded from their layouts with their PDK layer stacks, which you can rotate, slice by layer
@@ -40,9 +42,9 @@ across the **Si, SiN, thin-film LiNbO₃ (TFLN), BaTiO₃ (BTO) and InP** platfo
 | III. Passive devices | 9 Couplers · 10 Y-branches and MMIs · 11 MZIs · 12 Rings · 13 Bragg gratings · 14 WDM and polarisation | **written** |
 | IV. Coupling and packaging | 15 Grating couplers · 16 Edge couplers · 17 Fibre arrays and packaging | **written** |
 | V. Active devices | 18 Thermo-optic tuning · 19 Electro-optic effects · 20 Modulators · 21 Photodetectors | **written** |
-| VI. Lasers and amplifiers | 22 Absorption, emission, gain · 23 Semiconductor gain · 24 Fabry–Pérot laser · 25 Dynamics and noise · 26 Tunable lasers · 27 Lasers on silicon · 28 SOAs | outline + demos |
-| VII. Fabrication, testing, data | 29 Fabrication · 30 Design flow and open PDKs · 31 Testing · 32 Data analysis | outline |
-| VIII. Systems | 33 Links and transceivers · 34 Sensing, LiDAR, quantum, computing | outline |
+| VI. Lasers and amplifiers | 22 Absorption, emission, gain · 23 Semiconductor gain · 24 Fabry–Pérot laser · 25 Dynamics and noise · 26 Tunable lasers · 27 Lasers on silicon · 28 SOAs | **written** |
+| VII. Fabrication, testing, data | 29 Fabrication · 30 Design flow and open PDKs · 31 Testing · 32 Data analysis | **written** |
+| VIII. Systems | 33 Links and transceivers · 34 Sensing, LiDAR, quantum, computing | **written** |
 | Hands-on labs | 12 labs: simulate, make (openEBL), lasers and links | planned |
 | PDK devices in 3D | 13 devices from three open PDKs | working |
 | Appendices | A formulas · B materials · C glossary · D open tools, PDKs, data · E reading and free simulations | in progress |
