@@ -11,8 +11,8 @@
     <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: 200 mm wafer, dies coloured by shift</span></div>
     <div class="bd-scope tall"><canvas data-c="h" aria-hidden="true"></canvas><span class="bd-tag">distribution of the resonance shift over the dies</span></div>
   </div>
-  <div class="bd-scope short"><canvas data-c="x" aria-hidden="true"></canvas><span class="bd-tag">cross-section to scale: nominal and worst die</span></div>
-  <div class="bd-read" aria-live="polite"><span>σ of the shift <b data-o="s">–</b></span><span>full range <b data-o="rg">–</b></span><span>dies within ±1 nm <b data-o="y">–</b></span><span>heater power for the worst die <b data-o="p">–</b></span></div>
+  <div class="bd-scope short"><canvas data-c="x" aria-hidden="true"></canvas><span class="bd-tag">cross-section to scale: nominal and bluest die</span></div>
+  <div class="bd-read" aria-live="polite"><span>σ of the shift <b data-o="s">–</b></span><span>full range <b data-o="rg">–</b></span><span>dies within ±1 nm <b data-o="y">–</b></span><span>heater power for the bluest die <b data-o="p">–</b></span></div>
   <p class="bd-caption" data-o="cap"></p>
 </div>
 <script>
@@ -45,7 +45,7 @@
   function draw() {
     var sh = shifts(), dl = sh.map(function (s) { return s.dl; }), mean = dl.reduce(function (a, b) { return a + b; }, 0) / dl.length;
     var c0 = dl.map(function (v) { return v - mean; }), sd = Math.sqrt(c0.reduce(function (a, b) { return a + b * b; }, 0) / c0.length);
-    var mx = Math.max(1, Math.max.apply(null, c0.map(Math.abs))), worst = 0; c0.forEach(function (v, i) { if (Math.abs(v) > Math.abs(c0[worst])) worst = i; });
+    var mx = Math.max(1, Math.max.apply(null, c0.map(Math.abs))), blu = 0; c0.forEach(function (v, i) { if (v < c0[blu]) blu = i; });   // the bluest die needs the most heater power
     // ---- wafer map
     (function () {
       var dv = BD.setup(q('[data-c="g"]')), g = dv.g, R = Math.min(dv.w, dv.h - 44) / 2 - 6, cx = dv.w / 2, cy = 22 + (dv.h - 36) / 2, sc = R / 100;   // room for the legend below
@@ -53,7 +53,7 @@
       g.fillStyle = '#0e1420'; g.fillRect(cx - 8, cy + R - 3, 16, 6);   // notch
       dies.forEach(function (d, i) {
         g.fillStyle = col(c0[i], mx); g.fillRect(cx + (d.x - 9.3) * sc, cy - (d.y + 9.3) * sc, 18.6 * sc, 18.6 * sc);
-        if (i === worst) { g.strokeStyle = BD.C.white; g.lineWidth = 2; g.strokeRect(cx + (d.x - 9.3) * sc, cy - (d.y + 9.3) * sc, 18.6 * sc, 18.6 * sc); g.lineWidth = 1; }
+        if (i === blu) { g.strokeStyle = BD.C.white; g.lineWidth = 2; g.strokeRect(cx + (d.x - 9.3) * sc, cy - (d.y + 9.3) * sc, 18.6 * sc, 18.6 * sc); g.lineWidth = 1; }
       });
       BD.label(g, '20 mm dies', 8, 36, BD.C.dim); BD.label(g, 'blue: blue-shifted   red: red-shifted', 8, dv.h - 6, BD.C.dim);
     })();
@@ -64,14 +64,14 @@
       xt: [[lo, lo.toFixed(1)], [0, '0'], [hi, '+' + hi.toFixed(1) + ' nm']], yt: [[0, '0']] });
     cnt.forEach(function (n, k) { d2.g.fillStyle = col(edges[k] + (hi - lo) / nb / 2, mx); d2.g.fillRect(f2.X(edges[k]) + 1, f2.Y(n), f2.X(edges[k] + (hi - lo) / nb) - f2.X(edges[k]) - 2, f2.Y(0) - f2.Y(n)); });
     BD.vline(f2, -1, BD.C.dim, [3, 3]); BD.vline(f2, 1, BD.C.dim, [3, 3], '±1 nm');
-    // ---- cross-section, nominal 500 x 220 nm against the worst die
+    // ---- cross-section, nominal 500 x 220 nm against the bluest die
     (function () {
-      var dv = BD.setup(q('[data-c="x"]')), g = dv.g, sc = Math.min((dv.w - 40) / 1.2, (dv.h - 34) / 0.4), cx = dv.w / 2, base = dv.h - 12, s = sh[worst];
+      var dv = BD.setup(q('[data-c="x"]')), g = dv.g, sc = Math.min((dv.w - 40) / 1.2, (dv.h - 34) / 0.4), cx = dv.w / 2, base = dv.h - 12, s = sh[blu];
       g.fillStyle = BD.GEO.ox; g.fillRect(0, 18, dv.w, dv.h - 18);
       var w = 0.5 + s.dw / 1000, t = 0.22 + s.dt / 1000;
       g.fillStyle = BD.GEO.si; g.fillRect(cx - w / 2 * sc, base - t * sc, w * sc, t * sc);
       g.strokeStyle = BD.C.white; g.setLineDash([4, 3]); g.strokeRect(cx - 0.25 * sc, base - 0.22 * sc, 0.5 * sc, 0.22 * sc); g.setLineDash([]);
-      var wl = 'worst die: ' + (500 + s.dw).toFixed(1) + ' × ' + (220 + s.dt).toFixed(1) + ' nm';   // beside the core, or above it on a narrow panel
+      var wl = 'bluest die: ' + (500 + s.dw).toFixed(1) + ' × ' + (220 + s.dt).toFixed(1) + ' nm';   // beside the core, or above it on a narrow panel
       if (cx + 0.32 * sc + g.measureText(wl).width < dv.w - 4) BD.label(g, wl, cx + 0.32 * sc, base - 0.12 * sc, BD.C.white);
       else BD.label(g, wl, cx, base - Math.max(t, 0.22) * sc - 6, BD.C.white, 'center');
       BD.label(g, 'nominal 500 × 220 nm (dashed)', 10, 36, BD.C.dim);
@@ -84,7 +84,7 @@
     q('[data-o="p"]').textContent = ((Math.max.apply(null, c0) - Math.min.apply(null, c0)) / ETA).toFixed(0) + ' mW';
     var c = 'A ring\'s resonance moves by about 1.4 nm per nanometre of silicon thickness and 0.6 nm per nanometre of width (Chapter 6), so a few nanometres of variation across a wafer spread the resonances by several nanometres: more than a WDM channel spacing. ';
     c += 'Smooth patterns (the film thickness, the lithography dose) dominate over 200 mm; random die-to-die variation adds to them. ';
-    c += 'Every ring must be tuned by its heater, and a heater only red-shifts, so the bluest die sets the design offset and the full spread sets the heater power: about ' + ((Math.max.apply(null, c0) - Math.min.apply(null, c0)) / ETA).toFixed(0) + ' mW at 0.18 nm/mW. ';
+    c += 'Every ring must be tuned by its heater, and a heater only red-shifts, so the design is offset to the blue by the reddest die\'s shift, and the bluest die, a full spread away, needs the most heater power: about ' + ((Math.max.apply(null, c0) - Math.min.apply(null, c0)) / ETA).toFixed(0) + ' mW at 0.18 nm/mW. ';
     c += ' <i>Illustrative wafer patterns; shifts are relative to the wafer mean; within-die variation and the coupling gaps are left out.</i>';
     q('[data-o="cap"]').innerHTML = c;
   }

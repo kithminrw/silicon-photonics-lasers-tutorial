@@ -23,7 +23,7 @@
   var q = function (s) { return root.querySelector(s); }, hr = 0;
   // material and waveguide (illustrative textbook values; units cm, s)
   var c = 3e10, ng = 3.6, vg = c / ng, hv = 1.2398 / 1.55 * 1.602e-19, qe = 1.602e-19;
-  var w = 2e-4, dAct = 0.05e-4, Gam = 0.06, eta_i = 0.8, alpha_i = 15, g0 = 1500, Ntr0 = 2e18, T0 = 60, eps = 2e-17, beta = 1e-4;
+  var w = 2e-4, dAct = 0.05e-4, Gam = 0.06, eta_i = 0.8, alpha_i = 15, g0 = 1500, Ntr0 = 2e18, T0 = 60, T0N = 143, eps = 2e-17, beta = 1e-4;
   var A = 1e8, B = 1e-10, Cc = 3e-29;
   var S = BD.bind(root, {
     I: { fmt: function (x) { return x.toFixed(1) + ' mA'; } }, L: { fmt: function (x) { return x.toFixed(0) + ' µm'; } },
@@ -32,7 +32,7 @@
   BD.seg(root, 'hr', function (v) { hr = +v; draw(); });
   function model() {
     var L = S.L * 1e-4, R1 = S.R, R2 = hr ? 0.9 : S.R, V = L * w * dAct;
-    var am = Math.log(1 / (R1 * R2)) / (2 * L), tp = 1 / (vg * (alpha_i + am)), Ntr = Ntr0 * Math.exp((S.T - 25) / T0);
+    var am = Math.log(1 / (R1 * R2)) / (2 * L), tp = 1 / (vg * (alpha_i + am)), Ntr = Ntr0 * Math.exp((S.T - 25) / T0N);   // T0N = 143 K gives the threshold itself T0 = 60 K (Ith ~ AN + BN² + CN³)
     var gth = (alpha_i + am) / Gam, Nth = Ntr * Math.exp(gth / g0);
     var F1 = (1 - R1) / ((1 - R1) + Math.sqrt(R1 / R2) * (1 - R2));        // fraction of the output leaving the front facet
     return { L: L, V: V, am: am, tp: tp, Ntr: Ntr, gth: gth, Nth: Nth, F1: F1 };
@@ -128,7 +128,7 @@
     var cap;
     if (S.I * 1e-3 < Ith) cap = '<b>Below threshold</b>: the gain has not reached the losses, so the output is weak spontaneous emission spread over many modes. Raise the current past ' + (Ith * 1e3).toFixed(1) + ' mA.';
     else cap = 'Above threshold the carrier density clamps at N<sub>th</sub> and every extra electron becomes a photon, so the L–I curve turns into a straight line with slope η<sub>d</sub>hν/q. The switch-on shows a delay while the carriers build up, then relaxation oscillations at about ' + (fr / 1e9).toFixed(1) + ' GHz as photons and carriers trade energy. ';
-    cap += ' A shorter cavity or a less reflective facet raises the mirror loss: higher threshold, higher slope. Heating raises the transparency density (T<sub>0</sub> = ' + T0 + ' K here), so the threshold climbs exponentially. ';
+    cap += ' A shorter cavity or a less reflective facet raises the mirror loss: higher threshold, higher slope. Heating raises the transparency density, so the threshold climbs exponentially (T<sub>0</sub> = ' + T0 + ' K here: a factor of e per ' + T0 + ' K). ';
     if (isFinite(smsr)) cap += 'A Fabry–Pérot laser keeps several modes alive (side-mode suppression ≈ ' + smsr.toFixed(0) + ' dB here); Chapter 26 shows how gratings and rings pick one.';
     q('[data-o="cap"]').innerHTML = cap;
   }

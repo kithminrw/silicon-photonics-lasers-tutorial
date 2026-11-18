@@ -57,7 +57,7 @@ The light must move between the III–V gain region above and the silicon wavegu
 | 1.00 µm | 3.236 | 25 % | 60 % |
 | 1.50 µm | 3.273 | 14 % | 78 % |
 
-The transfer happens over a narrow range of widths, around 0.85 µm, where the light is shared equally. A taper that sweeps the silicon width slowly through this range, over tens to a couple of hundred micrometres, carries the light across with little loss. The designer can also choose an intermediate width under the gain section to set the modal gain, trading gain (Γ in the quantum wells) against the silicon's control of the mode, for example for a laser whose feedback comes from a silicon Bragg grating or rings.
+The transfer happens over a narrow range of widths, around 0.85 µm, where the light is shared equally. A taper that sweeps the silicon width slowly through this range, over tens to a couple of hundred micrometres, carries the light across with little loss. The designer can also choose an intermediate width under the gain section to set the modal gain, trading gain (Γ in the MQW region) against the silicon's control of the mode, for example for a laser whose feedback comes from a silicon Bragg grating or rings.
 
 **Try it.** Widen the silicon and watch the computed mode move from the III–V into the silicon; compare the fundamental with its partner.
 
@@ -87,7 +87,7 @@ with a thermal impedance $$Z_\mathrm{th}$$ that is larger on SOI than for a lase
 <div class="tbox tbox-example" markdown="1">
 <div class="tbox-title">Worked Example 27.1 · How hot does it get?</div>
 
-Suppose a laser with $$Z_\mathrm{th} = 80$$ K/W is driven at 100 mA and 1.5 V and emits 20 mW. It dissipates 130 mW and runs 10 K above its heat sink. With $$T_0 = 60$$ K its threshold is 18 % higher than if it were not self-heating, its gain peak and wavelength move by several nanometres, and at higher currents the extra heating can make the output roll over. Halving $$Z_\mathrm{th}$$ with a thermal shunt halves all of these.
+Suppose a laser with $$Z_\mathrm{th} = 80$$ K/W is driven at 100 mA and 1.5 V and emits 20 mW. It dissipates 130 mW and runs 10.4 K above its heat sink. With $$T_0 = 60$$ K its threshold is 19 % higher than if it were not self-heating, its gain peak moves by about 5 nm (and with it a Fabry–Pérot laser's wavelength; a DFB or ring laser's moves by about 1 nm), and at higher currents the extra heating can make the output roll over. Halving $$Z_\mathrm{th}$$ with a thermal shunt halves all of these.
 
 </div>
 
@@ -119,7 +119,7 @@ Four flip-chipped DFB lasers, tested before assembly and butt-coupled to edge co
 <div class="tbox-title">Key takeaways</div>
 
 - Lasers reach silicon off-chip, flip-chipped, bonded, transfer-printed or grown; each trades cost, density, coupling and heat.
-- In heterogeneous lasers the fundamental supermode moves from the III–V to the silicon as the silicon widens: in the example, from 52 % in the wells and 1 % in silicon at 0.4 µm to 14 % and 78 % at 1.5 µm, crossing near 0.85 µm.
+- In heterogeneous lasers the fundamental supermode moves from the III–V to the silicon as the silicon widens: in the example, from 52 % in the MQW region and 1 % in silicon at 0.4 µm to 14 % and 78 % at 1.5 µm, crossing near 0.85 µm.
 - Adiabatic tapers sweep through the crossing to transfer the light with little loss.
 - Self-heating, ΔT = Z<sub>th</sub>(IV − P<sub>out</sub>), is worse on the BOX; thermal shunts help.
 - Open PDKs and course data (SiEPICfab Shuksan, UBC ELEC 413) make laser integration accessible.

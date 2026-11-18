@@ -21,7 +21,7 @@
 (function () {
   var root = document.getElementById('bdBench'); if (!root || !window.BD) return;
   var q = function (s) { return root.querySelector(s); };
-  var NE = 2.446, NG = 4.18, R = 10, A = 0.99855, T = 0.9974, GC = -4.5, BW = 30, FLOOR = -75, LGC = 500;   // ring of Chapter 12 (300 nm gap); GC peak loss and 1 dB bandwidth; floor dBm; GC spacing um
+  var NE = 2.446, NG = 4.18, R = 10, A = 0.99855, T = 0.9974, GC = -4.5, BW = 30, FLOOR = -75, LGC = 500;   // ring of Chapter 12 (250 nm gap, 2 dB/cm); GC peak loss and 1 dB bandwidth; floor dBm; GC spacing um
   var vw = 'raw', seed = 5;
   var S = BD.bind(root, { p: { fmt: function (x) { return x.toFixed(1) + ' dBm'; } }, pol: { fmt: function (x) { return x.toFixed(0) + '°'; } },
     r: { fmt: function (x) { return x.toFixed(1) + ' dB'; } }, n: { fmt: function (x) { return x.toFixed(0); } } }, function () { draw(); });
@@ -40,7 +40,7 @@
   function draw() {
     var rnd = BD.rng(seed), xs = [], dev = [], loop = [], zx = [], zd = [], zl = [];
     for (var i = 0; i <= 2000; i++) { var l = 1500 + 100 * i / 2000; xs.push(l); dev.push(measure(l, true, rnd)); loop.push(measure(l, false, rnd)); }
-    for (i = 0; i <= 600; i++) { var lz = 1549 + 2.5 * i / 600; zx.push(lz); zd.push(measure(lz, true, rnd)); zl.push(measure(lz, false, rnd)); }
+    for (i = 0; i <= 2500; i++) { var lz = 1549 + 2.5 * i / 2500; zx.push(lz); zd.push(measure(lz, true, rnd)); zl.push(measure(lz, false, rnd)); }   // 1 pm steps, as a real resonance sweep
     var dbm = function (v) { return 10 * Math.log10(v) + 0; };
     // ---- setup schematic
     (function () {
@@ -83,7 +83,7 @@
     if (S.pol > 25) c += '<b>The polarisation is off:</b> only cos² of the light couples into the TE grating, so the whole spectrum drops by ' + (-10 * Math.log10(Math.pow(Math.cos(S.pol * Math.PI / 180), 2))).toFixed(1) + ' dB; set the polarisation controller for maximum power first. ';
     if (S.r > -18) c += 'Strong coupler reflections make fringes that can be mistaken for resonances, or hide shallow ones. ';
     c += 'Averaging sweeps lowers the noise floor but not the systematic errors.';
-    c += ' <i>Simulated: the 10 µm ring of Table 12.1 (300 nm gap), 500 µm between couplers, 1 % power noise and a −75 dBm detector floor.</i>';
+    c += ' <i>Simulated: the 10 µm ring of Table 12.1 (250 nm gap), 500 µm between couplers, 1 % power noise and a −75 dBm detector floor.</i>';
     q('[data-o="cap"]').innerHTML = c;
   }
   BD.observe(root, draw);

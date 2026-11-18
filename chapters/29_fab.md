@@ -72,11 +72,11 @@ $$\Delta\lambda = \frac{\lambda}{n_g}\left(\frac{\partial n_\mathrm{eff}}{\parti
 <div class="tbox tbox-example" markdown="1">
 <div class="tbox-title">Worked Example 29.1 · Ring resonances across a wafer</div>
 
-If the silicon thickness varies by 6 nm from the centre of a wafer to its edge, and the width by another 6 nm through the lithography dose, the ring resonances spread by up to $$1.4 \times 6 + 0.6 \times 6 \approx 12$$ nm where the two add, more than three channel spacings of the reference link. Random die-to-die width variation of 1.5 nm adds ±0.9 nm. Every ring must be tuned, and since heaters only red-shift ([Chapter 18]({% link chapters/18_thermal.md %})), the bluest die sets the design offset and the full spread sets the heater budget. The demo turns such maps into numbers.
+If the silicon thickness varies by 6 nm from the centre of a wafer to its edge, and the width by another 6 nm through the lithography dose, the ring resonances spread by up to $$1.4 \times 6 + 0.6 \times 6 \approx 12$$ nm where the two add, more than three channel spacings of the reference link. Random die-to-die width variation of 1.5 nm adds ±0.9 nm. Every ring must be tuned, and since heaters only red-shift ([Chapter 18]({% link chapters/18_thermal.md %})), the reddest die sets the design offset (it needs no heating) and the bluest die, a full spread away, sets the heater budget. The demo turns such maps into numbers.
 
 </div>
 
-**Try it.** Change the wafer-scale thickness and width variations and the random component, and generate new wafers; the map, the distribution and the worst die's cross-section update.
+**Try it.** Change the wafer-scale thickness and width variations and the random component, and generate new wafers; the map, the distribution and the bluest die's cross-section update.
 
 {% include demos/wafermc.html %}
 

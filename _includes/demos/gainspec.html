@@ -110,7 +110,7 @@
     var c = 'Injected electrons fill the bottom of the conduction band and holes the top of the valence band, up to the quasi-Fermi levels. Photons between E<sub>g</sub> and E<sub>Fc</sub> − E<sub>Fv</sub> are amplified (the Bernard–Duraffourg condition, shaded); above that window the material still absorbs. ';
     if (pk.g < 0) c += 'Here the density is below transparency (' + (ntr / 1e18).toFixed(2) + ' × 10¹⁸ cm⁻³): the material still absorbs everywhere. ';
     else c += 'More carriers widen the window, so the gain grows and its peak moves to shorter wavelengths (band filling). ';
-    if (T > 320) c += 'Heat smears the Fermi functions, so more carriers are needed for the same gain, and the gap shrinks, moving everything to longer wavelengths (about 0.5 nm/K). ';
+    if (T > 320) c += 'Heat smears the Fermi functions, so more carriers are needed for the same gain, and the gap shrinks, moving everything to longer wavelengths (the band edge by about 0.7 nm/K; at a fixed carrier density the gain peak moves faster still). ';
     c += ' <i>Bulk, parabolic bands, one valence band, k-conserving transitions with 6.6 meV Lorentzian broadening (figsrc/ch23_gain.py); no band-gap renormalisation, which would shift the spectrum to longer wavelengths by a few tens of meV. The band diagram\'s curvatures are exaggerated.</i>';
     q('[data-o="cap"]').innerHTML = c;
   }

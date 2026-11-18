@@ -113,7 +113,8 @@
     q('[data-o="l"]').textContent = (1000 * res[0]).toFixed(2) + ' nm';
     q('[data-o="s"]').textContent = res[2] > 0 ? (10 * Math.log10(res[2] / res[1])).toFixed(1) + ' dB' : '–';
     var cap = 'Each ring alone passes a comb of wavelengths; the two combs have slightly different spacings, so they line up only once every Vernier FSR = FSR₁FSR₂/|FSR₁ − FSR₂|. The laser picks the cavity mode with the highest net gain at that coincidence. ';
-    if (FV < 0.1) cap += '<b>The Vernier FSR is shorter than the gain bandwidth</b>: two supermodes compete and the laser can hop between them. Make the radii closer.';
+    var rival = Math.max(gain(res[0] + FV), gain(res[0] - FV));   // gain at the next coincidence of the two combs, one Vernier FSR away
+    if (rival > 0.5 * gain(res[0])) cap += '<b>The Vernier FSR is shorter than the gain window</b>: the next coincidence of the two combs sees almost as much gain, so two supermodes compete and the laser can hop between them. Make the radii closer.';
     else if (res[2] / res[1] > 0.5) cap += '<b>A neighbouring supermode is almost as strong</b>: the filter barely discriminates. Lower κ² (narrower ring resonances) or adjust a heater.';
     else cap += 'Tuning one heater makes the wavelength jump by one ring FSR (the coarse steps across the map); tuning both together moves it continuously (the stripes).';
     q('[data-o="cap"]').innerHTML = cap;

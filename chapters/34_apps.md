@@ -57,7 +57,7 @@ If the resonance can be tracked to $$\sigma_\lambda = 1$$ pm, the limit of detec
 
 ## <span class="secnum">34.2</span>LiDAR and optical phased arrays
 
-**Optical phased arrays** (OPAs) steer a beam without moving parts. A row of grating emitters, each fed through its own phase shifter ([Chapter 18]({% link chapters/18_thermal.md %})), radiates waves that add up in the direction where the path difference compensates the phase step: $$\sin\theta = \Delta\phi\,\lambda/(2\pi d)$$ for emitters a pitch $$d$$ apart. The beam's width is set by the aperture, about $$\lambda/(Nd)$$. The central difficulty is **grating lobes**: unless $$d \le \lambda/2$$ (0.78 µm at 1550 nm), the same phases add up in other directions too, and silicon waveguides couple when packed that closely. Designs use non-uniform spacing, waveguides of alternating widths that do not couple, or accept a limited steering range. Steering in the other direction comes from the wavelength, through the emitters' grating angle ([Chapter 15]({% link chapters/15_gc.md %})).
+**Optical phased arrays** (OPAs) steer a beam without moving parts. A row of grating emitters, each fed through its own phase shifter ([Chapter 18]({% link chapters/18_thermal.md %})), radiates waves that add up in the direction where the path difference compensates the phase step: $$\sin\theta = \Delta\phi\,\lambda/(2\pi d)$$ for emitters a pitch $$d$$ apart. The beam's width is set by the aperture: about $$0.886\,\lambda/(Nd)$$ radians between the half-power points, broadening as $$1/\cos\theta$$ when steered. The central difficulty is **grating lobes**: unless $$d \le \lambda/2$$ (0.78 µm at 1550 nm), the same phases add up in other directions too, and silicon waveguides couple when packed that closely. Designs use non-uniform spacing, waveguides of alternating widths that do not couple, or accept a limited steering range. Steering in the other direction comes from the wavelength, through the emitters' grating angle ([Chapter 15]({% link chapters/15_gc.md %})).
 
 **Try it.** Change the number of emitters, their pitch and the phase step; watch the main beam steer and the grating lobes appear.
 
@@ -88,7 +88,7 @@ Loss is the enemy: every lost photon is a lost qubit, so low-loss SiN and carefu
 
 ## <span class="secnum">34.4</span>Photonic computing
 
-A mesh of $$N(N-1)/2$$ MZIs, each with two phase shifters, can implement any $$N\times N$$ unitary matrix ([Chapter 11]({% link chapters/11_mzi.md %})). Light passing through it performs a matrix–vector multiplication in one pass, at the speed of light and with little energy per operation once the weights are set. That is attractive for the linear layers of neural networks. Other architectures use WDM, with rings weighting each wavelength before a photodiode sums them, or delay lines. The challenges are the conversions in and out of the optical domain, the precision (a few bits) set by noise and fabrication errors ([Chapter 29]({% link chapters/29_fab.md %})), and the nonlinear functions that light does poorly.
+A mesh of $$N(N-1)/2$$ MZIs, each with two phase shifters, plus $$N$$ phase shifters at its outputs, can implement any $$N\times N$$ unitary matrix ([Chapter 11]({% link chapters/11_mzi.md %})). Light passing through it performs a matrix–vector multiplication in one pass, at the speed of light and with little energy per operation once the weights are set. That is attractive for the linear layers of neural networks. Other architectures use WDM, with rings weighting each wavelength before a photodiode sums them, or delay lines. The challenges are the conversions in and out of the optical domain, the precision (a few bits) set by noise and fabrication errors ([Chapter 29]({% link chapters/29_fab.md %})), and the nonlinear functions that light does poorly.
 
 ## <span class="secnum">34.5</span>Microwave photonics and frequency combs
 
@@ -96,7 +96,7 @@ Light can carry and process radio-frequency signals. Ring filters ([Chapter 12](
 
 ## <span class="secnum">34.6</span>Visible and mid-infrared photonics
 
-Silicon absorbs below 1.1 µm and its oxide absorbs beyond about 4 µm, so other wavelengths need other platforms ([Chapter 4]({% link chapters/04_platforms.md %})):
+Silicon absorbs below 1.1 µm and its oxide absorbs beyond about 3.5 µm, so other wavelengths need other platforms ([Chapter 4]({% link chapters/04_platforms.md %})):
 
 - **Visible and near-infrared**: silicon nitride, aluminium nitride, aluminium oxide and titanium dioxide, for biophotonics, displays, and the lasers that control trapped ions and atoms in quantum computers and clocks.
 - **Mid-infrared** (2–10 µm), where many molecules have their fingerprint absorption lines: germanium on silicon, silicon on sapphire or suspended silicon, and chalcogenide glasses, for gas and chemical sensing.
@@ -124,7 +124,7 @@ The building blocks stay the same, but the figure of merit changes. A sensor opt
 <div class="tbox tbox-takeaways" markdown="1">
 <div class="tbox-title">Key takeaways</div>
 
-- Ring biosensors: $$S = (\lambda/n_g)\,\partial n_\mathrm{eff}/\partial n_c$$; 54 nm/RIU (TE) and 206 nm/RIU (TM) for a silicon strip in water; LOD = 3σ/S, about 10⁻⁵ RIU at 1 pm.
+- Ring biosensors: $$S = (\lambda/n_g)\,\partial n_\mathrm{eff}/\partial n_c$$; 54 nm/RIU (TE) and 206 nm/RIU (TM) for a silicon strip in water; LOD = 3σ/S: 1.5 × 10⁻⁵ RIU (TM) and 5.6 × 10⁻⁵ RIU (TE) at 1 pm.
 - Optical phased arrays steer with phase steps; pitches above λ/2 bring grating lobes.
 - FMCW LiDAR: resolution c/(2B), beat frequency 2RB/(cT), and a laser coherent over the round trip.
 - Quantum photonics needs pair sources, MZI meshes, single-photon detectors and very low loss; photonic computing uses meshes for matrix multiplication.

@@ -69,7 +69,7 @@ A ring's through-port resonance contains its round-trip loss $$a$$ and its self-
 <div class="tbox tbox-example" markdown="1">
 <div class="tbox-title">Worked Example 32.1 · Telling the two solutions apart</div>
 
-Suppose three rings of 10 µm radius with gaps of 200, 250 and 300 nm are fitted (illustrative numbers). Each gives two solutions. In one set the losses are 2.1, 1.9 and 2.0 dB/cm and the couplings fall steeply with the gap; in the other the "losses" are 6, 3 and 1.5 dB/cm and the "couplings" barely change. Loss cannot depend on a coupling gap several micrometres from most of the ring, so the first set is the physical one, here close to the 2 dB/cm and the couplings of [Table 12.1]({% link chapters/12_rings.md %}#tab-12-1).
+Suppose three rings of 10 µm radius with gaps of 200, 250 and 300 nm are fitted (illustrative numbers). Each gives two solutions. In one set the losses are 2.1, 1.9 and 2.0 dB/cm and the couplings fall steeply with the gap; in the other the "losses" are 8.6, 3.6 and 1.5 dB/cm and the "couplings" barely change. Loss cannot depend on a coupling gap several micrometres from most of the ring, so the first set is the physical one, here close to the 2 dB/cm and the couplings of [Table 12.1]({% link chapters/12_rings.md %}#tab-12-1).
 
 </div>
 

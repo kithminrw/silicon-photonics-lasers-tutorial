@@ -22,7 +22,7 @@
 (function () {
   var root = document.getElementById('bdLink'); if (!root || !window.BD) return;
   var q = function (s) { return root.querySelector(s); };
-  var RATE = 200e9, PEN = [['extinction (in sensitivity)', 0], ['crosstalk', 0.5], ['thermal drift and locking', 1.0], ['ageing and temperature', 1.0]];
+  var RATE = 200e9, PEN = [['extinction (in sensitivity)', 0], ['crosstalk', 0.5], ['dispersion (2 km)', 0.5], ['thermal drift and locking', 1.0], ['ageing and temperature', 1.0]];
   var S = BD.bind(root, { pl: { fmt: function (x) { return '+' + x.toFixed(1) + ' dBm'; } }, gc: { fmt: function (x) { return x.toFixed(1) + ' dB'; } }, rm: { fmt: function (x) { return x.toFixed(1) + ' dB'; } },
     km: { fmt: function (x) { return x.toFixed(1) + ' km'; } }, sen: { fmt: function (x) { return x.toFixed(1) + ' dBm'; } }, wp: { fmt: function (x) { return x.toFixed(0) + ' %'; } }, ht: { fmt: function (x) { return x.toFixed(1) + ' mW'; } } }, function () { draw(); });
   function draw() {
@@ -73,7 +73,7 @@
     q('[data-o="mg"]').textContent = margin.toFixed(1) + ' dB';
     q('[data-o="e"]').textContent = etot.toFixed(2) + ' pJ/bit';
     q('[data-o="ok"]').textContent = (margin >= 0 ? 'budget closes' : 'budget fails') + ', ' + (etot <= 5 ? 'energy met' : 'energy over');
-    var c = 'Each block subtracts its loss in decibels; what reaches the receiver must exceed its sensitivity plus penalties for crosstalk, drift and ageing (the extinction-ratio penalty is already inside the −11.6 dBm of Chapter 21). ';
+    var c = 'Each block subtracts its loss in decibels; what reaches the receiver must exceed its sensitivity plus penalties for crosstalk, dispersion, drift and ageing (the extinction-ratio penalty is already inside the −11.6 dBm of Chapter 21). ';
     c += 'The lasers dominate the energy: ' + (Math.pow(10, S.pl / 10)).toFixed(0) + ' mW of light per lane at ' + S.wp.toFixed(0) + ' % wall-plug efficiency costs ' + E[0][1].toFixed(2) + ' pJ/bit, so every decibel of margin can be traded for laser power. ';
     if (margin < 0) c += '<b>The budget does not close:</b> lower a loss, raise the laser power, or improve the receiver (FEC buys about 3 dB). ';
     c += ' <i>Per-lane losses from Chapters 1, 15, 18, 20 and 21; driver, TIA and decision energies are typical round numbers, and serialisers are not counted.</i>';

@@ -44,7 +44,7 @@ $$\frac{\mathrm{d}P}{\mathrm{d}z} = \left(\frac{\Gamma g_0}{1 + P/P_\mathrm{sat}
 
 </div>
 
-At low power the gain is exponential in the length. As the signal grows, stimulated emission consumes carriers faster than the current replaces them, and the local gain falls ([Chapter 22]({% link chapters/22_emission.md %})). The saturation power $$P_\mathrm{sat} = h\nu A/(\Gamma a\tau)$$ is larger for a big mode area $$A$$, a short carrier lifetime $$\tau$$ and a low differential gain $$a$$. The amplifier's usable output is quoted as the **output power at which the gain has dropped by 3 dB**.
+At low power the gain is exponential in the length. As the signal grows, stimulated emission consumes carriers faster than the current replaces them, and the local gain falls ([Chapter 22]({% link chapters/22_emission.md %})). The saturation power $$P_\mathrm{sat} = h\nu A/(\Gamma a\tau)$$, with $$A$$ the active region's cross-section (so that $$A/\Gamma$$ is the mode's area), is larger for a big mode area, a short carrier lifetime $$\tau$$ and a low differential gain $$a$$. The amplifier's usable output is quoted as the **output power at which the gain has dropped by 3 dB**.
 
 <div class="tbox tbox-example" markdown="1">
 <div class="tbox-title">Worked Example 28.1 · A 1 mm SOA</div>
@@ -68,7 +68,7 @@ $$F = 2n_{sp}\,\frac{G - 1}{G}\,\frac{\Gamma g}{\Gamma g - \alpha_i} \ \xrightar
 
 </div>
 
-Even a perfectly inverted amplifier ($$n_{sp} = 1$$) has a 3 dB noise figure: a fundamental quantum limit. Real SOAs have $$n_{sp} \approx 1.5$$–2.5 and internal loss, giving 5–7 dB; the example above gives 6.5 dB. Coupling loss at the input adds directly to the noise figure, decibel for decibel, which is why a pre-amplifier must be coupled efficiently.
+Even a perfectly inverted amplifier ($$n_{sp} = 1$$) has a 3 dB noise figure: a fundamental quantum limit. Real SOAs have $$n_{sp} \approx 1.5$$–2.5 and internal loss, giving 5–7 dB; the example above gives 6.5 dB with $$n_{sp} = 2$$. Coupling loss at the input adds directly to the noise figure, decibel for decibel, which is why a pre-amplifier must be coupled efficiently.
 
 ## <span class="secnum">28.4</span>Dynamics and patterning
 
@@ -108,7 +108,7 @@ A 1 mm SOA gives about 13 dB of small-signal gain, a −3 dB output power near 9
 <div class="tbox tbox-specnote" markdown="1">
 <div class="tbox-title">Reference-link choice</div>
 
-No SOA: the budget of [Chapter 1]({% link chapters/01_why.md %}) closes with about 9 dB of margin ([Chapter 21]({% link chapters/21_pd.md %})). An SOA would be the first upgrade for a longer reach or more channels.
+No SOA: the budget of [Chapter 1]({% link chapters/01_why.md %}) closes with about 9 dB of margin before penalties ([Chapter 21]({% link chapters/21_pd.md %})) and 5.9 dB after them ([Chapter 33]({% link chapters/33_links.md %}))). An SOA would be the first upgrade for a longer reach or more channels.
 
 </div>
 

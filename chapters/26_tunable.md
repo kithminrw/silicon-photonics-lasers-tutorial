@@ -71,7 +71,7 @@ Heating one ring slides its comb against the other, and the coincidence jumps fr
 <div class="tbox tbox-example" markdown="1">
 <div class="tbox-title">Worked Example 26.1 · Two silicon rings for 40 nm of tuning</div>
 
-With $$n_g = 4.18$$, rings of 10 and 11 µm radius have FSRs of 9.15 and 8.32 nm, so $$\mathrm{FSR}_V = 9.15 \times 8.32/0.83 = 92$$ nm: one coincidence across more than the gain bandwidth, which covers a 40 nm range with margin. Shifting ring 2 by 0.83 nm, about 5 mW with the TiN heaters of Chapter 18 (0.18 nm/mW for a ring with a 9.15 nm FSR), moves the lasing wavelength by 9.15 nm, a gearing of 11. The price of such a large gearing is selectivity: the neighbouring coincidences, one FSR away, are only slightly misaligned, so the rings' resonances must be narrow (low coupling) for a good SMSR. The demo shows the trade.
+With $$n_g = 4.18$$, rings of 10 and 11 µm radius have FSRs of 9.148 and 8.316 nm, so $$\mathrm{FSR}_V = 9.148 \times 8.316/0.832 \approx 91$$ nm: one coincidence across more than the gain bandwidth, which covers a 40 nm range with margin. Shifting ring 2 by 0.83 nm, about 5 mW with the TiN heaters of Chapter 18 (0.18 nm/mW for a ring with a 9.15 nm FSR), moves the lasing wavelength by 9.15 nm, a gearing of 11. The price of such a large gearing is selectivity: the neighbouring coincidences, one FSR away, are only slightly misaligned, so the rings' resonances must be narrow (low coupling) for a good SMSR. The demo shows the trade.
 
 </div>
 
@@ -110,6 +110,6 @@ Four λ/4-shifted DFB lasers at 400 GHz spacing, one per channel, with the ring 
 - λ/4-shifted DFB lasers (κL ≈ 1–3) are the telecom workhorse; they tune only with temperature, about 0.1 nm/K.
 - DBR lasers tune with current or heat in the mirror and phase sections, with mode hops unless the phase is controlled.
 - External-cavity lasers combine III–V gain with low-loss Si or SiN filters for wide tuning and narrow lines.
-- Two rings give $$\mathrm{FSR}_V = \mathrm{FSR}_1\mathrm{FSR}_2/\lvert\Delta\mathrm{FSR}\rvert$$: 92 nm for 10 and 11 µm silicon rings, with a tuning gearing of 11.
+- Two rings give $$\mathrm{FSR}_V = \mathrm{FSR}_1\mathrm{FSR}_2/\lvert\Delta\mathrm{FSR}\rvert$$: 91 nm for 10 and 11 µm silicon rings, with a tuning gearing of 11.
 
 </div>

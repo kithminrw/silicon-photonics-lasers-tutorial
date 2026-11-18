@@ -68,11 +68,11 @@ Each spontaneous photon that joins the lasing mode adds a small random phase, an
 <div class="tbox tbox-keyeq" markdown="1">
 <div class="tbox-title">Schawlow–Townes–Henry linewidth</div>
 
-$$\Delta\nu = \frac{v_g^2\,h\nu\,g_\mathrm{th}\,n_{sp}\,\alpha_m}{8\pi P_0}\,(1 + \alpha^2)$$
+$$\Delta\nu = \frac{v_g^2\,h\nu\,\Gamma g_\mathrm{th}\,n_{sp}\,\alpha_m}{8\pi P_0}\,(1 + \alpha^2)$$
 
 </div>
 
-with $$P_0$$ the power from one facet of a symmetric laser and $$n_{sp}$$ the population-inversion factor. The linewidth falls as $$1/P_0$$, since each spontaneous photon matters less among more photons. It also falls with lower cavity loss, which means longer photon lifetimes.
+with $$\Gamma g_\mathrm{th} = \alpha_i + \alpha_m$$ the modal gain at threshold, $$P_0$$ the power from one facet of a symmetric laser and $$n_{sp}$$ the population-inversion factor. The linewidth falls as $$1/P_0$$, since each spontaneous photon matters less among more photons. It also falls with lower cavity loss, which means longer photon lifetimes.
 
 **Try it.** Raise the bias, shorten the cavity and change α. The plots show the modulation response, the RIN and the linewidth against power.
 
