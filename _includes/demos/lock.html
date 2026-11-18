@@ -1,0 +1,102 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdLock" role="group" aria-label="Interactive demo: locking a ring resonator to a laser with a heater">
+  <div class="bd-head"><span>// try it · lock a drop ring to its laser (74 pm/K drift, heater 0.25 nm/mW, dither lock-in)</span>
+    <span class="bd-controls" style="margin:0"><button type="button" class="bd-toggle" data-act="loop" aria-pressed="true">loop on</button><button type="button" class="bd-btn" data-act="step">+10 K step</button><button type="button" class="bd-btn" data-act="reset">reset</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>ambient swing (peak) <b data-v="amb"></b></span><input type="range" data-k="amb" min="0" max="25" step="0.5" value="8" aria-label="ambient swing"></label>
+    <label class="bd-sl"><span>cold ring offset from laser <b data-v="off"></b></span><input type="range" data-k="off" min="-4" max="0.5" step="0.05" value="-1.5" aria-label="cold offset"></label>
+    <label class="bd-sl"><span>loop gain <b data-v="gain"></b></span><input type="range" data-k="gain" min="0.1" max="4" step="0.05" value="1" aria-label="loop gain"></label>
+  </div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: ring with heater, monitor photodiode and controller</span></div>
+    <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">drop-port spectrum now, and the laser</span></div>
+  </div>
+  <div class="bd-scope tall"><canvas data-c="t" aria-hidden="true"></canvas><span class="bd-tag">history: ambient temperature, heater power and dropped power</span></div>
+  <div class="bd-read" aria-live="polite"><span>dropped power <b data-o="pd">–</b></span><span>heater <b data-o="ph">–</b></span><span>resonance − laser <b data-o="dl">–</b></span><span>state <b data-o="st">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdLock'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  var DRIFT = 0.074, ETA = 0.246, FW = 0.64, PMAX = 20, TAU = 8e-6, DT = 2e-6, FD = 2e4, AD = 0.15, TLP = 2e-4, PER = 0.25;
+  var loop = true, t = 0, Th = 0, Pb = 0, lp = 0, step = 0, hist = [], timer = 0, visible = false;
+  var S = BD.bind(root, { amb: { fmt: function (x) { return '± ' + x.toFixed(1) + ' K'; } }, off: { fmt: function (x) { return (x * 1000).toFixed(0) + ' pm'; } },
+    gain: { fmt: function (x) { return x.toFixed(2) + ' ×'; } } }, function () { draw(); });
+  BD.toggle(q('[data-act="loop"]'), function (on) { loop = on; q('[data-act="loop"]').textContent = on ? 'loop on' : 'loop off'; });
+  q('[data-act="step"]').addEventListener('click', function () { step += 10; });
+  q('[data-act="reset"]').addEventListener('click', function () { t = 0; Th = 0; Pb = 0; lp = 0; step = 0; hist = []; draw(); });
+  function amb(tt) { return S.amb * Math.sin(2 * Math.PI * tt / PER) + step; }
+  function drop(dl) { return 0.9 / (1 + Math.pow(2 * dl / FW, 2)); }
+  var P = 0, last = { dl: 0, d: 0 };
+  function sim(n) {
+    for (var i = 0; i < n; i++) {
+      t += DT;
+      var dith = AD * Math.sin(2 * Math.PI * FD * t);
+      P = Math.max(0, Math.min(PMAX, (loop ? Pb : 0) + (loop ? dith : 0)));
+      Th += (P * ETA / DRIFT - Th) * DT / TAU;                       // heater temperature rise at the ring (K), first-order lag
+      var dl = S.off + DRIFT * (amb(t) + Th), d = drop(dl);            // resonance - laser (nm), dropped power
+      lp += (d * Math.sin(2 * Math.PI * FD * t) - lp) * DT / TLP;      // lock-in: demodulate the dither and low-pass
+      if (loop) Pb = Math.max(0, Math.min(PMAX, Pb + 6e4 * S.gain * lp * DT));
+      last = { dl: dl, d: d };
+      if (i % 50 === 0) { hist.push([t, amb(t), P, d]); if (hist.length > 600) hist.shift(); }
+    }
+  }
+  function draw() {
+    var dl = last.dl, d = last.d;
+    // ---- geometry: ring top view
+    (function () {
+      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, cx = dv.w * 0.42, cy = dv.h * 0.55, R = Math.min(dv.w * 0.2, dv.h * 0.27), wpx = 4;
+      BD.wg(g, [[10, cy + R + 9], [dv.w - 10, cy + R + 9]], wpx, BD.GEO.si);                  // bus
+      BD.wg(g, [[cx + R + 70, cy - R - 9], [10, cy - R - 9]], wpx, BD.GEO.si);                // drop waveguide
+      BD.glow(g, [[cx + R + 70, cy - R - 9], [cx - R - 30, cy - R - 9]], d, wpx * 3);
+      g.strokeStyle = BD.GEO.si; g.lineWidth = wpx; g.beginPath(); g.arc(cx, cy, R, 0, 2 * Math.PI); g.stroke();
+      var hc = 'rgba(240,138,60,' + (0.2 + 0.8 * P / PMAX).toFixed(2) + ')';
+      g.strokeStyle = hc; g.lineWidth = wpx * 2.6; g.beginPath(); g.arc(cx, cy, R, 0.35 * Math.PI, 2.15 * Math.PI); g.stroke(); g.lineWidth = 1;
+     
+      // monitor photodiode at the end of the drop waveguide, and the controller
+      g.fillStyle = 'rgba(127,224,160,.85)'; g.fillRect(4, cy - R - 17, 16, 16); BD.label(g, 'PD', 6, cy - R - 22, BD.C.green);
+      g.strokeStyle = BD.C.dim; g.setLineDash([4, 3]); g.beginPath(); g.moveTo(12, cy - R - 1); g.lineTo(12, dv.h - 16); g.lineTo(cx - 40, dv.h - 16); g.stroke(); g.setLineDash([]);
+      g.strokeStyle = BD.C.white; g.strokeRect(cx - 40, dv.h - 28, 80, 22); BD.label(g, loop ? 'lock-in + PI' : 'loop off', cx, dv.h - 13, BD.C.white, 'center');
+      g.strokeStyle = BD.C.dim; g.setLineDash([4, 3]); g.beginPath(); g.moveTo(cx + 40, dv.h - 16); g.lineTo(cx + R + 30, dv.h - 16); g.lineTo(cx + R + 30, cy); g.lineTo(cx + R + 6, cy); g.stroke(); g.setLineDash([]);
+      BD.label(g, 'heater ' + P.toFixed(1) + ' mW', cx + R + 34, cy - 6, 'rgba(240,138,60,1)');
+      BD.label(g, 'laser in →', dv.w - 70, cy + R + 24, BD.C.axis);
+      BD.label(g, 'R = 7.2 µm (drawn larger)', 8, 36, BD.C.dim);
+    })();
+    // ---- spectrum around the laser
+    var d2 = BD.setup(q('[data-c="s"]')), f2 = BD.frame(d2, { x: [-3, 3], y: [0, 1], pad: { l: 30, b: 22, t: 30 },
+      xt: [[-3, '−3'], [0, 'laser'], [3, '+3 nm']], yt: [[0, '0'], [0.9, '0.9']] });
+    var xs = [], ys = []; for (var i = 0; i <= 300; i++) { var x = -3 + 6 * i / 300; xs.push(x); ys.push(drop(x - dl)); }
+    BD.line(f2, xs, ys, BD.C.blue, 2); BD.vline(f2, 0, BD.C.gold, [2, 2]); BD.dot(f2, 0, d, BD.C.white, 4.5);
+    BD.vline(f2, Math.max(-3, Math.min(3, dl)), 'rgba(127,184,240,.5)', [4, 4], 'ring');
+    // ---- history
+    var d3 = BD.setup(q('[data-c="t"]')), t0 = hist.length ? hist[0][0] : 0, t1 = Math.max(t0 + 0.05, hist.length ? hist[hist.length - 1][0] : 0.05);
+    var f3 = BD.frame(d3, { x: [t0, t1], y: [0, 1], pad: { l: 40, b: 22, t: 30, r: 12 }, xt: [[t0, (1e3 * t0).toFixed(0) + ' ms'], [t1, (1e3 * t1).toFixed(0) + ' ms']], yt: [[0, '0'], [1, 'max']] });
+    var ht = hist.map(function (h) { return h[0]; });
+    BD.line(f3, ht, hist.map(function (h) { return 0.5 + h[1] / 60; }), BD.C.red, 1.4);
+    BD.line(f3, ht, hist.map(function (h) { return h[2] / PMAX; }), 'rgba(240,138,60,1)', 1.4);
+    BD.line(f3, ht, hist.map(function (h) { return h[3] / 0.9; }), BD.C.green, 1.8);
+    d3.g.fillStyle = BD.C.red; d3.g.fillText('ambient (±30 K full scale)', d3.w - 170, 16 + 26); d3.g.fillStyle = 'rgba(240,138,60,1)'; d3.g.fillText('heater (0–20 mW)', d3.w - 170, 30 + 26); d3.g.fillStyle = BD.C.green; d3.g.fillText('dropped power', d3.w - 170, 44 + 26);
+    // ---- readouts
+    var locked = loop && d > 0.8 && P > 0.05 && P < PMAX - 0.05;
+    var pdb = 10 * Math.log10(Math.max(d, 1e-4) / 0.9); q('[data-o="pd"]').textContent = (pdb > -0.05 ? '0.0' : pdb.toFixed(1).replace('-', '−')) + ' dB below peak';
+    q('[data-o="ph"]').textContent = P.toFixed(2) + ' mW';
+    q('[data-o="dl"]').textContent = (1000 * dl).toFixed(0).replace('-', '−') + ' pm';
+    var state = !loop ? 'free-running' : locked ? 'locked' : (Pb >= PMAX - 0.2 ? 'heater at maximum' : (Pb <= 0.2 && dl > 0 ? 'heater off, ring too red' : 'acquiring'));
+    q('[data-o="st"]').textContent = state;
+    var c;
+    if (!loop) c = 'Without control the ring follows the ambient temperature at 74 pm/K, and a few kelvin move its 0.64 nm passband off the laser. ';
+    else if (locked) c = '<b>Locked.</b> A small 20 kHz dither on the heater makes the photodiode signal wobble; a lock-in reads which side of the peak the ring is on, and an integrator moves the heater power to the top. ';
+    else if (state === 'heater off, ring too red') c = '<b>Lock lost:</b> the room got so hot that the ring sits red of the laser even with the heater off, and a heater can only push it redder. Design the cold ring far enough blue (the offset slider) for the hottest case. ';
+    else if (state === 'heater at maximum') c = '<b>Out of range:</b> the heater would need more than ' + PMAX + ' mW. A ring set too far blue wastes heater power all the time. ';
+    else c = 'The loop is climbing the slope towards the peak. ';
+    c += 'Heaters only heat, so the ring is designed blue of its laser by more than the hottest drift, and the heater pays for the difference: about ' + (Math.max(0, -S.off) / ETA).toFixed(1) + ' mW at the reference temperature here.';
+    c += ' <i>Ring drop response Lorentzian (FWHM 0.64 nm); heater as a first-order lag (τ = 8 µs, TiN, plain); time runs about 30 times slower than real.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  function tick() { if (!visible) return; sim(500); draw(); }
+  if (window.IntersectionObserver) new IntersectionObserver(function (es) { visible = es[0].isIntersecting; }).observe(root); else visible = true;
+  sim(1); BD.observe(root, draw);
+  timer = setInterval(tick, 33);
+})();
+</script>

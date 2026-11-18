@@ -3,6 +3,7 @@
 .bd::before{content:"";position:absolute;inset:7px;border:1px solid rgba(120,170,225,.26);border-radius:8px;pointer-events:none;}
 .bd *{box-sizing:border-box;}
 .bd-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(170,205,240,.75);margin:2px 2px 10px;}
+.bd-head .nc{text-transform:none;}
 .bd-seg{display:inline-flex;border:1px solid rgba(230,190,95,.45);border-radius:30px;overflow:hidden;}
 .bd-seg button{font:inherit;letter-spacing:.06em;color:rgba(233,208,143,.7);background:transparent;border:0;padding:3px 10px;cursor:pointer;}
 .bd-seg button[aria-pressed="true"]{background:rgba(230,190,95,.22);color:#f3d48a;}

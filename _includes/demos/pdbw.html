@@ -1,0 +1,79 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdPdBw" role="group" aria-label="Interactive demo: bandwidth and responsivity of a germanium photodiode">
+  <div class="bd-head"><span>// try it · Ge-on-Si PIN photodiode: transit time against RC, and responsivity</span>
+    <span class="bd-seg" role="group" aria-label="Illumination"><button type="button" data-il="wg" aria-pressed="true">waveguide-fed</button><button type="button" data-il="ni" aria-pressed="false">normal incidence</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>intrinsic Ge thickness <b data-v="d"></b></span><input type="range" data-k="d" min="0.2" max="2" step="0.01" value="0.5" aria-label="thickness"></label>
+    <label class="bd-sl"><span>detector size <b data-v="s"></b></span><input type="range" data-k="s" min="5" max="50" step="0.5" value="15" aria-label="size"></label>
+    <label class="bd-sl"><span>load + series resistance <b data-v="R"></b></span><input type="range" data-k="R" min="20" max="200" step="1" value="70" aria-label="resistance"></label>
+    <label class="bd-sl"><span>Ge absorption coefficient <b data-v="a"></b></span><input type="range" data-k="a" min="500" max="8000" step="50" value="3000" aria-label="absorption"></label>
+  </div>
+  <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: cross-section to scale</span></div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="b" aria-hidden="true"></canvas><span class="bd-tag">3 dB bandwidth against Ge thickness</span></div>
+    <div class="bd-scope tall"><canvas data-c="r" aria-hidden="true"></canvas><span class="bd-tag">responsivity against Ge thickness</span></div>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>capacitance <b data-o="C">–</b></span><span>transit / RC limit <b data-o="lim">–</b></span><span>bandwidth <b data-o="bw">–</b></span><span>responsivity <b data-o="R">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdPdBw'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  var VS = 6e4, EPS = 16.2 * 8.854e-12, CPAR = 5e-15, WWG = 4, GAM = 0.5, ETA = 0.9, RMAX = 1.25;   // m/s, F/m, F, um, -, internal QE, A/W at 1550 nm
+  var il = 'wg';
+  var S = BD.bind(root, { d: { fmt: function (x) { return x.toFixed(2) + ' µm'; } }, s: { fmt: function (x) { return x.toFixed(1) + ' µm'; } },
+    R: { fmt: function (x) { return x.toFixed(0) + ' Ω'; } }, a: { fmt: function (x) { return x.toFixed(0) + ' cm⁻¹'; } } }, function () { draw(); });
+  BD.seg(root, 'il', function (v) { il = v; q('[data-k="s"]').previousElementSibling.firstChild.textContent = v === 'wg' ? 'detector length ' : 'detector diameter '; draw(); });
+  function model(d) {
+    var A = il === 'wg' ? S.s * WWG : Math.PI * S.s * S.s / 4;        // um^2
+    var C = EPS * A * 1e-12 / (d * 1e-6) + CPAR, frc = 1 / (2 * Math.PI * S.R * C) / 1e9, ft = 0.45 * VS / (d * 1e-6) / 1e9;
+    var f = 1 / Math.sqrt(1 / (frc * frc) + 1 / (ft * ft));
+    var abs = il === 'wg' ? 1 - Math.exp(-GAM * S.a * 1e-4 * S.s) : 1 - Math.exp(-S.a * 1e-4 * d);   // a in 1/cm -> 1/um
+    return { C: C, frc: frc, ft: ft, f: f, R: ETA * RMAX * abs * (il === 'wg' ? 0.92 : 0.95) };       // 8 % or 5 % coupling/reflection loss
+  }
+  function draw() {
+    var m = model(S.d);
+    // ---- geometry: vertical PIN cross-section, to scale
+    (function () {
+      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, wd = il === 'wg' ? WWG : S.s, span = Math.max(wd + 6, 10), sc = Math.min((dv.w - 40) / span, (dv.h - 50) / (S.d + 2.6));
+      var cx = dv.w / 2, base = dv.h - 20, X = function (x) { return cx + x * sc; }, Y = function (y) { return base - y * sc; };
+      g.fillStyle = BD.GEO.ox; g.fillRect(0, 18, dv.w, dv.h - 18);
+      g.fillStyle = 'rgba(157,179,204,.55)'; g.fillRect(X(-wd / 2 - 2.5), Y(0.22), (wd + 5) * sc, 0.22 * sc);            // p-doped silicon underneath
+      g.fillStyle = 'rgba(240,150,170,.5)'; g.fillRect(X(-wd / 2 - 2.5), Y(0.22), (wd + 5) * sc, 0.22 * sc);
+      g.fillStyle = 'rgba(190,170,120,.9)'; g.fillRect(X(-wd / 2), Y(0.22 + S.d), wd * sc, S.d * sc);                 // intrinsic Ge
+      g.fillStyle = 'rgba(120,170,240,.85)'; g.fillRect(X(-wd / 2), Y(0.32 + S.d), wd * sc, 0.1 * sc);                  // n+ Ge top
+      g.fillStyle = BD.GEO.metal; g.fillRect(X(-0.4), Y(0.32 + S.d) - 0.3 * sc, 0.8 * sc, 0.3 * sc);
+      g.fillRect(X(-wd / 2 - 2.0), Y(0.22) - 0.3 * sc, 0.9 * sc, 0.3 * sc); g.fillRect(X(wd / 2 + 1.1), Y(0.22) - 0.3 * sc, 0.9 * sc, 0.3 * sc);
+      BD.label(g, 'intrinsic Ge ' + S.d.toFixed(2) + ' µm', X(-wd / 2 - 2.6), Y(0.22 + S.d / 2) - 10, BD.C.white);
+      BD.label(g, 'n+ Ge', X(-wd / 2 - 2.6), Y(0.32 + S.d) - 22, 'rgba(120,170,240,1)');
+      BD.label(g, 'p Si', X(wd / 2 + 2.6), Y(0.11) + 14, 'rgba(240,150,170,1)', 'right');
+      if (il === 'ni') { g.fillStyle = BD.C.gold; for (var k = -2; k <= 2; k++) { var xx = X(k * wd / 6); g.fillRect(xx - 1, 24, 2, Y(0.42 + S.d) - 34); g.beginPath(); g.moveTo(xx - 5, Y(0.42 + S.d) - 12); g.lineTo(xx + 5, Y(0.42 + S.d) - 12); g.lineTo(xx, Y(0.42 + S.d) - 4); g.fill(); } BD.label(g, 'light from above', X(wd / 6) + 8, 40, BD.C.gold); }
+      else BD.label(g, '⊙ light travels into the page along a ' + S.s.toFixed(0) + ' µm long detector, fed by the Si waveguide below', 10, 36, BD.C.gold);
+      BD.dim(g, X(-wd / 2), Y(0) + 12, X(wd / 2), Y(0) + 12, (il === 'wg' ? 'width ' : 'diameter ') + wd.toFixed(1) + ' µm', BD.C.axis, 0);
+      BD.scalebar(g, dv.w - 100, 36, sc, 80);
+    })();
+    // ---- bandwidth and responsivity against thickness
+    var ds = [], ft = [], frc = [], ff = [], rr = [];
+    for (var i = 0; i <= 120; i++) { var d = 0.2 + 1.8 * i / 120, mm = model(d); ds.push(d); ft.push(mm.ft); frc.push(mm.frc); ff.push(mm.f); rr.push(mm.R); }
+    var d2 = BD.setup(q('[data-c="b"]')), f2 = BD.frame(d2, { x: [0.2, 2], y: [1, 300], ylog: true, pad: { l: 44, b: 22, t: 30 },
+      xt: [[0.5, '0.5'], [1, '1'], [1.5, '1.5'], [2, '2 µm']], yt: [[1, '1 GHz'], [10, '10'], [100, '100']] });
+    BD.line(f2, ds, ft, BD.C.green, 1.4, [4, 3]); BD.line(f2, ds, frc, BD.C.red, 1.4, [4, 3]); BD.line(f2, ds, ff, BD.C.blue, 2.2); BD.dot(f2, S.d, m.f, BD.C.white, 4.5);
+    d2.g.fillStyle = BD.C.green; d2.g.fillText('transit', 52, d2.h - 62); d2.g.fillStyle = BD.C.red; d2.g.fillText('RC', 52, d2.h - 48); d2.g.fillStyle = BD.C.blue; d2.g.fillText('total', 52, d2.h - 34);
+    var d3 = BD.setup(q('[data-c="r"]')), f3 = BD.frame(d3, { x: [0.2, 2], y: [0, 1.2], pad: { l: 40, b: 22, t: 30 },
+      xt: [[0.5, '0.5'], [1, '1'], [1.5, '1.5'], [2, '2 µm']], yt: [[0, '0'], [0.5, '0.5'], [1, '1 A/W']] });
+    BD.hline(f3, ETA * RMAX, BD.C.dim, [3, 3], 'all light absorbed'); BD.line(f3, ds, rr, BD.C.gold, 2); BD.dot(f3, S.d, m.R, BD.C.white, 4.5);
+    // ---- readouts and caption
+    q('[data-o="C"]').textContent = (m.C * 1e15).toFixed(1) + ' fF';
+    q('[data-o="lim"]').textContent = m.ft.toFixed(0) + ' / ' + m.frc.toFixed(0) + ' GHz';
+    q('[data-o="bw"]').textContent = m.f.toFixed(0) + ' GHz';
+    q('[data-o="R"]').textContent = m.R.toFixed(2) + ' A/W';
+    var c = 'A thinner absorber lets carriers cross it sooner (transit limit ≈ 0.45 v<sub>sat</sub>/d) but raises the capacitance (RC limit); the bandwidth peaks between the two. ';
+    c += il === 'wg' ? 'Fed from a waveguide, light is absorbed along the detector\'s length, not its thickness, so a thin, fast diode still absorbs almost everything: that is why integrated receivers use waveguide photodiodes. ' : 'At normal incidence, light crosses the absorber only once: a thin, fast diode lets much of the light through, so speed and responsivity fight each other. ';
+    if (m.frc < m.ft) c += 'Here the RC limit dominates: make the detector smaller or the load lower. ';
+    c += ' <i>Vertical PIN; v<sub>sat</sub> = 6 × 10⁶ cm/s, ε<sub>Ge</sub> = 16.2, 5 fF parasitic, 90 % internal efficiency, 50 % modal overlap with the Ge for the waveguide-fed case. The absorption coefficient is a free parameter: it depends strongly on wavelength and strain near 1550 nm.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

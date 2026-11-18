@@ -1,0 +1,87 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdRingMod" role="group" aria-label="Interactive demo: a silicon ring modulator">
+  <div class="bd-head"><span>// try it · depletion ring modulator at 1550 nm: extinction, loss and bandwidth</span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>junction efficiency <b data-v="eff"></b></span><input type="range" data-k="eff" min="5" max="60" step="1" value="40" aria-label="efficiency"></label>
+    <label class="bd-sl"><span>intrinsic Q (doping loss) <b data-v="Qi"></b></span><input type="range" data-k="Qi" min="5000" max="60000" step="500" value="15000" aria-label="intrinsic Q"></label>
+    <label class="bd-sl"><span>loaded Q <b data-v="Q"></b></span><input type="range" data-k="Q" min="3000" max="30000" step="100" value="8000" aria-label="loaded Q"></label>
+    <label class="bd-sl"><span>drive swing <b data-v="V"></b></span><input type="range" data-k="V" min="0.5" max="4" step="0.05" value="2" aria-label="drive"></label>
+    <label class="bd-sl"><span>laser detuning <b data-v="d"></b></span><input type="range" data-k="d" min="-300" max="300" step="1" value="-100" aria-label="detuning"></label>
+  </div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: ring with its PN junction (top view, to scale)</span></div>
+    <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">through-port spectrum for the 0 and 1 levels, and the laser</span></div>
+  </div>
+  <div class="bd-scope"><canvas data-c="o" aria-hidden="true"></canvas><span class="bd-tag">extinction (blue) and loss (gold) against laser detuning</span></div>
+  <div class="bd-read" aria-live="polite"><span>extinction <b data-o="er">–</b></span><span>insertion loss <b data-o="il">–</b></span><span>optical bandwidth <b data-o="bw">–</b></span><span>reference target <b data-o="ok">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdRingMod'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  var LAM = 1550, R = 7.2, NG = 3.89, FSR = LAM * LAM / (NG * 2 * Math.PI * R * 1000);   // nm
+  var S = BD.bind(root, { eff: { fmt: function (x) { return x.toFixed(0) + ' pm/V'; } }, Qi: { fmt: function (x) { return x.toFixed(0); } }, Q: { fmt: function (x) { return x.toFixed(0); } },
+    V: { fmt: function (x) { return x.toFixed(2) + ' Vpp'; } }, d: { fmt: function (x) { return x.toFixed(0) + ' pm'; } } }, function () { draw(); });
+  function ring(Ql) {   // Lorentzian all-pass response; Q_c from 1/Ql = 1/Qi + 1/Qc
+    var QI = S.Qi, qc = 1 / Math.max(1e-9, 1 / Ql - 1 / QI), tmin = Math.pow((1 / QI - 1 / qc) / (1 / QI + 1 / qc), 2), fw = LAM / Ql * 1000;   // pm
+    return { tmin: tmin, fw: fw, T: function (dl) { return 1 - (1 - tmin) / (1 + Math.pow(2 * dl / fw, 2)); } };
+  }
+  function levels(r, det) {   // the resonance moves red by eff*V as reverse bias rises; '1' = more bias
+    var sh = S.eff * S.V / 2, t0 = r.T(det + sh), t1 = r.T(det - sh);   // detuning = laser - resonance(mid), pm
+    return { a: t0, b: t1, hi: Math.max(t0, t1), lo: Math.min(t0, t1) };
+  }
+  function draw() {
+    var Ql = Math.min(S.Q, S.Qi * 0.98), r = ring(Ql), L = levels(r, S.d), er = 10 * Math.log10(L.hi / Math.max(L.lo, 1e-6)), il = -10 * Math.log10((L.hi + L.lo) / 2);
+    var fopt = 3e8 / (LAM * 1e-9) / Ql / 1e9;   // GHz, photon-lifetime limit c/(lambda Q)
+    // ---- geometry: ring to scale, junction along 80 % of the ring
+    (function () {
+      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, sc = Math.min(dv.w - 20, dv.h - 60) / 22, cx = dv.w / 2, cy = 44 + (dv.h - 60) / 2 - 0.8 * sc, Rp = R * sc, wpx = Math.max(2, 0.5 * sc);
+      g.fillStyle = BD.GEO.ox; g.fillRect(0, 18, dv.w, dv.h - 18);
+      var a0 = 0.62 * Math.PI, a1 = 2.38 * Math.PI;
+      g.lineWidth = Math.max(2, 0.9 * sc); g.strokeStyle = 'rgba(240,150,170,.6)'; g.beginPath(); g.arc(cx, cy, Rp - 0.45 * sc, a0, a1); g.stroke();   // P: inner half of the rib
+      g.strokeStyle = 'rgba(120,170,240,.6)'; g.beginPath(); g.arc(cx, cy, Rp + 0.45 * sc, a0, a1); g.stroke();                                      // N: outer half
+      g.lineWidth = 1.5; g.setLineDash([3, 3]);
+      g.strokeStyle = 'rgba(240,120,150,.9)'; g.beginPath(); g.arc(cx, cy, Rp - 2 * sc, a0, a1); g.stroke();      // P++ contact ring
+      g.strokeStyle = 'rgba(90,140,240,.9)'; g.beginPath(); g.arc(cx, cy, Rp + 2 * sc, a0, a1); g.stroke(); g.setLineDash([]);
+      g.lineWidth = wpx; g.strokeStyle = BD.GEO.si; g.beginPath(); g.arc(cx, cy, Rp, 0, 2 * Math.PI); g.stroke(); g.lineWidth = 1;
+      var by = cy + Rp + 0.75 * sc; BD.wg(g, [[0, by], [dv.w, by]], wpx, BD.GEO.si);
+      BD.glow(g, [[dv.w / 2, by], [dv.w, by]], (L.a + L.b) / 2, wpx * 3);
+      BD.label(g, 'P', cx, cy - Rp + 2.2 * sc, 'rgba(240,150,170,1)', 'center');
+      BD.label(g, 'N', cx, cy - Rp - 1.2 * sc, 'rgba(120,170,240,1)', 'center');
+      BD.label(g, 'junction on 80 % of the ring', 8, 50, BD.C.dim);
+      BD.label(g, 'radius 7.2 µm, FSR ' + FSR.toFixed(1) + ' nm', 8, 36, BD.C.axis);
+      BD.scalebar(g, dv.w - 96, 36, sc, 80);
+    })();
+    // ---- spectra
+    var span = Math.max(400, 3 * r.fw), d2 = BD.setup(q('[data-c="s"]')), f2 = BD.frame(d2, { x: [-span, span], y: [0, 1.05], pad: { l: 30, b: 22, t: 30 },
+      xt: [[-span, (-span).toFixed(0)], [0, 'resonance'], [span, '+' + span.toFixed(0) + ' pm']], yt: [[0, '0'], [1, '1']] });
+    var sh = S.eff * S.V / 2, xs = [], y0 = [], y1 = [];
+    for (var i = 0; i <= 300; i++) { var x = -span + 2 * span * i / 300; xs.push(x); y0.push(r.T(x + sh)); y1.push(r.T(x - sh)); }
+    BD.line(f2, xs, y0, BD.C.blue, 1.8); BD.line(f2, xs, y1, BD.C.red, 1.8);
+    BD.vline(f2, S.d, BD.C.gold, [3, 3], 'laser'); BD.dot(f2, S.d, L.a, BD.C.blue, 4); BD.dot(f2, S.d, L.b, BD.C.red, 4);
+    d2.g.fillStyle = BD.C.blue; d2.g.fillText('low bias', 36, d2.h - 50); d2.g.fillStyle = BD.C.red; d2.g.fillText('high bias (red-shifted)', 36, d2.h - 36);
+    // ---- extinction and loss against detuning
+    var d3 = BD.setup(q('[data-c="o"]')), f3 = BD.frame(d3, { x: [-300, 300], y: [0, 12], pad: { l: 40, b: 22, t: 26 },
+      xt: [[-300, '−300'], [0, '0'], [300, '+300 pm']], yt: [[0, '0'], [4, '4'], [8, '8'], [12, '12 dB']] });
+    var ds = [], es = [], ls = [];
+    for (i = 0; i <= 300; i++) { var dd = -300 + 600 * i / 300, LL = levels(r, dd); ds.push(dd); es.push(Math.min(12, 10 * Math.log10(LL.hi / Math.max(LL.lo, 1e-6)))); ls.push(Math.min(12, -10 * Math.log10((LL.hi + LL.lo) / 2))); }
+    BD.hline(f3, 4, BD.C.dim, [3, 3], 'target 4 dB'); BD.line(f3, ds, es, BD.C.blue, 2); BD.line(f3, ds, ls, BD.C.gold, 1.6);
+    BD.dot(f3, S.d, Math.min(12, er), BD.C.white, 4);
+    // ---- readouts and caption
+    var ok = er >= 4 && il <= 3 && S.V <= 2.001;
+    q('[data-o="er"]').textContent = er.toFixed(1) + ' dB';
+    q('[data-o="il"]').textContent = il.toFixed(1) + ' dB';
+    q('[data-o="bw"]').textContent = fopt.toFixed(0) + ' GHz';
+    q('[data-o="ok"]').textContent = ok ? (fopt >= 30 ? 'met' : 'met, but slow') : 'not met';
+    var c = 'Reverse bias depletes the junction and moves the resonance red by ' + (S.eff * S.V).toFixed(0) + ' pm; a laser parked on the side of the dip sees its power change. ';
+    c += 'A higher Q makes the dip narrower and steeper, so a small shift gives a large extinction, but light then lives longer in the ring: the photon lifetime limits the bandwidth to about c/(λQ) = ' + fopt.toFixed(0) + ' GHz. ';
+    if (S.Q > S.Qi * 0.98) c += 'The loaded Q cannot exceed the intrinsic Q: it is held just below it. ';
+    if (r.tmin > 0.2) c += 'With Q<sub>L</sub> far below Q<sub>i</sub> the ring is strongly over-coupled, so the dip is only ' + (-10 * Math.log10(r.tmin)).toFixed(1) + ' dB deep: heavier doping lowers Q<sub>i</sub> and deepens it, but costs loss. ';
+    c += 'A lateral junction gives 10–20 pm/V (Chapter 19); L- and U-shaped or interleaved junctions reach 40 pm/V and more. The reference link asks for 4 dB at 2 Vpp with at most 3 dB loss and enough bandwidth for 50 Gb/s.';
+    c += ' <i>Lorentzian all-pass model; electrical bandwidth, the drop in loss with bias and self-heating are left out.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

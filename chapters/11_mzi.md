@@ -75,7 +75,7 @@ $$\mathrm{FSR} = \frac{\lambda^2}{n_g\,\Delta L}$$
 </div>
 
 <div class="tbox tbox-example" markdown="1">
-<div class="tbox-title">Worked Example 11.2 · A 100 µm imbalance</div>
+<div class="tbox-title">Worked Example 11.2 · A 100 <span class="nc">µm</span> imbalance</div>
 
 In 500 × 220 nm silicon strips at 1550 nm ($$n_g = 4.18$$, [Chapter 6]({% link chapters/06_soi.md %})), $$\Delta L = 100$$ µm gives FSR = $$1.55^2/(4.18 \times 100) = 5.75$$ nm. To separate channels 3.2 nm apart (the 400 GHz grid of the reference link) as an interleaver, you need FSR = 6.4 nm, so $$\Delta L = 2.4025/(4.18 \times 0.0064) = 90$$ µm.
 

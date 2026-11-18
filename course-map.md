@@ -166,37 +166,37 @@ Demos: ● Alignment tolerance · ● Fibre-array alignment
 
 Tuning, modulating and detecting light: thermo-optic phase shifters, electro-optic effects in each platform, modulators, and germanium photodetectors and receivers.
 
-### [18. Thermo-Optic Phase Shifters]({% link chapters/18_thermal.md %})
+### [18. Thermo-Optic Phase Shifters]({% link chapters/18_thermal.md %}) <span class="status status-written">written</span>
 
 *How many milliwatts for a π shift, and how fast?*
 
 18.1 The thermo-optic effect · 18.2 Heater types · 18.3 Thermal circuits · 18.4 Improving efficiency · 18.5 Crosstalk and stabilisation
 
-Demos: ○ Heater model; ○ Ring locking
+Demos: ● Thermo-optic phase shifter · ● Ring locking
 
-### [19. Electro-Optic Effects Across Platforms]({% link chapters/19_eo.md %})
+### [19. Electro-Optic Effects Across Platforms]({% link chapters/19_eo.md %}) <span class="status status-written">written</span>
 
 *Which effect gives the best VπL for a given loss and bandwidth?*
 
 19.1 Free-carrier plasma dispersion · 19.2 PN, PIN and MOS structures · 19.3 The Pockels effect · 19.4 Electro-absorption · 19.5 Figures of merit
 
-Demos: ○ Plasma dispersion; ○ Pockels phase shifter
+Demos: ● PN depletion phase shifter
 
-### [20. Modulators]({% link chapters/20_modulators.md %})
+### [20. Modulators]({% link chapters/20_modulators.md %}) <span class="status status-written">written</span>
 
 *Mach–Zehnder or ring modulator for a four-wavelength link?*
 
 20.1 Modulator metrics · 20.2 Mach–Zehnder modulators · 20.3 Ring modulators · 20.4 Electro-absorption modulators · 20.5 TFLN and BTO modulators · 20.6 Modulation formats · 20.7 Driver and modulator co-design
 
-Demos: ○ MZM and eye diagram; ○ Ring modulator
+Demos: ● MZM and eye diagram · ● Ring modulator
 
-### [21. Photodetectors and Receivers]({% link chapters/21_pd.md %})
+### [21. Photodetectors and Receivers]({% link chapters/21_pd.md %}) <span class="status status-written">written</span>
 
 *How much optical power does the receiver need for a target BER?*
 
 21.1 Absorption and responsivity · 21.2 Germanium-on-silicon photodiodes · 21.3 Bandwidth · 21.4 Dark current and noise · 21.5 Avalanche photodiodes · 21.6 Receivers · 21.7 Monitor photodiodes
 
-Demos: ○ Photodiode bandwidth; ○ Receiver sensitivity
+Demos: ● Photodiode bandwidth · ● Receiver sensitivity
 
 ## Part VI · Lasers and Amplifiers
 

@@ -1,0 +1,93 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdMzm" role="group" aria-label="Interactive demo: a Mach-Zehnder modulator and its eye diagram">
+  <div class="bd-head"><span>// try it · Mach–Zehnder modulator at 50 Gb/s: transfer curve and eye</span>
+    <span class="bd-seg" role="group" aria-label="Platform"><button type="button" data-pf="si" aria-pressed="true">Si depletion</button><button type="button" data-pf="ln" aria-pressed="false">thin-film LiNbO₃</button></span>
+    <span class="bd-seg" role="group" aria-label="Format"><button type="button" data-fm="nrz" aria-pressed="true">NRZ</button><button type="button" data-fm="pam4" aria-pressed="false">PAM4</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>electrode length <b data-v="L"></b></span><input type="range" data-k="L" min="1" max="20" step="0.1" value="3" aria-label="length"></label>
+    <label class="bd-sl"><span>drive swing <b data-v="V"></b></span><input type="range" data-k="V" min="0.3" max="6" step="0.05" value="2" aria-label="drive swing"></label>
+    <label class="bd-sl"><span>bias phase <b data-v="b"></b></span><input type="range" data-k="b" min="0" max="180" step="1" value="90" aria-label="bias phase"></label>
+  </div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top view, length to scale along the arms (widths stretched), travelling-wave electrodes</span></div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="t" aria-hidden="true"></canvas><span class="bd-tag">transfer curve, bias and swing</span></div>
+    <div class="bd-scope tall"><canvas data-c="e" aria-hidden="true"></canvas><span class="bd-tag">optical eye (2 symbols)</span></div>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>V<sub>π</sub> <b data-o="vpi">–</b></span><span>bandwidth <b data-o="bw">–</b></span><span>extinction <b data-o="er">–</b></span><span>insertion loss <b data-o="il">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdMzm'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  // V_pi L (V cm), propagation loss (dB/mm), and an RF-loss-limited bandwidth f0 (GHz) at length L0 (mm): f = f0 (L0/L)^2
+  var PF = { si: { vpl: 1.4, loss: 1.1, f0: 30, L0: 3, name: 'silicon depletion' }, ln: { vpl: 2.6, loss: 0.03, f0: 100, L0: 10, name: 'thin-film LiNbO₃' } };
+  var pf = 'si', fm = 'nrz', rnd = BD.rng(7), bits = [];
+  for (var i = 0; i < 400; i++) bits.push(rnd());
+  var S = BD.bind(root, { L: { fmt: function (x) { return x.toFixed(1) + ' mm'; } }, V: { fmt: function (x) { return x.toFixed(2) + ' Vpp'; } }, b: { fmt: function (x) { return x.toFixed(0) + '°'; } } }, function () { draw(); });
+  BD.seg(root, 'pf', function (v) { pf = v; draw(); });
+  BD.seg(root, 'fm', function (v) { fm = v; draw(); });
+  function draw() {
+    var P = PF[pf], vpi = P.vpl * 10 / S.L, bw = P.f0 * Math.pow(P.L0 / S.L, 2), ilp = P.loss * S.L, phb = S.b * Math.PI / 180;
+    var T = function (v) { return Math.pow(Math.cos((phb + Math.PI * v / vpi) / 2), 2); };
+    // ---- symbols and the band-limited drive
+    var nrz = fm === 'nrz', baud = nrz ? 50 : 25, ns = 32, dt = 1 / (baud * 1e9 * ns), a = 1 - Math.exp(-2 * Math.PI * bw * 1e9 * dt);
+    var lev = nrz ? [-1, 1] : [-1, -1 / 3, 1 / 3, 1], v = 0, wave = [], sym = [];
+    for (var k = 0; k < bits.length; k++) { var s = lev[Math.min(lev.length - 1, Math.floor(bits[k] * lev.length))]; sym.push(s);
+      for (var j = 0; j < ns; j++) { v += (s * S.V / 2 - v) * a; wave.push(v); } }
+    var loss = Math.pow(10, -ilp / 10), opt = wave.map(function (x) { return loss * T(x); });
+    // levels at the eye centre (skip the start-up)
+    var lv = lev.map(function () { return [0, 0]; });
+    for (k = 20; k < sym.length; k++) { var li = lev.indexOf(sym[k]); lv[li][0] += opt[k * ns + ns - 4]; lv[li][1]++; }
+    var means = lv.map(function (x) { return x[0] / Math.max(1, x[1]); }), hi = Math.max.apply(null, means), lo = Math.min.apply(null, means);
+    var er = 10 * Math.log10(hi / Math.max(lo, 1e-6)), avg = means.reduce(function (s, x) { return s + x; }, 0) / means.length, il = -10 * Math.log10(avg);
+    // ---- geometry
+    (function () {
+      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, x0 = 50, x1 = dv.w - 50, cy = dv.h / 2 + 6, sep = 26, Lpx = x1 - x0 - 140, scl = Lpx / 20;
+      var ea = x0 + 70, eb = ea + S.L * scl;
+      var up = [[x0 - 40, cy], [x0, cy], [x0 + 40, cy - sep], [x1 - 40, cy - sep], [x1, cy], [x1 + 40, cy]];
+      var dn = [[x0, cy], [x0 + 40, cy + sep], [x1 - 40, cy + sep], [x1, cy]];
+      BD.glow(g, up, 0.7, 7); BD.glow(g, dn, 0.7, 7);
+      BD.wgr(g, up, 3, BD.GEO.si, 30); BD.wgr(g, dn, 3, BD.GEO.si, 30);
+      // GSG travelling-wave electrodes over length L
+      g.fillStyle = 'rgba(216,220,228,.85)';
+      g.fillRect(ea, cy - sep - 16, eb - ea, 8); g.fillRect(ea, cy - 5, eb - ea, 10); g.fillRect(ea, cy + sep + 8, eb - ea, 8);
+      BD.label(g, 'G', ea - 12, cy - sep - 9, BD.C.axis); BD.label(g, 'S', ea - 12, cy + 4, BD.C.axis); BD.label(g, 'G', ea - 12, cy + sep + 16, BD.C.axis);
+      g.fillStyle = BD.C.gold; g.beginPath(); g.moveTo(ea - 26, cy); g.lineTo(ea - 18, cy - 4); g.lineTo(ea - 18, cy + 4); g.fill();
+      BD.label(g, 'RF in', ea - 30, cy + 18, BD.C.gold); BD.label(g, '50 Ω', eb + 6, cy + 4, BD.C.axis);
+      BD.dim(g, ea, cy + sep + 30, eb, cy + sep + 30, 'L = ' + S.L.toFixed(1) + ' mm', BD.C.gold, 0);
+      BD.label(g, '0', ea, dv.h - 4, BD.C.dim); BD.label(g, '20 mm', ea + 20 * scl, dv.h - 4, BD.C.dim, 'right');
+      g.strokeStyle = BD.C.dim; g.beginPath(); g.moveTo(ea, dv.h - 14); g.lineTo(ea + 20 * scl, dv.h - 14); g.stroke();
+    })();
+    // ---- transfer curve with bias and swing
+    var d2 = BD.setup(q('[data-c="t"]')), vr = Math.max(vpi * 1.2, S.V), f2 = BD.frame(d2, { x: [-vr, vr], y: [0, 1.05], pad: { l: 34, b: 22, t: 30 },
+      xt: [[-vr, (-vr).toFixed(1)], [0, 'bias'], [vr, '+' + vr.toFixed(1) + ' V']], yt: [[0, '0'], [0.5, '0.5'], [1, '1']] });
+    var xs = [], ys = []; for (var i2 = 0; i2 <= 300; i2++) { var vv = -vr + 2 * vr * i2 / 300; xs.push(vv); ys.push(T(vv)); }
+    d2.g.fillStyle = 'rgba(224,184,90,.12)'; d2.g.fillRect(f2.X(-S.V / 2), f2.p.t, f2.X(S.V / 2) - f2.X(-S.V / 2), d2.h - f2.p.t - f2.p.b);
+    BD.line(f2, xs, ys, BD.C.blue, 2); BD.dot(f2, 0, T(0), BD.C.white, 4); BD.dot(f2, -S.V / 2, T(-S.V / 2), BD.C.gold, 3.5); BD.dot(f2, S.V / 2, T(S.V / 2), BD.C.gold, 3.5);
+    // ---- eye: overlay 2-symbol windows
+    var d3 = BD.setup(q('[data-c="e"]')), f3 = BD.frame(d3, { x: [0, 2], y: [0, Math.max(0.05, loss * 1.05)], pad: { l: 34, b: 22, t: 30 }, xt: [[0, '0'], [1, '1 UI'], [2, '2']], yt: [[0, '0']] }), g3 = d3.g;
+    f3.clipIn(); g3.strokeStyle = 'rgba(127,224,160,.18)'; g3.lineWidth = 1;
+    var nz = BD.rng(3);
+    for (k = 20; k < sym.length - 2; k++) {
+      g3.beginPath();
+      for (j = 0; j <= 2 * ns; j++) { var y = opt[k * ns + j + ns / 2] + (nz() - 0.5) * 0.012 * loss, x = j / ns; if (j) g3.lineTo(f3.X(x), f3.Y(y)); else g3.moveTo(f3.X(x), f3.Y(y)); }
+      g3.stroke();
+    }
+    f3.clipOut();
+    // ---- readouts and caption
+    q('[data-o="vpi"]').textContent = vpi.toFixed(2) + ' V';
+    q('[data-o="bw"]').textContent = bw.toFixed(0) + ' GHz';
+    q('[data-o="er"]').textContent = er.toFixed(1) + ' dB';
+    q('[data-o="il"]').textContent = il.toFixed(1) + ' dB';
+    var c = 'A longer modulator needs less voltage (V<sub>π</sub> = V<sub>π</sub>L / L) but loses more light and, with lossy electrodes, bandwidth: ';
+    c += pf === 'si' ? 'silicon\'s free carriers cost about 1 dB/mm, and its electrodes limit a 3 mm modulator to about 30 GHz. ' : 'thin-film LiNbO₃ loses almost nothing and its velocity-matched electrodes reach about 100 GHz at 10 mm, so it can be long and driven with little voltage. ';
+    if (Math.abs(S.b - 90) > 25) c += 'Away from quadrature (90°) the swing sits on a curved part of the response, and the levels bunch up. ';
+    if (bw < baud * 0.5) c += '<b>The bandwidth is too low</b> for ' + baud + ' GBd: each symbol has no time to settle, and the eye closes. ';
+    if (!nrz) c += 'PAM4 carries two bits per symbol at half the symbol rate, but its three eyes share the swing, each a third as tall, and the cosine response squeezes the outer ones. ';
+    c += ' <i>Model: push-pull MZM, V<sub>π</sub>L of 1.4 V·cm (silicon, Chapter 19) or 2.6 V·cm (TFLN), bandwidth falling as 1/L² from RF loss, a first-order electrical response; no driver or receiver noise.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

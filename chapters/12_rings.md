@@ -84,7 +84,7 @@ $$\frac{1}{Q_L} = \frac{1}{Q_i} + \frac{1}{Q_c}, \qquad Q_i = \frac{2\pi n_g}{\l
 and at critical coupling $$Q_c = Q_i$$, so $$Q_L = Q_i/2$$. Near resonance the circulating power builds up above the input by $$\kappa^2/(1 - at)^2$$, which reaches several hundred in good silicon rings: a milliwatt in the bus becomes hundreds of milliwatts in the ring, enough for nonlinear effects ([Chapter 7]({% link chapters/07_loss.md %})).
 
 <div class="tbox tbox-example" markdown="1">
-<div class="tbox-title">Worked Example 12.1 · Choosing the gap of a 10 µm ring</div>
+<div class="tbox-title">Worked Example 12.1 · Choosing the gap of a 10 <span class="nc">µm</span> ring</div>
 
 For a 10 µm radius silicon ring with 2 dB/cm of loss ($$a = 0.99855$$, $$Q_i = 3.7\times10^5$$) and the coupler model of Chapter 9, [Table 12.1](#tab-12-1) shows three gaps. A 200 nm gap over-couples (κ² = 1.2 %, $$t = 0.9938 < a$$): a broad 22 pm resonance only 4 dB deep. At 250 nm (κ² = 0.52 %) the ring is still slightly over-coupled, with an 11 dB dip and $$Q_L = 1.3\times10^5$$. At 300 nm (κ² = 0.22 %, $$t = 0.99892 > a$$) it is slightly under-coupled: a 7.4 pm resonance, 17 dB deep, with $$Q_L = 2.1\times10^5$$. Critical coupling at 250 nm would need 3.6 dB/cm of loss. Because the loss is not known until the chip is measured, test chips sweep the gap.
 

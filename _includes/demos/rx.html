@@ -1,0 +1,86 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdRx" role="group" aria-label="Interactive demo: receiver sensitivity and bit-error ratio">
+  <div class="bd-head"><span>// try it · receiver sensitivity at 50 Gb/s NRZ (photodiode + TIA)</span>
+    <span class="bd-seg" role="group" aria-label="Detector"><button type="button" data-det="pin" aria-pressed="true">PIN</button><button type="button" data-det="apd" aria-pressed="false">APD</button></span>
+    <span class="bd-seg" role="group" aria-label="Target BER"><button type="button" data-ber="1e-12" aria-pressed="true">BER 10⁻¹²</button><button type="button" data-ber="2.4e-4" aria-pressed="false">2.4 × 10⁻⁴ (with FEC)</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>received power (average) <b data-v="P"></b></span><input type="range" data-k="P" min="-22" max="0" step="0.1" value="-11" aria-label="received power"></label>
+    <label class="bd-sl"><span>extinction ratio <b data-v="er"></b></span><input type="range" data-k="er" min="2" max="15" step="0.1" value="4" aria-label="extinction ratio"></label>
+    <label class="bd-sl"><span>TIA input noise <b data-v="in"></b></span><input type="range" data-k="in" min="5" max="40" step="0.5" value="20" aria-label="TIA noise"></label>
+    <label class="bd-sl"><span>APD gain M <b data-v="M"></b></span><input type="range" data-k="M" min="1" max="20" step="0.1" value="8" aria-label="APD gain"></label>
+  </div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">the receiver, and the signal at the decision circuit</span></div>
+    <div class="bd-scope tall"><canvas data-c="b" aria-hidden="true"></canvas><span class="bd-tag">bit-error ratio against received power</span></div>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>Q now <b data-o="Q">–</b></span><span>BER now <b data-o="ber">–</b></span><span>sensitivity <b data-o="sen">–</b></span><span>margin in the reference link <b data-o="mar">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdRx'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  var QE = 1.602e-19, RB = 50e9, B = 0.7 * RB, RESP = 0.9, KA = 0.1, ID = 1e-7, PRX = -2.7;   // responsivity A/W, APD k, dark current, reference-link received power (dBm)
+  var det = 'pin', tgt = 1e-12;
+  var S = BD.bind(root, { P: { fmt: function (x) { return x.toFixed(1) + ' dBm'; } }, er: { fmt: function (x) { return x.toFixed(1) + ' dB'; } },
+    in: { fmt: function (x) { return x.toFixed(1) + ' pA/√Hz'; } }, M: { fmt: function (x) { return x.toFixed(1); } } }, function () { draw(); });
+  BD.seg(root, 'det', function (v) { det = v; draw(); });
+  BD.seg(root, 'ber', function (v) { tgt = parseFloat(v); draw(); });
+  function erfc(x) { var t = 1 / (1 + 0.5 * Math.abs(x)), y = t * Math.exp(-x * x - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * 0.17087277))))))))); return x >= 0 ? y : 2 - y; }
+  function ber(Q) { return 0.5 * erfc(Q / Math.SQRT2); }
+  function qOf(pdbm) {
+    var P = 1e-3 * Math.pow(10, pdbm / 10), r = Math.pow(10, S.er / 10), M = det === 'apd' ? S.M : 1, F = det === 'apd' ? KA * M + (1 - KA) * (2 - 1 / M) : 1;
+    var i1 = M * RESP * 2 * P * r / (r + 1), i0 = M * RESP * 2 * P / (r + 1), th = Math.pow(S.in * 1e-12, 2) * B;
+    var s1 = Math.sqrt(th + 2 * QE * M * F * (i1 + M * ID) * B), s0 = Math.sqrt(th + 2 * QE * M * F * (i0 + M * ID) * B);
+    return { Q: (i1 - i0) / (s1 + s0), i1: i1, i0: i0, s1: s1, s0: s0 };
+  }
+  function qTarget(b) { var lo = 0, hi = 20; for (var i = 0; i < 60; i++) { var m = (lo + hi) / 2; if (ber(m) > b) lo = m; else hi = m; } return (lo + hi) / 2; }
+  function draw() {
+    var now = qOf(S.P), qt = qTarget(tgt), lo = -30, hi = 5;
+    for (var i = 0; i < 60; i++) { var m = (lo + hi) / 2; if (qOf(m).Q < qt) lo = m; else hi = m; }
+    var sens = (lo + hi) / 2;
+    // ---- receiver schematic and the two level distributions
+    (function () {
+      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, y = 62;
+      g.strokeStyle = BD.C.gold; g.beginPath(); g.moveTo(14, y); g.lineTo(46, y); g.stroke(); BD.label(g, 'light', 14, y - 6, BD.C.gold);
+      g.fillStyle = 'rgba(190,170,120,.9)'; g.fillRect(48, y - 9, 22, 18); BD.label(g, det === 'apd' ? 'APD' : 'PD', 50, y + 22, BD.C.axis);
+      g.strokeStyle = BD.C.axis; g.beginPath(); g.moveTo(70, y); g.lineTo(96, y); g.stroke();
+      g.beginPath(); g.moveTo(96, y - 14); g.lineTo(96, y + 14); g.lineTo(122, y); g.closePath(); g.stroke(); BD.label(g, 'TIA', 100, y + 26, BD.C.axis);
+      g.beginPath(); g.moveTo(122, y); g.lineTo(150, y); g.stroke(); g.strokeRect(150, y - 10, 30, 20); BD.label(g, 'decide', 150, y + 24, BD.C.axis);
+      // Gaussian distributions of the 0 and 1 currents, with the threshold
+      var x0 = 30, x1 = dv.w - 20, yb = dv.h - 26, ht = dv.h - 150, mx = now.i1 + 4 * now.s1, mn = Math.min(0, now.i0 - 4 * now.s0);
+      var X = function (v) { return x0 + (x1 - x0) * (v - mn) / (mx - mn); };
+      var th = (now.i0 * now.s1 + now.i1 * now.s0) / (now.s0 + now.s1);
+      [[now.i0, now.s0, BD.C.blue], [now.i1, now.s1, BD.C.red]].forEach(function (p) {
+        g.fillStyle = p[2] === BD.C.blue ? 'rgba(127,184,240,.3)' : 'rgba(240,138,106,.3)'; g.beginPath(); g.moveTo(X(mn), yb);
+        for (var k = 0; k <= 200; k++) { var v = mn + (mx - mn) * k / 200; g.lineTo(X(v), yb - ht * Math.exp(-0.5 * Math.pow((v - p[0]) / p[1], 2))); }
+        g.lineTo(X(mx), yb); g.fill();
+      });
+      g.strokeStyle = BD.C.white; g.setLineDash([4, 3]); g.beginPath(); g.moveTo(X(th), yb - ht - 6); g.lineTo(X(th), yb); g.stroke(); g.setLineDash([]);
+      g.strokeStyle = BD.C.axis; g.beginPath(); g.moveTo(x0, yb); g.lineTo(x1, yb); g.stroke();
+      BD.label(g, '"0"', X(now.i0), yb + 14, BD.C.blue, 'center'); BD.label(g, '"1"', X(now.i1), yb + 14, BD.C.red, 'center'); BD.label(g, 'threshold', X(th) + 4, yb - ht - 8, BD.C.white);
+      BD.label(g, 'photocurrent ' + (1e6 * now.i0).toFixed(0) + ' and ' + (1e6 * now.i1).toFixed(0) + ' µA, noise ' + (1e6 * now.s1).toFixed(1) + ' µA rms', x0, 108, BD.C.axis);
+    })();
+    // ---- waterfall
+    var d2 = BD.setup(q('[data-c="b"]')), f2 = BD.frame(d2, { x: [-22, 0], y: [1e-15, 1], ylog: true, pad: { l: 46, b: 22, t: 30 },
+      xt: [[-20, '−20'], [-15, '−15'], [-10, '−10'], [-5, '−5'], [0, '0 dBm']], yt: [[1e-15, '10⁻¹⁵'], [1e-12, '10⁻¹²'], [1e-9, '10⁻⁹'], [1e-6, '10⁻⁶'], [1e-3, '10⁻³'], [1, '1']] });
+    var ps = [], bs = []; for (i = 0; i <= 220; i++) { var p = -22 + 22 * i / 220; ps.push(p); bs.push(Math.max(1e-16, ber(qOf(p).Q))); }
+    BD.hline(f2, tgt, BD.C.dim, [3, 3], 'target'); BD.vline(f2, PRX, BD.C.green, [3, 3]); d2.g.fillStyle = BD.C.green; d2.g.textAlign = 'right'; d2.g.fillText('received in the link, −2.7 dBm', f2.X(PRX) - 4, f2.p.t + 12); d2.g.textAlign = 'left';
+    BD.line(f2, ps, bs, BD.C.blue, 2.2); BD.dot(f2, S.P, Math.max(1e-15, ber(now.Q)), BD.C.white, 4.5);
+    if (sens > -22 && sens < 0) BD.dot(f2, sens, tgt, BD.C.gold, 4);
+    // ---- readouts and caption
+    var b = ber(now.Q);
+    q('[data-o="Q"]').textContent = now.Q.toFixed(2);
+    q('[data-o="ber"]').textContent = b < 1e-15 ? '< 10⁻¹⁵' : b.toExponential(1);
+    q('[data-o="sen"]').textContent = sens.toFixed(1).replace('-', '−') + ' dBm';
+    q('[data-o="mar"]').textContent = (PRX - sens).toFixed(1).replace('-', '−') + ' dB';
+    var c = 'The error ratio is set by Q, the gap between the 0 and 1 currents divided by the sum of their noises: BER = ½ erfc(Q/√2), so Q = ' + qt.toFixed(2) + ' for the target. ';
+    if (det === 'pin') c += 'With a PIN diode the TIA\'s noise dominates, so a quieter TIA or a larger extinction ratio buys sensitivity decibel for decibel. ';
+    else c += 'An APD multiplies the photocurrent before the TIA adds its noise, but adds multiplication noise of its own (excess noise F = ' + (KA * S.M + (1 - KA) * (2 - 1 / S.M)).toFixed(1) + '): beyond an optimum gain, more M makes it worse. ';
+    c += 'The extinction ratio matters because only the difference between the levels carries the data: at 4 dB, the OMA is only 0.86 times the average power. ';
+    c += ' <i>Gaussian noise; R = 0.9 A/W, noise bandwidth 0.7 × 50 GHz, Ge-on-Si APD with k = 0.1, 0.1 µA dark current; no ISI or crosstalk penalties.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

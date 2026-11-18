@@ -1,0 +1,92 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdPn" role="group" aria-label="Interactive demo: a depletion-mode PN phase shifter in silicon">
+  <div class="bd-head"><span>// try it · PN depletion phase shifter (rib 500 × 220 nm, 90 nm slab, 1550 nm, Soref–Bennett)</span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>doping (both sides) <b data-v="N"></b></span><input type="range" data-k="N" min="17" max="18.3" step="0.01" value="17.7" aria-label="doping"></label>
+    <label class="bd-sl"><span>reverse bias <b data-v="V"></b></span><input type="range" data-k="V" min="0" max="4" step="0.02" value="2" aria-label="reverse bias"></label>
+    <label class="bd-sl"><span>junction offset <b data-v="xj"></b></span><input type="range" data-k="xj" min="-0.15" max="0.15" step="0.005" value="0" aria-label="junction offset"></label>
+    <label class="bd-sl"><span>phase-shifter length <b data-v="L"></b></span><input type="range" data-k="L" min="0.5" max="6" step="0.05" value="3" aria-label="length"></label>
+  </div>
+  <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: cross-section to scale, with the doping, the depletion region and the mode's weight across the width</span></div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="n" aria-hidden="true"></canvas><span class="bd-tag">effective-index change (×10⁻⁴) against reverse bias</span></div>
+    <div class="bd-scope tall"><canvas data-c="p" aria-hidden="true"></canvas><span class="bd-tag">phase shift of the whole length against bias</span></div>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>depletion width <b data-o="W">–</b></span><span>V<sub>π</sub>L <b data-o="vpl">–</b></span><span>loss <b data-o="a">–</b></span><span>capacitance <b data-o="C">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdPn'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  // from figsrc/ch19_pn.py: femwell sensitivity of n_eff to the silicon index, per um of width, in 20 nm bins
+  var DATA = {"neff":2.5679,"x":[-1.99,-1.97,-1.95,-1.93,-1.91,-1.89,-1.87,-1.85,-1.83,-1.81,-1.79,-1.77,-1.75,-1.73,-1.71,-1.69,-1.67,-1.65,-1.63,-1.61,-1.59,-1.57,-1.55,-1.53,-1.51,-1.49,-1.47,-1.45,-1.43,-1.41,-1.39,-1.37,-1.35,-1.33,-1.31,-1.29,-1.27,-1.25,-1.23,-1.21,-1.19,-1.17,-1.15,-1.13,-1.11,-1.09,-1.07,-1.05,-1.03,-1.01,-0.99,-0.97,-0.95,-0.93,-0.91,-0.89,-0.87,-0.85,-0.83,-0.81,-0.79,-0.77,-0.75,-0.73,-0.71,-0.69,-0.67,-0.65,-0.63,-0.61,-0.59,-0.57,-0.55,-0.53,-0.51,-0.49,-0.47,-0.45,-0.43,-0.41,-0.39,-0.37,-0.35,-0.33,-0.31,-0.29,-0.27,-0.25,-0.23,-0.21,-0.19,-0.17,-0.15,-0.13,-0.11,-0.09,-0.07,-0.05,-0.03,-0.01,0.01,0.03,0.05,0.07,0.09,0.11,0.13,0.15,0.17,0.19,0.21,0.23,0.25,0.27,0.29,0.31,0.33,0.35,0.37,0.39,0.41,0.43,0.45,0.47,0.49,0.51,0.53,0.55,0.57,0.59,0.61,0.63,0.65,0.67,0.69,0.71,0.73,0.75,0.77,0.79,0.81,0.83,0.85,0.87,0.89,0.91,0.93,0.95,0.97,0.99,1.01,1.03,1.05,1.07,1.09,1.11,1.13,1.15,1.17,1.19,1.21,1.23,1.25,1.27,1.29,1.31,1.33,1.35,1.37,1.39,1.41,1.43,1.45,1.47,1.49,1.51,1.53,1.55,1.57,1.59,1.61,1.63,1.65,1.67,1.69,1.71,1.73,1.75,1.77,1.79,1.81,1.83,1.85,1.87,1.89,1.91,1.93,1.95,1.97,1.99],"w":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1e-05,1e-05,1e-05,1e-05,1e-05,2e-05,2e-05,3e-05,3e-05,4e-05,6e-05,7e-05,9e-05,0.00012,0.00015,0.00019,0.00024,0.0003,0.00039,0.00052,0.00067,0.00084,0.00105,0.00132,0.00169,0.00208,0.00262,0.00329,0.00429,0.00541,0.00677,0.00831,0.01031,0.01342,0.01784,0.02368,0.03018,0.03668,0.04589,0.05759,0.0742,0.08933,0.11166,0.13885,0.18126,0.22977,0.28433,0.37649,0.51633,0.71539,0.91173,1.10646,1.27257,1.45683,1.62945,1.85228,2.02661,2.21034,2.29439,2.41611,2.46894,2.51902,2.50848,2.47455,2.41734,2.30576,2.1809,2.0228,1.84526,1.63992,1.44318,1.2595,1.10452,0.9216,0.73025,0.52315,0.37811,0.28381,0.22971,0.18141,0.13916,0.11171,0.0893,0.07423,0.05796,0.04612,0.03634,0.02887,0.02235,0.01759,0.0141,0.01132,0.00878,0.00696,0.00548,0.00435,0.00339,0.00268,0.00215,0.00168,0.00131,0.00103,0.00083,0.00063,0.00048,0.00037,0.00031,0.00025,0.0002,0.00016,0.00012,9e-05,7e-05,6e-05,4e-05,3e-05,3e-05,2e-05,2e-05,1e-05,1e-05,1e-05,1e-05,1e-05,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.0]};
+  var LAM = 1.55e-6, Q = 1.602e-19, EPS = 11.7 * 8.854e-12, KT = 0.02585, NI = 1e10, CONTACT = 1.2, NC = 1e20;
+  var S = BD.bind(root, { N: { fmt: function (x) { var v = Math.pow(10, x); return (v / Math.pow(10, Math.floor(x))).toFixed(1) + '×10' + sup(Math.floor(x)) + ' cm⁻³'; } },
+    V: { fmt: function (x) { return x.toFixed(2) + ' V'; } }, xj: { fmt: function (x) { return (1000 * x).toFixed(0) + ' nm'; } }, L: { fmt: function (x) { return x.toFixed(2) + ' mm'; } } }, function () { draw(); });
+  function sup(n) { return String(n).split('').map(function (c) { return '⁰¹²³⁴⁵⁶⁷⁸⁹'[+c]; }).join(''); }
+  function soref(N, P) { return [-(8.8e-22 * N + 8.5e-18 * Math.pow(P, 0.8)), 8.5e-18 * N + 6.0e-18 * P]; }   // dn, d alpha (1/cm)
+  function depl(N, V) { var vbi = KT * Math.log(N * N / (NI * NI)), n = N * 1e6, W = Math.sqrt(2 * EPS * (vbi + V) * 2 / (Q * n)) * 1e6; return { xp: W / 2, xn: W / 2, W: W, vbi: vbi }; }
+  function dneff(N, V, xj) {   // complex sum of w(x) * delta n(x) dx with exact splits at the depletion edges
+    var d = depl(N, V), re = 0, im = 0, x = DATA.x, w = DATA.w;
+    function seg(a, b, lo, hi) { return Math.max(0, Math.min(b, hi) - Math.max(a, lo)); }
+    var regs = [[-9, -CONTACT, 0, NC], [-CONTACT, xj - d.xp, 0, N], [xj + d.xn, CONTACT, N, 0], [CONTACT, 9, NC, 0]];
+    for (var i = 0; i < x.length; i++) {
+      var a = x[i] - 0.01, b = x[i] + 0.01;
+      regs.forEach(function (r) { var l = seg(a, b, r[0], r[1]); if (l > 0) { var s = soref(r[2], r[3]); re += w[i] * l * s[0]; im += w[i] * l * s[1] * 100 * LAM / (4 * Math.PI); } });
+    }
+    return [re, im];
+  }
+  function draw() {
+    if (!DATA) return;
+    var N = Math.pow(10, S.N), d = depl(N, S.V), z = dneff(N, 0, S.xj), v = dneff(N, S.V, S.xj), dn = v[0] - z[0];
+    var vpl = dn > 0 ? LAM * 100 * S.V / (2 * dn) : NaN, lossdB = 4 * Math.PI * v[1] / LAM / 100 * 4.343;
+    var h = Math.abs(S.xj) < 0.25 ? 0.22 : 0.09, Cfu = EPS * h / d.W * 1e9;   // fF/um
+    // ---- geometry: x from -2 to 2 um, to scale
+    (function () {
+      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, sc = (dv.w - 40) / 4.2, x0 = dv.w / 2, base = dv.h - 26, X = function (x) { return x0 + x * sc; }, Y = function (y) { return base - y * sc; };
+      g.fillStyle = BD.GEO.ox; g.fillRect(0, 20, dv.w, dv.h - 20);
+      function fillSi(a, b, col) {   // silicon between x = a and b (rib where |x| < 0.25, slab elsewhere)
+        g.fillStyle = col; var pts = [[a, 0], [b, 0]], c = [];
+        for (var k = 0; k <= 60; k++) { var xx = b - (b - a) * k / 60; c.push([xx, Math.abs(xx) < 0.25 ? 0.22 : 0.09]); }
+        g.beginPath(); g.moveTo(X(a), Y(0)); g.lineTo(X(b), Y(0)); c.forEach(function (p) { g.lineTo(X(p[0]), Y(p[1])); }); g.closePath(); g.fill();
+      }
+      fillSi(-2.05, -CONTACT, 'rgba(240,120,150,.95)'); fillSi(-CONTACT, S.xj - d.xp, 'rgba(240,150,170,.6)');
+      fillSi(S.xj - d.xp, S.xj + d.xn, 'rgba(225,232,242,.95)');
+      fillSi(S.xj + d.xn, CONTACT, 'rgba(120,170,240,.6)'); fillSi(CONTACT, 2.05, 'rgba(90,140,240,.95)');
+      g.fillStyle = BD.GEO.metal; g.fillRect(X(-1.95), Y(0.09) - 0.35 * sc, 0.3 * sc, 0.35 * sc); g.fillRect(X(1.65), Y(0.09) - 0.35 * sc, 0.3 * sc, 0.35 * sc);
+      // the mode's weight across the width, drawn above the rib
+      var mx = Math.max.apply(null, DATA.w), hh = Math.min(70, base - 80);
+      g.strokeStyle = BD.C.gold; g.lineWidth = 1.6; g.beginPath();
+      var first = true; DATA.x.forEach(function (x, i) { if (Math.abs(x) > 1.4) return; var px = X(x), py = Y(0.22) - 14 - hh * DATA.w[i] / mx; if (!first) g.lineTo(px, py); else { g.moveTo(px, py); first = false; } }); g.stroke(); g.lineWidth = 1;
+      BD.label(g, 'mode weight ∂n_eff/∂n(x)', X(0.35), Y(0.22) - 14 - hh * 0.9, BD.C.gold);
+      BD.label(g, 'P', X(-0.8), Y(0.09) + 16, 'rgba(240,150,170,1)', 'center'); BD.label(g, 'N', X(0.8), Y(0.09) + 16, 'rgba(120,170,240,1)', 'center');
+      BD.label(g, 'P++', X(-1.6), Y(0.09) + 16, 'rgba(240,150,170,1)', 'center'); BD.label(g, 'N++', X(1.6), Y(0.09) + 16, 'rgba(120,170,240,1)', 'center');
+      BD.label(g, 'depleted ' + (1000 * d.W).toFixed(0) + ' nm', X(S.xj), Y(0.22) - 4, BD.C.white, 'center');
+      BD.label(g, 'contact', X(-1.8), Y(0.09) - 0.35 * sc - 4, BD.C.axis, 'center'); BD.label(g, 'contact', X(1.8), Y(0.09) - 0.35 * sc - 4, BD.C.axis, 'center');
+      BD.scalebar(g, dv.w - 110, 36, sc, 80);
+    })();
+    // ---- delta n_eff against V
+    var Vs = [], ns = [], ph = []; for (var i = 0; i <= 40; i++) { var vv = 4 * i / 40, r = dneff(N, vv, S.xj)[0] - z[0]; Vs.push(vv); ns.push(r * 1e4); ph.push(2 * r * S.L * 1e-3 / LAM); }
+    var d2 = BD.setup(q('[data-c="n"]')), top = Math.max(1, Math.ceil(ns[40] * 1.15)), f2 = BD.frame(d2, { x: [0, 4], y: [0, top], pad: { l: 40, b: 22, t: 30 },
+      xt: [[0, '0'], [1, '1'], [2, '2'], [3, '3'], [4, '4 V']], yt: [[0, '0'], [top / 2, (top / 2).toFixed(1)], [top, top.toFixed(1)]] });
+    BD.line(f2, Vs, ns, BD.C.blue, 2); BD.dot(f2, S.V, dn * 1e4, BD.C.white, 4.5);
+    var d3 = BD.setup(q('[data-c="p"]')), tp = Math.max(1.2, Math.ceil(ph[40] * 10) / 10 + 0.2), f3 = BD.frame(d3, { x: [0, 4], y: [0, tp], pad: { l: 40, b: 22, t: 30 },
+      xt: [[0, '0'], [1, '1'], [2, '2'], [3, '3'], [4, '4 V']], yt: [[0, '0'], [1, 'π'], [tp, tp.toFixed(1) + 'π']] });
+    BD.hline(f3, 1, BD.C.gold, [4, 3], 'π'); BD.line(f3, Vs, ph, BD.C.green, 2); BD.dot(f3, S.V, 2 * dn * S.L * 1e-3 / LAM, BD.C.white, 4.5);
+    // ---- readouts and caption
+    q('[data-o="W"]').textContent = (1000 * d.W).toFixed(0) + ' nm';
+    q('[data-o="vpl"]').textContent = isFinite(vpl) ? vpl.toFixed(2) + ' V·cm' : '–';
+    q('[data-o="a"]').textContent = lossdB.toFixed(1) + ' dB/cm (' + (lossdB * S.L / 10).toFixed(1) + ' dB)';
+    q('[data-o="C"]').textContent = Cfu.toFixed(2) + ' fF/µm';
+    var c = 'Reverse bias widens the depletion region, sweeping out holes and electrons where the mode is strongest; fewer carriers means a higher index (Soref–Bennett). ';
+    c += 'Holes change the index about three times more than electrons for the same loss, ';
+    c += S.xj > 0.02 ? 'and moving the junction towards the N side, as here, puts more of the mode on the P side. ' : 'which is why junctions are often offset towards the N side. ';
+    c += 'Higher doping gives a better V<sub>π</sub>L but more loss and capacitance: the product of loss and V<sub>π</sub>L, here ' + (lossdB * vpl).toFixed(0) + ' dB·V, is the figure of merit. ';
+    if (isFinite(vpl) && S.V > 0) c += 'For a π shift over ' + S.L.toFixed(1) + ' mm you would need about ' + (vpl / (S.L / 10)).toFixed(1) + ' V' + (vpl / (S.L / 10) > S.V * 1.05 ? ' with this curve (it bends over, so more in practice)' : '') + '. ';
+    c += ' <i>Abrupt lateral junction with uniform doping, P++/N++ contacts from 1.2 µm; mode weight from femwell perturbation theory.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>
