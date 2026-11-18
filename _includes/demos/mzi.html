@@ -9,7 +9,7 @@
     <label class="bd-sl"><span>phase shifter on the long arm <b data-v="ph"></b></span><input type="range" data-k="ph" min="0" max="2" step="0.01" value="0" aria-label="phase shift"></label>
     <label class="bd-sl"><span>waveguide loss <b data-v="a"></b></span><input type="range" data-k="a" min="0" max="20" step="0.1" value="3" aria-label="loss"></label>
   </div>
-  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top view (line width ∝ power at 1550 nm)</span></div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top view (glow ∝ power at 1550 nm)</span></div>
   <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">transmission against wavelength</span></div>
   <div class="bd-read" aria-live="polite"><span>FSR <b data-o="fsr">–</b></span><span>extinction (bar port) <b data-o="er">–</b></span><span>n<sub>g</sub> <b>4.20</b></span><span>excess loss <b data-o="il">–</b></span></div>
   <p class="bd-caption" data-o="cap"></p>
@@ -49,38 +49,59 @@
     BD.line(f, xs, c.map(tr), BD.C.blue, 1.6);
     BD.line(f, xs, b.map(tr), BD.C.gold, 1.6);
     dv.g.fillStyle = BD.C.gold; dv.g.fillText('bar', f.p.l + 6, f.p.t + 12); dv.g.fillStyle = BD.C.blue; dv.g.fillText('cross', f.p.l + 36, f.p.t + 12);
-    // ---- geometry: two 2x2 couplers, a straight upper arm and a lower arm with a delay loop of depth dL/2
+    // ---- geometry: top view. Waveguides have one width; the warm glow underneath shows the power at 1550 nm.
     (function () {
-      var dg = BD.setup(q('[data-c="g"]')), g = dg.g, Lb = 25, Lc = 20, sep = 24, D = S.dL / 2, wl = 20;
-      var xs = [0, Lb, Lb + Lc, 2 * Lb + Lc], xS = xs[3], xE = xS + L0, Xt = xE + 2 * Lb + Lc + 30;
-      var sx = (dg.w - 110) / Xt, top = 30, avail = dg.h - top - 18, sy = Math.min(sx, avail / (sep + D + 6)), k = sy / sx;
-      var X = function (x) { return 12 + x * sx; }, Y = function (y) { return top + 6 + (sep / 2 - y) * sy; };
-      var r = mzi(lam0), pu = 1 - S.k1, pl = S.k1, w = function (p) { return 1.6 + 5 * p; };
-      function coupler(x0, upIn, loIn, upOut, loOut) {   // S-bends in, straight coupling section, S-bends out
-        var g0 = 0.6;
-        [[1, upIn, upOut], [-1, loIn, loOut]].forEach(function (a) {   // input half drawn with the input power, output half with the output power
-          BD.wg(g, BD.sbend(X(x0), Y(a[0] * sep / 2), X(x0 + Lb), Y(a[0] * g0), 16).concat([[X(x0 + Lb + Lc / 2), Y(a[0] * g0)]]), w(a[1]));
-          BD.wg(g, [[X(x0 + Lb + Lc / 2), Y(a[0] * g0)], [X(x0 + Lb + Lc), Y(a[0] * g0)]].concat(BD.sbend(X(x0 + Lb + Lc), Y(a[0] * g0), X(x0 + 2 * Lb + Lc), Y(a[0] * sep / 2), 16)), w(a[2]));
+      var dg = BD.setup(q('[data-c="g"]')), g = dg.g, roomy = dg.w > 520;
+      var Lst = 14, Lb = 24, Lc = 18, sep = 26, D = S.dL / 2, wl = 26;                    // um: stubs, bends, coupler, arm spacing, loop width
+      var xi = Lst, xa = xi + 2 * Lb + Lc, xb = xa + L0, xc = xb + 2 * Lb + Lc, Xt = xc + Lst;
+      var top = 34, bot = dg.h - 26, padR = roomy ? 96 : 70, sx = (dg.w - 16 - padR) / Xt;
+      var sy = Math.min(sx, (bot - top) / (sep + D + 4)), k = sy / sx, wPx = 2.6, rPx = Math.min(7 * sx, 7 * sy) + 3;
+      var X = function (x) { return 8 + x * sx; }, Y = function (y) { return top + (sep / 2 + 2 - y) * sy; };
+      var yC = Math.max(1.1 * sy, (wPx + 3) / 2);                                          // half centre spacing in the couplers (px)
+      var r = mzi(lam0), pu = 1 - S.k1, pl = S.k1, xm = (xa + xb) / 2;
+      // a coupler: S-bends in, straight section, S-bends out; returns [upper-in, upper-out, lower-in, lower-out] point lists
+      function coupler(x0) {
+        var out = [];
+        [1, -1].forEach(function (sg) {
+          var yo = Y(sg * sep / 2), yi = Y(0) - sg * yC, xmid = X(x0 + Lb + Lc / 2);
+          var inn = BD.sbend(X(x0), yo, X(x0 + Lb), yi, 20).concat([[xmid, yi]]);
+          var outp = [[xmid, yi], [X(x0 + Lb + Lc), yi]].concat(BD.sbend(X(x0 + Lb + Lc), yi, X(x0 + 2 * Lb + Lc), yo, 20));
+          out.push(inn, outp);
         });
+        return out;
       }
-      coupler(0, 1, 0.04, pu, pl);
-      BD.wg(g, [[X(xS), Y(sep / 2)], [X(xE), Y(sep / 2)]], w(pu));
-      var xm = (xS + xE) / 2;
-      BD.wg(g, [[X(xS), Y(-sep / 2)], [X(xm - wl / 2), Y(-sep / 2)], [X(xm - wl / 2), Y(-sep / 2 - D)], [X(xm + wl / 2), Y(-sep / 2 - D)], [X(xm + wl / 2), Y(-sep / 2)], [X(xE), Y(-sep / 2)]], w(pl));
-      var ht = 0.25 + 0.65 * (S.ph % 2) / 2;   // heater on the long arm, brighter for more phase
-      g.fillStyle = 'rgba(224,138,58,' + ht.toFixed(2) + ')'; g.fillRect(X(xS + 8), Y(-sep / 2) - 5, 50 * sx, 10);
-      if (dg.w > 520) BD.label(g, 'heater ' + S.ph.toFixed(2) + 'π', X(xS + 8), Y(-sep / 2) + 16, BD.C.gold);
-      coupler(xE, pu, pl, r[0], r[1]);
-      var roomy = dg.w > 520;   // on narrow screens keep only the essential labels
-      if (roomy) { BD.label(g, 'κ² ' + (100 * S.k1).toFixed(0) + ' %', X(Lb), Y(sep / 2) - 8, BD.C.axis); BD.label(g, 'κ² ' + (100 * S.k2).toFixed(0) + ' %', X(xE + Lb), Y(sep / 2) - 8, BD.C.axis); }
-      var xo = X(xE + 2 * Lb + Lc) + 4;
-      BD.label(g, 'bar ' + (100 * r[0]).toFixed(0) + ' %', xo, Y(sep / 2) + 3, BD.C.gold);
-      BD.label(g, 'cross ' + (100 * r[1]).toFixed(0) + ' %', xo, Y(-sep / 2) + 3, BD.C.blue);
-      BD.label(g, 'in', 2, Y(sep / 2) - 6, BD.C.white);
-      if (D > 1) BD.dim(g, X(xm + wl / 2) + 10, Y(-sep / 2), X(xm + wl / 2) + 10, Y(-sep / 2 - D), 'ΔL/2 = ' + D.toFixed(1) + ' µm', BD.C.gold, -44);
-      if (roomy) BD.label(g, 'short arm L = ' + L0 + ' µm', X(xm) - 50, Y(sep / 2) - 8, BD.C.axis);
-      BD.scalebar(g, dg.w - 96, dg.h - 8, sx, 60);
-      if (k < 0.98) BD.label(g, 'vertical ×' + k.toFixed(2), dg.w - 8, top - 10, BD.C.dim, 'right');
+      var c1 = coupler(xi), c2 = coupler(xb);
+      var loopPts = D > 0.5 ? [[X(xa), Y(-sep / 2)], [X(xm - wl / 2), Y(-sep / 2)], [X(xm - wl / 2), Y(-sep / 2 - D)], [X(xm + wl / 2), Y(-sep / 2 - D)], [X(xm + wl / 2), Y(-sep / 2)], [X(xb), Y(-sep / 2)]]
+                            : [[X(xa), Y(-sep / 2)], [X(xb), Y(-sep / 2)]];
+      var paths = [   // [points, power]
+        [[[X(0), Y(sep / 2)], [X(xi), Y(sep / 2)]], 1], [[[X(0), Y(-sep / 2)], [X(xi), Y(-sep / 2)]], 0],
+        [c1[0], 1], [c1[1], pu], [c1[2], 0], [c1[3], pl],
+        [[[X(xa), Y(sep / 2)], [X(xb), Y(sep / 2)]], pu], [loopPts, pl],
+        [c2[0], pu], [c2[1], r[0]], [c2[2], pl], [c2[3], r[1]],
+        [[[X(xc), Y(sep / 2)], [X(Xt), Y(sep / 2)]], r[0]], [[[X(xc), Y(-sep / 2)], [X(Xt), Y(-sep / 2)]], r[1]]
+      ];
+      paths.forEach(function (pp) { BD.glow(g, pp[0], pp[1], rPx); });
+      paths.forEach(function (pp) { BD.wgr(g, pp[0], wPx, BD.GEO.si, rPx); });
+      // heater (TiN strip with two contact pads) on the straight part of the long arm
+      var hx0 = X(xa + 10), hx1 = X(Math.min(xm - wl / 2 - 6, xa + 70)), hy = Y(-sep / 2), heat = 0.3 + 0.65 * (S.ph % 2) / 2;
+      g.fillStyle = 'rgba(224,138,58,' + heat.toFixed(2) + ')'; g.fillRect(hx0, hy - 4, hx1 - hx0, 8);
+      g.fillStyle = BD.GEO.metal; g.fillRect(hx0 - 4, hy + 6, 8, 8); g.fillRect(hx1 - 4, hy + 6, 8, 8);
+      g.strokeStyle = BD.GEO.metal; g.beginPath(); g.moveTo(hx0, hy + 4); g.lineTo(hx0, hy + 6); g.moveTo(hx1, hy + 4); g.lineTo(hx1, hy + 6); g.stroke();
+      // labels
+      BD.label(g, 'in', X(0), Y(sep / 2) - 7, BD.C.white);
+      if (roomy) {
+        BD.label(g, 'κ² ' + (100 * S.k1).toFixed(0) + ' %', X(xi + Lb + Lc / 2), Y(-sep / 2) + 16, BD.C.axis, 'center');
+        BD.label(g, 'κ² ' + (100 * S.k2).toFixed(0) + ' %', X(xb + Lb + Lc / 2), Y(-sep / 2) + 16, BD.C.axis, 'center');
+      }
+      BD.label(g, 'bar ' + (100 * r[0]).toFixed(0) + ' %', X(Xt) + 6, Y(sep / 2) + 3, BD.C.gold);
+      BD.label(g, 'cross ' + (100 * r[1]).toFixed(0) + ' %', X(Xt) + 6, Y(-sep / 2) + 3, BD.C.blue);
+      if (roomy) {
+        BD.label(g, 'arm L = ' + L0 + ' µm', X(xm), Y(sep / 2) - 8, BD.C.axis, 'center');
+        BD.label(g, 'heater ' + S.ph.toFixed(2) + 'π', (hx0 + hx1) / 2, hy + 26, BD.C.gold, 'center');
+      }
+      if (D > 0.5) BD.dim(g, X(xm + wl / 2) + 12, Y(-sep / 2), X(xm + wl / 2) + 12, Y(-sep / 2 - D), (roomy ? 'ΔL/2 = ' : 'ΔL/2 ') + D.toFixed(roomy ? 1 : 0) + ' µm', BD.C.gold, roomy ? -46 : -30);
+      BD.scalebar(g, dg.w - padR + 4, dg.h - 8, sx, 60);
+      if (k < 0.98) BD.label(g, 'vertical ×' + k.toFixed(2), dg.w - 8, 14, BD.C.dim, 'right');
     })();
     var fsr = S.dL > 0 ? lam0 * lam0 / (ng * S.dL) : Infinity;
     q('[data-o="fsr"]').textContent = isFinite(fsr) ? (1000 * fsr).toFixed(2) + ' nm' : '∞ (balanced)';

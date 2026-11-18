@@ -130,9 +130,21 @@
   function sbend(x0, y0, x1, y1, n) {   // points of a cosine S-bend from (x0,y0) to (x1,y1)
     var pts = []; n = n || 24; for (var i = 0; i <= n; i++) { var t = i / n; pts.push([x0 + (x1 - x0) * t, y0 + (y1 - y0) * (1 - Math.cos(Math.PI * t)) / 2]); } return pts;
   }
+  function wgr(g, pts, widthPx, col, rPx, cap) {   // a waveguide polyline with rounded corners (radius clamped to fit each corner)
+    g.strokeStyle = col || GEO.si; g.lineWidth = Math.max(1.2, widthPx); g.lineJoin = 'round'; g.lineCap = cap || 'round';
+    g.beginPath(); g.moveTo(pts[0][0], pts[0][1]);
+    for (var i = 1; i < pts.length - 1; i++) {
+      var a = pts[i - 1], b = pts[i], c = pts[i + 1], r = Math.min(rPx || 0, Math.hypot(b[0] - a[0], b[1] - a[1]) / 2, Math.hypot(c[0] - b[0], c[1] - b[1]) / 2);
+      if (r > 0.5) g.arcTo(b[0], b[1], c[0], c[1], r); else g.lineTo(b[0], b[1]);
+    }
+    g.lineTo(pts[pts.length - 1][0], pts[pts.length - 1][1]); g.stroke(); g.lineWidth = 1; g.lineCap = 'butt';
+  }
+  function glow(g, pts, power, rPx) {   // a soft light underlay along a waveguide path, brighter for more power
+    if (power <= 0.005) return; wgr(g, pts, 9, 'rgba(255,214,120,' + (0.12 + 0.55 * Math.min(1, power)).toFixed(3) + ')', rPx, 'butt');   // butt caps: no bright beads where segments meet
+  }
   function label(g, s, x, y, col, align) { g.fillStyle = col || C.axis; g.textAlign = align || 'left'; g.fillText(s, x, y); g.textAlign = 'left'; }
 
   window.BD = { C: C, setup: setup, frame: frame, line: line, hline: hline, vline: vline, dot: dot, logticks: logticks,
                 eng: eng, fft: fft, gauss: gauss, rng: rng, bind: bind, seg: seg, toggle: toggle, observe: observe,
-                GEO: GEO, nice: nice, scalebar: scalebar, dim: dim, wg: wg, sbend: sbend, label: label };
+                GEO: GEO, nice: nice, scalebar: scalebar, dim: dim, wg: wg, wgr: wgr, glow: glow, sbend: sbend, label: label };
 })();

@@ -8,7 +8,7 @@
     <label class="bd-sl"><span>coupling coefficient κ <b data-v="k"></b></span><input type="range" data-k="k" min="0" max="100" step="0.1" value="50" aria-label="coupling coefficient"></label>
     <label class="bd-sl"><span>number of periods N <b data-v="N"></b></span><input type="range" data-k="N" min="10" max="2000" step="1" value="300" aria-label="number of periods"></label>
   </div>
-  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: a few periods magnified (top) and the whole grating to scale (bottom)</span></div>
+  <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: a magnified stretch (top) and the whole grating to scale (bottom)</span></div>
   <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">reflection and transmission against wavelength</span></div>
   <div class="bd-read" aria-live="polite"><span>λ<sub>B</sub> <b data-o="lb">–</b></span><span>κL <b data-o="kl">–</b></span><span>peak R <b data-o="r">–</b></span><span>bandwidth (nulls) <b data-o="bw">–</b></span><span>length <b data-o="len">–</b></span></div>
   <p class="bd-caption" data-o="cap"></p>
@@ -60,27 +60,44 @@
       xt: [[l0, (1000 * l0).toFixed(1)], [lb, (1000 * lb).toFixed(1) + ' nm'], [l1, (1000 * l1).toFixed(1)]], yt: [[0, '0'], [0.5, '0.5'], [1, '1']] });
     BD.line(f, xs, T, BD.C.blue, 1.4); BD.line(f, xs, R, BD.C.gold, 2);
     dv.g.fillStyle = BD.C.gold; dv.g.fillText('R', f.p.l + 6, f.p.t + 12); dv.g.fillStyle = BD.C.blue; dv.g.fillText('T', f.p.l + 22, f.p.t + 12);
-    // ---- geometry: magnified corrugated waveguide, and the full grating with its apodisation profile
+    // ---- geometry: a magnified stretch of the corrugated waveguide (one outline, no seams), linked to the whole grating below
     (function () {
-      var dv2 = BD.setup(q('[data-c="g"]')), gg = dv2.g, w0 = 0.5, P = S.P / 1000, nP = 14;
-      var dw = 0.012 + 0.12 * (Math.log10(S.k) - 3) / 2.2;   // corrugation drawn to grow with kappa (illustrative)
-      var sc = Math.min((dv2.w - 40) / (nP * P), (dv2.h * 0.55) / (w0 + 2 * dw + 0.3)), x0 = 20, yc = 24 + (dv2.h * 0.55) / 2;
-      gg.fillStyle = BD.GEO.si;
+      var dv2 = BD.setup(q('[data-c="g"]')), gg = dv2.g, W = dv2.w, H = dv2.h, w0 = 0.5, P = S.P / 1000, nP = 12;
+      var dw = 0.015 + 0.085 * (Math.log10(S.k) - 3) / 2.2;          // half corrugation, drawn to grow with kappa (illustrative)
+      var segL = nP * P + (ps ? P / 2 : 0), topB = H * 0.62, sc = Math.min((W - 150) / segL, 74 / (w0 + 2 * dw), (topB - 86) / (w0 + 2 * dw));
+      var x0 = (W - segL * sc) / 2, yc = 48 + (topB - 48 - 30) / 2, Yt = function (h) { return yc - h * sc; }, Yb = function (h) { return yc + h * sc; };
+      // outline of the square-wave edge: wide half then narrow half each period; a lambda/4 shift inserts an extra narrow half-period
+      var edge = [], x = x0;
       for (var i = 0; i < nP; i++) {
-        var xa = x0 + i * P * sc, half = (i === nP / 2 && ps) ? 0 : 1;   // quarter-wave shift: a half-period without the wide tooth
-        gg.fillRect(xa, yc - (w0 / 2 + dw * half) * sc, P / 2 * sc, (w0 + 2 * dw * half) * sc);
-        gg.fillRect(xa + P / 2 * sc, yc - (w0 / 2 - dw) * sc, P / 2 * sc + 0.5, (w0 - 2 * dw) * sc);
+        if (ps && i === nP / 2) { edge.push([x, w0 / 2 - dw], [x + P / 2 * sc, w0 / 2 - dw]); x += P / 2 * sc; }
+        edge.push([x, w0 / 2 + dw], [x + P / 2 * sc, w0 / 2 + dw], [x + P / 2 * sc, w0 / 2 - dw], [x + P * sc, w0 / 2 - dw]); x += P * sc;
       }
-      BD.dim(gg, x0, yc + (w0 / 2 + dw) * sc + 10, x0 + P * sc, yc + (w0 / 2 + dw) * sc + 10, 'Λ = ' + S.P.toFixed(1) + ' nm', BD.C.gold, -6);
-      BD.label(gg, 'corrugation grows with κ (drawn illustratively)', x0 + 2 * P * sc, yc - (w0 / 2 + dw) * sc - 8, BD.C.dim);
-      // full grating to scale
-      var yb = dv2.h - 26, Lum = S.N * P, sxl = (dv2.w - 60) / Math.max(Lum, 1e-3);
-      gg.fillStyle = 'rgba(157,179,204,.25)'; gg.fillRect(30, yb - 7, Lum * sxl, 14);
-      gg.strokeStyle = BD.C.gold; gg.lineWidth = 1.5; gg.beginPath();
-      for (var j = 0; j <= 100; j++) { var z = j / 100 - 0.5, kk = apo ? Math.exp(-Math.pow(z / 0.22, 2)) : 1, xx = 30 + (j / 100) * Lum * sxl, yy = yb + 7 - 14 * kk; if (j) gg.lineTo(xx, yy); else gg.moveTo(xx, yy); }
-      gg.stroke(); gg.lineWidth = 1;
-      if (ps) { gg.fillStyle = BD.C.red; gg.fillRect(30 + 0.5 * Lum * sxl - 1, yb - 10, 2, 20); BD.label(gg, 'λ/4 shift', 30 + 0.5 * Lum * sxl + 4, yb - 10, BD.C.red); }
-      BD.label(gg, 'N = ' + S.N.toFixed(0) + ' periods, L = ' + (Lum).toFixed(0) + ' µm (gold: coupling profile)', 30, yb - 12, BD.C.axis);
+      gg.fillStyle = BD.GEO.si; gg.beginPath();
+      gg.moveTo(12, Yt(w0 / 2)); gg.lineTo(x0, Yt(w0 / 2));                                  // lead-in waveguide, top edge
+      edge.forEach(function (p) { gg.lineTo(p[0], Yt(p[1])); });
+      gg.lineTo(x, Yt(w0 / 2)); gg.lineTo(W - 12, Yt(w0 / 2)); gg.lineTo(W - 12, Yb(w0 / 2)); gg.lineTo(x, Yb(w0 / 2));
+      for (var j = edge.length - 1; j >= 0; j--) gg.lineTo(edge[j][0], Yb(edge[j][1]));
+      gg.lineTo(x0, Yb(w0 / 2)); gg.lineTo(12, Yb(w0 / 2)); gg.closePath(); gg.fill();
+      gg.fillStyle = BD.GEO.glow + '0.35)'; gg.fillRect(12, yc - 2, W - 24, 4);              // the guided light along the core
+      // dimensions
+      BD.dim(gg, x0, Yt(w0 / 2 + dw) - 10, x0 + P * sc, Yt(w0 / 2 + dw) - 10, 'Λ = ' + S.P.toFixed(1) + ' nm', BD.C.gold, -6);
+      var narrow = W < 560;
+      if (!narrow) BD.label(gg, 'waveguide 500 nm wide', 14, Yt(w0 / 2) - 6, BD.C.axis);
+      BD.label(gg, narrow ? '±' + Math.round(1000 * dw) + ' nm corrugation (illustrative)' : 'corrugation ±' + Math.round(1000 * dw) + ' nm (illustrative: grows with κ)', narrow ? W / 2 : x0, Yb(w0 / 2 + dw) + 16, BD.C.dim, narrow ? 'center' : 'left');
+      if (ps) { var xs = x0 + (nP / 2) * P * sc; gg.strokeStyle = BD.C.red; gg.setLineDash([3, 3]); gg.beginPath(); gg.moveTo(xs + P / 4 * sc, Yt(w0 / 2 + dw) - 4); gg.lineTo(xs + P / 4 * sc, Yb(w0 / 2 + dw) + 4); gg.stroke(); gg.setLineDash([]);
+                BD.label(gg, 'λ/4 shift', xs + P / 4 * sc, Yt(w0 / 2 + dw) - 20, BD.C.red, 'center'); }
+      // the whole grating to scale, with its coupling profile; the bracket shows where the magnified stretch sits
+      var yb = H - 44, xL = 60, xR = W - 60, Lum = S.N * P, sxl = (xR - xL) / Lum, hmax = 9;
+      gg.fillStyle = BD.GEO.si; gg.fillRect(12, yb - 2, W - 24, 4);
+      gg.fillStyle = 'rgba(157,179,204,.55)'; gg.beginPath(); gg.moveTo(xL, yb);
+      for (var m = 0; m <= 120; m++) { var z = m / 120 - 0.5, kk = apo ? Math.exp(-Math.pow(z / 0.22, 2)) : 1; gg.lineTo(xL + (m / 120) * (xR - xL), yb - 2 - hmax * kk); }
+      for (m = 120; m >= 0; m--) { z = m / 120 - 0.5; kk = apo ? Math.exp(-Math.pow(z / 0.22, 2)) : 1; gg.lineTo(xL + (m / 120) * (xR - xL), yb + 2 + hmax * kk); }
+      gg.closePath(); gg.fill();
+      if (ps) { gg.fillStyle = BD.C.red; gg.fillRect((xL + xR) / 2 - 1, yb - hmax - 6, 2, 2 * hmax + 12); }
+      var zx = ps ? (xL + xR) / 2 : xL + 0.06 * (xR - xL), zw = Math.max(3, segL * sxl);    // where the magnified view comes from
+      gg.strokeStyle = BD.C.gold; gg.strokeRect(zx - zw / 2, yb - hmax - 4, zw, 2 * hmax + 8);
+      gg.setLineDash([2, 3]); gg.beginPath(); gg.moveTo(zx - zw / 2, yb - hmax - 4); gg.lineTo(x0, Yb(w0 / 2 + dw) + 22); gg.moveTo(zx + zw / 2, yb - hmax - 4); gg.lineTo(x, Yb(w0 / 2 + dw) + 22); gg.stroke(); gg.setLineDash([]);
+      BD.dim(gg, xL, yb + hmax + 8, xR, yb + hmax + 8, 'L = ' + Lum.toFixed(0) + ' µm, ' + S.N.toFixed(0) + ' periods' + (apo ? ', Gaussian apodisation' : ''), BD.C.axis, 11);
     })();
     q('[data-o="lb"]').textContent = (1000 * lb).toFixed(2) + ' nm';
     q('[data-o="kl"]').textContent = kl.toFixed(2);
