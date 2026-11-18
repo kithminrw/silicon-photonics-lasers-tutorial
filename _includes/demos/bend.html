@@ -1,0 +1,62 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdBend" role="group" aria-label="Interactive demo: circular and Euler bends">
+  <div class="bd-head"><span>// try it · circular and Euler (clothoid) 90° bends</span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>bend size (end-point offset) R <b data-v="R"></b></span><input type="range" data-k="R" min="1" max="20" step="0.1" value="5" aria-label="bend size"></label>
+    <label class="bd-sl"><span>Euler fraction p <b data-v="p"></b></span><input type="range" data-k="p" min="0" max="1" step="0.01" value="1" aria-label="Euler fraction"></label>
+  </div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top view to scale (500 nm wide waveguides)</span></div>
+    <div class="bd-scope tall"><canvas data-c="k" aria-hidden="true"></canvas><span class="bd-tag">curvature along the bend</span></div>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>circular: radius <b data-o="rc">–</b>, length <b data-o="lc">–</b></span><span>Euler: minimum radius <b data-o="re">–</b>, length <b data-o="le">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdBend'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  var S = BD.bind(root, { R: { fmt: function (x) { return x.toFixed(1) + ' µm'; } }, p: { fmt: function (x) { return x.toFixed(2) + (x === 0 ? ' (circular)' : x === 1 ? ' (full Euler)' : ''); } } }, function () { draw(); });
+  // a 90-degree bend whose curvature rises linearly (clothoid), stays constant, then falls; p = fraction of the angle in the clothoids
+  function euler(p, R) {
+    var th = Math.PI / 2, thc = p * th / 2, tha = th - 2 * thc, km = 1, s1 = 2 * thc / km, sa = tha / km, L = 2 * s1 + sa, n = 600;
+    var x = 0, y = 0, a = 0, pts = [[0, 0]], ks = [0], ss = [0], ds = L / n;
+    for (var i = 1; i <= n; i++) {
+      var s = i * ds, k = s < s1 ? km * s / s1 : s < s1 + sa ? km : km * (L - s) / s1;
+      if (s1 === 0) k = km;
+      a += k * ds; x += Math.cos(a - k * ds / 2) * ds; y += Math.sin(a - k * ds / 2) * ds; pts.push([x, y]); ks.push(k); ss.push(s);
+    }
+    var scale = R / x;   // scale the unit-curvature path so its end point lands at (R, R)
+    return { pts: pts.map(function (p2) { return [p2[0] * scale, p2[1] * scale]; }), ks: ks.map(function (k) { return k / scale; }), ss: ss.map(function (s) { return s * scale; }), L: L * scale, kmax: km / scale };
+  }
+  function draw() {
+    var R = S.R, e = euler(S.p, R), c = euler(0, R);
+    // ---- geometry
+    var dg = BD.setup(q('[data-c="g"]')), g = dg.g, pad = 30, sc = Math.min((dg.w - 2 * pad) / (R * 1.25), (dg.h - 2 * pad - 10) / (R * 1.25)), x0 = pad, y0 = dg.h - pad;
+    var X = function (x) { return x0 + x * sc; }, Y = function (y) { return y0 - y * sc; }, wPx = Math.max(1.5, 0.5 * sc);
+    g.fillStyle = BD.GEO.ox; g.fillRect(0, 22, dg.w, dg.h - 22);
+    // lead-in and lead-out straights
+    BD.wg(g, [[X(-0.4 * R / 1.25), Y(0)], [X(0), Y(0)]], wPx); BD.wg(g, [[X(R), Y(R)], [X(R), Y(R * 1.2)]], wPx);
+    BD.wg(g, c.pts.map(function (p) { return [X(p[0]), Y(p[1])]; }), wPx, 'rgba(127,184,240,.45)');
+    BD.wg(g, e.pts.map(function (p) { return [X(p[0]), Y(p[1])]; }), wPx, BD.GEO.si);
+    // colour the Euler path by curvature
+    for (var i = 1; i < e.pts.length; i += 3) { var t = e.ks[i] / e.kmax; g.fillStyle = 'rgba(255,214,120,' + (0.15 + 0.7 * t).toFixed(2) + ')'; g.fillRect(X(e.pts[i][0]) - 1.5, Y(e.pts[i][1]) - 1.5, 3, 3); }
+    BD.dim(g, X(0), Y(0) + 14, X(R), Y(0) + 14, 'R = ' + R.toFixed(1) + ' µm', BD.C.gold, 11);
+    BD.label(g, 'circular (faint)', X(R * 0.55), Y(R * 0.1) - 4, 'rgba(127,184,240,.9)');
+    BD.label(g, S.p > 0 ? 'Euler (glow ∝ curvature)' : '', X(R * 0.05), Y(R * 0.95), BD.C.gold);
+    BD.scalebar(g, dg.w - 90, 34, sc, 60);
+    // ---- curvature against path length
+    var dk = BD.setup(q('[data-c="k"]')), Lm = Math.max(e.L, c.L), km = Math.max(e.kmax, c.kmax) * 1.15, f = BD.frame(dk, { x: [0, Lm], y: [0, km], pad: { l: 46, b: 22 },
+      xt: [[0, '0'], [Lm / 2, (Lm / 2).toFixed(1)], [Lm, Lm.toFixed(1) + ' µm']], yt: [[0, '0'], [c.kmax, (1 / c.kmax).toFixed(1) + ' µm⁻¹ ·'], [e.kmax, '']] });
+    BD.line(f, c.ss, c.ks, 'rgba(127,184,240,.7)', 1.6, [5, 3]);
+    BD.line(f, e.ss, e.ks, BD.C.gold, 2);
+    dk.g.fillStyle = BD.C.dim; dk.g.fillText('curvature 1/r (µm⁻¹)', f.p.l + 6, f.p.t + 12);
+    q('[data-o="rc"]').textContent = R.toFixed(1) + ' µm'; q('[data-o="lc"]').textContent = c.L.toFixed(2) + ' µm';
+    q('[data-o="re"]').textContent = (1 / e.kmax).toFixed(2) + ' µm'; q('[data-o="le"]').textContent = e.L.toFixed(2) + ' µm';
+    var cap = 'A circular bend jumps from zero curvature to 1/R at its ends, which shifts the mode suddenly and couples power into radiation and higher-order modes at each junction. An Euler bend ramps the curvature linearly, so the mode can follow. ';
+    if (S.p > 0.05) cap += 'The price: for the same footprint its tightest radius is smaller (' + (1 / e.kmax).toFixed(2) + ' µm against ' + R.toFixed(1) + ' µm) and it is ' + (100 * (e.L / c.L - 1)).toFixed(0) + ' % longer. In silicon strips, where radiation is small above a few micrometres, removing the junction mismatch usually wins.';
+    q('[data-o="cap"]').innerHTML = cap;
+  }
+  BD.observe(root, draw);
+})();
+</script>

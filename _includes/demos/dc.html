@@ -4,7 +4,7 @@
     <span class="bd-seg" role="group" aria-label="Polarisation"><button type="button" data-pol="TE" aria-pressed="true">TE</button><button type="button" data-pol="TM" aria-pressed="false">TM</button></span></div>
   <div class="bd-sliders">
     <label class="bd-sl"><span>gap g <b data-v="g"></b></span><input type="range" data-k="g" min="0.1" max="0.5" step="0.005" value="0.2" aria-label="gap"></label>
-    <label class="bd-sl"><span>coupling length L <b data-v="L"></b></span><input type="range" data-k="L" min="0" max="80" step="0.1" value="12.5" aria-label="length"></label>
+    <label class="bd-sl"><span>coupling length L <b data-v="L"></b></span><input type="range" data-k="L" min="0" max="80" step="0.1" value="16.4" aria-label="length"></label>
     <label class="bd-sl"><span>wavelength λ <b data-v="lam"></b></span><input type="range" data-k="lam" min="1.5" max="1.6" step="0.001" value="1.55" aria-label="wavelength"></label>
   </div>
   <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top view (glow ∝ power; gap magnified) and the cross-section to scale</span></div>
@@ -22,9 +22,9 @@
     lam: { fmt: function (x) { return (1000 * x).toFixed(1) + ' nm'; } }
   }, function () { draw(); });
   BD.seg(root, 'pol', function (v) { pol = v; draw(); });
-  // Illustrative supermode model: dn = dn0 (lam/1.55)^p exp(-gamma(lam) (g - 0.2)), gamma ~ evanescent decay rate.
-  // Anchored to L_x ~ 30 um at 200 nm gap for TE; TM couples more strongly. Use a mode solver for a real design.
-  var M = { TE: { dn0: 0.0258, gam: 8.0, p: 1.6 }, TM: { dn0: 0.075, gam: 5.6, p: 1.2 } };
+  // Supermode model dn = dn0 (lam/1.55)^p exp(-gamma (1.55/lam) (g - 0.2)). TE is fitted to femwell solutions of two
+  // 500 x 220 nm strips (figsrc/ch09_supermodes.py: L_x = 37.8 um at 200 nm, 2.4x per 100 nm, dn ~ lam^7.7); TM is illustrative.
+  var M = { TE: { dn0: 0.0205, gam: 8.75, p: 7.7 }, TM: { dn0: 0.075, gam: 5.6, p: 3 } };
   var LB = 2.5;   // extra effective coupling length contributed by the bends at each end (um)
   function dn(g, lam) { var m = M[pol]; return m.dn0 * Math.pow(lam / 1.55, m.p) * Math.exp(-m.gam * (1.55 / lam) * (g - 0.2)); }
   function cross(L, g, lam) { var lx = lam / (2 * dn(g, lam)); return Math.pow(Math.sin(Math.PI * (L + LB) / (2 * lx)), 2); }
@@ -79,7 +79,7 @@
     c += 'The coupling falls about exponentially with the gap, because it comes from the evanescent tails. ';
     if (Math.abs(k - 0.5) < 0.05) c += 'This is a 3 dB coupler at ' + (1000 * lam).toFixed(0) + ' nm, but it drifts by about ' + (100 * slope).toFixed(1) + ' % per nm: a broadband 3 dB coupler needs the asymmetric or adiabatic designs of Section 9.5.';
     else c += 'The bends at each end add about ' + LB + ' µm of effective coupling length, which is why a 50/50 coupler is shorter than L<sub>x</sub>/2. ';
-    c += ' <i>Illustrative model fitted to typical 500 × 220 nm strip waveguides; use a mode solver for a real design.</i>';
+    c += ' <i>TE model fitted to femwell supermode solutions for 500 × 220 nm strips at 1550 nm; the TM model is illustrative.</i>';
     q('[data-o="cap"]').innerHTML = c;
   }
   BD.observe(root, draw);

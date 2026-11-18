@@ -1,0 +1,113 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdEim" role="group" aria-label="Interactive demo: effective-index method for strip and rib waveguides">
+  <div class="bd-head"><span>// try it · channel waveguide by the effective-index method</span>
+    <span class="bd-seg" role="group" aria-label="Polarisation"><button type="button" data-pol="TE" aria-pressed="true">TE-like</button><button type="button" data-pol="TM" aria-pressed="false">TM-like</button></span></div>
+  <div class="bd-head" style="margin-top:-4px"><span>preset</span>
+    <span class="bd-seg" role="group" aria-label="Preset"><button type="button" data-pre="strip" aria-pressed="true">Si strip 220</button><button type="button" data-pre="rib" aria-pressed="false">Si rib 220/90</button><button type="button" data-pre="thick" aria-pressed="false">Si 340</button><button type="button" data-pre="sin" aria-pressed="false">SiN 400</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>width W <b data-v="w"></b></span><input type="range" data-k="w" min="0.2" max="2" step="0.005" value="0.5" aria-label="width"></label>
+    <label class="bd-sl"><span>core thickness t <b data-v="t"></b></span><input type="range" data-k="t" min="0.1" max="1" step="0.005" value="0.22" aria-label="thickness"></label>
+    <label class="bd-sl"><span>slab left after etch s <b data-v="s"></b></span><input type="range" data-k="s" min="0" max="0.6" step="0.005" value="0" aria-label="slab thickness"></label>
+    <label class="bd-sl"><span>wavelength λ <b data-v="lam"></b></span><input type="range" data-k="lam" min="1.2" max="1.7" step="0.005" value="1.55" aria-label="wavelength"></label>
+  </div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: cross-section to scale, with |E|² of the fundamental mode</span></div>
+    <div class="bd-scope tall"><canvas data-c="n" aria-hidden="true"></canvas><span class="bd-tag">effective index against width (lateral modes)</span></div>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>n<sub>eff</sub> (EIM) <b data-o="ne">–</b></span><span>n<sub>g</sub> <b data-o="ng">–</b></span><span>guided modes <b data-o="m">–</b></span><span>single-mode below W ≈ <b data-o="wc">–</b></span><span>step 1: n<sub>I</sub> / n<sub>II</sub> <b data-o="n12">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdEim'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); }, pol = 'TE', mat = 'si';
+  var um = function (x) { return (1000 * x).toFixed(0) + ' nm'; };
+  var S = BD.bind(root, { w: { fmt: um }, t: { fmt: um }, s: { fmt: function (x) { return x < 0.001 ? '0 (strip)' : um(x); } }, lam: { fmt: um } }, function (k) { if (k === 't' || k === 's') clampS(); draw(); });
+  BD.seg(root, 'pol', function (v) { pol = v; draw(); });
+  var PRE = { strip: ['si', 0.5, 0.22, 0], rib: ['si', 0.5, 0.22, 0.09], thick: ['si', 0.45, 0.34, 0], sin: ['sin', 1.2, 0.4, 0] };
+  BD.seg(root, 'pre', function (v) { var p = PRE[v]; mat = p[0]; [['w', p[1]], ['t', p[2]], ['s', p[3]]].forEach(function (a) { var el = q('[data-k="' + a[0] + '"]'); el.value = a[1]; el.dispatchEvent(new Event('input')); }); });
+  function clampS() { if (S.s > S.t - 0.01) { var el = q('[data-k="s"]'); el.value = Math.max(0, S.t - 0.01); el.dispatchEvent(new Event('input')); } }
+  // Sellmeier models (Chapter 2): Si (Li 1980), SiO2 (Malitson 1965), Si3N4 (Luke 2015)
+  function nsi(l) { var l1 = 1.1071; return Math.sqrt(11.6858 + 0.939816 / (l * l) + 0.00810461 * l1 * l1 / (l * l - l1 * l1)); }
+  function nox(l) { var l2 = l * l; return Math.sqrt(1 + 0.6961663 * l2 / (l2 - 0.0684043 * 0.0684043) + 0.4079426 * l2 / (l2 - 0.1162414 * 0.1162414) + 0.8974794 * l2 / (l2 - 9.896161 * 9.896161)); }
+  function nsin(l) { var l2 = l * l; return Math.sqrt(1 + 3.0249 * l2 / (l2 - 0.1353406 * 0.1353406) + 40314 * l2 / (l2 - 1239.842 * 1239.842)); }
+  function ncore(l) { return mat === 'sin' ? nsin(l) : nsi(l); }
+  // symmetric slab: index of mode m (TE or TM boundary conditions)
+  function slab(n1, n2, d, lam, tm, m) {
+    var k0 = 2 * Math.PI / lam, lo = n2 + 1e-9, hi = n1 - 1e-9; if (d <= 0 || hi <= lo) return NaN;
+    var F = function (ne) { var ka = k0 * Math.sqrt(Math.max(n1 * n1 - ne * ne, 1e-18)), g = k0 * Math.sqrt(Math.max(ne * ne - n2 * n2, 0)), p = tm ? g * n1 * n1 / (n2 * n2) : g; return ka * d - 2 * Math.atan(p / ka); };
+    if (F(lo) <= m * Math.PI) return NaN;
+    for (var it = 0, a = lo, b = hi; it < 60; it++) { var c = (a + b) / 2; if (F(c) > m * Math.PI) a = c; else b = c; }
+    return (a + b) / 2;
+  }
+  // effective-index method: vertical slabs first (core region t, side region s), then a lateral slab of width W
+  function eim(W, t, s, lam, m) {
+    var tmV = pol === 'TM', n1 = ncore(lam), n2 = nox(lam);
+    var nI = slab(n1, n2, t, lam, tmV, 0), nII = s > 0.002 ? slab(n1, n2, s, lam, tmV, 0) : n2;
+    if (!isFinite(nII)) nII = n2;
+    return { ne: slab(nI, nII, W, lam, !tmV, m), nI: nI, nII: nII };
+  }
+  function vprof(y, t, lam) {   // vertical field profile of the core-region slab (symmetric, centred at t/2)
+    var n1 = ncore(lam), n2 = nox(lam), tm = pol === 'TM', ne = slab(n1, n2, t, lam, tm, 0), k0 = 2 * Math.PI / lam;
+    var ka = k0 * Math.sqrt(n1 * n1 - ne * ne), g = k0 * Math.sqrt(ne * ne - n2 * n2), yc = y - t / 2;
+    return Math.abs(yc) <= t / 2 ? Math.cos(ka * yc) : Math.cos(ka * t / 2) * Math.exp(-g * (Math.abs(yc) - t / 2));
+  }
+  function lprof(x, W, r) {     // lateral profile of the fundamental lateral mode
+    var k0 = 2 * Math.PI / S.lam, ka = k0 * Math.sqrt(Math.max(r.nI * r.nI - r.ne * r.ne, 0)), g = k0 * Math.sqrt(Math.max(r.ne * r.ne - r.nII * r.nII, 0));
+    return Math.abs(x) <= W / 2 ? Math.cos(ka * x) : Math.cos(ka * W / 2) * Math.exp(-g * (Math.abs(x) - W / 2));
+  }
+  function draw() {
+    var W = S.w, t = S.t, s = S.s, lam = S.lam, r = eim(W, t, s, lam, 0);
+    var rp = eim(W, t, s, lam + 0.005, 0), rm = eim(W, t, s, lam - 0.005, 0), ng = r.ne - lam * (rp.ne - rm.ne) / 0.01;
+    var nm = 0; while (nm < 8 && isFinite(eim(W, t, s, lam, nm).ne)) nm++;
+    // ---- geometry: oxide, silicon (or nitride) ridge and slab, mode intensity
+    var dg = BD.setup(q('[data-c="g"]')), g = dg.g, spanX = Math.max(W * 2.2, 1.6), spanY = Math.max(t * 3.2, 1.1);
+    var sc = Math.min((dg.w - 30) / spanX, (dg.h - 50) / spanY), cx = dg.w / 2, y0 = dg.h / 2 + t / 2 * sc;   // y0 = bottom of the core
+    var X = function (x) { return cx + x * sc; }, Y = function (y) { return y0 - y * sc; };
+    g.fillStyle = BD.GEO.ox; g.fillRect(0, 22, dg.w, dg.h - 22);
+    g.fillStyle = 'rgba(160,200,240,.08)'; g.fillRect(0, Y(0), dg.w, dg.h - Y(0));          // buried oxide below
+    var col = mat === 'sin' ? BD.GEO.sin : BD.GEO.si;
+    g.fillStyle = col; g.fillRect(X(-W / 2), Y(t), W * sc, t * sc);
+    if (s > 0.002) g.fillRect(0, Y(s), dg.w, s * sc);
+    if (isFinite(r.ne)) {   // |E|^2 of the fundamental mode: separable EIM field
+      var mx = 0, vals = [];
+      var stepPx = 3;
+      for (var py = 24; py < dg.h - 2; py += stepPx) for (var px = 0; px < dg.w; px += stepPx) {
+        var v = Math.pow(vprof((y0 - py) / sc, t, lam) * lprof((px - cx) / sc, W, r), 2); vals.push([px, py, v]); mx = Math.max(mx, v);
+      }
+      vals.forEach(function (p) { var a = p[2] / mx; if (a > 0.02) { g.fillStyle = 'rgba(255,200,90,' + (0.75 * a).toFixed(3) + ')'; g.fillRect(p[0], p[1], stepPx, stepPx); } });
+    }
+    g.strokeStyle = 'rgba(255,255,255,.55)'; g.strokeRect(X(-W / 2), Y(t), W * sc, t * sc);
+    BD.dim(g, X(-W / 2), Y(t) - 10, X(W / 2), Y(t) - 10, 'W = ' + um(W), BD.C.gold, -6);
+    BD.dim(g, X(W / 2) + 12, Y(t), X(W / 2) + 12, Y(0), 't ' + um(t), BD.C.gold, -26);
+    if (s > 0.002) BD.label(g, 'slab ' + um(s), 8, Y(s) - 4, BD.C.axis);
+    BD.label(g, mat === 'sin' ? 'Si₃N₄' : 'Si', X(-W / 2) + 4, Y(t) + 12, '#172036');
+    BD.label(g, 'SiO₂', 8, dg.h - 8, BD.C.dim);
+    BD.scalebar(g, dg.w - 90, dg.h - 8, sc, 60);
+    // ---- n_eff against width for the first lateral modes
+    var dn = BD.setup(q('[data-c="n"]')), wmax = 2, nlo = nox(lam), nhi = ncore(lam), f = BD.frame(dn, { x: [0.1, wmax], y: [nlo, Math.min(nhi, (r.nI || nhi) + 0.15)], pad: { l: 42, b: 22 },
+      xt: [[0.5, '0.5'], [1, '1'], [1.5, '1.5'], [2, '2 µm']], yt: [[nlo, nlo.toFixed(2)], [r.nI || nhi, (r.nI || nhi).toFixed(2)]] });
+    var COL = [BD.C.gold, BD.C.blue, BD.C.green, BD.C.red], wc = NaN;
+    for (var m = 0; m < 4; m++) {
+      var xs = [], ys = [];
+      for (var k = 0; k <= 90; k++) { var ww = 0.1 + (wmax - 0.1) * k / 90, e = eim(ww, t, s, lam, m).ne; xs.push(ww); ys.push(e); if (m === 1 && !isFinite(wc) && isFinite(e)) wc = ww; }
+      BD.line(f, xs, ys, COL[m], m ? 1.3 : 2);
+    }
+    BD.vline(f, W, BD.C.dim, [3, 3]); if (isFinite(r.ne)) BD.dot(f, W, r.ne, BD.C.white, 4);
+    BD.hline(f, r.nII, BD.C.dim, [2, 4], s > 0.002 ? 'n_II (slab)' : 'n_clad');
+    // ---- readouts
+    q('[data-o="ne"]').textContent = isFinite(r.ne) ? r.ne.toFixed(4) : 'not guided';
+    q('[data-o="ng"]').textContent = isFinite(ng) ? ng.toFixed(3) : '–';
+    q('[data-o="m"]').textContent = nm + ' ' + pol + '-like';
+    q('[data-o="wc"]').textContent = isFinite(wc) ? um(wc - 0.0105) : '> 2 µm';
+    q('[data-o="n12"]').textContent = (r.nI || NaN).toFixed(3) + ' / ' + r.nII.toFixed(3);
+    var c = 'Step 1 solves a vertical slab for the core region (n<sub>I</sub>) and for the region beside it (n<sub>II</sub>: the remaining slab, or the cladding); step 2 solves a lateral slab of width W between them, with the other polarisation\'s boundary conditions. ';
+    if (mat === 'si' && s < 0.002 && Math.abs(W - 0.5) < 0.006 && Math.abs(t - 0.22) < 0.003 && pol === 'TE' && Math.abs(lam - 1.55) < 0.003)
+      c += 'For 500 × 220 nm at 1550 nm a full-vectorial solver (femwell) gives n<sub>eff</sub> = 2.446 and n<sub>g</sub> = 4.18, and puts the TE1 cut-off near 450 nm: the EIM overestimates n<sub>eff</sub> and underestimates the single-mode width, as it does for small high-contrast strips, but it gets the trends right. ';
+    if (s > 0.002) c += 'In a rib the lateral contrast is only n<sub>I</sub> − n<sub>II</sub>, so the mode spreads sideways and the waveguide stays single-mode to a larger width, at the cost of larger bends. ';
+    if (nm > 1) c += '<b>This width guides ' + nm + ' modes</b> in the EIM; single-mode routing needs W below about ' + (isFinite(wc) ? um(wc - 0.0105) : '–') + (s < 0.002 && mat === 'si' ? ' (for strips, check this with a full solver, which gives a larger width)' : '') + '.';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

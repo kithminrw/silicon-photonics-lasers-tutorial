@@ -1,6 +1,6 @@
 {% include demos/assets.html %}
 <div class="bd" id="bdRing" role="group" aria-label="Interactive demo: spectrum of a ring resonator">
-  <div class="bd-head"><span>// try it · ring resonator (Si strip, n<sub>g</sub> = 4.2)</span>
+  <div class="bd-head"><span>// try it · ring resonator (Si strip, n<sub>g</sub> = 4.18)</span>
     <span class="bd-seg" role="group" aria-label="Configuration"><button type="button" data-cfg="ap" aria-pressed="true">all-pass</button><button type="button" data-cfg="ad" aria-pressed="false">add-drop</button></span>
     <span class="bd-seg" role="group" aria-label="Span"><button type="button" data-span="wide" aria-pressed="true">several FSRs</button><button type="button" data-span="zoom" aria-pressed="false">zoom on one</button></span></div>
   <div class="bd-sliders">
@@ -17,7 +17,7 @@
 (function () {
   var root = document.getElementById('bdRing'); if (!root || !window.BD) return;
   var q = function (s) { return root.querySelector(s); }, cfg = 'ap', zoom = false;
-  var neff0 = 2.44, ng = 4.2, lam0 = 1.55;
+  var neff0 = 2.446, ng = 4.18, lam0 = 1.55;
   var S = BD.bind(root, {
     R: { fmt: function (x) { return x.toFixed(1) + ' µm'; } },
     g: { fmt: function (x) { return (1000 * x).toFixed(0) + ' nm'; } },
@@ -25,9 +25,9 @@
   }, function () { draw(); });
   BD.seg(root, 'cfg', function (v) { cfg = v; draw(); });
   BD.seg(root, 'span', function (v) { zoom = v === 'zoom'; draw(); });
-  // Point coupler between a ring and a straight bus (500 x 220 nm Si, TE): the supermode model of the Chapter 9 demo
-  // (L_x ~ 30 um at 200 nm gap), integrated along the curved gap g + z^2/(2R): L_eff = sqrt(2 pi R / gamma).
-  function kappa2(R, g) { var dn = 0.0258 * Math.exp(-8.0 * (g - 0.2)), lx = lam0 / (2 * dn), leff = Math.sqrt(2 * Math.PI * R / 8.0), kk = Math.sin(Math.min(Math.PI / 2, Math.PI * leff / (2 * lx))); return kk * kk; }
+  // Point coupler between a ring and a straight bus (500 x 220 nm Si, TE): the femwell-fitted supermode model of the Chapter 9
+  // demo (L_x = 37.8 um at 200 nm gap, 2.4x per 100 nm), integrated along the curved gap g + z^2/(2R): L_eff = sqrt(2 pi R / gamma).
+  function kappa2(R, g) { var dn = 0.0205 * Math.exp(-8.75 * (g - 0.2)), lx = lam0 / (2 * dn), leff = Math.sqrt(2 * Math.PI * R / 8.75), kk = Math.sin(Math.min(Math.PI / 2, Math.PI * leff / (2 * lx))); return kk * kk; }
   function draw() {
     var K = kappa2(S.R, S.g), L = 2 * Math.PI * S.R, alpha = S.a * 100 / 4.343, a = Math.exp(-alpha * L * 1e-6 / 2), t1 = Math.sqrt(1 - K), t2 = cfg === 'ad' ? t1 : 1;
     var fsr = lam0 * lam0 / (ng * L), m0 = Math.round(neff0 * L / lam0);

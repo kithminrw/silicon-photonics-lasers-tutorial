@@ -21,7 +21,7 @@
 (function () {
   var root = document.getElementById('bdVern'); if (!root || !window.BD) return;
   var q = function (s) { return root.querySelector(s); }, mapImg = null, mapKey = '';
-  var neff0 = 2.44, ng = 4.2, lam0 = 1.55, aRing = Math.exp(-(3 * 100 / 4.343) / 2 * 1e-6);   // 3 dB/cm, field per um
+  var neff0 = 2.446, ng = 4.18, lam0 = 1.55, aRing = Math.exp(-(3 * 100 / 4.343) / 2 * 1e-6);   // 3 dB/cm, field per um
   var Lcav = 2500, ngc = 3.9, l0 = 1.5, l1 = 1.6;   // optical cavity: about 2.5 mm, average group index 3.9
   var S = BD.bind(root, {
     R1: { fmt: function (x) { return x.toFixed(2) + ' µm'; } }, R2: { fmt: function (x) { return x.toFixed(2) + ' µm'; } },

@@ -11,14 +11,14 @@
   </div>
   <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top view (glow ∝ power at 1550 nm)</span></div>
   <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">transmission against wavelength</span></div>
-  <div class="bd-read" aria-live="polite"><span>FSR <b data-o="fsr">–</b></span><span>extinction (bar port) <b data-o="er">–</b></span><span>n<sub>g</sub> <b>4.20</b></span><span>excess loss <b data-o="il">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>FSR <b data-o="fsr">–</b></span><span>extinction (bar port) <b data-o="er">–</b></span><span>n<sub>g</sub> <b>4.18</b></span><span>excess loss <b data-o="il">–</b></span></div>
   <p class="bd-caption" data-o="cap"></p>
 </div>
 <script>
 (function () {
   var root = document.getElementById('bdMzi'); if (!root || !window.BD) return;
   var q = function (s) { return root.querySelector(s); }, db = false;
-  var neff0 = 2.44, ng = 4.2, lam0 = 1.55, L0 = 200;   // um; L0 = length of the short arm
+  var neff0 = 2.446, ng = 4.18, lam0 = 1.55, L0 = 200;   // um; L0 = length of the short arm
   var S = BD.bind(root, {
     dL: { fmt: function (x) { return x.toFixed(1) + ' µm'; } }, k1: { fmt: function (x) { return (100 * x).toFixed(1) + ' %'; } },
     k2: { fmt: function (x) { return (100 * x).toFixed(1) + ' %'; } }, ph: { fmt: function (x) { return x.toFixed(2) + 'π'; } },

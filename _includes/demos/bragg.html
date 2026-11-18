@@ -17,7 +17,7 @@
 (function () {
   var root = document.getElementById('bdBragg'); if (!root || !window.BD) return;
   var q = function (s) { return root.querySelector(s); }, apo = 0, ps = 0;
-  var neff0 = 2.44, ng = 4.2, lam0 = 1.55;
+  var neff0 = 2.446, ng = 4.18, lam0 = 1.55;
   var S = BD.bind(root, {
     P: { fmt: function (x) { return x.toFixed(1) + ' nm'; } },
     k: { map: function (v) { return 1000 * Math.pow(10, 2.2 * v / 100); }, fmt: function (x) { return (x / 1000).toFixed(x < 1e4 ? 2 : 1) + ' /mm'; } },   // 1e3 .. 1.6e5 /m

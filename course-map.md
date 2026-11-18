@@ -50,7 +50,7 @@ Demos: ● Platform comparator
 
 How a strip of high-index material guides light: slab and channel waveguides on SOI and other platforms, the losses that limit them, and the bends, tapers and transitions that route light around a chip.
 
-### [5. The Slab Waveguide]({% link chapters/05_slab.md %})
+### [5. The Slab Waveguide]({% link chapters/05_slab.md %}) <span class="status status-written">written</span>
 
 *What sets the number of guided modes and their effective index?*
 
@@ -58,35 +58,35 @@ How a strip of high-index material guides light: slab and channel waveguides on 
 
 Demos: ● Slab-waveguide mode solver
 
-### [6. Channel Waveguides on SOI and Beyond]({% link chapters/06_soi.md %})
+### [6. Channel Waveguides on SOI and Beyond]({% link chapters/06_soi.md %}) <span class="status status-written">written</span>
 
 *Which width and etch depth give single-mode, low-loss, compact routing?*
 
 6.1 Geometries · 6.2 The effective-index method · 6.3 Numerical mode solvers · 6.4 Effective and group index of SOI waveguides · 6.5 Single-mode conditions and polarisation · 6.6 Other platforms · 6.7 Sensitivity to fabrication
 
-Demos: ○ Effective-index explorer; ○ 2D mode solver
+Demos: ● Effective-index explorer; ○ 2D mode solver
 
-### [7. Loss, Dispersion and Nonlinearity]({% link chapters/07_loss.md %})
+### [7. Loss, Dispersion and Nonlinearity]({% link chapters/07_loss.md %}) <span class="status status-written">written</span>
 
 *What limits a waveguide's propagation loss, and how do you measure it?*
 
 7.1 Loss mechanisms and units · 7.2 Sidewall-roughness scattering · 7.3 Absorption · 7.4 Substrate leakage · 7.5 Dispersion · 7.6 Nonlinear effects · 7.7 Measuring loss
 
-Demos: ○ Roughness scattering; ○ Cutback simulator
+Demos: ● Cutback simulator; ○ Roughness scattering
 
-### [8. Bends, Tapers and Transitions]({% link chapters/08_bends.md %})
+### [8. Bends, Tapers and Transitions]({% link chapters/08_bends.md %}) <span class="status status-written">written</span>
 
 *How tight can a bend be, and how short a taper?*
 
 8.1 Radiation loss in bends · 8.2 Mode mismatch at straight–bend junctions · 8.3 Tapers and adiabaticity · 8.4 Overlap integrals and butt coupling · 8.5 Waveguide crossings · 8.6 Transitions between layers
 
-Demos: ○ Bend loss; ○ Taper adiabaticity
+Demos: ● Circular and Euler bends; ○ Taper adiabaticity
 
 ## Part III · Passive Devices
 
 The building blocks that split, combine, filter and route light without power: directional couplers, Y-branches and MMIs, Mach–Zehnder interferometers, ring resonators, Bragg gratings, and WDM and polarisation devices.
 
-### [9. Coupled-Mode Theory and Directional Couplers]({% link chapters/09_couplers.md %})
+### [9. Coupled-Mode Theory and Directional Couplers]({% link chapters/09_couplers.md %}) <span class="status status-written">written</span>
 
 *Which length and gap give a 50/50 split, and how robust is it?*
 
@@ -94,7 +94,7 @@ The building blocks that split, combine, filter and route light without power: d
 
 Demos: ● Directional coupler
 
-### [10. Y-Branches and Multimode Interference Couplers]({% link chapters/10_mmi.md %})
+### [10. Y-Branches and Multimode Interference Couplers]({% link chapters/10_mmi.md %}) <span class="status status-written">written</span>
 
 *Y-branch or MMI, and how long must the MMI be?*
 
@@ -102,7 +102,7 @@ Demos: ● Directional coupler
 
 Demos: ● MMI self-imaging
 
-### [11. Mach–Zehnder Interferometers]({% link chapters/11_mzi.md %})
+### [11. Mach–Zehnder Interferometers]({% link chapters/11_mzi.md %}) <span class="status status-written">written</span>
 
 *How does the arm-length difference set the spectrum?*
 
@@ -110,7 +110,7 @@ Demos: ● MMI self-imaging
 
 Demos: ● Mach–Zehnder interferometer
 
-### [12. Ring Resonators]({% link chapters/12_rings.md %})
+### [12. Ring Resonators]({% link chapters/12_rings.md %}) <span class="status status-written">written</span>
 
 *How do coupling and loss shape a ring's resonance?*
 
@@ -118,7 +118,7 @@ Demos: ● Mach–Zehnder interferometer
 
 Demos: ● Ring resonator
 
-### [13. Bragg Gratings and Photonic Crystals]({% link chapters/13_bragg.md %})
+### [13. Bragg Gratings and Photonic Crystals]({% link chapters/13_bragg.md %}) <span class="status status-written">written</span>
 
 *How long and how strong must a grating be for a given reflectivity and bandwidth?*
 
@@ -126,7 +126,7 @@ Demos: ● Ring resonator
 
 Demos: ● Bragg grating
 
-### [14. WDM Filters and Polarisation Management]({% link chapters/14_wdm.md %})
+### [14. WDM Filters and Polarisation Management]({% link chapters/14_wdm.md %}) <span class="status status-written">written</span>
 
 *How do you separate four wavelengths with low crosstalk?*
 

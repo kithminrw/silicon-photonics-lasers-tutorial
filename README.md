@@ -7,13 +7,13 @@ across the **Si, SiN, thin-film LiNbO₃ (TFLN), BaTiO₃ (BTO) and InP** platfo
 
 **Read it online:** <https://www.kithminrw.com/silicon-photonics-lasers-tutorial/>
 
-> **Status: draft v0.1 (November 2026).** Part I is written; the other parts are detailed outlines that
+> **Status: draft v0.1 (November 2026).** Parts I–III are written; the other parts are detailed outlines that
 > are being filled in. Corrections are very welcome (see [Contributing](#contributing)).
 
 ## What makes it different
 
 - **Interactive demos in every chapter.** Small physical models that run in the browser with no
-  installation: change a slider and watch the light. Seventeen are built so far, including a slab-waveguide
+  installation: change a slider and watch the light. Twenty are built so far, including a slab-waveguide
   mode solver, exact fibre LP modes, Fresnel reflection and evanescent fields, Gaussian-beam coupling,
   directional couplers, MMI self-imaging, Mach–Zehnder interferometers, ring resonators, Bragg gratings by
   transfer matrix, grating-coupler phase matching, a fibre-array alignment game, a laser rate-equation
@@ -33,8 +33,8 @@ across the **Si, SiN, thin-film LiNbO₃ (TFLN), BaTiO₃ (BTO) and InP** platfo
 |---|---|---|
 | Preface and course map | audience, reading paths, the whole outline on one page | written |
 | I. Foundations | 1 Why integrated photonics · 2 Electromagnetic theory · 3 Gaussian beams and fibres · 4 Materials and platforms | **written** |
-| II. Waveguides | 5 Slab waveguide · 6 Channel waveguides · 7 Loss, dispersion, nonlinearity · 8 Bends, tapers, transitions | outline + demos |
-| III. Passive devices | 9 Couplers · 10 Y-branches and MMIs · 11 MZIs · 12 Rings · 13 Bragg gratings · 14 WDM and polarisation | outline + demos |
+| II. Waveguides | 5 Slab waveguide · 6 Channel waveguides · 7 Loss, dispersion, nonlinearity · 8 Bends, tapers, transitions | **written** |
+| III. Passive devices | 9 Couplers · 10 Y-branches and MMIs · 11 MZIs · 12 Rings · 13 Bragg gratings · 14 WDM and polarisation | **written** |
 | IV. Coupling and packaging | 15 Grating couplers · 16 Edge couplers · 17 Fibre arrays and packaging | outline + demos |
 | V. Active devices | 18 Thermo-optic tuning · 19 Electro-optic effects · 20 Modulators · 21 Photodetectors | outline |
 | VI. Lasers and amplifiers | 22 Absorption, emission, gain · 23 Semiconductor gain · 24 Fabry–Pérot laser · 25 Dynamics and noise · 26 Tunable lasers · 27 Lasers on silicon · 28 SOAs | outline + demos |
@@ -91,7 +91,8 @@ Every page has an *Edit this page on GitHub* link.
 When writing a page:
 
 - **Maths** goes in `$$...$$` (KaTeX). Inside inline maths, write `\lvert x \rvert` rather than `|x|`:
-  a bare `|` makes the Markdown parser read the line as a table.
+  a bare `|` makes the Markdown parser read the line as a table. Inside raw-HTML figure captions, write
+  `\(...\)` instead of `$$...$$`, which the parser leaves untouched there.
 - **Boxes** use `<div class="tbox tbox-TYPE" markdown="1">` with a `<div class="tbox-title">` line;
   types are `keyeq`, `example`, `insight`, `pitfall`, `tryit`, `derivation`, `specnote`, `objectives`, `takeaways`.
 - **Links** between pages use `{% link chapters/06_soi.md %}`, so a broken link fails the build.
