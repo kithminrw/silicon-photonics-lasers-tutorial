@@ -85,11 +85,16 @@ defaults:
       path: "course-map.md"
     values:
       layout: "default"
+  - scope:
+      path: "labs"
+      type: "pages"
+    values:
+      layout: "default"
 
 exclude:
   - tools/
   - figsrc/
-  - labs/
+  - labs/*.png
   - README.md
   - HANDOFF.md
   - LICENSE*

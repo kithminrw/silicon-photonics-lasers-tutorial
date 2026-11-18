@@ -2,6 +2,8 @@
 title: Hands-On Labs
 layout: default
 nav_order: 10.5
+has_children: true
+has_toc: false
 permalink: /labs/
 ---
 
@@ -14,7 +16,7 @@ Labs
 Learning by doing, with free tools only: simulate the devices, lay out and submit a chip, and analyse real measurements.
 {: .part-blurb }
 
-<p><span class="status status-outline">planned</span> The labs are designed and listed below; their scripts will be added to <a href="https://github.com/kithminrw/silicon-photonics-lasers-tutorial/tree/main/labs"><code>labs/</code></a> as the chapters they support are written.</p>
+<p>The labs are designed and listed below. Each written lab has its own page and a script you can download from it, also in the repository's <a href="https://github.com/kithminrw/silicon-photonics-lasers-tutorial/tree/main/labs"><code>labs/</code></a> folder; the others follow.</p>
 
 The twelve labs follow three tracks. **Simulate** (Labs 1–6): mode solvers, coupled-mode and FDTD simulations, circuit models and grating couplers. **Make** (Labs 7–9): lay out a passive chip in the SiEPIC EBeam PDK, verify and submit it to an openEBL run, and analyse the measured data that comes back. **Lasers and links** (Labs 10–12): rate-equation models, a Vernier tunable laser and the budget of the reference link. Every tool is free and open source; the interactive demos in the chapters are a quick way to explore the same models before running a lab.
 
@@ -23,7 +25,7 @@ The twelve labs follow three tracks. **Simulate** (Labs 1–6): mode solvers, co
 
 | Lab | Title | Chapters | Tools and what you do |
 |---|---|---|---|
-| 1 | Slab and channel waveguide modes in Python | 5–6 | NumPy/SciPy; the slab solver of Chapter 5, then the effective-index method |
+| 1 | [Slab and channel waveguide modes in Python]({% link labs/lab01_slab.md %}) <span class="status status-written">written</span> | 5–6 | NumPy: the slab solver of Chapter 5, then the effective-index method against femwell |
 | 2 | Mode solving with femwell | 6–7 | femwell (FEM, open source): n_eff, n_g and loss against width |
 | 3 | Directional coupler and MMI design | 9–10 | MEEP (FDTD) or an EME solver; supermodes, beat length, self-imaging |
 | 4 | MZI and ring circuits with S-parameters | 11–12 | SAX: compact models and spectra |

@@ -13,3 +13,8 @@ __pycache__/
 .venv*/
 labs/out/
 tools/out/
+
+# Lab outputs
+labs/*.png
+labs/__pycache__/
+__pycache__/

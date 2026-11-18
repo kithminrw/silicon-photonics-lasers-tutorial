@@ -146,7 +146,7 @@ Strong confinement (large $$b$$ and $$\Gamma$$) gives compact devices and tight 
 
 The effective index of a mode changes with wavelength for two reasons: the materials are dispersive ([Chapter 2]({% link chapters/02_em.md %})), and the mode's shape changes, because a longer wavelength pushes more of it into the low-index cladding. The second effect, **waveguide dispersion**, lowers $$n_\mathrm{eff}$$ as $$\lambda$$ grows, and so raises the group index $$n_g = n_\mathrm{eff} - \lambda\,\mathrm{d}n_\mathrm{eff}/\mathrm{d}\lambda$$ above both the effective index and the bulk group index.
 
-For the 220 nm film at 1550 nm the TE0 mode has $$n_\mathrm{eff} = 2.85$$ but $$n_g = 3.70$$, and the TM0 mode $$n_\mathrm{eff} = 2.05$$ but $$n_g = 3.97$$ ([Figure 5.2b](#fig-5-2)). Strong waveguide dispersion is a hallmark of high-contrast waveguides: in a silicon strip, where the light is confined in both directions, the group index reaches about 4.2 ([Chapter 6]({% link chapters/06_soi.md %})).
+For the 220 nm film at 1550 nm the TE0 mode has $$n_\mathrm{eff} = 2.85$$ but $$n_g = 3.70$$, and the TM0 mode $$n_\mathrm{eff} = 2.05$$ but $$n_g = 3.96$$ ([Figure 5.2b](#fig-5-2)). Strong waveguide dispersion is a hallmark of high-contrast waveguides: in a silicon strip, where the light is confined in both directions, the group index reaches about 4.2 ([Chapter 6]({% link chapters/06_soi.md %})).
 
 <div class="tbox tbox-tryit" markdown="1">
 <div class="tbox-title">Explore further</div>
