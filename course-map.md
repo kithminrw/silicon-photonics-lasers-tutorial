@@ -138,29 +138,29 @@ Demos: ○ Four-channel demultiplexer
 
 Getting light on and off the chip: grating couplers, edge couplers, fibre arrays, photonic wire bonds and the packaging that turns a die into a product.
 
-### [15. Grating Couplers]({% link chapters/15_gc.md %})
+### [15. Grating Couplers]({% link chapters/15_gc.md %}) <span class="status status-written">written</span>
 
-*Which period and angle couple 1550 nm TE light into a fibre tilted at 8°?*
+*Which period and angle couple 1550 nm TE light into a fibre tilted at 8°, and how much of the light can you expect to get?*
 
-15.1 Phase matching · 15.2 Directionality · 15.3 Mode matching to the fibre · 15.4 Bandwidth and polarisation · 15.5 Back-reflection · 15.6 Focusing, SWG and 2D grating couplers · 15.7 The coupling-efficiency budget
+15.1 Phase matching · 15.2 Directionality · 15.3 Mode matching to the fibre · 15.4 Bandwidth and polarisation · 15.5 Back-reflection · 15.6 Focusing, SWG and 2D grating couplers · 15.7 Grating couplers in practice
 
-Demos: ● Grating-coupler phase matching
+Demos: ● Grating-coupler phase matching · ● Grating-coupler efficiency budget
 
-### [16. Edge Couplers and Spot-Size Converters]({% link chapters/16_edge.md %})
+### [16. Edge Couplers and Spot-Size Converters]({% link chapters/16_edge.md %}) <span class="status status-written">written</span>
 
 *How narrow must the taper tip be to match a 3 µm or a 10 µm spot?*
 
 16.1 Edge-coupling basics · 16.2 Inverse tapers · 16.3 Multi-stage couplers and overlays · 16.4 Facets · 16.5 Fibres at the edge · 16.6 Edge against grating couplers
 
-Demos: ○ Inverse taper
+Demos: ● Inverse-taper edge coupler
 
-### [17. Fibre Arrays, Photonic Wire Bonds and Packaging]({% link chapters/17_fiberarrays.md %})
+### [17. Fibre Arrays, Photonic Wire Bonds and Packaging]({% link chapters/17_fiberarrays.md %}) <span class="status status-written">written</span>
 
 *How tolerant is a coupling interface, and how do you find the peak quickly?*
 
 17.1 Fibre arrays · 17.2 Alignment · 17.3 Attaching fibres · 17.4 Photonic wire bonds and micro-optics · 17.5 Laser and chip assembly · 17.6 Co-packaged optics · 17.7 Design rules for test and packaging
 
-Demos: ● Fibre-array alignment
+Demos: ● Alignment tolerance · ● Fibre-array alignment
 
 ## Part V · Active Devices
 

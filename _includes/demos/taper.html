@@ -1,0 +1,122 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdTaper" role="group" aria-label="Interactive demo: a silicon inverse-taper edge coupler">
+  <div class="bd-head"><span>// try it · inverse-taper edge coupler (220 nm Si in oxide, 1550 nm, femwell modes)</span>
+    <span class="bd-seg" role="group" aria-label="Polarisation"><button type="button" data-pol="TE" aria-pressed="true">TE</button><button type="button" data-pol="TM" aria-pressed="false">TM</button></span>
+    <span class="bd-seg" role="group" aria-label="Fibre"><button type="button" data-fib="0" aria-pressed="false">lensed 2.5 µm</button><button type="button" data-fib="1" aria-pressed="true">UHNA 4 µm</button><button type="button" data-fib="2" aria-pressed="false">SMF-28 10.4 µm</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>tip width <b data-v="w"></b></span><input type="range" data-k="w" min="0.08" max="0.5" step="0.002" value="0.16" aria-label="tip width"></label>
+    <label class="bd-sl"><span>lateral fibre offset <b data-v="dx"></b></span><input type="range" data-k="dx" min="0" max="3" step="0.02" value="0" aria-label="lateral offset"></label>
+  </div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: taper top view (widths stretched) and the facet cross-section to scale, with the mode and the fibre's mode</span></div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="m" aria-hidden="true"></canvas><span class="bd-tag">mode-field diameter against tip width (femwell)</span></div>
+    <div class="bd-scope tall"><canvas data-c="o" aria-hidden="true"></canvas><span class="bd-tag">coupling to the fibre against tip width (femwell overlap)</span></div>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>n<sub>eff</sub> at the tip <b data-o="ne">–</b></span><span>mode size (1/e², x × y) <b data-o="mfd">–</b></span><span>coupling <b data-o="eta">–</b></span><span>1 dB lateral tolerance <b data-o="tol">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdTaper'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  // femwell results from figsrc/ch16_taper.py: [width um, neff, MFDx um, MFDy um, overlap lensed 2.5, UHNA 4, SMF-28 10.4, power below -2 um]
+  var DATA = {"TE":[[0.13,1.4445,11.756,14.318,0.3254,0.5191,0.9001,0.21001],[0.135,1.4448,10.449,12.031,0.4024,0.6109,0.909,0.17355],[0.14,1.4452,9.079,9.905,0.4874,0.7018,0.8881,0.13807],[0.15,1.4466,6.612,6.73,0.6576,0.8448,0.767,0.07989],[0.16,1.449,4.671,4.895,0.7981,0.9087,0.6003,0.0423],[0.17,1.4528,3.657,3.636,0.8863,0.8932,0.4412,0.01951],[0.18,1.4586,2.863,2.842,0.9203,0.8234,0.3219,0.00832],[0.2,1.4785,1.917,1.884,0.8593,0.6203,0.1685,0.00111],[0.25,1.6018,0.958,0.926,0.4829,0.2471,0.0449,1e-06],[0.3,1.8271,0.598,0.595,0.2515,0.1125,0.0184,1e-06],[0.4,2.2275,0.411,0.417,0.133,0.0556,0.0087,1e-06],[0.5,2.4459,0.424,0.381,0.1179,0.0486,0.0075,1e-06]],"TM":[[0.09,1.4457,8.308,7.915,0.5653,0.7736,0.8449,0.1084],[0.1,1.447,6.167,6.109,0.6965,0.8679,0.7267,0.0689],[0.12,1.4514,3.966,3.911,0.8655,0.9036,0.4889,0.02463],[0.14,1.4585,2.839,2.863,0.919,0.8219,0.3217,0.0085],[0.16,1.4685,2.207,2.24,0.8993,0.7068,0.2196,0.00276],[0.18,1.4812,1.811,1.847,0.8443,0.5975,0.1578,0.00091],[0.2,1.4962,1.546,1.583,0.7778,0.506,0.1192,0.00031],[0.25,1.5418,1.167,1.2,0.6231,0.3512,0.07,2e-05],[0.3,1.5929,0.977,1.0,0.5123,0.2656,0.0488,1e-06],[0.4,1.6913,0.811,0.802,0.3902,0.1863,0.0319,1e-06],[0.5,1.7706,0.763,0.709,0.337,0.1553,0.0259,1e-06]]};
+  var FIB = [{ n: 'lensed fibre', mfd: 2.5 }, { n: 'UHNA fibre', mfd: 4.0 }, { n: 'SMF-28', mfd: 10.4 }];
+  var pol = 'TE', fib = 1;
+  var S = BD.bind(root, {
+    w: { fmt: function (x) { return (1000 * x).toFixed(0) + ' nm'; } }, dx: { fmt: function (x) { return x.toFixed(2) + ' µm'; } }
+  }, function () { draw(); });
+  BD.seg(root, 'pol', function (v) { pol = v; draw(); });
+  BD.seg(root, 'fib', function (v) { fib = +v; draw(); });
+  function rows() { return DATA[pol]; }
+  function at(w, col, logy) {   // linear interpolation in width (log of the value for sizes)
+    var R = rows(), i = 0; if (w <= R[0][0]) return R[0][col]; if (w >= R[R.length - 1][0]) return R[R.length - 1][col];
+    while (R[i + 1][0] < w) i++;
+    var t = (w - R[i][0]) / (R[i + 1][0] - R[i][0]), a = R[i][col], b = R[i + 1][col];
+    return logy ? Math.exp(Math.log(a) + t * (Math.log(b) - Math.log(a))) : a + t * (b - a);
+  }
+  function draw() {
+    if (!DATA) return;
+    var w = S.w, ne = at(w, 1), mx = at(w, 2, true), my = at(w, 3, true), eta0 = at(w, 4 + fib), sub = at(w, 7, true), fm = FIB[fib].mfd;
+    var wx = mx / 2, wf = fm / 2, eta = eta0 * Math.exp(-2 * S.dx * S.dx / (wx * wx + wf * wf)), tol = Math.sqrt(0.1151 * (wx * wx + wf * wf));
+    // ---- geometry
+    (function () {
+      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, H = dv.h, split = Math.round(dv.w * 0.5);
+      // left: top view, length compressed and widths stretched (the 500 nm input drawn at 40 % of the height)
+      var lx0 = 16, lx1 = split - 40, cy = 30 + (H - 54) / 2, wIn = 0.5, k = 0.4 * (H - 54) / wIn;
+      g.fillStyle = BD.GEO.ox; g.fillRect(0, 18, split - 20, H - 18);
+      // light spreading out of the taper towards the facet
+      var spread = Math.min((H - 54) / 2, 6 + 3.2 * mx), grd = g.createLinearGradient(lx0 + 40, 0, lx1, 0);
+      grd.addColorStop(0, 'rgba(255,214,120,0)'); grd.addColorStop(1, 'rgba(255,214,120,.28)');
+      g.fillStyle = grd; g.beginPath(); g.moveTo(lx0 + 40, cy - wIn * k * 0.6); g.lineTo(lx1, cy - spread); g.lineTo(lx1, cy + spread); g.lineTo(lx0 + 40, cy + wIn * k * 0.6); g.fill();
+      g.fillStyle = BD.GEO.si; g.beginPath();
+      g.moveTo(lx0, cy - wIn * k / 2); g.lineTo(lx0 + 40, cy - wIn * k / 2); g.lineTo(lx1, cy - w * k / 2); g.lineTo(lx1, cy + w * k / 2); g.lineTo(lx0 + 40, cy + wIn * k / 2); g.lineTo(lx0, cy + wIn * k / 2); g.closePath(); g.fill();
+      g.strokeStyle = BD.GEO.edge; g.setLineDash([4, 3]); g.beginPath(); g.moveTo(lx1, 34); g.lineTo(lx1, H - 22); g.stroke(); g.setLineDash([]);
+      BD.label(g, 'facet', lx1 - 4, 44, BD.C.axis, 'right');
+      BD.dim(g, lx0 + 40, H - 12, lx1, H - 12, 'taper, ~200 µm', BD.C.gold, 0);
+      BD.label(g, '500 nm', lx0, cy - wIn * k / 2 - 6, BD.C.axis);
+      BD.label(g, (1000 * w).toFixed(0) + ' nm tip', lx1 - 4, cy - Math.max(w * k / 2, 4) - 8, BD.C.white, 'right');
+      BD.label(g, 'top view (widths stretched)', 8, 40, BD.C.dim);
+      // right: facet cross-section to scale, window 14 um
+      var rx0 = split, rw = dv.w - split - 8, sc = Math.min(rw, H - 26) / 14, cx = rx0 + rw / 2, yc = 22 + (H - 26) / 2;
+      g.save(); g.beginPath(); g.rect(rx0, 18, rw, H - 18); g.clip();
+      g.fillStyle = BD.GEO.ox; g.fillRect(rx0, 18, rw, H - 18);
+      var subY = yc + (2.0 + 0.11) * sc; g.fillStyle = 'rgba(157,179,204,.35)'; g.fillRect(rx0, subY, rw, H - subY);
+      // mode: elliptical Gaussian at 1/e^2 contour, drawn with a radial gradient
+      g.save(); g.translate(cx, yc); g.scale(1, my / mx);
+      var rg = g.createRadialGradient(0, 0, 0, 0, 0, wx * sc * 1.4);
+      rg.addColorStop(0, 'rgba(255,214,120,.75)'); rg.addColorStop(0.5, 'rgba(255,214,120,.35)'); rg.addColorStop(1, 'rgba(255,214,120,0)');
+      g.fillStyle = rg; g.beginPath(); g.arc(0, 0, wx * sc * 1.4, 0, 2 * Math.PI); g.fill();
+      g.strokeStyle = BD.C.gold; g.lineWidth = 1.2; g.beginPath(); g.arc(0, 0, wx * sc, 0, 2 * Math.PI); g.restore(); g.stroke(); g.lineWidth = 1;
+      // silicon tip, to scale (at least 1 px)
+      g.fillStyle = BD.GEO.si; g.fillRect(cx - Math.max(0.5, w * sc / 2), yc - 0.11 * sc, Math.max(1, w * sc), Math.max(1, 0.22 * sc));
+      // fibre mode (1/e^2 circle), offset laterally
+      g.strokeStyle = BD.C.blue; g.setLineDash([5, 4]); g.beginPath(); g.arc(cx + S.dx * sc, yc, wf * sc, 0, 2 * Math.PI); g.stroke(); g.setLineDash([]);
+      g.restore();
+      BD.label(g, 'facet cross-section, to scale', rx0 + 8, 40, BD.C.dim);
+      BD.label(g, FIB[fib].n + ' mode ' + fm + ' µm (dashed)', rx0 + 8, 54, BD.C.blue);
+      BD.label(g, 'Si substrate (2 µm BOX)', rx0 + 8, H - 6, BD.C.axis);
+      BD.scalebar(g, dv.w - 96, 40, sc, 80);
+    })();
+    // ---- MFD against width
+    var R = rows(), W = R.map(function (r) { return r[0]; });
+    var d2 = BD.setup(q('[data-c="m"]')), f2 = BD.frame(d2, { x: [0.08, 0.5], y: [0, 12], pad: { l: 34, b: 22 },
+      xt: [[0.1, '100'], [0.2, '200'], [0.3, '300'], [0.4, '400'], [0.5, '500 nm']], yt: [[0, '0'], [4, '4'], [8, '8'], [12, '12 µm']] });
+    BD.hline(f2, fm, BD.C.blue, [5, 4], FIB[fib].n);
+    BD.line(f2, W, R.map(function (r) { return Math.min(r[2], 12); }), BD.C.gold, 2);
+    BD.line(f2, W, R.map(function (r) { return Math.min(r[3], 12); }), BD.C.green, 1.6, [4, 3]);
+    BD.dot(f2, w, Math.min(mx, 12), BD.C.white, 4); BD.dot(f2, w, Math.min(my, 12), BD.C.white, 3);
+    d2.g.fillStyle = BD.C.gold; d2.g.fillText('horizontal', d2.w - 90, d2.h * 0.45); d2.g.fillStyle = BD.C.green; d2.g.fillText('vertical', d2.w - 90, d2.h * 0.45 + 14);
+    // ---- overlap against width
+    var d3 = BD.setup(q('[data-c="o"]')), f3 = BD.frame(d3, { x: [0.08, 0.5], y: [-12, 0], pad: { l: 40, b: 22 },
+      xt: [[0.1, '100'], [0.2, '200'], [0.3, '300'], [0.4, '400'], [0.5, '500 nm']], yt: [[-12, '−12'], [-6, '−6'], [-3, '−3'], [-1, '−1'], [0, '0 dB']] });
+    R.forEach(function (r, i) {   // shade where more than 1 % of the mode reaches 2 um below the core: a 2 um BOX leaks
+      if (r[7] > 0.01 && i + 1 < R.length) { d3.g.fillStyle = 'rgba(240,128,128,.12)'; d3.g.fillRect(f3.X(r[0]), f3.p.t, f3.X(R[i + 1][0]) - f3.X(r[0]) + 1, d3.h - f3.p.t - f3.p.b); }
+    });
+    for (var j = 0; j < 3; j++) BD.line(f3, W, R.map(function (r) { return Math.max(-12, 10 * Math.log10(r[4 + j])); }), j === fib ? BD.C.gold : 'rgba(170,205,240,.3)', j === fib ? 2 : 1);
+    BD.dot(f3, w, Math.max(-12, 10 * Math.log10(eta0)), BD.C.white, 4);
+    d3.g.fillStyle = BD.C.gold; d3.g.textAlign = 'right'; d3.g.fillText(FIB[fib].n, d3.w - 14, 36); d3.g.fillStyle = BD.C.dim; d3.g.fillText('other fibres', d3.w - 14, 50);
+    d3.g.fillStyle = 'rgba(240,128,128,.8)'; d3.g.fillText('shaded: > 1 % below 2 µm', d3.w - 14, 64); d3.g.textAlign = 'left';
+    // ---- readouts and caption
+    var R0 = rows()[0][0], lost = w < R0 - 1e-9;
+    q('[data-o="ne"]').textContent = lost ? '→ 1.444' : ne.toFixed(3);
+    q('[data-o="mfd"]').textContent = lost ? '> ' + rows()[0][2].toFixed(0) + ' µm' : mx.toFixed(2) + ' × ' + my.toFixed(2) + ' µm';
+    q('[data-o="eta"]').textContent = lost ? '–' : (10 * Math.log10(eta)).toFixed(2).replace('-', '−') + ' dB (' + (100 * eta).toFixed(0) + ' %)';
+    q('[data-o="tol"]').textContent = lost ? '–' : '± ' + tol.toFixed(2) + ' µm';
+    if (lost) {
+      q('[data-o="cap"]').innerHTML = '<b>Below about ' + (1000 * R0).toFixed(0) + ' nm the ' + pol + ' mode is barely guided:</b> its index is within a few parts in ten thousand of the oxide\'s and it spreads over tens of micrometres, more than the calculation window and far more than any BOX. In practice the light is lost to the substrate and the cladding. ' + (pol === 'TE' ? 'TM, with its field along the 220 nm height, survives to narrower tips: switch to TM.' : 'TE gives up even sooner.');
+      return;
+    }
+    var c = 'As the silicon narrows, the mode can no longer stay inside it: n<sub>eff</sub> falls towards the oxide index (1.444) and the mode spreads into the cladding. ';
+    if (mx < fm * 0.7) c += 'Here the mode is still smaller than the ' + FIB[fib].n + '\'s; a narrower tip would match it better. ';
+    else if (mx > fm * 1.4) c += 'Here the mode has grown larger than the ' + FIB[fib].n + '\'s; a wider tip would match it better. ';
+    else c += '<b>Near the best match</b> for the ' + FIB[fib].n + '. ';
+    if (sub > 0.01) c += 'But ' + (100 * sub).toFixed(0) + ' % of the mode now reaches more than 2 µm below the core, where a standard BOX ends: on a real wafer this light leaks into the silicon substrate (shaded), which is why edge couplers for large spots use a thick BOX, a substrate undercut or a second, larger waveguide. ';
+    if (fib === 2) c += 'No single silicon tip reaches 10 µm without leaking: SMF-28 needs a lensed fibre, a high-NA fibre spliced to it, or a multi-stage coupler. ';
+    if (S.dx > 0) c += 'The lateral tolerance grows with the spot: larger spots are easier to align. ';
+    c += ' <i>Modes computed in an infinite oxide with femwell; overlaps assume an ideal facet, no substrate and an infinitely slow taper. The offset uses the Gaussian estimate.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

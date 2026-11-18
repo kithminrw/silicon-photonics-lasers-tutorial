@@ -1,0 +1,114 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdCouple" role="group" aria-label="Interactive demo: alignment tolerance of two Gaussian modes">
+  <div class="bd-head"><span>// try it · alignment tolerance: two Gaussian modes, offset, tilt and gap (1550 nm)</span>
+    <span class="bd-seg" role="group" aria-label="Preset"><button type="button" data-pre="gc" aria-pressed="true">fibre to grating</button><button type="button" data-pre="uhna" aria-pressed="false">UHNA to taper</button><button type="button" data-pre="lens" aria-pressed="false">lensed fibre to taper</button></span>
+    <span class="bd-seg" role="group" aria-label="Medium in the gap"><button type="button" data-med="1" aria-pressed="true">air</button><button type="button" data-med="1.45" aria-pressed="false">index-matched</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>fibre mode (1/e² diameter) <b data-v="m1"></b></span><input type="range" data-k="m1" min="1.5" max="12" step="0.05" value="10.4" aria-label="fibre mode diameter"></label>
+    <label class="bd-sl"><span>chip mode (1/e² diameter) <b data-v="m2"></b></span><input type="range" data-k="m2" min="1.5" max="12" step="0.05" value="9.2" aria-label="chip mode diameter"></label>
+    <label class="bd-sl"><span>lateral offset <b data-v="d"></b></span><input type="range" data-k="d" min="0" max="6" step="0.02" value="0" aria-label="lateral offset"></label>
+    <label class="bd-sl"><span>tilt <b data-v="th"></b></span><input type="range" data-k="th" min="0" max="6" step="0.02" value="0" aria-label="tilt"></label>
+    <label class="bd-sl"><span>gap (waist to waist) <b data-v="z"></b></span><input type="range" data-k="z" min="0" max="60" step="0.1" value="10" aria-label="gap"></label>
+  </div>
+  <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: side view to scale, with the fibre's beam spreading across the gap and the chip's mode</span></div>
+  <div class="bd-scope"><canvas data-c="p" aria-hidden="true"></canvas><span class="bd-tag">coupling against each misalignment, the others held at their current values</span></div>
+  <div class="bd-read" aria-live="polite"><span>coupling <b data-o="eta">–</b></span><span>1 dB offset <b data-o="td">–</b></span><span>1 dB tilt <b data-o="tt">–</b></span><span>1 dB gap <b data-o="tz">–</b></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdCouple'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  var lam = 1.55, n = 1, pre = 'gc';
+  var PRE = { gc: [10.4, 9.2, 10], uhna: [4.0, 3.6, 0], lens: [2.5, 2.5, 0] };
+  var S = BD.bind(root, {
+    m1: { fmt: function (x) { return x.toFixed(2) + ' µm'; } }, m2: { fmt: function (x) { return x.toFixed(2) + ' µm'; } },
+    d: { fmt: function (x) { return x.toFixed(2) + ' µm'; } }, th: { fmt: function (x) { return x.toFixed(2) + '°'; } },
+    z: { fmt: function (x) { return x.toFixed(1) + ' µm'; } }
+  }, function () { draw(); });
+  function setSl(k, v) { var el = q('[data-k="' + k + '"]'); el.value = v; el.dispatchEvent(new Event('input', { bubbles: true })); }
+  BD.seg(root, 'pre', function (v) { pre = v; setSl('m1', PRE[v][0]); setSl('m2', PRE[v][1]); setSl('z', PRE[v][2]); setSl('d', 0); setSl('th', 0); draw(); });
+  BD.seg(root, 'med', function (v) { n = parseFloat(v); draw(); });
+  // complex helpers
+  function cm(a, b) { return [a[0] * b[0] - a[1] * b[1], a[0] * b[1] + a[1] * b[0]]; }
+  function cd(a, b) { var s = b[0] * b[0] + b[1] * b[1]; return [(a[0] * b[0] + a[1] * b[1]) / s, (a[1] * b[0] - a[0] * b[1]) / s]; }
+  function csqrt(a) { var r = Math.hypot(a[0], a[1]), t = Math.atan2(a[1], a[0]) / 2; return [Math.sqrt(r) * Math.cos(t), Math.sqrt(r) * Math.sin(t)]; }
+  // 1D overlap of a waist w1 at the chip facet with a beam of waist w2 whose waist is a distance z away,
+  // offset d and tilted th (radians, in the medium): integral of exp(-A x^2 + B x + C)
+  function eta1(w1, w2, d, th, z) {
+    var k = 2 * Math.PI * n / lam, zr = Math.PI * n * w2 * w2 / lam;
+    var qc = [-z, -zr];                                   // conjugate of q = -z + j zR
+    var jk2q = cm([0, k / 2], cd([1, 0], qc));             // j k / (2 q*)
+    var A = [1 / (w1 * w1) - jk2q[0], -jk2q[1]];
+    var B = [-2 * d * jk2q[0], -2 * d * jk2q[1] + k * th];
+    var C = [d * d * jk2q[0], d * d * jk2q[1]];
+    var E = cd(cm(B, B), [4 * A[0], 4 * A[1]]); E = [E[0] + C[0], E[1] + C[1]];
+    var sq = csqrt(cd([Math.PI, 0], A)), mag2 = (sq[0] * sq[0] + sq[1] * sq[1]) * Math.exp(2 * E[0]);
+    var wz = w2 * Math.sqrt(1 + Math.pow(z / zr, 2));
+    return mag2 / (Math.PI / 2 * w1 * wz);
+  }
+  function eta(d, thDeg, z) { var w1 = S.m2 / 2, w2 = S.m1 / 2, th = thDeg * Math.PI / 180; return eta1(w1, w2, d, th, z) * eta1(w1, w2, 0, 0, z); }
+  function tol(f, hi) {   // first value where coupling falls 1 dB below the aligned value along one axis
+    var e0 = f(0), lo = 0; if (f(hi) > e0 * Math.pow(10, -0.1)) return null;
+    for (var i = 0; i < 50; i++) { var m = (lo + hi) / 2; if (f(m) > e0 * Math.pow(10, -0.1)) lo = m; else hi = m; } return (lo + hi) / 2;
+  }
+  function draw() {
+    var e = eta(S.d, S.th, S.z), dB = 10 * Math.log10(e);
+    // ---- geometry: fibre on the left emitting to the right, chip on the right, isotropic scale fitted to the modes
+    (function () {
+      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, H = dv.h, w1 = S.m2 / 2, w2 = S.m1 / 2, zr = Math.PI * n * w2 * w2 / lam;
+      var wz = w2 * Math.sqrt(1 + Math.pow(S.z / zr, 2)), V = Math.max(8, 2.8 * Math.max(w1, wz) * 2 / 2 * 1.6 + 2 * S.d);
+      var span = Math.max(1.6 * V, S.z + 1.2 * V), sc = Math.min((dv.w - 30) / span, (H - 44) / V);
+      var xf = 16 + 0.35 * V * sc, xc = xf + S.z * sc, cy = 30 + (H - 34) / 2, half = 0.48 * V;
+      if (n > 1.2) { g.fillStyle = 'rgba(160,200,240,.08)'; g.fillRect(xf, cy - half * sc, xc - xf, 2 * half * sc); }
+      // fibre body and its mode
+      g.fillStyle = 'rgba(127,184,240,.10)'; g.fillRect(0, cy - half * sc, xf, 2 * half * sc);
+      g.fillStyle = 'rgba(127,184,240,.30)'; g.fillRect(0, cy - w2 * sc, xf, 2 * w2 * sc);
+      // chip, offset and tilted, with its mode
+      g.save(); g.translate(xc, cy); g.rotate(-S.th * Math.PI / 180); g.translate(0, -S.d * sc);
+      g.fillStyle = BD.GEO.ox; g.fillRect(0, -half * sc, dv.w, 2 * half * sc);
+      g.fillStyle = 'rgba(224,184,90,.30)'; g.fillRect(0, -w1 * sc, dv.w, 2 * w1 * sc);
+      g.strokeStyle = BD.GEO.edge; g.beginPath(); g.moveTo(0, -half * sc); g.lineTo(0, half * sc); g.stroke();
+      g.restore();
+      // the fibre's beam spreading across the gap (1/e^2 radius)
+      g.fillStyle = 'rgba(127,184,240,.22)'; g.beginPath();
+      for (var i = 0; i <= 60; i++) { var zz = S.z * i / 60, ww = w2 * Math.sqrt(1 + Math.pow(zz / zr, 2)); g.lineTo(xf + zz * sc, cy - ww * sc); }
+      for (i = 60; i >= 0; i--) { zz = S.z * i / 60; ww = w2 * Math.sqrt(1 + Math.pow(zz / zr, 2)); g.lineTo(xf + zz * sc, cy + ww * sc); }
+      g.fill();
+      g.strokeStyle = BD.C.blue; g.lineWidth = 1.2; g.beginPath();
+      for (i = 0; i <= 60; i++) { zz = S.z * i / 60; ww = w2 * Math.sqrt(1 + Math.pow(zz / zr, 2)); g.lineTo(xf + zz * sc, cy - ww * sc); } g.stroke();
+      g.beginPath(); for (i = 0; i <= 60; i++) { zz = S.z * i / 60; ww = w2 * Math.sqrt(1 + Math.pow(zz / zr, 2)); g.lineTo(xf + zz * sc, cy + ww * sc); } g.stroke(); g.lineWidth = 1;
+      g.strokeStyle = BD.C.dim; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(0, cy); g.lineTo(dv.w, cy); g.stroke(); g.setLineDash([]);
+      if (S.z > 0.5) BD.dim(g, xf, H - 8, xc, H - 8, 'gap ' + S.z.toFixed(1) + ' µm', BD.C.gold, 0);
+      BD.label(g, 'fibre, mode ' + S.m1.toFixed(1) + ' µm', 6, 40, BD.C.blue);
+      BD.label(g, 'chip, mode ' + S.m2.toFixed(1) + ' µm', dv.w - 8, 40, BD.C.gold, 'right');
+      BD.label(g, 'Rayleigh range in the gap ' + zr.toFixed(1) + ' µm', dv.w / 2, 40, BD.C.dim, 'center');
+      BD.scalebar(g, dv.w - 96, H - 14, sc, 80);
+    })();
+    // ---- three tolerance panels
+    var dv2 = BD.setup(q('[data-c="p"]')), W3 = dv2.w / 3, panels = [
+      { k: 'd', hi: 6, f: function (v) { return eta(v, S.th, S.z); }, cur: S.d, xt: [[0, '0'], [3, '3'], [6, '6 µm']], name: 'offset' },
+      { k: 'th', hi: 6, f: function (v) { return eta(S.d, v, S.z); }, cur: S.th, xt: [[0, '0'], [3, '3'], [6, '6°']], name: 'tilt' },
+      { k: 'z', hi: 60, f: function (v) { return eta(S.d, S.th, v); }, cur: S.z, xt: [[0, '0'], [30, '30'], [60, '60 µm']], name: 'gap' }];
+    panels.forEach(function (P, i) {
+      var f = BD.frame(dv2, { x: [0, P.hi], y: [-10, 0], pad: { l: i * W3 + 36, r: (2 - i) * W3 + 10, b: 22, t: 34 }, xt: P.xt, yt: i === 0 ? [[-10, '−10'], [-3, '−3'], [-1, '−1'], [0, '0 dB']] : [[-10, ''], [-3, ''], [-1, ''], [0, '']] });
+      var xs = [], ys = []; for (var j = 0; j <= 120; j++) { var v = P.hi * j / 120; xs.push(v); ys.push(Math.max(-10, 10 * Math.log10(P.f(v)))); }
+      BD.line(f, xs, ys, BD.C.blue, 1.8); BD.dot(f, P.cur, Math.max(-10, 10 * Math.log10(P.f(P.cur))), BD.C.white, 4);
+      dv2.g.fillStyle = BD.C.white; dv2.g.textAlign = 'right'; dv2.g.fillText(P.name, (i + 1) * W3 - 14, 48); dv2.g.textAlign = 'left';
+    });
+    // ---- readouts and caption
+    var td = tol(function (v) { return eta(v, 0, S.z); }, 20), tt = tol(function (v) { return eta(0, v, S.z); }, 30), tz = tol(function (v) { return eta(0, 0, S.z + v); }, 2000);
+    q('[data-o="eta"]').textContent = dB.toFixed(2) + ' dB';
+    q('[data-o="td"]').textContent = td === null ? '–' : '± ' + td.toFixed(2) + ' µm';
+    q('[data-o="tt"]').textContent = tt === null ? '–' : '± ' + tt.toFixed(2) + '°';
+    q('[data-o="tz"]').textContent = tz === null ? '> 2 mm' : '+ ' + tz.toFixed(1) + ' µm';
+    var c = 'Large modes tolerate offsets, because the 1 dB offset grows with the mode size, but they are sensitive to tilt, because their far field is narrow; small modes are the opposite, and they diverge quickly across a gap. ';
+    if (pre === 'gc') c += 'A fibre over a grating coupler is the forgiving case: about ±2 µm for 1 dB, with tens of micrometres of gap to spare. ';
+    else c += 'Edge coupling to a small spot needs sub-micrometre alignment and almost no gap: the beam doubles its area within a Rayleigh range of a few micrometres. ';
+    if (n > 1.2) c += 'Filling the gap with an index-matching medium lengthens the Rayleigh range and removes the facet reflection, so the gap matters less. ';
+    c += ' <i>Gaussian modes with flat phase at their waists; the offset and tilt are in the plane of the drawing.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

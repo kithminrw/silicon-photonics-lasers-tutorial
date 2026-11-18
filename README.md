@@ -7,16 +7,17 @@ across the **Si, SiN, thin-film LiNbO₃ (TFLN), BaTiO₃ (BTO) and InP** platfo
 
 **Read it online:** <https://www.kithminrw.com/silicon-photonics-lasers-tutorial/>
 
-> **Status: draft v0.1 (November 2026).** Parts I–III are written; the other parts are detailed outlines that
+> **Status: draft v0.1 (November 2026).** Parts I–IV are written; the other parts are detailed outlines that
 > are being filled in. Corrections are very welcome (see [Contributing](#contributing)).
 
 ## What makes it different
 
 - **Interactive demos in every chapter.** Small physical models that run in the browser with no
-  installation: change a slider and watch the light. Twenty are built so far, including a slab-waveguide
+  installation: change a slider and watch the light. Twenty-three are built so far, including a slab-waveguide
   mode solver, exact fibre LP modes, Fresnel reflection and evanescent fields, Gaussian-beam coupling,
   directional couplers, MMI self-imaging, Mach–Zehnder interferometers, ring resonators, Bragg gratings by
-  transfer matrix, grating-coupler phase matching, a fibre-array alignment game, a laser rate-equation
+  transfer matrix, grating-coupler phase matching and efficiency budget, an inverse-taper edge coupler from
+  femwell modes, Gaussian alignment tolerances, a fibre-array alignment game, a laser rate-equation
   simulator and a Vernier tunable laser.
 - **Real devices in 3D.** Devices from open process design kits (SiEPIC EBeam, CORNERSTONE, Luxtelligence
   TFLN) extruded from their layouts with their PDK layer stacks, which you can rotate, slice by layer
@@ -35,7 +36,7 @@ across the **Si, SiN, thin-film LiNbO₃ (TFLN), BaTiO₃ (BTO) and InP** platfo
 | I. Foundations | 1 Why integrated photonics · 2 Electromagnetic theory · 3 Gaussian beams and fibres · 4 Materials and platforms | **written** |
 | II. Waveguides | 5 Slab waveguide · 6 Channel waveguides · 7 Loss, dispersion, nonlinearity · 8 Bends, tapers, transitions | **written** |
 | III. Passive devices | 9 Couplers · 10 Y-branches and MMIs · 11 MZIs · 12 Rings · 13 Bragg gratings · 14 WDM and polarisation | **written** |
-| IV. Coupling and packaging | 15 Grating couplers · 16 Edge couplers · 17 Fibre arrays and packaging | outline + demos |
+| IV. Coupling and packaging | 15 Grating couplers · 16 Edge couplers · 17 Fibre arrays and packaging | **written** |
 | V. Active devices | 18 Thermo-optic tuning · 19 Electro-optic effects · 20 Modulators · 21 Photodetectors | outline |
 | VI. Lasers and amplifiers | 22 Absorption, emission, gain · 23 Semiconductor gain · 24 Fabry–Pérot laser · 25 Dynamics and noise · 26 Tunable lasers · 27 Lasers on silicon · 28 SOAs | outline + demos |
 | VII. Fabrication, testing, data | 29 Fabrication · 30 Design flow and open PDKs · 31 Testing · 32 Data analysis | outline |

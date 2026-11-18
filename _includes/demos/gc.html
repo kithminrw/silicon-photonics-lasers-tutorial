@@ -104,7 +104,7 @@
     if (Math.abs(S.th) < 1) c += '<b>Near-vertical coupling</b> also satisfies the condition for the backward direction, so the second-order Bragg reflection sends light back into the waveguide; that is why fibres are tilted by about 8–12°. ';
     c += 'The bandwidth comes from the fibre\'s angular acceptance: as the wavelength changes, the diffracted beam swings away from the fibre axis. ';
     c += 'Part of the light always goes down into the BOX; the reflection from the silicon substrate decides whether it returns in phase, which is why the BOX thickness matters.';
-    c += ' <i>Averaged-index model: the grating index is taken as the fill-factor average of the 220 nm and 150 nm slab indices. A full simulation of a real 70 nm-etch coupler puts the period nearer 630 nm (Lab 6). Peak efficiency is not modelled (Section 15.7).</i>';
+    c += ' <i>Averaged-index model: the grating index is taken as the fill-factor average of the 220 nm and 150 nm slab indices. A full simulation of a real 70 nm-etch coupler puts the period nearer 630 nm (Lab 6). Peak efficiency is not modelled here; see the efficiency-budget demo (Section 15.3).</i>';
     q('[data-o="cap"]').innerHTML = c;
   }
   BD.observe(root, draw);
