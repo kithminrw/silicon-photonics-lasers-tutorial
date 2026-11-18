@@ -6,10 +6,10 @@
     <label class="bd-sl"><span>temperature <b data-v="T"></b></span><input type="range" data-k="T" min="250" max="380" step="1" value="300" aria-label="temperature"></label>
   </div>
   <div class="bd-row">
-    <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">band diagram E(k): filled states and quasi-Fermi levels</span></div>
-    <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">material gain (+) or absorption (−) against wavelength</span></div>
+    <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">bands E(k): filled states, quasi-Fermi levels</span></div>
+    <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">gain (+) or absorption (−) against wavelength</span></div>
   </div>
-  <div class="bd-scope"><canvas data-c="p" aria-hidden="true"></canvas><span class="bd-tag">peak gain against carrier density, at this temperature</span></div>
+  <div class="bd-scope"><canvas data-c="p" aria-hidden="true"></canvas><span class="bd-tag">peak gain against carrier density</span></div>
   <div class="bd-read" aria-live="polite"><span>quasi-Fermi separation − E<sub>g</sub> <b data-o="df">–</b></span><span>peak gain <b data-o="gp">–</b></span><span>peak wavelength <b data-o="lp">–</b></span><span>transparency density <b data-o="nt">–</b></span></div>
   <p class="bd-caption" data-o="cap"></p>
 </div>
@@ -20,10 +20,11 @@
   // same model as figsrc/ch23_gain.py
   var HB = 1.054571817e-34, QE = 1.602176634e-19, M0 = 9.1093837e-31, KB = 1.380649e-23, C = 2.99792458e8, E0 = 8.8541878e-12;
   var EG0 = 0.80, DEGDT = -3.5e-4, ME = 0.045, MV = 0.46, EP = 25, NR = 3.5, TAU = 1e-13, MR = ME * MV / (ME + MV);
-  // Fermi-Dirac integral F_1/2 on a table, for inversion
+  // Fermi-Dirac integral F_1/2 on a table, for inversion. With x = t^2 the integrand 2t^2/(1 + e^(t^2 - eta)) is smooth,
+  // so a coarse midpoint rule is accurate; the sliders need eta from about -5 (holes) to +13 (electrons), so -10..30 covers it.
   var ETA = [], F = [];
   var DE = 0.2;
-  for (var e = -30; e <= 60.001; e += DE) { var s = 0, xm = Math.max(40, e + 40); for (var x = 0.01; x < xm; x += 0.02) s += Math.sqrt(x) / (1 + Math.exp(x - e)); ETA.push(e); F.push(2 / Math.sqrt(Math.PI) * s * 0.02); }
+  for (var e = -10; e <= 30.001; e += DE) { var s = 0, tm = Math.sqrt(Math.max(40, e + 40)); for (var t = 0.01; t < tm; t += 0.02) s += 2 * t * t / (1 + Math.exp(t * t - e)); ETA.push(e); F.push(2 / Math.sqrt(Math.PI) * s * 0.02); }
   function etaOf(n, m, T) {
     var Nc = 2 * Math.pow(m * M0 * KB * T / (2 * Math.PI * HB * HB), 1.5) / 1e6, u = n / Nc, lo = 0, hi = F.length - 1;
     while (hi - lo > 1) { var mid = (lo + hi) >> 1; if (F[mid] < u) lo = mid; else hi = mid; }
@@ -82,21 +83,23 @@
       // the gain-peak transition
       var dpk = pk.E - Eg, kk2 = Math.sqrt(Math.max(0, dpk * (MR / ME) / (0.6 * 0.05 / ME))), xp = cx + kk2 * kmax;
       g.strokeStyle = BD.C.gold; g.fillStyle = BD.C.gold; g.lineWidth = 2; g.beginPath(); g.moveTo(xp, Y(Eg + dpk * MR / ME)); g.lineTo(xp, Y(-dpk * MR / MV)); g.stroke(); g.lineWidth = 1;
-      BD.label(g, 'peak gain ' + (1239.84 / pk.E).toFixed(0) + ' nm', xp + 6, (Y(Eg) + Y(0)) / 2, BD.C.gold);
+      var pl = 'peak gain ' + (1239.84 / pk.E).toFixed(0) + ' nm', pr = xp + 10 + g.measureText(pl).width > dv.w;   // flip left of the arrow near the edge
+      BD.label(g, pl, pr ? xp - 6 : xp + 6, (Y(Eg) + Y(0)) / 2, BD.C.gold, pr ? 'right' : 'left');
       BD.label(g, 'conduction band (electrons)', 10, 36, BD.C.blue); BD.label(g, 'valence band (holes)', 10, dv.h - 8, BD.C.red);
       BD.label(g, 'E_g = ' + Eg.toFixed(3) + ' eV', cx + 6, (Y(Eg) + Y(0)) / 2 + 16, BD.C.axis);
     })();
     // ---- gain spectrum against wavelength
-    var lam = Es.map(function (E) { return 1239.84 / E; }), d2 = BD.setup(q('[data-c="s"]'));
-    var f2 = BD.frame(d2, { x: [1239.84 / (Eg + 0.22), 1239.84 / (Eg - 0.04)], y: [-4500, 2500], pad: { l: 48, b: 22, t: 30 },
-      xt: [[1300, '1300'], [1400, '1400'], [1500, '1500'], [1600, '1600'], [1700, '1700 nm']], yt: [[-4000, '−4000'], [-2000, '−2000'], [0, '0'], [2000, '2000 /cm']] });
+    var lam = Es.map(function (E) { return 1239.84 / E; }), d2 = BD.setup(q('[data-c="s"]')), la = 1239.84 / (Eg + 0.22), lb = 1239.84 / (Eg - 0.04);
+    var xt2 = [1300, 1400, 1500, 1600, 1700].filter(function (v) { return v >= la && v <= lb; }).map(function (v, i, a) { return [v, v + (i === a.length - 1 ? ' nm' : '')]; });   // only ticks in range; unit on the last
+    var f2 = BD.frame(d2, { x: [la, lb], y: [-4500, 2500], pad: { l: 48, b: 22, t: 30 },
+      xt: xt2, yt: [[-4000, '−4000'], [-2000, '−2000'], [0, '0'], [2000, '2000 /cm']] });
     BD.hline(f2, 0, BD.C.dim, [3, 3]);
     d2.g.fillStyle = 'rgba(127,224,160,.10)'; var xa = f2.X(1239.84 / r.dF), xb = f2.X(1239.84 / Eg); if (r.dF > Eg) d2.g.fillRect(Math.min(xa, xb), f2.p.t, Math.abs(xb - xa), d2.h - f2.p.t - f2.p.b);
     BD.line(f2, lam, r.g, BD.C.gold, 2); BD.dot(f2, 1239.84 / pk.E, Math.max(-4500, pk.g), BD.C.white, 4);
     d2.g.fillStyle = BD.C.green; d2.g.fillText('E_g < hν < E_Fc − E_Fv', 54, 44);
     // ---- peak gain against N
     var d3 = BD.setup(q('[data-c="p"]')), f3 = BD.frame(d3, { x: [0.3, 6], y: [-500, 2500], pad: { l: 48, b: 22, t: 26 },
-      xt: [[1, '1'], [2, '2'], [3, '3'], [4, '4'], [5, '5'], [6, '6 × 10¹⁸ cm⁻³']], yt: [[0, '0'], [1000, '1000'], [2000, '2000 /cm']] });
+      xt: [[1, '1'], [2, '2'], [3, '3'], [4, '4'], [5, d3.w < 520 ? '' : '5'], [6, '6 × 10¹⁸ cm⁻³']], yt: [[0, '0'], [1000, '1000'], [2000, '2000 /cm']] });   // no '5' when the unit label needs its room
     var ns = [], gs = []; for (i = 0; i <= 45; i++) { var nn = 0.3 + 5.7 * i / 45; ns.push(nn); gs.push(Math.max(-500, peak(nn * 1e18, T).g)); }
     BD.hline(f3, 0, BD.C.dim, [3, 3]); BD.line(f3, ns, gs, BD.C.blue, 2); BD.dot(f3, S.N, Math.max(-500, pk.g), BD.C.white, 4.5); BD.vline(f3, ntr / 1e18, BD.C.green, [3, 3], 'N_tr');
     // ---- readouts and caption

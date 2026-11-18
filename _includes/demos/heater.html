@@ -7,7 +7,7 @@
     <label class="bd-sl"><span>heater power <b data-v="P"></b></span><input type="range" data-k="P" min="0" max="40" step="0.1" value="13" aria-label="heater power"></label>
     <label class="bd-sl"><span>heater length <b data-v="L"></b></span><input type="range" data-k="L" min="50" max="1000" step="10" value="300" aria-label="heater length"></label>
   </div>
-  <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: cross-section to scale, coloured by the temperature rise</span></div>
+  <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: section to scale, coloured by ΔT</span></div>
   <div class="bd-row">
     <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">step response at the waveguide (log time)</span></div>
     <div class="bd-scope tall"><canvas data-c="m" aria-hidden="true"></canvas><span class="bd-tag">power for π against speed, all six designs</span></div>
@@ -39,7 +39,7 @@
     // ---- geometry with the temperature map
     (function () {
       var dv = BD.setup(q('[data-c="g"]')), g = dv.g, M = C.map, x0 = M.x[0], x1 = M.x[1], y0 = M.y[0], y1 = M.y[1];
-      var sc = Math.min((dv.w - 20) / (x1 - x0), (dv.h - 30) / (y1 - y0)), ox = (dv.w - sc * (x1 - x0)) / 2, oy = 22;
+      var sc = Math.min((dv.w - 20) / (x1 - x0), (dv.h - 30) / (y1 - y0)), ox = (dv.w - sc * (x1 - x0)) / 2, oy = Math.min(30, 22 + (dv.h - 30 - sc * (y1 - y0)));   // a little lower when there is room: clear of the panel tag
       var X = function (x) { return ox + (x - x0) * sc; }, Y = function (y) { return oy + (y1 - y) * sc; };
       var dx = (x1 - x0) / (M.nx - 1), dy = (y1 - y0) / (M.ny - 1);
       for (var j = 0; j < M.ny; j++) for (var i = 0; i < M.nx; i++) {
@@ -61,8 +61,9 @@
       BD.label(g, ht === 'metal' ? 'TiN heater' : 'doped slab (heater)', X(ht === 'metal' ? 1.3 : 1.7), Y(ht === 'metal' ? 1.9 : 0.5), BD.C.white);
       BD.scalebar(g, dv.w - 100, dv.h - 10, sc, 80);
       // colour key
-      for (var k = 0; k <= 60; k++) { g.fillStyle = ramp(2 * k / 60); g.fillRect(dv.w - 160 + k * 2, 30, 2.2, 8); }
-      BD.label(g, '0', dv.w - 162, 50, BD.C.white); BD.label(g, (dT).toFixed(1) + ' K', dv.w - 100, 50, BD.C.white, 'center'); BD.label(g, (2 * dT).toFixed(0) + ' K', dv.w - 40, 50, BD.C.white, 'right');
+      var ky = oy + (y1 - y0) * sc + 34 <= dv.h - 22 ? oy + (y1 - y0) * sc + 12 : 30;   // below the map when there is room, else over its top-right corner
+      for (var k = 0; k <= 60; k++) { g.fillStyle = ramp(2 * k / 60); g.fillRect(dv.w - 160 + k * 2, ky, 2.2, 8); }
+      BD.label(g, '0', dv.w - 162, ky + 20, BD.C.white); BD.label(g, (dT).toFixed(1) + ' K', dv.w - 100, ky + 20, BD.C.white, 'center'); BD.label(g, (2 * dT).toFixed(0) + ' K', dv.w - 40, ky + 20, BD.C.white, 'right');
     })();
     // ---- step responses of the three configurations of this heater
     var d2 = BD.setup(q('[data-c="s"]')), f2 = BD.frame(d2, { x: [1e-8, 5e-3], y: [0, 1.05], xlog: true, pad: { l: 34, b: 22, t: 30 },
@@ -78,7 +79,9 @@
     DATA.cases.forEach(function (K) {
       var on = K.heater === ht && K.config === cf, tr = K.t90 - K.t10;
       BD.dot(f3, tr, K.P_pi, on ? BD.C.white : (K.heater === 'metal' ? BD.C.gold : BD.C.red), on ? 5.5 : 3.5);
-      d3.g.fillStyle = on ? BD.C.white : BD.C.axis; d3.g.textAlign = K.heater === 'metal' ? 'left' : 'right'; d3.g.fillText((K.heater === 'metal' ? 'TiN ' : 'doped ') + K.config, f3.X(tr) + (K.heater === 'metal' ? 8 : -8), f3.Y(K.P_pi) + (K.heater === 'metal' ? -4 : 10)); d3.g.textAlign = 'left';
+      var kl = (K.heater === 'metal' ? 'TiN ' : 'doped ') + K.config, kw = d3.g.measureText(kl).width, kr = K.heater === 'metal';   // TiN labels right of the dot, doped left, unless that runs off the panel
+      if (kr && f3.X(tr) + 8 + kw > d3.w - 2) kr = false; else if (!kr && f3.X(tr) - 8 - kw < 2) kr = true;
+      d3.g.fillStyle = on ? BD.C.white : BD.C.axis; d3.g.textAlign = kr ? 'left' : 'right'; d3.g.fillText(kl, f3.X(tr) + (kr ? 8 : -8), f3.Y(K.P_pi) + (K.heater === 'metal' ? -4 : 10)); d3.g.textAlign = 'left';
     });
     // ---- readouts and caption
     q('[data-o="pp"]').textContent = C.P_pi.toFixed(1) + ' mW';

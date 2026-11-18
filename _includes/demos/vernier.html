@@ -8,10 +8,10 @@
     <label class="bd-sl"><span>heater on ring 1 (phase) <b data-v="p1"></b></span><input type="range" data-k="p1" min="0" max="2" step="0.005" value="0" aria-label="ring 1 phase"></label>
     <label class="bd-sl"><span>heater on ring 2 (phase) <b data-v="p2"></b></span><input type="range" data-k="p2" min="0" max="2" step="0.005" value="0" aria-label="ring 2 phase"></label>
   </div>
-  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: gain chip, two rings with heaters and a loop mirror (rings to scale with each other)</span></div>
-  <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">ring drop spectra, their product (twice, loop mirror) and the gain</span></div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: rings to scale, heaters in orange</span></div>
+  <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">two ring spectra, product² (two passes), gain</span></div>
   <div class="bd-row">
-    <div class="bd-scope tall"><canvas data-c="m" aria-hidden="true"></canvas><span class="bd-tag">tuning map: lasing wavelength against the two heater phases</span></div>
+    <div class="bd-scope tall"><canvas data-c="m" aria-hidden="true"></canvas><span class="bd-tag">tuning map: lasing λ against the two heaters</span></div>
     <div class="bd-scope tall"><canvas data-c="z" aria-hidden="true"></canvas><span class="bd-tag">zoom: filter peak and cavity modes</span></div>
   </div>
   <div class="bd-read" aria-live="polite"><span>FSR<sub>1</sub> / FSR<sub>2</sub> <b data-o="f">–</b></span><span>Vernier FSR <b data-o="v">–</b></span><span>lasing at <b data-o="l">–</b></span><span>next-best supermode <b data-o="s">–</b></span></div>
@@ -66,7 +66,7 @@
     BD.line(f, xs, gs, BD.C.dim, 1.2, [5, 4]); BD.line(f, xs, pr, BD.C.green, 2);
     BD.vline(f, res[0], BD.C.white, [3, 3], 'lasing');
     // ---- tuning map
-    var dm = BD.setup(q('[data-c="m"]')), g = dm.g, sz = Math.min(dm.w - 70, dm.h - 40), ox = 40, oy = 24, img = buildMap();
+    var dm = BD.setup(q('[data-c="m"]')), g = dm.g, sz = Math.min(dm.w - 88, dm.h - 40), ox = 40, oy = 24, img = buildMap();
     g.imageSmoothingEnabled = false; g.drawImage(img, ox, oy, sz, sz); g.strokeStyle = BD.C.axis; g.strokeRect(ox, oy, sz, sz);
     var cx = ox + sz * (S.p1 / 2), cy = oy + sz * (1 - S.p2 / 2);
     g.strokeStyle = '#fff'; g.lineWidth = 1.5; g.beginPath(); g.arc(cx, cy, 5, 0, 7); g.stroke(); g.lineWidth = 1;
@@ -83,24 +83,28 @@
     modes.forEach(function (m) { if (m > zl0 && m < zl1) { var v = gain(m) * Math.pow(drop(m, S.R1, p1) * drop(m, S.R2, p2), 2); dz.g.strokeStyle = Math.abs(m - res[0]) < 1e-9 ? BD.C.gold : 'rgba(170,205,240,.45)'; dz.g.beginPath(); dz.g.moveTo(fz.X(m), fz.Y(0)); dz.g.lineTo(fz.X(m), fz.Y(v)); dz.g.stroke(); } });
     // ---- geometry: gain chip -> bus -> ring 1 -> middle waveguide -> ring 2 -> top waveguide -> loop mirror
     (function () {
-      var dv2 = BD.setup(q('[data-c="g"]')), gg = dv2.g, top = 26, bot = dv2.h - 10, gp = 1.0;
-      var sc = Math.min((bot - top) / (2 * S.R1 + 2 * S.R2 + 6 * gp + 4), (dv2.w - 300) / (2 * S.R1 + 2 * S.R2 + 30));
-      var chipW = 96, x1 = 140 + S.R1 * sc, x2 = x1 + (S.R1 + S.R2 + 12) * sc;
+      // the scale comes from the room the drawing needs: chip, the two rings, the top waveguide and the loop mirror with its label.
+      // Narrow panels (phones) get a compact layout: short chip, short top waveguide, labels inside the rings and above the loop.
+      var dv2 = BD.setup(q('[data-c="g"]')), gg = dv2.g, top = 26, bot = dv2.h - 10, gp = 1.0, cmp = dv2.w < 520;
+      var chipW = cmp ? 58 : 96, xs = cmp ? 90 : 140, run = cmp ? 8 : 40, tail = cmp ? 38 : 107;
+      var sc = Math.max(0.1, Math.min((bot - top) / (2 * S.R1 + 2 * S.R2 + 6 * gp + 4), (dv2.w - xs - tail) / (2 * S.R1 + 2 * S.R2 + 12 + run)));
+      var x1 = xs + S.R1 * sc, x2 = x1 + (S.R1 + S.R2 + 12) * sc;
       var yb = bot - 6, c1 = yb - (S.R1 + gp) * sc, yM = yb - (2 * S.R1 + 2 * gp) * sc, c2 = yM - (S.R2 + gp) * sc, yT = yM - (2 * S.R2 + 2 * gp) * sc;
-      gg.fillStyle = 'rgba(201,194,176,.85)'; gg.fillRect(10, yb - 11, chipW, 22); BD.label(gg, 'III–V gain chip', 14, yb + 4, '#172036');
+      gg.fillStyle = 'rgba(201,194,176,.85)'; gg.fillRect(10, yb - 11, chipW, 22); BD.label(gg, cmp ? 'gain chip' : 'III–V gain chip', 14, yb + 4, '#172036');
       BD.wg(gg, [[10 + chipW, yb], [x1 + (S.R1 + 8) * sc, yb]], 3);
       BD.wg(gg, [[x1 - (S.R1 + 8) * sc, yM], [x2 + (S.R2 + 8) * sc, yM]], 3);
-      var lx = x2 + (S.R2 + 40) * sc + 20; BD.wg(gg, [[x2 - (S.R2 + 8) * sc, yT], [lx, yT]], 3);
+      var lx = x2 + (S.R2 + run) * sc + 20; BD.wg(gg, [[x2 - (S.R2 + 8) * sc, yT], [lx, yT]], 3);
       gg.strokeStyle = BD.GEO.si; gg.lineWidth = 3; gg.beginPath(); gg.arc(lx, yT + 14, 14, -Math.PI / 2, Math.PI * 1.25); gg.stroke(); gg.lineWidth = 1;
-      BD.label(gg, 'loop mirror', lx + 20, yT + 18, BD.C.axis);
+      if (cmp) BD.label(gg, 'loop mirror', Math.min(lx, dv2.w - 36), yT + 40, BD.C.axis, 'center'); else BD.label(gg, 'loop mirror', lx + 20, yT + 18, BD.C.axis);
       [[x1, c1, S.R1, S.p1, BD.C.gold], [x2, c2, S.R2, S.p2, BD.C.blue]].forEach(function (rr, i) {
         gg.strokeStyle = BD.GEO.si; gg.lineWidth = 3; gg.beginPath(); gg.arc(rr[0], rr[1], rr[2] * sc, 0, 7); gg.stroke();
         gg.strokeStyle = 'rgba(224,138,58,' + (0.25 + 0.65 * (rr[3] % 2) / 2).toFixed(2) + ')'; gg.lineWidth = 6;
         gg.beginPath(); gg.arc(rr[0], rr[1], rr[2] * sc, Math.PI * 0.6, Math.PI * 1.4); gg.stroke(); gg.lineWidth = 1;
-        BD.label(gg, 'R' + (i + 1) + ' = ' + rr[2].toFixed(2) + ' µm', rr[0] + rr[2] * sc + 8, rr[1] + 3, rr[4]);
+        if (cmp) BD.label(gg, 'R' + (i + 1), rr[0], rr[1] + 3, rr[4], 'center');
+        else BD.label(gg, 'R' + (i + 1) + ' = ' + rr[2].toFixed(2) + ' µm', rr[0] + rr[2] * sc + 8, rr[1] + 3, rr[4]);
       });
       BD.label(gg, '← light out', 10, yb - 16, BD.C.white);
-      BD.label(gg, 'heaters (orange) glow with their phase', dv2.w - 8, top + 4, BD.C.dim, 'right');
+      if (!cmp) BD.label(gg, 'heaters glow with their phase', dv2.w - 8, top + 4, BD.C.dim, 'right');
     })();
     // ---- readouts
     var F1 = lam0 * lam0 / (ng * 2 * Math.PI * S.R1), F2 = lam0 * lam0 / (ng * 2 * Math.PI * S.R2), FV = F1 * F2 / Math.abs(F1 - F2);

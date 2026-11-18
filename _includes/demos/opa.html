@@ -7,7 +7,7 @@
     <label class="bd-sl"><span>phase step between emitters Δφ <b data-v="ph"></b></span><input type="range" data-k="ph" min="-180" max="180" step="1" value="60" aria-label="phase step"></label>
   </div>
   <div class="bd-row">
-    <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: emitters to scale (coloured by phase) and the beams they form</span></div>
+    <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: emitters to scale and their beams</span></div>
     <div class="bd-scope tall"><canvas data-c="f" aria-hidden="true"></canvas><span class="bd-tag">far field against angle</span></div>
   </div>
   <div class="bd-read" aria-live="polite"><span>steering angle <b data-o="th">–</b></span><span>beam width <b data-o="bw">–</b></span><span>grating lobes <b data-o="gl">–</b></span><span>grating-lobe-free range <b data-o="fr">–</b></span></div>
@@ -38,11 +38,13 @@
       L.forEach(function (l) {
         var col = l.m === 0 ? BD.C.gold : 'rgba(240,138,106,.85)', ex = cx + Rr * Math.sin(l.th), ey = y - Rr * Math.cos(l.th);
         g.strokeStyle = col; g.lineWidth = l.m === 0 ? 3 : 2; g.beginPath(); g.moveTo(cx, y - 6); g.lineTo(ex, ey); g.stroke(); g.lineWidth = 1;
-        BD.label(g, l.m === 0 ? 'main beam' : 'grating lobe', ex + (l.th > 0 ? 6 : -6), ey, col, l.th > 0 ? 'left' : 'right');
+        // label at the beam's end, or, for a steep beam on a narrow panel, further down the beam (just under it) so it stays inside
+        var lab = l.m === 0 ? 'main beam' : 'grating lobe', sn = Math.abs(Math.sin(l.th)), tl = sn > 0.05 ? Math.min(1, (dv.w / 2 - 10 - g.measureText(lab).width) / (Rr * sn)) : 1;
+        BD.label(g, lab, cx + tl * (ex - cx) + (l.th > 0 ? 6 : -6), y - 6 + tl * (ey - y + 6) + (tl < 1 ? 10 : 0), col, l.th > 0 ? 'left' : 'right');
       });
       g.strokeStyle = BD.C.dim; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(cx, y - 6); g.lineTo(cx, 30); g.stroke(); g.setLineDash([]);
       BD.label(g, 'colour = phase', 8, 36, BD.C.dim); BD.label(g, 'aperture ' + (S.N * S.d).toFixed(0) + ' µm', cx, y + 22, BD.C.axis, 'center');
-      BD.scalebar(g, dv.w - 100, 36, sc, 80);
+      BD.scalebar(g, dv.w - 100, dv.h - 10, sc, 80);   // bottom right: the beams all point upwards, so nothing reaches it
     })();
     // ---- far field
     var xs = [], ys = []; for (var i = 0; i <= 1440; i++) { var th = -Math.PI / 2 + Math.PI * i / 1440; xs.push(th * 180 / Math.PI); ys.push(10 * Math.log10(Math.max(af(th), 1e-4))); }

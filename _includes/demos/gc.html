@@ -7,7 +7,7 @@
     <label class="bd-sl"><span>fill factor (unetched fraction) <b data-v="ff"></b></span><input type="range" data-k="ff" min="0.2" max="0.9" step="0.01" value="0.5" aria-label="fill factor"></label>
     <label class="bd-sl"><span>fibre angle θ (in air) <b data-v="th"></b></span><input type="range" data-k="th" min="-5" max="25" step="0.1" value="8" aria-label="fibre angle"></label>
   </div>
-  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: side view of the grating to scale, with the fibre at angle θ</span></div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: side view to scale, fibre at angle θ</span></div>
   <div class="bd-row">
     <div class="bd-scope tall"><canvas data-c="k" aria-hidden="true"></canvas><span class="bd-tag">wavevector diagram at the centre wavelength</span></div>
     <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">relative coupling against wavelength</span></div>
@@ -65,8 +65,9 @@
     // ---- spectrum
     var d2 = BD.setup(q('[data-c="s"]')), f = BD.frame(d2, { x: [l0, l1], y: [-12, 0.5], pad: { l: 40, b: 22 },
       xt: [[l0, (1000 * l0).toFixed(0)], [lc, (1000 * lc).toFixed(0) + ' nm'], [l1, (1000 * l1).toFixed(0)]], yt: [[-12, '−12'], [-6, '−6'], [-1, '−1'], [0, '0 dB']] });
-    d2.g.fillStyle = 'rgba(224,184,90,.1)'; d2.g.fillRect(f.X(1.53), f.p.t, f.X(1.565) - f.X(1.53), d2.h - f.p.t - f.p.b);
-    d2.g.fillStyle = 'rgba(233,208,143,.7)'; d2.g.fillText('C band', f.X(1.532), d2.h - f.p.b - 6);
+    var cba = Math.max(f.X(1.53), f.p.l), cbb = Math.min(f.X(1.565), d2.w - f.p.r);   // the C band, clipped to the plot; its label only where it fits
+    if (cbb > cba) { d2.g.fillStyle = 'rgba(224,184,90,.1)'; d2.g.fillRect(cba, f.p.t, cbb - cba, d2.h - f.p.t - f.p.b);
+      if (cba + 2 + d2.g.measureText('C band').width <= d2.w - f.p.r) { d2.g.fillStyle = 'rgba(233,208,143,.7)'; d2.g.fillText('C band', cba + 2, d2.h - f.p.b - 6); } }
     BD.line(f, xs, ys, BD.C.blue, 2); BD.hline(f, -1, BD.C.dim, [3, 3]);
     // ---- geometry: cross-section of the shallow-etched grating and the tilted fibre
     (function () {
@@ -82,7 +83,8 @@
       }
       var xg = x0 + nT * S.P * sc; gg.fillRect(xg, base - (tSi - etch) * sc, dv2.w * 0.05, (tSi - etch) * sc);
       BD.dim(gg, x0, base + 12, x0 + S.P * sc, base + 12, 'Λ = ' + (1000 * S.P).toFixed(0) + ' nm', BD.C.gold, 10);
-      BD.label(gg, 'fill ' + (100 * S.ff).toFixed(0) + ' %, 70 nm etch', x0 + 2 * S.P * sc, base + 26, BD.C.axis);
+      var lamW = gg.measureText('Λ = ' + (1000 * S.P).toFixed(0) + ' nm').width;   // the fill label starts clear of the Λ label
+      BD.label(gg, 'fill ' + (100 * S.ff).toFixed(0) + ' %, 70 nm etch', Math.max(x0 + 2 * S.P * sc, x0 + S.P * sc / 2 + lamW / 2 + 8), base + 26, BD.C.axis);
       // fibre: axis tilted by theta (in air) from the normal, aimed at the grating centre
       var xc = x0 + nT * S.P * sc / 2, th = S.th * Math.PI / 180, Lf = Math.max(40, base - 70), ux = Math.sin(th), uy = -Math.cos(th);
       var fx = xc + ux * Lf, fy = base + uy * Lf, half = Math.min(4.5 * sc, 60);
@@ -90,7 +92,10 @@
       gg.fillStyle = 'rgba(127,184,240,.35)'; gg.fillRect(-half / 1.7, -60, 2 * half / 1.7, 60); gg.restore();
       gg.strokeStyle = BD.C.green; gg.setLineDash([4, 3]); gg.beginPath(); gg.moveTo(xc, base - tSi * sc); gg.lineTo(fx, fy); gg.stroke(); gg.setLineDash([]);
       gg.strokeStyle = BD.C.dim; gg.beginPath(); gg.moveTo(xc, base - tSi * sc); gg.lineTo(xc, fy); gg.stroke();
-      BD.label(gg, 'fibre, θ = ' + S.th.toFixed(1) + '°', fx + 10, fy + 14, BD.C.white);
+      // the fibre's label right of the fibre, or left of it when it would run into the scale bar's label or off the panel
+      var fl = 'fibre, θ = ' + S.th.toFixed(1) + '°', flw = gg.measureText(fl).width, sbp = BD.nice(80 / sc) * sc, sbx = dv2.w - 110 + sbp / 2, sbw = 30;
+      var hit = fx + 10 + flw > dv2.w - 4 || (fx + 10 < sbx + sbw && fx + 10 + flw > sbx - sbw && Math.abs(fy + 14 - (base - 45)) < 11);
+      BD.label(gg, fl, hit ? fx - 10 : fx + 10, fy + 14, BD.C.white, hit ? 'right' : 'left');
       BD.label(gg, nc > 1.2 ? 'oxide cladding' : 'air', dv2.w - 8, 34, BD.C.dim, 'right');
       BD.label(gg, 'BOX', dv2.w - 8, dv2.h - 6, BD.C.dim, 'right');
       BD.scalebar(gg, dv2.w - 110, base - 40, sc, 80);

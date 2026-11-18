@@ -6,12 +6,12 @@
     <label class="bd-sl"><span>silicon width under the III–V <b data-v="w"></b></span><input type="range" data-k="w" min="0.4" max="1.5" step="0.01" value="0.5" aria-label="silicon width"></label>
   </div>
   <div class="bd-row">
-    <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: cross-section to scale, with the computed mode intensity</span></div>
-    <div class="bd-scope tall"><canvas data-c="t" aria-hidden="true"></canvas><span class="bd-tag">the taper in top view (lengths compressed, widths stretched)</span></div>
+    <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: to scale, with the computed mode</span></div>
+    <div class="bd-scope tall"><canvas data-c="t" aria-hidden="true"></canvas><span class="bd-tag">taper top view: length squeezed, width stretched</span></div>
   </div>
   <div class="bd-row">
-    <div class="bd-scope tall"><canvas data-c="n" aria-hidden="true"></canvas><span class="bd-tag">effective index of the supermodes against silicon width</span></div>
-    <div class="bd-scope tall"><canvas data-c="c" aria-hidden="true"></canvas><span class="bd-tag">where the selected mode lives: MQW and silicon confinement</span></div>
+    <div class="bd-scope tall"><canvas data-c="n" aria-hidden="true"></canvas><span class="bd-tag">supermode index against silicon width</span></div>
+    <div class="bd-scope tall"><canvas data-c="c" aria-hidden="true"></canvas><span class="bd-tag">MQW and silicon share of the selected mode</span></div>
   </div>
   <div class="bd-read" aria-live="polite"><span>n<sub>eff</sub> <b data-o="n">–</b></span><span>in the MQW region <b data-o="gm">–</b></span><span>in the silicon <b data-o="gs">–</b></span><span>field drawn for <b data-o="mw">–</b></span></div>
   <p class="bd-caption" data-o="cap"></p>
@@ -52,7 +52,8 @@
         g.fillStyle = ramp(v); g.fillRect(X(x0 + i * dx - dx / 2), Y(y0 + j * dy + dy / 2), dx * sc + 0.6, dy * sc + 0.6);
       }
       BD.label(g, 'p-InP', X(1.6), Y(1.6), BD.C.white); BD.label(g, 'MQW', X(1.6), Y(ytop + 0.25), 'rgba(240,138,106,1)');
-      BD.label(g, 'n-InP contact layer', X(1.6), Y(ytop + 0.02) + 12, BD.C.axis); BD.label(g, 'Si ' + w.toFixed(2) + ' µm', X(w / 2) + 4, Y(0.25), BD.C.white);
+      BD.label(g, 'n-InP contact', X(-0.95), Y(ytop + 0.02) + 12, BD.C.axis, 'right');   // left of the core: the Si label takes the right
+      BD.label(g, 'Si ' + w.toFixed(2) + ' µm', X(w / 2) + 4, Y(0.25), BD.C.white);
       BD.label(g, 'oxide', X(-2.9), Y(-0.4), BD.C.dim);
       BD.scalebar(g, dv.w - 90, dv.h - 6, sc, 70);
     })();
@@ -64,7 +65,7 @@
       g.fillStyle = BD.GEO.si; g.beginPath(); g.moveTo(xa, cy - 0.2 * k); g.lineTo(xa + 60, cy - 0.2 * k); g.lineTo(xw(1.5), cy - 0.75 * k); g.lineTo(xb, cy - 0.75 * k); g.lineTo(xb, cy + 0.75 * k); g.lineTo(xw(1.5), cy + 0.75 * k); g.lineTo(xa + 60, cy + 0.2 * k); g.lineTo(xa, cy + 0.2 * k); g.closePath(); g.fill();
       g.strokeStyle = BD.C.gold; g.setLineDash([4, 3]); g.beginPath(); g.moveTo(xw(w), 30); g.lineTo(xw(w), dv.h - 22); g.stroke(); g.setLineDash([]);
       BD.label(g, 'gain section', xa, cy - 1.5 * k - 8, 'rgba(240,138,106,1)'); BD.label(g, 'III–V mesa tip', xw(1.5) - 4, cy - 0.9 * k, 'rgba(240,138,106,1)', 'right');
-      BD.label(g, 'passive Si', xb, cy + 0.75 * k + 14, BD.C.axis, 'right'); BD.label(g, 'here: Si ' + w.toFixed(2) + ' µm', xw(w) + 4, dv.h - 26, BD.C.gold);
+      BD.label(g, 'passive Si', xb, cy + 0.75 * k + 14, BD.C.axis, 'right'); var hl = 'here: Si ' + w.toFixed(2) + ' µm', hr = xw(w) + 8 + g.measureText(hl).width > dv.w; BD.label(g, hl, hr ? xw(w) - 4 : xw(w) + 4, dv.h - 26, BD.C.gold, hr ? 'right' : 'left');
     })();
     // ---- n_eff against width
     var d3 = BD.setup(q('[data-c="n"]')), f3 = BD.frame(d3, { x: [0.4, 1.5], y: [3.06, 3.30], pad: { l: 44, b: 22, t: 30 },

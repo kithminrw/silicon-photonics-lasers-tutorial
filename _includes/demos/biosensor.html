@@ -8,8 +8,8 @@
     <label class="bd-sl"><span>resonance-tracking noise σ <b data-v="s"></b></span><input type="range" data-k="s" min="0.1" max="10" step="0.1" value="1" aria-label="tracking noise"></label>
   </div>
   <div class="bd-row">
-    <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: cross-section in water, with the evanescent field reaching the fluid (to scale)</span></div>
-    <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">resonance before (blue) and after (gold) the index change</span></div>
+    <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: in water, to scale, evanescent field</span></div>
+    <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">resonance before (blue) and after (gold)</span></div>
   </div>
   <div class="bd-read" aria-live="polite"><span>bulk sensitivity <b data-o="S">–</b></span><span>resonance shift <b data-o="sh">–</b></span><span>linewidth <b data-o="fw">–</b></span><span>limit of detection (3σ) <b data-o="lod">–</b></span></div>
   <p class="bd-caption" data-o="cap"></p>
@@ -39,7 +39,7 @@
       }
       g.strokeStyle = BD.C.white; g.strokeRect(X(-0.25), Y(0.22), 0.5 * sc, 0.22 * sc);
       BD.label(g, 'water (analyte), n = 1.318', 8, 36, BD.C.blue); BD.label(g, 'oxide', 8, dv.h - 6, BD.C.dim);
-      BD.label(g, 'field decays in ' + (1000 / gam).toFixed(0) + ' nm (1/γ)', X(0.3), Y(0.5), BD.C.gold);
+      var dl = 'tail 1/γ = ' + (1000 / gam).toFixed(0) + ' nm'; BD.label(g, dl, Math.min(X(0.3), dv.w - 4 - g.measureText(dl).width), Y(0.5), BD.C.gold);
       BD.scalebar(g, dv.w - 100, 36, sc, 80);
     })();
     // ---- resonance before and after

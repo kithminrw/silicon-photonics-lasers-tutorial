@@ -8,7 +8,7 @@
     <label class="bd-sl"><span>drive swing <b data-v="V"></b></span><input type="range" data-k="V" min="0.3" max="6" step="0.05" value="2" aria-label="drive swing"></label>
     <label class="bd-sl"><span>bias phase <b data-v="b"></b></span><input type="range" data-k="b" min="0" max="180" step="1" value="90" aria-label="bias phase"></label>
   </div>
-  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top view, length to scale along the arms (widths stretched), travelling-wave electrodes</span></div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: arm length to scale, widths stretched</span></div>
   <div class="bd-row">
     <div class="bd-scope tall"><canvas data-c="t" aria-hidden="true"></canvas><span class="bd-tag">transfer curve, bias and swing</span></div>
     <div class="bd-scope tall"><canvas data-c="e" aria-hidden="true"></canvas><span class="bd-tag">optical eye (2 symbols)</span></div>
@@ -43,8 +43,8 @@
     var er = 10 * Math.log10(hi / Math.max(lo, 1e-6)), avg = means.reduce(function (s, x) { return s + x; }, 0) / means.length, il = -10 * Math.log10(avg);
     // ---- geometry
     (function () {
-      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, x0 = 50, x1 = dv.w - 50, cy = dv.h / 2 + 6, sep = 26, Lpx = x1 - x0 - 140, scl = Lpx / 20;
-      var ea = x0 + 70, eb = ea + S.L * scl;
+      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, x0 = 50, x1 = dv.w - 50, cy = dv.h / 2 + 6, sep = 26, Lpx = x1 - x0 - 98, scl = Lpx / 20;   // the 20 mm ruler spans the straight arms
+      var ea = x0 + 58, eb = ea + S.L * scl;
       var up = [[x0 - 40, cy], [x0, cy], [x0 + 40, cy - sep], [x1 - 40, cy - sep], [x1, cy], [x1 + 40, cy]];
       var dn = [[x0, cy], [x0 + 40, cy + sep], [x1 - 40, cy + sep], [x1, cy]];
       BD.glow(g, up, 0.7, 7); BD.glow(g, dn, 0.7, 7);
@@ -54,7 +54,7 @@
       g.fillRect(ea, cy - sep - 16, eb - ea, 8); g.fillRect(ea, cy - 5, eb - ea, 10); g.fillRect(ea, cy + sep + 8, eb - ea, 8);
       BD.label(g, 'G', ea - 12, cy - sep - 9, BD.C.axis); BD.label(g, 'S', ea - 12, cy + 4, BD.C.axis); BD.label(g, 'G', ea - 12, cy + sep + 16, BD.C.axis);
       g.fillStyle = BD.C.gold; g.beginPath(); g.moveTo(ea - 26, cy); g.lineTo(ea - 18, cy - 4); g.lineTo(ea - 18, cy + 4); g.fill();
-      BD.label(g, 'RF in', ea - 30, cy + 18, BD.C.gold); BD.label(g, '50 Ω', eb + 6, cy + 4, BD.C.axis);
+      BD.label(g, 'RF in', ea - 18, cy + 18, BD.C.gold); BD.label(g, '50 Ω', eb + 6, cy + 4, BD.C.axis);
       BD.dim(g, ea, cy + sep + 30, eb, cy + sep + 30, 'L = ' + S.L.toFixed(1) + ' mm', BD.C.gold, 0);
       BD.label(g, '0', ea, dv.h - 4, BD.C.dim); BD.label(g, '20 mm', ea + 20 * scl, dv.h - 4, BD.C.dim, 'right');
       g.strokeStyle = BD.C.dim; g.beginPath(); g.moveTo(ea, dv.h - 14); g.lineTo(ea + 20 * scl, dv.h - 14); g.stroke();

@@ -8,8 +8,8 @@
     <label class="bd-sl"><span>longest waveguide <b data-v="L"></b></span><input type="range" data-k="L" min="0.1" max="5" step="0.05" value="1.5" aria-label="longest length"></label>
     <label class="bd-sl"><span>coupler-to-coupler variation (σ) <b data-v="sd"></b></span><input type="range" data-k="sd" min="0" max="1.5" step="0.05" value="0.5" aria-label="coupler variation"></label>
   </div>
-  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: the test structures: grating-coupler pairs (127 µm apart) joined by waveguides of increasing length (schematic)</span></div>
-  <div class="bd-scope tall"><canvas data-c="p" aria-hidden="true"></canvas><span class="bd-tag">insertion loss against length, with a least-squares fit</span></div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: cutback structures (schematic)</span></div>
+  <div class="bd-scope tall"><canvas data-c="p" aria-hidden="true"></canvas><span class="bd-tag">loss against length, with a least-squares fit</span></div>
   <div class="bd-read" aria-live="polite"><span>fitted loss <b data-o="fit">–</b></span><span>true loss <b data-o="true">–</b></span><span>coupler loss (intercept / 2) <b data-o="gc">–</b></span></div>
   <p class="bd-caption" data-o="cap"></p>
 </div>
@@ -43,7 +43,7 @@
       for (var r2 = 1; r2 <= rows; r2++) { var yr = top + r2 * (bot - top) / (rows + 1); pts.push([xcur, yr]); xcur = xcur === xb ? xa : xb; pts.push([xcur, yr]); }
       pts.push([xcur, bot], [gcx, bot]);
       BD.wgr(g, pts, 1.6, BD.GEO.si, 5);
-      BD.label(g, Ls[i].toFixed(2) + ' cm', x0 + colW / 2, dg.h - 8, BD.C.axis, 'center');
+      BD.label(g, Ls[i].toFixed(2) + (colW > g.measureText('0.00 cm').width + 6 ? ' cm' : ''), x0 + colW / 2, dg.h - 8, BD.C.axis, 'center');   // numbers only when the columns are narrow
     }
     // ---- plot
     var ymin = Math.min.apply(null, IL) - 1.5, ymax = Math.max.apply(null, IL) + 1.5;

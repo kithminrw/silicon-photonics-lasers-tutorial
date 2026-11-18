@@ -7,9 +7,9 @@
     <label class="bd-sl"><span>junction offset <b data-v="xj"></b></span><input type="range" data-k="xj" min="-0.15" max="0.15" step="0.005" value="0" aria-label="junction offset"></label>
     <label class="bd-sl"><span>phase-shifter length <b data-v="L"></b></span><input type="range" data-k="L" min="0.5" max="6" step="0.05" value="3" aria-label="length"></label>
   </div>
-  <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: cross-section to scale, with the doping, the depletion region and the mode's weight across the width</span></div>
+  <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: section to scale, doping and depletion</span></div>
   <div class="bd-row">
-    <div class="bd-scope tall"><canvas data-c="n" aria-hidden="true"></canvas><span class="bd-tag">effective-index change (×10⁻⁴) against reverse bias</span></div>
+    <div class="bd-scope tall"><canvas data-c="n" aria-hidden="true"></canvas><span class="bd-tag">Δn_eff (×10⁻⁴) against reverse bias</span></div>
     <div class="bd-scope tall"><canvas data-c="p" aria-hidden="true"></canvas><span class="bd-tag">phase shift of the whole length against bias</span></div>
   </div>
   <div class="bd-read" aria-live="polite"><span>depletion width <b data-o="W">–</b></span><span>V<sub>π</sub>L <b data-o="vpl">–</b></span><span>loss <b data-o="a">–</b></span><span>capacitance <b data-o="C">–</b></span></div>
@@ -59,7 +59,7 @@
       var mx = Math.max.apply(null, DATA.w), hh = Math.min(70, base - 80);
       g.strokeStyle = BD.C.gold; g.lineWidth = 1.6; g.beginPath();
       var first = true; DATA.x.forEach(function (x, i) { if (Math.abs(x) > 1.4) return; var px = X(x), py = Y(0.22) - 14 - hh * DATA.w[i] / mx; if (!first) g.lineTo(px, py); else { g.moveTo(px, py); first = false; } }); g.stroke(); g.lineWidth = 1;
-      BD.label(g, 'mode weight ∂n_eff/∂n(x)', X(0.35), Y(0.22) - 14 - hh * 0.9, BD.C.gold);
+      BD.label(g, 'mode weight ∂n_eff/∂n(x)', Math.min(X(0.35), dv.w - 4 - g.measureText('mode weight ∂n_eff/∂n(x)').width), Y(0.22) - 14 - hh * 0.9, BD.C.gold);   // kept inside a narrow panel
       BD.label(g, 'P', X(-0.8), Y(0.09) + 16, 'rgba(240,150,170,1)', 'center'); BD.label(g, 'N', X(0.8), Y(0.09) + 16, 'rgba(120,170,240,1)', 'center');
       BD.label(g, 'P++', X(-1.6), Y(0.09) + 16, 'rgba(240,150,170,1)', 'center'); BD.label(g, 'N++', X(1.6), Y(0.09) + 16, 'rgba(120,170,240,1)', 'center');
       BD.label(g, 'depleted ' + (1000 * d.W).toFixed(0) + ' nm', X(S.xj), Y(0.22) - 4, BD.C.white, 'center');

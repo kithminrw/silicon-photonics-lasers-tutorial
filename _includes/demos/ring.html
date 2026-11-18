@@ -8,7 +8,7 @@
     <label class="bd-sl"><span>coupling gap g (each coupler) <b data-v="g"></b></span><input type="range" data-k="g" min="0.08" max="0.6" step="0.005" value="0.25" aria-label="coupling gap"></label>
     <label class="bd-sl"><span>propagation loss <b data-v="a"></b></span><input type="range" data-k="a" min="0" max="100" step="0.1" value="45" aria-label="loss"></label>
   </div>
-  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top view to scale; the inset magnifies the coupling gap</span></div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top view to scale, inset: the gap</span></div>
   <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">transmission (dB) against wavelength</span></div>
   <div class="bd-read" aria-live="polite"><span>κ² <b data-o="k2">–</b></span><span>FSR <b data-o="fsr">–</b></span><span>FWHM <b data-o="fw">–</b></span><span>loaded Q <b data-o="ql">–</b></span><span>intrinsic Q <b data-o="qi">–</b></span><span>extinction <b data-o="er">–</b></span><span>finesse <b data-o="fi">–</b></span><span>build-up |E<sub>ring</sub>/E<sub>in</sub>|² <b data-o="bu">–</b></span></div>
   <p class="bd-caption" data-o="cap"></p>
@@ -73,8 +73,12 @@
       g.strokeStyle = BD.GEO.si; g.lineWidth = wW * M; g.beginPath(); g.arc(icx, ccy, Rp, Math.PI / 2 - 3.6 / S.R, Math.PI / 2 + 3.6 / S.R); g.stroke(); g.lineWidth = 1;
       g.restore();
       var y1 = ibus - wW / 2 * M, y0 = y1 - S.g * M;
-      BD.dim(g, icx + 18, y0, icx + 18, y1, 'g = ' + (1000 * S.g).toFixed(0) + ' nm', BD.C.gold, -40);
-      BD.label(g, '×' + (M / sc).toFixed(0) + ' (500 nm wide waveguides)', ix + 4, top + 12, BD.C.dim);
+      // the gap's label just right of its dimension line, kept inside a narrow inset; the magnification note shortened to fit
+      var gl = 'g = ' + (1000 * S.g).toFixed(0) + ' nm', glw = g.measureText(gl).width, gx = Math.max(ix + 4, Math.min(icx + 18, dg.w - 10 - glw));
+      if (y1 - y0 >= 12) BD.dim(g, gx, y0, gx, y1, gl, BD.C.gold, -(glw / 2 + 6));   // a gap too thin to hold the label: label it under the bus
+      else { BD.dim(g, gx, y0, gx, y1, '', BD.C.gold, 0); BD.label(g, gl, gx, ibus + wW / 2 * M + 13, BD.C.gold); }
+      var mg = '×' + (M / sc).toFixed(0); mg = [mg + ' (500 nm wide waveguides)', mg + ', 500 nm wide', mg].filter(function (s) { return ix + 4 + g.measureText(s).width <= dg.w - 4; })[0] || mg;
+      BD.label(g, mg, ix + 4, top + 12, BD.C.dim);
     })();
     // ---- readouts
     var tmin = (t2 * t2 * a * a - 2 * t1 * t2 * a + t1 * t1) / Math.pow(1 - ra, 2);

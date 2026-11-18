@@ -9,9 +9,9 @@
   </div>
   <div class="bd-row">
     <div class="bd-scope tall"><canvas data-c="d" aria-hidden="true"></canvas><span class="bd-tag">data and the best fit</span></div>
-    <div class="bd-scope tall"><canvas data-c="m" aria-hidden="true"></canvas><span class="bd-tag">misfit χ² over loss and coupling (darker = better)</span></div>
+    <div class="bd-scope tall"><canvas data-c="m" aria-hidden="true"></canvas><span class="bd-tag">misfit χ² over loss and coupling (dark = good)</span></div>
   </div>
-  <div class="bd-scope short"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: the two rings that fit the data equally well (top view, gap drawn larger)</span></div>
+  <div class="bd-scope short"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: two equally good fits (gap enlarged)</span></div>
   <div class="bd-read" aria-live="polite"><span>solution A (under-coupled) <b data-o="a">–</b></span><span>solution B (over-coupled) <b data-o="b">–</b></span><span>truth <b data-o="t">–</b></span><span>loaded Q <b data-o="q">–</b></span></div>
   <p class="bd-caption" data-o="cap"></p>
 </div>
@@ -54,7 +54,7 @@
     }
     // critical-coupling line a = t
     var cx = [], cy = []; for (i = 0; i <= 60; i++) { var lo3 = -0.7 + 2.2 * i / 60, a3 = aOf(Math.pow(10, lo3)); cx.push(lo3); cy.push(Math.log10(1 - a3 * a3)); }
-    BD.line(f2, cx, cy, BD.C.dim, 1, [4, 3]); d2.g.fillStyle = BD.C.dim; d2.g.fillText('critical coupling (a = t)', f2.X(0.4), f2.Y(-1.25));
+    BD.line(f2, cx, cy, BD.C.dim, 1, [4, 3]); d2.g.fillStyle = BD.C.dim; d2.g.fillText('critical coupling a = t', Math.min(f2.X(0.4), d2.w - 4 - d2.g.measureText('critical coupling a = t').width), f2.Y(-1.25));
     BD.dot(f2, S.lo, S.k, BD.C.white, 5); BD.dot(f2, bestU.lo, bestU.kk, BD.C.blue, 4); BD.dot(f2, bestO.lo, bestO.kk, BD.C.red, 4);
     // ---- the two rings
     (function () {
@@ -64,7 +64,7 @@
         g.strokeStyle = BD.GEO.si; g.lineWidth = 3; g.beginPath(); g.arc(cx2, y - gap / 2 - 2, Rp, 0, 2 * Math.PI); g.stroke();
         g.beginPath(); g.moveTo(cx2 - 70, y + Rp - gap / 2 + gap); g.lineTo(cx2 + 70, y + Rp - gap / 2 + gap); g.stroke(); g.lineWidth = 1;
         BD.label(g, z[3], cx2 - 70, 34, z[2]);
-        BD.label(g, Math.pow(10, o.lo).toFixed(1) + ' dB/cm, κ² ' + (100 * (1 - o.t * o.t)).toFixed(2) + ' %', cx2 + Rp + 8, y - 4, BD.C.axis);
+        BD.label(g, Math.pow(10, o.lo).toFixed(1) + ' dB/cm, κ² ' + (100 * (1 - o.t * o.t)).toFixed(2) + ' %', cx2 - 70, y + Rp + 26, BD.C.axis);   // under the bus, so it fits a phone-width panel
       });
     })();
     var fmt = function (o) { return Math.pow(10, o.lo).toFixed(2) + ' dB/cm, κ² ' + (100 * (1 - o.t * o.t)).toFixed(2) + ' %'; };

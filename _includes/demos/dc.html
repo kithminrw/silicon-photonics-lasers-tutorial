@@ -7,7 +7,7 @@
     <label class="bd-sl"><span>coupling length L <b data-v="L"></b></span><input type="range" data-k="L" min="0" max="80" step="0.1" value="16.4" aria-label="length"></label>
     <label class="bd-sl"><span>wavelength λ <b data-v="lam"></b></span><input type="range" data-k="lam" min="1.5" max="1.6" step="0.001" value="1.55" aria-label="wavelength"></label>
   </div>
-  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top view (glow ∝ power; gap magnified) and the cross-section to scale</span></div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top (gap enlarged), section to scale</span></div>
   <div class="bd-scope tall"><canvas data-c="z" aria-hidden="true"></canvas><span class="bd-tag">power in each waveguide along the coupler</span></div>
   <div class="bd-scope short"><canvas data-c="l" aria-hidden="true"></canvas><span class="bd-tag">cross-coupled power against wavelength</span></div>
   <div class="bd-read" aria-live="polite"><span>Δn (even − odd) <b data-o="dn">–</b></span><span>cross-over length L<sub>x</sub> <b data-o="lx">–</b></span><span>split (cross / through) <b data-o="k">–</b></span><span>50/50 at L = <b data-o="l50">–</b></span></div>
@@ -37,8 +37,14 @@
     for (var i = 0; i <= 400; i++) { var z = zmax * i / 400, c = Math.pow(Math.sin(Math.PI * (z + LB) / (2 * lx)), 2); zs.push(z); p1.push(1 - c); p2.push(c); }
     var gg = dv.g; gg.fillStyle = 'rgba(127,184,240,.08)'; gg.fillRect(f.X(0), f.p.t, f.X(L) - f.X(0), dv.h - f.p.t - f.p.b);
     BD.line(f, zs, p1, BD.C.gold, 2); BD.line(f, zs, p2, BD.C.blue, 2);
-    BD.vline(f, L, BD.C.white, [4, 3], 'end of coupler');
-    gg.fillStyle = BD.C.gold; gg.fillText('input (through) guide', f.p.l + 6, f.p.t + 12); gg.fillStyle = BD.C.blue; gg.fillText('coupled (cross) guide', f.p.l + 150, f.p.t + 12);
+    // the legend on one row or (narrow panel) two, on the side away from the end-of-coupler line; that line's label below the legend if they would meet
+    var wi = gg.measureText('input (through) guide').width, wc = gg.measureText('coupled (cross) guide').width, two = f.p.l + 150 + wc > dv.w - f.p.r - 4;
+    var lw = two ? Math.max(wi, wc) : 144 + wc, xL = f.X(L), xr = dv.w - f.p.r - 6 - lw, hitsL = function (x) { return xL > x - 3 && xL < x + lw + 3; };
+    var lgx = hitsL(f.p.l + 6) && !hitsL(xr) ? xr : f.p.l + 6;
+    var meet = xL + 4 < lgx + lw && xL + 4 + gg.measureText('end of coupler').width > lgx;
+    BD.vline(f, L, BD.C.white, [4, 3], 'end of coupler', meet ? (two ? 26 : 14) : 0);
+    gg.fillStyle = BD.C.gold; gg.fillText('input (through) guide', lgx, f.p.t + 12);
+    gg.fillStyle = BD.C.blue; gg.fillText('coupled (cross) guide', two ? lgx : lgx + 144, two ? f.p.t + 24 : f.p.t + 12);
     // ---- against wavelength
     var dl = BD.setup(q('[data-c="l"]')), f2 = BD.frame(dl, { x: [1.5, 1.6], y: [0, 1], pad: { l: 40, b: 22 },
       xt: [[1.5, '1500'], [1.55, '1550'], [1.6, '1600 nm']], yt: [[0, '0'], [0.5, '0.5'], [1, '1']] });

@@ -48,7 +48,8 @@
     var tr = function (v) { return db ? 10 * Math.log10(Math.max(v, 1e-6)) : v; };
     BD.line(f, xs, c.map(tr), BD.C.blue, 1.6);
     BD.line(f, xs, b.map(tr), BD.C.gold, 1.6);
-    dv.g.fillStyle = BD.C.gold; dv.g.fillText('bar', f.p.l + 6, f.p.t + 12); dv.g.fillStyle = BD.C.blue; dv.g.fillText('cross', f.p.l + 36, f.p.t + 12);
+    // the legend above the plot's top-right corner, off the fringes (dense on a narrow panel)
+    var wcr = dv.g.measureText('cross').width; BD.label(dv.g, 'cross', dv.w - f.p.r, f.p.t - 6, BD.C.blue, 'right'); BD.label(dv.g, 'bar', dv.w - f.p.r - wcr - 8, f.p.t - 6, BD.C.gold, 'right');
     // ---- geometry: top view. Waveguides have one width; the warm glow underneath shows the power at 1550 nm.
     (function () {
       var dg = BD.setup(q('[data-c="g"]')), g = dg.g, roomy = dg.w > 520;
@@ -101,7 +102,9 @@
       }
       if (D > 0.5) BD.dim(g, X(xm + wl / 2) + 12, Y(-sep / 2), X(xm + wl / 2) + 12, Y(-sep / 2 - D), (roomy ? 'ΔL/2 = ' : 'ΔL/2 ') + D.toFixed(roomy ? 1 : 0) + ' µm', BD.C.gold, roomy ? -46 : -30);
       BD.scalebar(g, dg.w - padR + 4, dg.h - 8, sx, 60);
-      if (k < 0.98) BD.label(g, 'vertical ×' + k.toFixed(2), dg.w - 8, 14, BD.C.dim, 'right');
+      // beside the panel tag, or under it when the tag reaches that far
+      var vl = 'vertical ×' + k.toFixed(2), tagEl = q('[data-c="g"]').parentElement.querySelector('.bd-tag'), tagR = tagEl ? tagEl.offsetLeft + tagEl.offsetWidth : 0;
+      if (k < 0.98) BD.label(g, vl, dg.w - 8, dg.w - 8 - g.measureText(vl).width > tagR + 6 ? 14 : 28, BD.C.dim, 'right');
     })();
     var fsr = S.dL > 0 ? lam0 * lam0 / (ng * S.dL) : Infinity;
     q('[data-o="fsr"]').textContent = isFinite(fsr) ? (1000 * fsr).toFixed(2) + ' nm' : '∞ (balanced)';

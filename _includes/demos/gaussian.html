@@ -9,7 +9,7 @@
     <label class="bd-sl"><span>fibre position after lens d<sub>2</sub> <b data-v="d2"></b></span><input type="range" data-k="d2" min="20" max="1500" step="1" value="430" aria-label="fibre distance"></label>
     <label class="bd-sl"><span>lateral fibre offset Δx <b data-v="dx"></b></span><input type="range" data-k="dx" min="0" max="12" step="0.05" value="0" aria-label="lateral offset"></label>
   </div>
-  <div class="bd-scope tall"><canvas data-c="b" aria-hidden="true"></canvas><span class="bd-tag">beam radius w(z) at 1550 nm (vertical axis stretched)</span></div>
+  <div class="bd-scope tall"><canvas data-c="b" aria-hidden="true"></canvas><span class="bd-tag">beam radius w(z), 1550 nm (vertical stretched)</span></div>
   <div class="bd-scope short"><canvas data-c="e" aria-hidden="true"></canvas><span class="bd-tag">coupling into the fibre against lateral offset</span></div>
   <div class="bd-read" aria-live="polite"><span>z<sub>R</sub> <b data-o="zr">–</b></span><span>divergence <b data-o="div">–</b></span><span>image waist <b data-o="w2">–</b></span><span>at d<sub>2</sub> = <b data-o="z2">–</b></span><span>coupling <b data-o="eta">–</b></span><span>1 dB offset <b data-o="tol">–</b></span></div>
   <p class="bd-caption" data-o="cap"></p>
@@ -52,8 +52,13 @@
     }
     wmax = Math.max(wmax, wf) * 1.15;
     var d = BD.setup(q('[data-c="b"]')), f = BD.frame(d, { x: [0, zEnd], y: [-wmax, wmax], pad: { l: 46, b: 22 },
-      xt: [[0, '0'], [S.d1, 'lens'], [S.d1 + S.d2, 'fibre']], yt: [[-wmax / 1.15, '−' + wmax.toFixed(0)], [0, '0 µm'], [wmax / 1.15, wmax.toFixed(0)]] });
-    var g = d.g; f.clipIn(); g.beginPath();
+      xt: [[0, ''], [S.d1, ''], [S.d1 + S.d2, '']], yt: [[-wmax / 1.15, '−' + wmax.toFixed(0)], [0, '0 µm'], [wmax / 1.15, wmax.toFixed(0)]] });
+    var g = d.g, xl = f.X(S.d1), xr = f.X(S.d1 + S.d2), lw = g.measureText('lens').width, fw = g.measureText('fibre').width, yb = d.h - f.p.b + 12;
+    // tick labels by hand: 'lens' and 'fibre' side by side when they are close, and the 0 only when it clears 'lens'
+    var near = xr - xl < (lw + fw) / 2 + 6, ll = near ? xl - 1 - lw : xl - lw / 2;
+    g.fillStyle = BD.C.axis; g.fillText('lens', ll, yb); g.fillText('fibre', Math.min(near ? xr + 1 : xr - fw / 2, d.w - fw - 2), yb);
+    if (ll > f.p.l + 8) BD.label(g, '0', f.p.l, yb, BD.C.axis, 'center');
+    f.clipIn(); g.beginPath();
     for (k = 0; k <= 500; k++) g.lineTo(f.X(zs[k]), f.Y(ws[k]));
     for (k = 500; k >= 0; k--) g.lineTo(f.X(zs[k]), f.Y(-ws[k]));
     g.closePath(); g.fillStyle = 'rgba(224,184,90,.22)'; g.fill(); f.clipOut();

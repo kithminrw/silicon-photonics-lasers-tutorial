@@ -8,12 +8,12 @@
     <label class="bd-sl"><span>front-facet reflectivity R<sub>1</sub> <b data-v="R"></b></span><input type="range" data-k="R" min="0.02" max="0.95" step="0.01" value="0.32" aria-label="reflectivity"></label>
     <label class="bd-sl"><span>temperature T <b data-v="T"></b></span><input type="range" data-k="T" min="10" max="95" step="1" value="25" aria-label="temperature"></label>
   </div>
-  <div class="bd-scope short"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: the Fabry–Pérot cavity in side view (length to scale against 1.5 mm)</span></div>
+  <div class="bd-scope short"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: side view, cavity length to scale</span></div>
   <div class="bd-row">
     <div class="bd-scope tall"><canvas data-c="li" aria-hidden="true"></canvas><span class="bd-tag">L–I: front-facet power against current</span></div>
     <div class="bd-scope tall"><canvas data-c="tr" aria-hidden="true"></canvas><span class="bd-tag">switch-on: current stepped from 0 to I at t = 0</span></div>
   </div>
-  <div class="bd-scope short"><canvas data-c="sp" aria-hidden="true"></canvas><span class="bd-tag">optical spectrum: longitudinal modes under the gain curve</span></div>
+  <div class="bd-scope short"><canvas data-c="sp" aria-hidden="true"></canvas><span class="bd-tag">spectrum: longitudinal modes under the gain</span></div>
   <div class="bd-read" aria-live="polite"><span>I<sub>th</sub> <b data-o="ith">–</b></span><span>slope <b data-o="se">–</b></span><span>η<sub>d</sub> <b data-o="ed">–</b></span><span>α<sub>m</sub> <b data-o="am">–</b></span><span>τ<sub>p</sub> <b data-o="tp">–</b></span><span>mode spacing <b data-o="dl">–</b></span><span>P at I <b data-o="p">–</b></span><span>f<sub>r</sub> <b data-o="fr">–</b></span></div>
   <p class="bd-caption" data-o="cap"></p>
 </div>
@@ -107,9 +107,12 @@
         BD.label(gg, Pnow.toFixed(1) + ' mW', xa, yc - 10 - w / 2, BD.C.gold);
       }
       BD.dim(gg, x0, yc + 32, x0 + Lp, yc + 32, 'L = ' + S.L.toFixed(0) + ' µm', BD.C.gold, -6);
-      BD.label(gg, 'R₂ ' + (100 * R2).toFixed(0) + ' %' + (hr ? ' (HR)' : ''), x0 - 10, yc - 28, BD.C.axis);
-      BD.label(gg, 'R₁ ' + (100 * R1).toFixed(0) + ' %', x0 + Lp - 10, yc - 28, BD.C.axis);
-      BD.label(gg, 'active layer: glow ∝ output power', x0 + Lp + 12, yc + 22, BD.C.dim);
+      // R1 one row up when a short cavity brings it onto R2; the glow note right of the chip (clear of the L label), else under it
+      var r2 = 'R₂ ' + (100 * R2).toFixed(0) + ' %' + (hr ? ' (HR)' : ''), r1x = x0 + Lp - 10;
+      BD.label(gg, r2, x0 - 10, yc - 28, BD.C.axis);
+      BD.label(gg, 'R₁ ' + (100 * R1).toFixed(0) + ' %', r1x, r1x < x0 - 4 + gg.measureText(r2).width ? yc - 40 : yc - 28, BD.C.axis);
+      var al = 'active layer: glow ∝ output power', ax = Math.max(x0 + Lp + 12, x0 + Lp / 2 + gg.measureText('L = ' + S.L.toFixed(0) + ' µm').width / 2 + 8);
+      if (ax + gg.measureText(al).width <= dv2.w - 4) BD.label(gg, al, ax, yc + 22, BD.C.dim); else BD.label(gg, al, x0 - 10, yc + 48, BD.C.dim);
     })();
     // ---- readouts
     var se = eta_i * M.am / (alpha_i + M.am) * hv / qe * M.F1;

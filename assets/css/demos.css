@@ -20,7 +20,7 @@
 .bd-tag.r{left:auto;right:8px;color:#e9d08f;}
 .bd-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px;}
 .bd-read{display:flex;gap:6px 18px;flex-wrap:wrap;margin:9px 2px 0;font-family:"IBM Plex Mono",monospace;font-size:11px;color:rgba(170,205,240,.75);}
-.bd-read b{color:#fff;font-weight:500;}
+.bd-read b{color:#fff;font-weight:500;white-space:nowrap;}
 .bd-read .ok{color:#7fe0a0;}.bd-read .bad{color:#f39a7c;}
 .bd-controls{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px;}
 .bd-btn,.bd-toggle{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:rgba(205,225,248,.85);background:transparent;border:1px solid rgba(140,190,240,.35);border-radius:30px;padding:5px 12px;cursor:pointer;}
@@ -32,3 +32,9 @@
 .bd button:focus-visible,.bd input:focus-visible{outline:2px solid #9fd0ff;outline-offset:2px;}
 .bd-caption{margin:10px 2px 0 !important;font-size:13.5px;line-height:1.5;color:rgba(215,230,247,.92);min-height:2.6em;}
 @media (max-width:640px){.bd-row{grid-template-columns:minmax(0,1fr);}.bd-caption{font-size:12.5px;}.bd-scope canvas{height:170px;}}
+/* Stack the two panels whenever the demo itself is narrow (with the sidebar open, 800-960 px windows
+   would otherwise squeeze each panel to ~220 px); the @media rule above stays as the fallback. */
+.bd{container-type:inline-size;}
+@container (max-width:640px){.bd-row{grid-template-columns:minmax(0,1fr);}}
+/* On the narrowest phones (320 px) a wrapped panel tag would run into the plot: keep it to one line. */
+@container (max-width:300px){.bd-tag{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:calc(100% - 16px);}}

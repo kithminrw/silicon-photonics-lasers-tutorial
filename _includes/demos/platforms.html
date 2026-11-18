@@ -9,7 +9,7 @@
     <div class="bd-scope tall"><canvas data-c="x" aria-hidden="true"></canvas><span class="bd-tag">typical waveguide cross-sections, same scale</span></div>
     <div class="bd-scope tall"><canvas data-c="r" aria-hidden="true"></canvas><span class="bd-tag">typical ranges (log scales)</span></div>
   </div>
-  <div class="bd-scope short"><canvas data-c="c" aria-hidden="true"></canvas><span class="bd-tag">what each platform does on its own (● native, ◐ with added material or bonding, ○ no)</span></div>
+  <div class="bd-scope short"><canvas data-c="c" aria-hidden="true"></canvas><span class="bd-tag">● native  ◐ with added material  ○ no</span></div>
   <p class="bd-caption" data-o="cap"></p>
 </div>
 <script>
@@ -51,7 +51,7 @@
     rows.forEach(function (rw, i) {
       var y0 = top + i * rowH, lo = Math.log10(rw[2]), hi = Math.log10(rw[3]), X = function (v) { return l + (r - l) * (Math.log10(v) - lo) / (hi - lo); };
       g2.fillStyle = BD.C.axis; g2.fillText(rw[0], l, y0 + 2);
-      g2.strokeStyle = BD.C.grid; for (var e = Math.ceil(lo); e <= hi; e++) { g2.beginPath(); g2.moveTo(X(Math.pow(10, e)), y0 + 8); g2.lineTo(X(Math.pow(10, e)), y0 + rowH - 14); g2.stroke(); g2.fillStyle = BD.C.dim; g2.textAlign = 'center'; g2.fillText(BD.eng(Math.pow(10, e)).replace(' ', ''), X(Math.pow(10, e)), y0 + rowH - 4); g2.textAlign = 'left'; }
+      g2.strokeStyle = BD.C.grid; for (var e = Math.ceil(lo); e <= hi; e++) { g2.beginPath(); g2.moveTo(X(Math.pow(10, e)), y0 + 8); g2.lineTo(X(Math.pow(10, e)), y0 + rowH - 20); g2.stroke(); g2.fillStyle = BD.C.dim; g2.textAlign = 'center'; g2.fillText(BD.eng(Math.pow(10, e)).replace(' ', ''), X(Math.pow(10, e)), y0 + rowH - 10); g2.textAlign = 'left'; }   // clear of the next row's title
       [[A, BD.C.gold, 0], [B, BD.C.blue, 1]].forEach(function (pp) {
         var v = P[pp[0]][rw[1]], yy = y0 + 16 + pp[2] * 14;
         g2.fillStyle = pp[1]; g2.fillRect(X(v[0]), yy, Math.max(3, X(v[1]) - X(v[0])), 9);
@@ -61,12 +61,23 @@
     [[A, BD.C.gold, 0], [B, BD.C.blue, 1]].forEach(function (pp) { var p = P[pp[0]], dn = p.core - p.clad; g2.fillStyle = pp[1]; g2.fillRect(l, dc + 6 + pp[2] * 10, (r - l) * dn / 2.2, 7); g2.fillText(dn.toFixed(2), l + (r - l) * dn / 2.2 + 4, dc + 13 + pp[2] * 10); });
     // ---- capability matrix
     var d3 = BD.setup(q('[data-c="c"]')), g3 = d3.g, cw = (d3.w - 120) / CAPS.length, sym = ['○', '◐', '●'];
-    CAPS.forEach(function (cname, i) { g3.fillStyle = BD.C.axis; g3.textAlign = 'center'; g3.fillText(cname, 120 + cw * (i + 0.5), 34); });
-    [[A, BD.C.gold, 0], [B, BD.C.blue, 1]].forEach(function (pp) {
-      var p = P[pp[0]], y = 62 + pp[2] * 30; g3.textAlign = 'left'; g3.fillStyle = pp[1]; g3.fillText(p.name, 10, y);
-      p.caps.forEach(function (cv, i) { g3.textAlign = 'center'; g3.font = '15px sans-serif'; g3.fillStyle = cv ? pp[1] : BD.C.dim; g3.fillText(sym[cv], 120 + cw * (i + 0.5), y + 4); g3.font = '9.5px "IBM Plex Mono", monospace'; });
-    });
-    g3.textAlign = 'left';
+    var nw = Math.max.apply(null, CAPS.map(function (s) { return g3.measureText(s).width; })), rowsN = cw >= nw + 8 ? 1 : 2 * cw >= nw + 8 ? 2 : 0;
+    function mark(cv, col, x, y) { g3.textAlign = 'center'; g3.font = '15px sans-serif'; g3.fillStyle = cv ? col : BD.C.dim; g3.fillText(sym[cv], x, y); g3.font = '9.5px "IBM Plex Mono", monospace'; g3.textAlign = 'left'; }
+    if (rowsN) {   // capabilities across: names on one row, or staggered on two
+      CAPS.forEach(function (cname, i) { var hw = g3.measureText(cname).width / 2;
+        BD.label(g3, cname, Math.min(120 + cw * (i + 0.5), d3.w - hw - 2), rowsN === 1 ? 34 : i % 2 ? 42 : 30, BD.C.axis, 'center'); });
+      [[A, BD.C.gold, 0], [B, BD.C.blue, 1]].forEach(function (pp) {
+        var p = P[pp[0]], y = (rowsN === 1 ? 62 : 66) + pp[2] * 30; BD.label(g3, p.name, 10, y, pp[1]);
+        p.caps.forEach(function (cv, i) { mark(cv, pp[1], 120 + cw * (i + 0.5), y + 4); });
+      });
+    } else {   // narrow panel: capabilities down, the two platforms across
+      var x0 = 16 + nw, abbr = { si: 'Si', sin: 'SiN', ln: 'TFLN', bto: 'BTO', inp: 'InP' };
+      CAPS.forEach(function (cname, i) { BD.label(g3, cname, 10, 56 + i * 17, BD.C.axis); });
+      [[A, BD.C.gold, 0], [B, BD.C.blue, 1]].forEach(function (pp) {
+        var x = x0 + 26 + pp[2] * 52; BD.label(g3, abbr[pp[0]], x, 36, pp[1], 'center');
+        P[pp[0]].caps.forEach(function (cv, i) { mark(cv, pp[1], x, 60 + i * 17); });
+      });
+    }
     var pa = P[A], pb = P[B], c;
     c = pa.name + ' against ' + pb.name + ': ';
     var ra = pa.core / pa.clad, rb = pb.core / pb.clad;

@@ -15,16 +15,17 @@
   function lg(v) { return Math.log10(v); }
   /* plot frame: o = {x:[min,max], y:[min,max], xlog, ylog, xt:[[v,'label']], yt:[...], xl, yl, pad:{l,r,t,b}} */
   function frame(d, o) {
-    var p = Object.assign({ l: 48, r: 12, t: 22, b: 26 }, o.pad || {}), g = d.g;
+    var p = Object.assign({ l: 48, r: 12, t: 30, b: 26 }, o.pad || {}), g = d.g;   // t: 30 keeps the top tick label clear of the panel tag
     var x0 = o.xlog ? lg(o.x[0]) : o.x[0], x1 = o.xlog ? lg(o.x[1]) : o.x[1];
     var y0 = o.ylog ? lg(o.y[0]) : o.y[0], y1 = o.ylog ? lg(o.y[1]) : o.y[1];
     var X = function (v) { var u = o.xlog ? lg(Math.max(v, 1e-300)) : v; return p.l + (d.w - p.l - p.r) * (u - x0) / (x1 - x0); };
     var Y = function (v) { var u = o.ylog ? lg(Math.max(v, 1e-300)) : v; return d.h - p.b - (d.h - p.t - p.b) * (u - y0) / (y1 - y0); };
     g.strokeStyle = C.grid; g.lineWidth = 1; g.fillStyle = C.axis;
-    (o.xt || []).forEach(function (t) { var x = X(t[0]); g.beginPath(); g.moveTo(x, p.t); g.lineTo(x, d.h - p.b); g.stroke();
-      g.textAlign = 'center'; g.fillText(t[1], x, d.h - p.b + 12); });
-    (o.yt || []).forEach(function (t) { var y = Y(t[0]); g.beginPath(); g.moveTo(p.l, y); g.lineTo(d.w - p.r, y); g.stroke();
-      g.textAlign = 'right'; g.fillText(t[1], p.l - 5, y + 3); });
+    // ticks outside the axis range are skipped; tick labels are kept inside the canvas (an end label slides inwards)
+    (o.xt || []).forEach(function (t) { var x = X(t[0]); if (x < p.l - 0.5 || x > d.w - p.r + 0.5) return; g.beginPath(); g.moveTo(x, p.t); g.lineTo(x, d.h - p.b); g.stroke();
+      var hw = g.measureText(t[1]).width / 2; g.textAlign = 'center'; g.fillText(t[1], Math.min(Math.max(x, hw + 2), d.w - hw - 2), d.h - p.b + 12); });
+    (o.yt || []).forEach(function (t) { var y = Y(t[0]); if (y < p.t - 0.5 || y > d.h - p.b + 0.5) return; g.beginPath(); g.moveTo(p.l, y); g.lineTo(d.w - p.r, y); g.stroke();
+      var wide = g.measureText(t[1]).width > p.l - 7; g.textAlign = wide ? 'left' : 'right'; g.fillText(t[1], wide ? 2 : p.l - 5, y + 3); });
     g.textAlign = 'right'; if (o.xl) g.fillText(o.xl, d.w - p.r, d.h - 4);
     g.textAlign = 'left'; if (o.yl) g.fillText(o.yl, 4, p.t - 8 + 0);
     g.textAlign = 'left';
@@ -42,14 +43,17 @@
     g.stroke(); g.setLineDash([]); f.clipOut();
   }
   function hline(f, y, col, dash, label) {
-    var g = f.d.g, yy = f.Y(y); g.strokeStyle = col; g.setLineDash(dash || [5, 4]); g.lineWidth = 1.1;
+    var g = f.d.g, yy = f.Y(y); if (!(yy >= f.p.t - 0.5 && yy <= f.d.h - f.p.b + 0.5)) return;   // off the plot: draw nothing
+    g.strokeStyle = col; g.setLineDash(dash || [5, 4]); g.lineWidth = 1.1;
     g.beginPath(); g.moveTo(f.p.l, yy); g.lineTo(f.d.w - f.p.r, yy); g.stroke(); g.setLineDash([]);
     if (label) { g.fillStyle = col; g.textAlign = 'right'; g.fillText(label, f.d.w - f.p.r - 2, yy - 4); g.textAlign = 'left'; }
   }
-  function vline(f, x, col, dash, label) {
-    var g = f.d.g, xx = f.X(x); g.strokeStyle = col; g.setLineDash(dash || [5, 4]); g.lineWidth = 1.1;
+  function vline(f, x, col, dash, label, dy) {   // dy: move the label down (to clear another line's label)
+    var g = f.d.g, xx = f.X(x); if (!(xx >= f.p.l - 0.5 && xx <= f.d.w - f.p.r + 0.5)) return;   // off the plot: draw nothing
+    g.strokeStyle = col; g.setLineDash(dash || [5, 4]); g.lineWidth = 1.1;
     g.beginPath(); g.moveTo(xx, f.p.t); g.lineTo(xx, f.d.h - f.p.b); g.stroke(); g.setLineDash([]);
-    if (label) { g.fillStyle = col; g.fillText(label, xx + 4, f.p.t + 10); }
+    if (label) { g.fillStyle = col; var left = xx + 4 + g.measureText(label).width > f.d.w - 2;   // flip to the left of the line near the right edge
+      g.textAlign = left ? 'right' : 'left'; g.fillText(label, left ? xx - 4 : xx + 4, f.p.t + 10 + (dy || 0)); g.textAlign = 'left'; }
   }
   function dot(f, x, y, col, r) { var g = f.d.g; g.fillStyle = col; g.beginPath(); g.arc(f.X(x), f.Y(y), r || 3.5, 0, 7); g.fill(); }
   function logticks(a, b, unit) {

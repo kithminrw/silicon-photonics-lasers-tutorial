@@ -9,7 +9,7 @@
     <label class="bd-sl"><span>grating-coupler reflection <b data-v="r"></b></span><input type="range" data-k="r" min="-40" max="-10" step="0.5" value="-20" aria-label="reflection"></label>
     <label class="bd-sl"><span>averaged sweeps <b data-v="n"></b></span><input type="range" data-k="n" min="1" max="32" step="1" value="1" aria-label="averages"></label>
   </div>
-  <div class="bd-scope short"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: the setup, laser to detector, with the chip's two test structures</span></div>
+  <div class="bd-scope short"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: the setup, laser to detector</span></div>
   <div class="bd-row">
     <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">measured spectrum, 1500–1600 nm</span></div>
     <div class="bd-scope tall"><canvas data-c="z" aria-hidden="true"></canvas><span class="bd-tag">zoom on one resonance near 1550 nm</span></div>
@@ -45,17 +45,20 @@
     // ---- setup schematic
     (function () {
       var dv = BD.setup(q('[data-c="g"]')), g = dv.g, y = dv.h / 2 + 6, bx = function (x, w, lab, col) { g.strokeStyle = col || BD.C.axis; g.strokeRect(x, y - 11, w, 22); BD.label(g, lab, x + w / 2, y + 4, col || BD.C.axis, 'center'); };
-      bx(10, 80, 'tunable laser', BD.C.gold); bx(110, 70, 'pol. ctrl', BD.C.axis); bx(dv.w - 90, 80, 'detector', BD.C.green);
-      g.strokeStyle = BD.C.gold; g.beginPath(); g.moveTo(90, y); g.lineTo(110, y); g.moveTo(180, y); g.lineTo(205, y); g.stroke();
-      var cx0 = 210, cx1 = dv.w - 110; g.fillStyle = 'rgba(157,179,204,.12)'; g.fillRect(cx0, y - 22, cx1 - cx0, 44); BD.label(g, 'chip', cx0 + 4, y - 26, BD.C.dim);
+      // a compact layout (short names, smaller boxes) when the panel is narrower than the full schematic needs
+      var cmp = dv.w < 600, L = cmp ? { lx: 8, lw: 44, lt: 'laser', px: 60, pw: 40, pt: 'pol.', dw: 32, dt: 'PD', c0: 108 }
+                                    : { lx: 10, lw: 80, lt: 'tunable laser', px: 110, pw: 70, pt: 'pol. ctrl', dw: 80, dt: 'detector', c0: 210 };
+      bx(L.lx, L.lw, L.lt, BD.C.gold); bx(L.px, L.pw, L.pt, BD.C.axis); bx(dv.w - L.dw - 10, L.dw, L.dt, BD.C.green);
+      g.strokeStyle = BD.C.gold; g.beginPath(); g.moveTo(L.lx + L.lw, y); g.lineTo(L.px, y); g.moveTo(L.px + L.pw, y); g.lineTo(L.c0 - 5, y); g.stroke();
+      var cx0 = L.c0, cx1 = dv.w - L.dw - 30; g.fillStyle = 'rgba(157,179,204,.12)'; g.fillRect(cx0, y - 22, cx1 - cx0, 44); BD.label(g, 'chip', cx0 + 4, y - 26, BD.C.dim);
       // GC - ring - GC and the loopback
       g.strokeStyle = BD.GEO.si; g.lineWidth = 2; g.beginPath(); g.moveTo(cx0 + 20, y - 8); g.lineTo(cx1 - 20, y - 8); g.stroke();
       g.beginPath(); g.arc((cx0 + cx1) / 2, y - 16, 7, 0, 2 * Math.PI); g.stroke();
       g.beginPath(); g.moveTo(cx0 + 20, y + 10); g.lineTo(cx1 - 20, y + 10); g.stroke(); g.lineWidth = 1;
       ['GC', 'GC'].forEach(function (t, k) { var xx = k ? cx1 - 26 : cx0 + 14; g.fillStyle = 'rgba(224,184,90,.6)'; g.fillRect(xx, y - 12, 12, 8); g.fillRect(xx, y + 6, 12, 8); });
-      BD.label(g, 'device: GC → ring → GC', (cx0 + cx1) / 2 + 12, y - 12, BD.C.axis); BD.label(g, 'loopback: GC → GC', (cx0 + cx1) / 2, y + 22, BD.C.axis, 'center');
-      g.strokeStyle = BD.C.gold; g.beginPath(); g.moveTo(cx1, y); g.lineTo(dv.w - 90, y); g.stroke();
-      BD.label(g, 'polarisation off by ' + S.pol.toFixed(0) + '°', 110, y - 18, S.pol > 20 ? BD.C.red : BD.C.dim);
+      BD.label(g, cmp ? 'ring' : 'device: GC → ring → GC', (cx0 + cx1) / 2 + 12, y - 12, BD.C.axis); BD.label(g, cmp ? 'loopback' : 'loopback: GC → GC', (cx0 + cx1) / 2, y + 22, BD.C.axis, 'center');
+      g.strokeStyle = BD.C.gold; g.beginPath(); g.moveTo(cx1, y); g.lineTo(dv.w - L.dw - 10, y); g.stroke();
+      BD.label(g, 'polarisation off by ' + S.pol.toFixed(0) + '°', cmp ? 8 : 110, cmp ? dv.h - 8 : y - 18, S.pol > 20 ? BD.C.red : BD.C.dim);
     })();
     // ---- spectra
     var ys = vw === 'raw' ? dev.map(dbm) : dev.map(function (d, k) { return dbm(d) - dbm(loop[k]); });

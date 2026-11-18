@@ -10,9 +10,9 @@
     <label class="bd-sl"><span>laser wall-plug efficiency <b data-v="wp"></b></span><input type="range" data-k="wp" min="5" max="40" step="1" value="15" aria-label="wall-plug efficiency"></label>
     <label class="bd-sl"><span>heater power per ring <b data-v="ht"></b></span><input type="range" data-k="ht" min="0" max="30" step="0.5" value="20" aria-label="heater power"></label>
   </div>
-  <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: the link, with the optical power after each block (one wavelength)</span></div>
+  <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: power after each block (one λ)</span></div>
   <div class="bd-row">
-    <div class="bd-scope tall"><canvas data-c="m" aria-hidden="true"></canvas><span class="bd-tag">margin: received power against sensitivity plus penalties</span></div>
+    <div class="bd-scope tall"><canvas data-c="m" aria-hidden="true"></canvas><span class="bd-tag">received power against sensitivity + penalties</span></div>
     <div class="bd-scope tall"><canvas data-c="e" aria-hidden="true"></canvas><span class="bd-tag">energy per bit, where the picojoules go</span></div>
   </div>
   <div class="bd-read" aria-live="polite"><span>received power <b data-o="rx">–</b></span><span>margin after penalties <b data-o="mg">–</b></span><span>energy per bit <b data-o="e">–</b></span><span>targets <b data-o="ok">–</b></span></div>
@@ -37,14 +37,25 @@
     // ---- geometry: blocks along the link with power levels
     (function () {
       var dv = BD.setup(q('[data-c="g"]')), g = dv.g, n = blocks.length, x0 = 30, x1 = dv.w - 30, w = (x1 - x0) / n, top = 54, bot = dv.h - 50;
-      var Y = function (dbm) { return top + (bot - top) * (12 - dbm) / 30; };
+      var Y = function (dbm) { return top + (bot - top) * (16 - dbm) / 34; };   // +16 dBm (the slider's top) to −18 dBm
       g.fillStyle = 'rgba(157,179,204,.10)'; g.fillRect(x0, top - 30, w * 3 + w * 0.9, 18); g.fillRect(x0 + w * 6, top - 30, w * 2 - 4, 18);
       BD.label(g, 'transmitter chip', x0 + 6, top - 17, BD.C.dim); BD.label(g, 'receiver chip', x0 + w * 6 + 6, top - 17, BD.C.dim); BD.label(g, 'fibre', x0 + w * 4.5, top - 17, BD.C.dim, 'center');
       g.strokeStyle = BD.C.gold; g.lineWidth = 2; g.beginPath();
       levels.forEach(function (lv, i) { var xa = x0 + i * w, xb = xa + w; if (i === 0) g.moveTo(xa, Y(lv)); else g.lineTo(xa, Y(lv)); g.lineTo(xb, Y(lv)); }); g.stroke(); g.lineWidth = 1;
-      levels.forEach(function (lv, i) { var xa = x0 + i * w; BD.label(g, lv.toFixed(1), xa + w / 2, Y(lv) - 6, BD.C.white, 'center'); BD.label(g, blocks[i][0], xa + w / 2, dv.h - 30 + (i % 2) * 12, BD.C.axis, 'center'); });
+      var short = ['laser', 'mod.', 'rings', 'TX GC', 'fibre', 'conn.', 'RX GC', 'demux'];   // block names on a narrow panel
+      levels.forEach(function (lv, i) { var xa = x0 + i * w; BD.label(g, lv.toFixed(1), xa + w / 2, Y(lv) - 6, BD.C.white, 'center'); BD.label(g, w < 60 ? short[i] : blocks[i][0], xa + w / 2, dv.h - 30 + (i % 2) * 12, BD.C.axis, 'center'); });
       g.strokeStyle = BD.C.red; g.setLineDash([4, 3]); g.beginPath(); g.moveTo(x0, Y(S.sen + pen)); g.lineTo(x1, Y(S.sen + pen)); g.stroke(); g.setLineDash([]);
-      BD.label(g, 'sensitivity + penalties ' + (S.sen + pen).toFixed(1) + ' dBm', x1, Y(S.sen + pen) + 12, BD.C.red, 'right');
+      // label the sensitivity line where it hits neither the power values nor the power line: right or left end, below or above
+      var ys = Y(S.sen + pen), sl = 'sensitivity + penalties ' + (S.sen + pen).toFixed(1) + ' dBm', boxes = [];
+      levels.forEach(function (lv, i) { var xa = x0 + i * w, vw = g.measureText(lv.toFixed(1)).width;
+        boxes.push([xa + w / 2 - vw / 2, Y(lv) - 14, xa + w / 2 + vw / 2, Y(lv) - 5], [xa, Y(lv) - 1, xa + w, Y(lv) + 1]);
+        if (i) boxes.push([xa - 1, Math.min(Y(levels[i - 1]), Y(lv)), xa + 1, Math.max(Y(levels[i - 1]), Y(lv))]); });
+      var cand = [[x1, ys + 12, 'right'], [x1, ys - 4, 'right'], [x0, ys + 12, 'left'], [x0, ys - 4, 'left']], pick = null;
+      [sl, 'need ' + (S.sen + pen).toFixed(1) + ' dBm'].forEach(function (s) {   // the short form only when the long one fits nowhere
+        var sw = g.measureText(s).width; cand.forEach(function (cd) { if (pick) return; var lx = cd[2] === 'right' ? cd[0] - sw : cd[0], ty = cd[1] - 8;
+          if (!boxes.some(function (b) { return b[0] < lx + sw && b[2] > lx && b[1] < ty + 9 && b[3] > ty; })) pick = [s, cd]; }); });
+      if (!pick) pick = [sl, cand[0]];
+      BD.label(g, pick[0], pick[1][0], pick[1][1], BD.C.red, pick[1][2]);
       BD.label(g, 'dBm', 6, top, BD.C.dim);
     })();
     // ---- margin bars

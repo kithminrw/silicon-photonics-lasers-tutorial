@@ -7,10 +7,10 @@
     <label class="bd-sl"><span>tip width <b data-v="w"></b></span><input type="range" data-k="w" min="0.08" max="0.5" step="0.002" value="0.16" aria-label="tip width"></label>
     <label class="bd-sl"><span>lateral fibre offset <b data-v="dx"></b></span><input type="range" data-k="dx" min="0" max="3" step="0.02" value="0" aria-label="lateral offset"></label>
   </div>
-  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: taper top view (widths stretched) and the facet cross-section to scale, with the mode and the fibre's mode</span></div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top (width stretched), facet to scale</span></div>
   <div class="bd-row">
     <div class="bd-scope tall"><canvas data-c="m" aria-hidden="true"></canvas><span class="bd-tag">mode-field diameter against tip width (femwell)</span></div>
-    <div class="bd-scope tall"><canvas data-c="o" aria-hidden="true"></canvas><span class="bd-tag">coupling to the fibre against tip width (femwell overlap)</span></div>
+    <div class="bd-scope tall"><canvas data-c="o" aria-hidden="true"></canvas><span class="bd-tag">fibre coupling against tip width (femwell)</span></div>
   </div>
   <div class="bd-read" aria-live="polite"><span>n<sub>eff</sub> at the tip <b data-o="ne">–</b></span><span>mode size (1/e², x × y) <b data-o="mfd">–</b></span><span>coupling <b data-o="eta">–</b></span><span>1 dB lateral tolerance <b data-o="tol">–</b></span></div>
   <p class="bd-caption" data-o="cap"></p>
@@ -42,6 +42,7 @@
     // ---- geometry
     (function () {
       var dv = BD.setup(q('[data-c="g"]')), g = dv.g, H = dv.h, split = Math.round(dv.w * 0.5);
+      var cmp = split + 18 + g.measureText('facet cross-section, to scale').width > dv.w - 96;   // narrow panel: short labels (the tag names both views)
       // left: top view, length compressed and widths stretched (the 500 nm input drawn at 40 % of the height)
       var lx0 = 16, lx1 = split - 40, cy = 30 + (H - 54) / 2, wIn = 0.5, k = 0.4 * (H - 54) / wIn;
       g.fillStyle = BD.GEO.ox; g.fillRect(0, 18, split - 20, H - 18);
@@ -55,8 +56,9 @@
       BD.label(g, 'facet', lx1 - 4, 44, BD.C.axis, 'right');
       BD.dim(g, lx0 + 40, H - 12, lx1, H - 12, 'taper, ~200 µm', BD.C.gold, 0);
       BD.label(g, '500 nm', lx0, cy - wIn * k / 2 - 6, BD.C.axis);
-      BD.label(g, (1000 * w).toFixed(0) + ' nm tip', lx1 - 4, cy - Math.max(w * k / 2, 4) - 8, BD.C.white, 'right');
-      BD.label(g, 'top view (widths stretched)', 8, 40, BD.C.dim);
+      var tl = (1000 * w).toFixed(0) + ' nm tip', tup = lx1 - 4 - g.measureText(tl).width > lx0 + g.measureText('500 nm').width + 4;   // above the tip, or below it when it would meet the 500 nm label
+      BD.label(g, tl, lx1 - 4, tup ? cy - Math.max(w * k / 2, 4) - 8 : cy + Math.max(w * k / 2, 4) + 14, BD.C.white, 'right');
+      BD.label(g, cmp ? 'top view' : 'top view (widths stretched)', 8, 40, BD.C.dim);
       // right: facet cross-section to scale, window 14 um
       var rx0 = split, rw = dv.w - split - 8, sc = Math.min(rw, H - 26) / 14, cx = rx0 + rw / 2, yc = 22 + (H - 26) / 2;
       g.save(); g.beginPath(); g.rect(rx0, 18, rw, H - 18); g.clip();
@@ -73,8 +75,8 @@
       // fibre mode (1/e^2 circle), offset laterally
       g.strokeStyle = BD.C.blue; g.setLineDash([5, 4]); g.beginPath(); g.arc(cx + S.dx * sc, yc, wf * sc, 0, 2 * Math.PI); g.stroke(); g.setLineDash([]);
       g.restore();
-      BD.label(g, 'facet cross-section, to scale', rx0 + 8, 40, BD.C.dim);
-      BD.label(g, FIB[fib].n + ' mode ' + fm + ' µm (dashed)', rx0 + 8, 54, BD.C.blue);
+      if (!cmp) BD.label(g, 'facet cross-section, to scale', rx0 + 8, 40, BD.C.dim);
+      BD.label(g, cmp ? FIB[fib].n.replace(' fibre', '') + ' ' + fm + ' µm (dashed)' : FIB[fib].n + ' mode ' + fm + ' µm (dashed)', rx0 + 8, 54, BD.C.blue);
       BD.label(g, 'Si substrate (2 µm BOX)', rx0 + 8, H - 6, BD.C.axis);
       BD.scalebar(g, dv.w - 96, 40, sc, 80);
     })();

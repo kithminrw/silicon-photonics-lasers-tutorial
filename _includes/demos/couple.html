@@ -10,8 +10,8 @@
     <label class="bd-sl"><span>tilt <b data-v="th"></b></span><input type="range" data-k="th" min="0" max="6" step="0.02" value="0" aria-label="tilt"></label>
     <label class="bd-sl"><span>gap (waist to waist) <b data-v="z"></b></span><input type="range" data-k="z" min="0" max="60" step="0.1" value="10" aria-label="gap"></label>
   </div>
-  <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: side view to scale, with the fibre's beam spreading across the gap and the chip's mode</span></div>
-  <div class="bd-scope"><canvas data-c="p" aria-hidden="true"></canvas><span class="bd-tag">coupling against each misalignment, the others held at their current values</span></div>
+  <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: side view to scale, beam in the gap</span></div>
+  <div class="bd-scope"><canvas data-c="p" aria-hidden="true"></canvas><span class="bd-tag">coupling against each misalignment alone</span></div>
   <div class="bd-read" aria-live="polite"><span>coupling <b data-o="eta">–</b></span><span>1 dB offset <b data-o="td">–</b></span><span>1 dB tilt <b data-o="tt">–</b></span><span>1 dB gap <b data-o="tz">–</b></span></div>
   <p class="bd-caption" data-o="cap"></p>
 </div>
@@ -82,7 +82,11 @@
       if (S.z > 0.5) BD.dim(g, xf, H - 8, xc, H - 8, 'gap ' + S.z.toFixed(1) + ' µm', BD.C.gold, 0);
       BD.label(g, 'fibre, mode ' + S.m1.toFixed(1) + ' µm', 6, 40, BD.C.blue);
       BD.label(g, 'chip, mode ' + S.m2.toFixed(1) + ' µm', dv.w - 8, 40, BD.C.gold, 'right');
-      BD.label(g, 'Rayleigh range in the gap ' + zr.toFixed(1) + ' µm', dv.w / 2, 40, BD.C.dim, 'center');
+      // between the two mode labels when it fits, else on a second row (short if need be)
+      var rl = 'Rayleigh range in the gap ' + zr.toFixed(1) + ' µm', rw = g.measureText(rl).width, wl = g.measureText('fibre, mode ' + S.m1.toFixed(1) + ' µm').width, wr = g.measureText('chip, mode ' + S.m2.toFixed(1) + ' µm').width;
+      var row1 = dv.w / 2 - rw / 2 > 6 + wl + 8 && dv.w / 2 + rw / 2 < dv.w - 8 - wr - 8;
+      if (!row1 && rw > dv.w - 16) rl = 'Rayleigh range ' + zr.toFixed(1) + ' µm';
+      BD.label(g, rl, dv.w / 2, row1 ? 40 : 54, BD.C.dim, 'center');
       BD.scalebar(g, dv.w - 96, H - 14, sc, 80);
     })();
     // ---- three tolerance panels

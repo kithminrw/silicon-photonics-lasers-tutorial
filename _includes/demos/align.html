@@ -3,7 +3,7 @@
   <div class="bd-head"><span>// try it · align a two-fibre array to a loopback (127 <span class="nc">µm</span> pitch)</span>
     <span class="bd-seg" role="group" aria-label="Step size"><button type="button" data-step="0.5" aria-pressed="false">0.5 µm</button><button type="button" data-step="1" aria-pressed="false">1 µm</button><button type="button" data-step="2" aria-pressed="true">2 µm</button><button type="button" data-step="5" aria-pressed="false">5 µm</button></span></div>
   <div class="bd-row">
-    <div class="bd-scope tall"><canvas data-c="m" aria-hidden="true"></canvas><span class="bd-tag">your search path (map hidden until you reveal it)</span></div>
+    <div class="bd-scope tall"><canvas data-c="m" aria-hidden="true"></canvas><span class="bd-tag">your search path (map hidden until revealed)</span></div>
     <div>
       <div class="bd-scope tall"><canvas data-c="p" aria-hidden="true"></canvas><span class="bd-tag">power meter: loopback power against move</span></div>
     </div>
@@ -63,7 +63,7 @@
   });
   function draw() {
     // ---- map / path
-    var dv = BD.setup(q('[data-c="m"]')), R = 24, f = BD.frame(dv, { x: [-R, R], y: [-R, R], pad: { l: 30, b: 22, t: 22 },
+    var dv = BD.setup(q('[data-c="m"]')), R = 24, f = BD.frame(dv, { x: [-R, R], y: [-R, R], pad: { l: 30, b: 22, t: 30 },
       xt: [[-20, '−20'], [0, '0'], [20, '20 µm']], yt: [[-20, '−20'], [0, '0'], [20, '20']] }), g = dv.g;
     if (reveal) {
       var n = 60;

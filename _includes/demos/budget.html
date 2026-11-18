@@ -30,19 +30,28 @@
     var lev = [], p = S.pl; steps.forEach(function (s) { p += s[1]; lev.push(p); });
     var rx = lev[lev.length - 1], margin = rx - S.sens, loss = S.pl - rx;
     var ymin = Math.min(S.sens - 3, rx - 3, -20), ymax = Math.max(S.pl + 2, 0);
-    var d = BD.setup(q('[data-c="w"]')), n = steps.length, f = BD.frame(d, { x: [-0.5, n - 0.5], y: [ymin, ymax], pad: { l: 44, b: 34 },
-      yt: [[ymin, ymin.toFixed(0)], [0, '0 dBm'], [ymax, ymax.toFixed(0)]] }), g = d.g;
-    var bw = (f.X(1) - f.X(0)) * 0.6;
+    var d = BD.setup(q('[data-c="w"]')), n = steps.length, yt = [[ymin, ymin.toFixed(0)], [0, '0 dBm']];
+    if (ymax / (ymax - ymin) * (d.h - 64) > 11) yt.push([ymax, ymax.toFixed(0)]);   // the top tick only when it clears the 0 dBm one
+    var f = BD.frame(d, { x: [-0.5, n - 0.5], y: [ymin, ymax], pad: { l: 44, b: 34 }, yt: yt }), g = d.g;
+    var bw = (f.X(1) - f.X(0)) * 0.6, boxes = [];
+    // block names on one row, or staggered on two when the columns are too narrow for them
+    var two = steps.some(function (s, i) { return i && (g.measureText(s[0]).width + g.measureText(steps[i - 1][0]).width) / 2 + 6 > f.X(1) - f.X(0); });
     for (var i = 0; i < n; i++) {
       var top = i ? lev[i - 1] : lev[0], bot = lev[i], x = f.X(i);
       if (i === 0) { g.fillStyle = BD.C.gold; g.fillRect(x - bw / 2, f.Y(lev[0]), bw, f.Y(ymin) - f.Y(lev[0])); }
       else { g.fillStyle = 'rgba(240,138,106,.75)'; g.fillRect(x - bw / 2, f.Y(top), bw, Math.max(1, f.Y(bot) - f.Y(top)));
              g.strokeStyle = BD.C.dim; g.setLineDash([2, 2]); g.beginPath(); g.moveTo(f.X(i - 1) + bw / 2, f.Y(top)); g.lineTo(x - bw / 2, f.Y(top)); g.stroke(); g.setLineDash([]); }
-      g.fillStyle = BD.C.axis; g.textAlign = 'center'; g.fillText(steps[i][0], x, d.h - f.p.b + 13);
-      g.fillStyle = BD.C.white; g.fillText(lev[i].toFixed(1), x, f.Y(lev[i]) + (i ? 12 : -4));
+      g.fillStyle = BD.C.axis; g.textAlign = 'center'; g.fillText(steps[i][0], x, d.h - f.p.b + 13 + (two && i % 2 ? 11 : 0));
+      var vs = lev[i].toFixed(1), vy = f.Y(lev[i]) + (i ? 12 : -4), vw = g.measureText(vs).width;
+      g.fillStyle = BD.C.white; g.fillText(vs, x, vy); boxes.push([x - vw / 2, vy - 8, x + vw / 2, vy + 1]);
     }
     g.textAlign = 'left';
-    BD.hline(f, S.sens, BD.C.green, [5, 4], 'receiver sensitivity');
+    // the sensitivity line's label goes where it misses the power values: right or left end, above or below the line
+    BD.hline(f, S.sens, BD.C.green, [5, 4]);
+    var ys = f.Y(S.sens), sl = 'receiver sensitivity', sw = g.measureText(sl).width, xr = d.w - f.p.r - 2 - sw, xl = f.p.l + 4;
+    var pk = [[xr, ys - 4], [xr, ys + 11], [xl, ys - 4], [xl, ys + 11]].filter(function (c) {
+      return !boxes.some(function (b) { return b[0] < c[0] + sw && b[2] > c[0] && b[1] < c[1] + 1 && b[3] > c[1] - 8; }); })[0] || [xr, ys - 4];
+    BD.label(g, sl, pk[0], pk[1], BD.C.green);
     // margin bracket at the right
     var xm = f.X(n - 1) + bw / 2 + 6; g.strokeStyle = margin >= 3 ? BD.C.green : BD.C.red; g.lineWidth = 2;
     g.beginPath(); g.moveTo(xm, f.Y(rx)); g.lineTo(xm, f.Y(S.sens)); g.stroke(); g.lineWidth = 1;

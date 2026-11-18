@@ -7,10 +7,10 @@
     <label class="bd-sl"><span>numerical aperture NA <b data-v="na"></b></span><input type="range" data-k="na" min="0.05" max="0.35" step="0.001" value="0.123" aria-label="numerical aperture"></label>
     <label class="bd-sl"><span>wavelength λ <b data-v="lam"></b></span><input type="range" data-k="lam" min="0.6" max="1.7" step="0.005" value="1.55" aria-label="wavelength"></label>
   </div>
-  <div class="bd-scope short"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: fibre cross-section to scale, LP01 intensity and its mode-field diameter</span></div>
+  <div class="bd-scope short"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: fibre section to scale, LP01 and MFD</span></div>
   <div class="bd-row">
     <div class="bd-scope tall"><canvas data-c="b" aria-hidden="true"></canvas><span class="bd-tag">normalised propagation constant b against V</span></div>
-    <div class="bd-scope tall"><canvas data-c="f" aria-hidden="true"></canvas><span class="bd-tag">LP01 field: exact (solid) and Gaussian fit (dashed)</span></div>
+    <div class="bd-scope tall"><canvas data-c="f" aria-hidden="true"></canvas><span class="bd-tag">LP01 field: exact (solid), Gaussian fit (dashed)</span></div>
   </div>
   <div class="bd-read" aria-live="polite"><span>V <b data-o="v">–</b></span><span>guided LP modes <b data-o="m">–</b></span><span>single-mode cut-off λ<sub>c</sub> <b data-o="lc">–</b></span><span>MFD (Marcuse) <b data-o="mfd">–</b></span></div>
   <p class="bd-caption" data-o="cap"></p>
@@ -69,7 +69,7 @@
     if (curves.LP11) { dv.g.fillStyle = BD.C.blue; dv.g.fillText('LP11', f.X(4.2), f.Y(0.5)); }
     // field of LP01 against radius, and the Marcuse Gaussian
     var md0 = ms[0], w0 = S.a * (0.65 + 1.619 * Math.pow(V, -1.5) + 2.879 * Math.pow(V, -6)), rmax = Math.max(3 * w0, 1.6 * S.a);
-    var d2 = BD.setup(q('[data-c="f"]')), f2 = BD.frame(d2, { x: [0, rmax], y: [0, 1.05], pad: { l: 32, b: 22 }, xt: [[0, '0'], [S.a, 'a'], [rmax, rmax.toFixed(1) + ' µm']], yt: [[0, '0'], [1, '1']] });
+    var d2 = BD.setup(q('[data-c="f"]')), f2 = BD.frame(d2, { x: [0, rmax], y: [0, 1.05], pad: { l: 32, b: 22 }, xt: [[0, (d2.w - 44) * S.a / rmax > 14 ? '0' : ''], [S.a, 'a'], [rmax, rmax.toFixed(1) + ' µm']], yt: [[0, '0'], [1, '1']] });
     d2.g.fillStyle = 'rgba(224,184,90,.10)'; d2.g.fillRect(f2.X(0), f2.p.t, f2.X(S.a) - f2.X(0), d2.h - f2.p.t - f2.p.b);
     if (md0) {
       var u = md0.u, w = Math.sqrt(V * V - u * u), rs = [], ex = [], ga = [];
@@ -80,16 +80,16 @@
     // ---- geometry: core, LP01 intensity, MFD circle; the 125 um cladding extends beyond the view
     (function () {
       var dv2 = BD.setup(q('[data-c="g"]')), gg = dv2.g, R = Math.max(2.2 * w0, 1.6 * S.a), sc = (dv2.h - 34) / (2 * R), cx = dv2.w * 0.35, cy = 22 + (dv2.h - 34) / 2;
+      var A = (2 * S.a).toFixed(1), M = (2 * w0).toFixed(1), L = ['core: 2a = ' + A + ' µm (solid circle)', 'MFD = ' + M + ' µm (dashed)', 'cladding Ø 125 µm, beyond the view'];
+      if (cx + R * sc + 20 + gg.measureText(L[2]).width > dv2.w - 4) { cx = R * sc + 12; L = ['core 2a = ' + A + ' µm (solid)', 'MFD = ' + M + ' µm (dashed)', 'cladding Ø 125 µm']; }   // narrow panel: circle to the left, short labels
       gg.fillStyle = 'rgba(160,200,240,.12)'; gg.fillRect(0, 18, dv2.w, dv2.h - 18);
       var gr = gg.createRadialGradient(cx, cy, 0, cx, cy, 2.5 * w0 * sc);
       for (var i = 0; i <= 10; i++) { var r = 2.5 * w0 * i / 10; gr.addColorStop(i / 10, 'rgba(255,214,120,' + (0.85 * Math.exp(-2 * r * r / (w0 * w0))).toFixed(3) + ')'); }
       gg.fillStyle = gr; gg.beginPath(); gg.arc(cx, cy, 2.5 * w0 * sc, 0, 7); gg.fill();
       gg.strokeStyle = BD.GEO.si; gg.lineWidth = 2; gg.beginPath(); gg.arc(cx, cy, S.a * sc, 0, 7); gg.stroke(); gg.lineWidth = 1;
       gg.strokeStyle = BD.C.gold; gg.setLineDash([4, 3]); gg.beginPath(); gg.arc(cx, cy, w0 * sc, 0, 7); gg.stroke(); gg.setLineDash([]);
-      var tx = cx + R * sc + 20;
-      BD.label(gg, 'core: 2a = ' + (2 * S.a).toFixed(1) + ' µm (solid circle)', tx, cy - 14, BD.C.axis);
-      BD.label(gg, 'MFD = ' + (2 * w0).toFixed(1) + ' µm (dashed)', tx, cy + 2, BD.C.gold);
-      BD.label(gg, 'cladding Ø 125 µm, beyond the view', tx, cy + 18, BD.C.dim);
+      var tx = cx + R * sc + (L[2].length > 20 ? 20 : 14);
+      BD.label(gg, L[0], tx, cy - 14, BD.C.axis); BD.label(gg, L[1], tx, cy + 2, BD.C.gold); BD.label(gg, L[2], tx, cy + 18, BD.C.dim);
       BD.scalebar(gg, dv2.w - 100, dv2.h - 8, sc, 70);
     })();
     var lc = 2 * Math.PI * S.a * S.na / 2.405;

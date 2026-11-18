@@ -49,7 +49,8 @@
       BD.label(g, 'n+ Ge', X(-wd / 2 - 2.6), Y(0.32 + S.d) - 22, 'rgba(120,170,240,1)');
       BD.label(g, 'p Si', X(wd / 2 + 2.6), Y(0.11) + 14, 'rgba(240,150,170,1)', 'right');
       if (il === 'ni') { g.fillStyle = BD.C.gold; for (var k = -2; k <= 2; k++) { var xx = X(k * wd / 6); g.fillRect(xx - 1, 24, 2, Y(0.42 + S.d) - 34); g.beginPath(); g.moveTo(xx - 5, Y(0.42 + S.d) - 12); g.lineTo(xx + 5, Y(0.42 + S.d) - 12); g.lineTo(xx, Y(0.42 + S.d) - 4); g.fill(); } BD.label(g, 'light from above', X(wd / 6) + 8, 40, BD.C.gold); }
-      else BD.label(g, '⊙ light travels into the page along a ' + S.s.toFixed(0) + ' µm long detector, fed by the Si waveguide below', 10, 36, BD.C.gold);
+      else BD.label(g, ['⊙ light travels into the page along a ' + S.s.toFixed(0) + ' µm long detector, fed by the Si waveguide below', '⊙ light travels into the page, along ' + S.s.toFixed(0) + ' µm of Ge',
+        '⊙ light travels into the page'].filter(function (s, i) { return i === 2 || 10 + g.measureText(s).width <= dv.w - 108; })[0], 10, 36, BD.C.gold);   // as long as fits left of the scale bar
       BD.dim(g, X(-wd / 2), Y(0) + 12, X(wd / 2), Y(0) + 12, (il === 'wg' ? 'width ' : 'diameter ') + wd.toFixed(1) + ' µm', BD.C.axis, 0);
       BD.scalebar(g, dv.w - 100, 36, sc, 80);
     })();

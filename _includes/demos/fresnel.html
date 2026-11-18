@@ -8,7 +8,7 @@
     <label class="bd-sl"><span>angle of incidence θ<sub>1</sub> <b data-v="th"></b></span><input type="range" data-k="th" min="0" max="89.5" step="0.1" value="30" aria-label="angle"></label>
   </div>
   <div class="bd-row">
-    <div class="bd-scope tall"><canvas data-c="ray" aria-hidden="true"></canvas><span class="bd-tag">rays (line width ∝ power) and the field beyond the interface</span></div>
+    <div class="bd-scope tall"><canvas data-c="ray" aria-hidden="true"></canvas><span class="bd-tag">rays (width ∝ power), field past the interface</span></div>
     <div class="bd-scope tall"><canvas data-c="rt" aria-hidden="true"></canvas><span class="bd-tag">reflected power R against angle</span></div>
   </div>
   <div class="bd-read" aria-live="polite"><span>R <b data-o="R">–</b></span><span>T <b data-o="T">–</b></span><span>θ<sub>c</sub> <b data-o="tc">–</b></span><span>θ<sub>B</sub> <b data-o="tb">–</b></span><span>decay length at 1550 nm <b data-o="dp">–</b></span></div>
@@ -55,12 +55,12 @@
     } else {
       // evanescent field: intensity decays as exp(-2 z / d), drawn over 3 decay lengths
       var k0 = 2 * Math.PI / 1.55, kap = k0 * Math.sqrt(n1 * n1 * Math.sin(a) * Math.sin(a) - n2 * n2), dp = 1 / kap;
-      var px = (d.h - cy - 8) / Math.max(3 * dp, 0.05);
+      var px = (d.h - cy - 8) / Math.max(3 * dp, 0.05), lw = g.measureText('evanescent field').width, hw = Math.max(30, Math.min(70, d.w / 2 - lw - 12));   // narrower band on a narrow panel, so the label fits beside it
       for (var yy = 0; yy < d.h - cy; yy += 2) {
         var I = Math.exp(-2 * (yy / px) / dp);
-        g.fillStyle = 'rgba(127,224,160,' + (0.55 * I).toFixed(3) + ')'; g.fillRect(cx - 70, cy + yy, 140, 2);
+        g.fillStyle = 'rgba(127,224,160,' + (0.55 * I).toFixed(3) + ')'; g.fillRect(cx - hw, cy + yy, 2 * hw, 2);
       }
-      g.fillStyle = BD.C.green; g.fillText('evanescent field', cx + 76, cy + 16);
+      g.fillStyle = BD.C.green; g.fillText('evanescent field', cx + hw + 6, cy + 16);
     }
     // ---- R against angle
     var d2 = BD.setup(q('[data-c="rt"]')), f = BD.frame(d2, { x: [0, 90], y: [0, 1], xt: [[0, '0°'], [30, '30°'], [60, '60°'], [90, '90°']],
@@ -70,7 +70,7 @@
     BD.line(f, xs, rs, pol === 's' ? BD.C.blue : BD.C.dim, pol === 's' ? 2 : 1.2);
     BD.line(f, xs, rp, pol === 'p' ? BD.C.blue : BD.C.dim, pol === 'p' ? 2 : 1.2, [5, 3]);
     if (isFinite(tc)) BD.vline(f, tc, BD.C.green, [4, 3], 'θc');
-    BD.vline(f, tb, BD.C.teal, [2, 3], 'θB');
+    BD.vline(f, tb, BD.C.teal, [2, 3], 'θB', isFinite(tc) && Math.abs(f.X(tc) - f.X(tb)) < 24 ? 12 : 0);   // a second row when θc is close
     BD.dot(f, S.th, R, BD.C.gold, 4);
     d2.g.fillStyle = BD.C.dim; d2.g.textAlign = 'right'; d2.g.fillText('solid s · dashed p', d2.w - f.p.r - 6, d2.h - f.p.b - 8); d2.g.textAlign = 'left';
     // ---- readouts

@@ -8,8 +8,8 @@
     <label class="bd-sl"><span>input offset from centre <b data-v="x0"></b></span><input type="range" data-k="x0" min="0" max="3" step="0.01" value="0" aria-label="input offset"></label>
     <label class="bd-sl"><span>wavelength λ <b data-v="lam"></b></span><input type="range" data-k="lam" min="1.5" max="1.6" step="0.001" value="1.55" aria-label="wavelength"></label>
   </div>
-  <div class="bd-scope short"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top view of the MMI (width drawn larger than the length scale)</span></div>
-  <div class="bd-scope tall"><canvas data-c="m" aria-hidden="true"></canvas><span class="bd-tag">intensity in the multimode section (top view, length compressed)</span></div>
+  <div class="bd-scope short"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top view, width stretched</span></div>
+  <div class="bd-scope tall"><canvas data-c="m" aria-hidden="true"></canvas><span class="bd-tag">intensity in the MMI (top view, length squeezed)</span></div>
   <div class="bd-scope short"><canvas data-c="o" aria-hidden="true"></canvas><span class="bd-tag">intensity across the output end</span></div>
   <div class="bd-read" aria-live="polite"><span>guided modes <b data-o="n">–</b></span><span>beat length L<sub>π</sub> <b data-o="lp">–</b></span><span>1 × 2 length <b data-o="l12">–</b></span><span>power in upper / lower half <b data-o="ud">–</b></span></div>
   <p class="bd-caption" data-o="cap"></p>
@@ -64,9 +64,12 @@
     g.imageSmoothingEnabled = true; g.drawImage(off, padL, padT, wpx, hpx);
     g.strokeStyle = BD.C.axis; g.strokeRect(padL, padT, wpx, hpx);
     // guide marks at the 1x2 output positions (+-We/4)
-    g.fillStyle = BD.C.dim; g.fillText('input', padL + 4, padT + hpx * (1 - xc / G.We) - 6);
+    var yi = padT + hpx * (1 - xc / G.We); g.fillStyle = BD.C.dim; g.fillText('input', padL + 4, yi - 6 >= padT + 10 ? yi - 6 : yi + 14);   // below the input near the top edge
+    var lastR = -1e9;
     [[3 / 8, '3Lπ/8'], [3 / 4, '3Lπ/4'], [3 / 2, '3Lπ/2'], [3, '3Lπ']].forEach(function (m) {
-      var zz = m[0] * G.Lp; if (zz <= L) { var X = padL + wpx * zz / L; g.strokeStyle = 'rgba(255,255,255,.35)'; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(X, padT); g.lineTo(X, padT + hpx); g.stroke(); g.setLineDash([]); g.fillStyle = BD.C.dim; g.fillText(m[1], X + 3, padT + 10); }
+      var zz = m[0] * G.Lp; if (zz <= L) { var X = padL + wpx * zz / L; g.strokeStyle = 'rgba(255,255,255,.35)'; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(X, padT); g.lineTo(X, padT + hpx); g.stroke(); g.setLineDash([]);
+        var tw = g.measureText(m[1]).width, lx = X + 3 + tw > dv.w - 2 ? X - 3 - tw : X + 3, row = lx < lastR + 4 ? 1 : 0;   // left of the line at the right edge; a second row when two marks are close
+        g.fillStyle = BD.C.dim; g.fillText(m[1], lx, padT + 10 + 11 * row); if (!row) lastR = lx + tw; }
     });
     // ---- output cross-section
     var Iout = cache[cols - 1], xo = xs.map(function (x) { return x - G.We / 2; }), Io = Array.prototype.map.call(Iout, function (v) { return v / maxI; });
@@ -92,7 +95,7 @@
       BD.label(g, 'upper ' + (100 * up / tot).toFixed(0) + ' %', dg.w - 6, Y(S.W / 4 + wA / 2) - 4, BD.C.white, 'right');
       BD.label(g, 'lower ' + (100 * dn / tot).toFixed(0) + ' %', dg.w - 6, Y(-S.W / 4 - wA / 2) + 12, BD.C.white, 'right');
       BD.label(g, 'input', X(0), Y(S.x0 - wA / 2) + 12, BD.C.gold);
-      if (k > 1.05) BD.label(g, 'width drawn ×' + k.toFixed(1), dg.w - 6, top - 8, BD.C.dim, 'right');
+      if (k > 1.05) BD.label(g, (dg.w < 420 ? 'width ×' : 'width drawn ×') + k.toFixed(1), dg.w - 6, top - 8, BD.C.dim, 'right');   // short on a phone, clear of the panel tag
     })();
     // ---- readouts
     q('[data-o="n"]').textContent = G.N;

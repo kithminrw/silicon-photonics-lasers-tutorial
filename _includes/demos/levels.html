@@ -33,13 +33,15 @@
     var Wp = Math.pow(10, S.p), Ws = S.s > -2.99 ? Math.pow(10, S.s) : 0, P = pops(Wp, Ws, sys), inv = P.n2 - P.n1;
     // ---- level diagram
     (function () {
-      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, n = sys === 2 ? 2 : sys === 3 ? 3 : 4, x0 = 40, x1 = dv.w * 0.62, top = 40, bot = dv.h - 26;
+      // level names in a column on the right (name, then population), sized to the longest name, so they fit a phone-width panel
+      var names = sys === 2 ? ['level 1', 'level 2'] : sys === 3 ? ['1 ground', '2 upper laser', '3 pump band'] : ['0 ground', '1 lower laser', '2 upper laser', '3 pump band'];
+      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, n = names.length, x0 = 40, top = 40, bot = dv.h - 26;
+      var x1 = dv.w - 14 - Math.max.apply(null, names.map(function (s) { return g.measureText(s).width; })), ax = function (f) { return x0 + f * (x1 - x0); };
       var ys = n === 2 ? [bot, top + 30] : n === 3 ? [bot, top + 50, top] : [bot, bot - 50, top + 50, top];
-      var names = n === 2 ? ['1', '2'] : n === 3 ? ['1 (ground, lower laser level)', '2 (upper laser level)', '3 (pump band)'] : ['0 (ground)', '1 (lower laser level)', '2 (upper laser level)', '3 (pump band)'];
       for (var i = 0; i < n; i++) {
         g.strokeStyle = BD.C.white; g.lineWidth = 2; g.beginPath(); g.moveTo(x0, ys[i]); g.lineTo(x1, ys[i]); g.stroke(); g.lineWidth = 1;
         var w = (x1 - x0) * Math.min(1, P.lev[i]); g.fillStyle = 'rgba(224,184,90,.55)'; g.fillRect(x0, ys[i] - 9, w, 8);
-        BD.label(g, names[i] + '  ' + (100 * P.lev[i]).toFixed(1) + ' %', x1 + 8, ys[i] + 4, BD.C.axis);
+        BD.label(g, names[i], x1 + 8, ys[i] + 4, BD.C.axis); BD.label(g, (100 * P.lev[i]).toFixed(1) + ' %', x1 + 8, ys[i] + 15, BD.C.white);
       }
       function arrow(xa, ya, xb, yb, col, wd, lab) {
         g.strokeStyle = col; g.fillStyle = col; g.lineWidth = Math.max(1, wd); g.beginPath(); g.moveTo(xa, ya); g.lineTo(xb, yb); g.stroke();
@@ -47,11 +49,11 @@
         if (lab) BD.label(g, lab, xa + 6, (ya + yb) / 2, col);
       }
       var lw = function (r) { return 1 + 2.5 * Math.log10(1 + 10 * r); };
-      if (n === 2) { arrow(x0 + 30, ys[0] - 4, x0 + 30, ys[1] + 4, BD.C.blue, lw(Wp), 'pump'); arrow(x0 + 110, ys[1] + 4, x0 + 110, ys[0] - 4, BD.C.red, lw(P.n2), 'spontaneous'); }
-      else if (n === 3) { arrow(x0 + 30, ys[0] - 4, x0 + 30, ys[2] + 4, BD.C.blue, lw(Wp * P.n1), 'pump'); arrow(x0 + 80, ys[2] + 4, x0 + 80, ys[1] - 4, BD.C.dim, 1.5, 'fast');
-        arrow(x0 + 150, ys[1] + 4, x0 + 150, ys[0] - 4, BD.C.red, lw(P.n2 * (1 + Ws)), 'laser transition'); }
-      else { arrow(x0 + 30, ys[0] - 4, x0 + 30, ys[3] + 4, BD.C.blue, lw(Wp * P.lev[0]), 'pump'); arrow(x0 + 80, ys[3] + 4, x0 + 80, ys[2] - 4, BD.C.dim, 1.5, 'fast');
-        arrow(x0 + 150, ys[2] + 4, x0 + 150, ys[1] - 4, BD.C.red, lw(P.n2 * (1 + Ws)), 'laser transition'); arrow(x0 + 220, ys[1] + 4, x0 + 220, ys[0] - 4, BD.C.dim, 1.5, 'fast'); }
+      if (n === 2) { arrow(ax(0.1), ys[0] - 4, ax(0.1), ys[1] + 4, BD.C.blue, lw(Wp), 'pump'); arrow(ax(0.45), ys[1] + 4, ax(0.45), ys[0] - 4, BD.C.red, lw(P.n2), 'spontaneous'); }
+      else if (n === 3) { arrow(ax(0.1), ys[0] - 4, ax(0.1), ys[2] + 4, BD.C.blue, lw(Wp * P.n1), 'pump'); arrow(ax(0.32), ys[2] + 4, ax(0.32), ys[1] - 4, BD.C.dim, 1.5, 'fast');
+        arrow(ax(0.56), ys[1] + 4, ax(0.56), ys[0] - 4, BD.C.red, lw(P.n2 * (1 + Ws)), 'laser transition'); }
+      else { arrow(ax(0.1), ys[0] - 4, ax(0.1), ys[3] + 4, BD.C.blue, lw(Wp * P.lev[0]), 'pump'); arrow(ax(0.32), ys[3] + 4, ax(0.32), ys[2] - 4, BD.C.dim, 1.5, 'fast');
+        arrow(ax(0.56), ys[2] + 4, ax(0.56), ys[1] - 4, BD.C.red, lw(P.n2 * (1 + Ws)), 'laser transition'); arrow(ax(0.86), ys[1] + 4, ax(0.86), ys[0] - 4, BD.C.dim, 1.5, 'fast'); }
     })();
     // ---- inversion against pump for the three systems
     var d2 = BD.setup(q('[data-c="p"]')), f2 = BD.frame(d2, { x: [0.01, 100], y: [-1, 1], xlog: true, pad: { l: 40, b: 22, t: 30 },

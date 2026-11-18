@@ -8,7 +8,7 @@
     <label class="bd-sl"><span>coupler 2 power coupling <b data-v="k2"></b></span><input type="range" data-k="k2" min="0" max="1" step="0.01" value="0.5" aria-label="coupler 2"></label>
     <label class="bd-sl"><span>coupler 3 power coupling <b data-v="k3"></b></span><input type="range" data-k="k3" min="0" max="1" step="0.01" value="0.5" aria-label="coupler 3"></label>
   </div>
-  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: the layout drawn from the netlist (top view, delays not to scale)</span></div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: netlist layout, delays not to scale</span></div>
   <div class="bd-row">
     <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">transmission to the two outputs</span></div>
     <div class="bd-scope tall" style="overflow:auto"><pre data-o="net" style="margin:0;padding:26px 10px 8px;font:10.5px/1.45 'IBM Plex Mono',monospace;color:rgba(170,205,240,.85);white-space:pre"></pre><span class="bd-tag">netlist (instances, models and connections)</span></div>
@@ -56,7 +56,7 @@
       });
       up.push([x1 + 20, yu]); lo.push([x1 + 20, yl]);
       BD.wgr(g, up, 3, BD.GEO.si, 8); BD.wgr(g, lo, 3, BD.GEO.si, 8);
-      BD.label(g, 'in', x0 - 24, yu - 6, BD.C.axis); BD.label(g, 'bar', x1 + 4, yu - 6, BD.C.blue); BD.label(g, 'cross', x1 + 4, yl + 14, BD.C.red);
+      BD.label(g, 'in', x0 - 24, yu - 6, BD.C.axis); BD.label(g, 'bar', dv.w - 4, yu - 6, BD.C.blue, 'right'); BD.label(g, 'cross', dv.w - 4, yl + 14, BD.C.red, 'right');
     })();
     // ---- spectrum
     var l0 = 1.53, l1 = 1.57, xs = [], b = [], x = [];

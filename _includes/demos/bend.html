@@ -6,7 +6,7 @@
     <label class="bd-sl"><span>Euler fraction p <b data-v="p"></b></span><input type="range" data-k="p" min="0" max="1" step="0.01" value="1" aria-label="Euler fraction"></label>
   </div>
   <div class="bd-row">
-    <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top view to scale (500 nm wide waveguides)</span></div>
+    <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top view to scale, 500 nm waveguides</span></div>
     <div class="bd-scope tall"><canvas data-c="k" aria-hidden="true"></canvas><span class="bd-tag">curvature along the bend</span></div>
   </div>
   <div class="bd-read" aria-live="polite"><span>circular: radius <b data-o="rc">–</b>, length <b data-o="lc">–</b></span><span>Euler: minimum radius <b data-o="re">–</b>, length <b data-o="le">–</b></span></div>
@@ -42,7 +42,7 @@
     // colour the Euler path by curvature
     for (var i = 1; i < e.pts.length; i += 3) { var t = e.ks[i] / e.kmax; g.fillStyle = 'rgba(255,214,120,' + (0.15 + 0.7 * t).toFixed(2) + ')'; g.fillRect(X(e.pts[i][0]) - 1.5, Y(e.pts[i][1]) - 1.5, 3, 3); }
     BD.dim(g, X(0), Y(0) + 14, X(R), Y(0) + 14, 'R = ' + R.toFixed(1) + ' µm', BD.C.gold, 11);
-    BD.label(g, 'circular (faint)', X(R * 0.55), Y(R * 0.1) - 4, 'rgba(127,184,240,.9)');
+    BD.label(g, 'circular (faint)', X(R * 0.707) - 9 - wPx * 0.36, Y(R * 0.293) - 9 - wPx * 0.36, 'rgba(127,184,240,.9)', 'right');   // inside the arc's midpoint (the Euler path runs outside it)
     BD.label(g, S.p > 0 ? 'Euler (glow ∝ curvature)' : '', X(R * 0.05), Y(R * 0.95), BD.C.gold);
     BD.scalebar(g, dg.w - 90, 34, sc, 60);
     // ---- curvature against path length

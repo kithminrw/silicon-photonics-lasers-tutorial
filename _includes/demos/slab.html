@@ -11,7 +11,7 @@
     <label class="bd-sl"><span>substrate index n<sub>2</sub> <b data-v="n2"></b></span><input type="range" data-k="n2" min="1" max="3.4" step="0.005" value="1.444" aria-label="substrate index"></label>
     <label class="bd-sl"><span>cover index n<sub>3</sub> <b data-v="n3"></b></span><input type="range" data-k="n3" min="1" max="3.4" step="0.005" value="1.444" aria-label="cover index"></label>
   </div>
-  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: side view to scale, with the zig-zag ray of each guided mode</span></div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: side view to scale, each mode's ray</span></div>
   <div class="bd-row">
     <div class="bd-scope tall"><canvas data-c="f" aria-hidden="true"></canvas><span class="bd-tag">mode fields across the slab (core shaded)</span></div>
     <div class="bd-scope tall"><canvas data-c="n" aria-hidden="true"></canvas><span class="bd-tag">effective index against thickness</span></div>
@@ -67,7 +67,10 @@
     var span = Math.max(d * 3, 1.2 * lam), x0 = d / 2 - span / 2, x1 = d / 2 + span / 2, xs = [];
     for (var i = 0; i <= 400; i++) xs.push(x0 + (x1 - x0) * i / 400);
     var dv = BD.setup(q('[data-c="f"]')), f = BD.frame(dv, { x: [x0, x1], y: [-1.15, 1.15], pad: { l: 30, b: 22 },
-      xt: [[0, '0'], [d, (1000 * d).toFixed(0) + ' nm']], yt: [[0, '0']] }), g = dv.g;
+      xt: [[0, ''], [d, '']], yt: [[0, '0']] }), g = dv.g;
+    // the core's edge labels, centred on their ticks, or pushed apart (0 left, thickness right) for a thin core
+    var dl = (1000 * d).toFixed(0) + ' nm', near = f.X(d) - f.X(0) < (g.measureText('0').width + g.measureText(dl).width) / 2 + 6;
+    BD.label(g, '0', near ? f.X(0) - 1 : f.X(0), dv.h - f.p.b + 12, BD.C.axis, near ? 'right' : 'center'); BD.label(g, dl, near ? f.X(d) + 1 : f.X(d), dv.h - f.p.b + 12, BD.C.axis, near ? 'left' : 'center');
     g.fillStyle = 'rgba(224,184,90,.12)'; g.fillRect(f.X(0), f.p.t, f.X(d) - f.X(0), dv.h - f.p.t - f.p.b);
     g.fillStyle = BD.C.dim; g.fillText('n₂', f.X(x0) + 6, dv.h - f.p.b - 6); g.textAlign = 'right'; g.fillText('n₃', f.X(x1) - 6, dv.h - f.p.b - 6); g.textAlign = 'left';
     var gam = NaN, dcov = NaN;
@@ -117,7 +120,11 @@
       BD.label(g, 'n₂ = ' + n2.toFixed(3) + ' (substrate)', 8, bot - 4, BD.C.axis);
       BD.dim(g, dg.w - 70, yT, dg.w - 70, yB, (1000 * d).toFixed(0) + ' nm', BD.C.gold, 26);
       BD.scalebar(g, dg.w - 150, bot - 6, sc, 60);
-      if (ms.length) BD.label(g, 'θ₀ = ' + (Math.asin(ms[0] / n1) * 180 / Math.PI).toFixed(1) + '° from the normal', dg.w / 2 - 70, top + 12, BD.C.gold);
+      if (ms.length) {   // centred if it clears the cover label, else at the right end, else short
+        var t0 = 'θ₀ = ' + (Math.asin(ms[0] / n1) * 180 / Math.PI).toFixed(1) + '°', tl = t0 + ' from the normal', x3 = 18 + g.measureText('n₃ = ' + n3.toFixed(3) + ' (cover)').width;
+        if (dg.w / 2 - 70 >= x3) BD.label(g, tl, dg.w / 2 - 70, top + 12, BD.C.gold);
+        else BD.label(g, dg.w - 8 - g.measureText(tl).width >= x3 ? tl : t0, dg.w - 8, top + 12, BD.C.gold, 'right');
+      }
     })();
     // ---- readouts
     q('[data-o="m"]').textContent = ms.length + ' ' + pol + (ms.length ? ' (' + pol + '0' + (ms.length > 1 ? '–' + pol + (ms.length - 1) : '') + ')' : '');

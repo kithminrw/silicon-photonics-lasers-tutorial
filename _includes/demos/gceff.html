@@ -8,9 +8,9 @@
     <label class="bd-sl"><span>fibre position along the grating <b data-v="zf"></b></span><input type="range" data-k="zf" min="0" max="16" step="0.05" value="3.8" aria-label="fibre position"></label>
     <label class="bd-sl"><span>BOX thickness <b data-v="t"></b></span><input type="range" data-k="t" min="1" max="3.5" step="0.005" value="2" aria-label="BOX thickness"></label>
   </div>
-  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: side view to scale (the silicon layer and its teeth drawn 4× thicker), with the emitted light and the fibre</span></div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: side view to scale (Si 4× thicker)</span></div>
   <div class="bd-row">
-    <div class="bd-scope tall"><canvas data-c="p" aria-hidden="true"></canvas><span class="bd-tag">emitted power against the fibre mode, along the grating</span></div>
+    <div class="bd-scope tall"><canvas data-c="p" aria-hidden="true"></canvas><span class="bd-tag">emission and fibre mode along the grating</span></div>
     <div class="bd-scope tall"><canvas data-c="d" aria-hidden="true"></canvas><span class="bd-tag">directionality against BOX thickness</span></div>
   </div>
   <div class="bd-read" aria-live="polite"><span>directionality <b data-o="D">–</b></span><span>emitted before the end <b data-o="E">–</b></span><span>mode overlap <b data-o="M">–</b></span><span>coupling efficiency <b data-o="CE">–</b></span></div>
@@ -87,7 +87,10 @@
       g.fillStyle = 'rgba(127,184,240,.12)'; g.fillRect(-w0 * sc * 1.8, -hgt * 1.3, 3.6 * w0 * sc, hgt * 1.3);
       g.fillStyle = 'rgba(127,184,240,.32)'; g.fillRect(-w0 * sc, -hgt * 1.3, 2 * w0 * sc, hgt * 1.3);
       g.restore();
-      BD.label(g, 'fibre core (mode 10.4 µm)', xc + w0 * sc + 8, top + 14, BD.C.blue);
+      // right of the core, else left of it, else the short form
+      var fc = [['fibre core (mode 10.4 µm)', 1], ['fibre core (mode 10.4 µm)', -1], ['fibre core', 1], ['fibre core', -1]].filter(function (c) {
+        var w = g.measureText(c[0]).width; return c[1] > 0 ? xc + w0 * sc + 8 + w <= dv.w - 4 : xc - w0 * sc - 8 - w >= 14 + BD.nice(50 / sc) * sc; })[0] || ['fibre core', 1];   // left: clear of the scale bar
+      BD.label(g, fc[0], xc + fc[1] * (w0 * sc + 8), top + 14, BD.C.blue, fc[1] > 0 ? 'left' : 'right');
       BD.dim(g, x0, base + 12, x0 + L * sc, base + 12, 'grating ' + L + ' µm', BD.C.gold, 0);
       BD.dim(g, dv.w - 24, base, dv.w - 24, subTop, '', BD.C.white, 0);
       BD.label(g, 'BOX ' + S.t.toFixed(2) + ' µm', dv.w - 30, (base + subTop) / 2 + 4, BD.C.white, 'right');
