@@ -40,7 +40,12 @@ $$S = \frac{\mathrm{d}\lambda}{\mathrm{d}n_c} = \frac{\lambda}{n_g}\,\frac{\part
 
 </div>
 
-with $$\sigma_\lambda$$ the noise in tracking the resonance. Computed with femwell for a 500 × 220 nm silicon strip in water (<code>figsrc/ch34_sensor.py</code>), $$S$$ is 54 nm per refractive-index unit (RIU) for TE light and 206 nm/RIU for TM. TM's field reaches far further into the water above the strip, so half of a change in the water's index appears in its effective index, against 15 % for TE. Thinner or slotted waveguides and subwavelength gratings push more of the field into the analyte still.
+with $$\sigma_\lambda$$ the noise in tracking the resonance. Computed with femwell for a 500 × 220 nm silicon strip in water (<code>figsrc/ch34_sensor.py</code>), $$S$$ is 54 nm per refractive-index unit (RIU) for TE light and 206 nm/RIU for TM. TM's field reaches far further into the water above the strip ([Figure 34.1](#fig-34-1)), so half of a change in the water's index appears in its effective index, against 15 % for TE. Thinner or slotted waveguides and subwavelength gratings push more of the field into the analyte still.
+
+<figure id="fig-34-1">
+  <img src="{{ '/assets/figs/ch34_sensor.svg' | relative_url }}" style="width:640px" alt="Power density of the TE0 and TM0 modes of a 500 by 220 nm silicon strip on oxide covered by water at 1550 nm: the TE mode stays mostly inside the silicon and spreads sideways, the TM mode reaches much further into the water above and the oxide below; insets give effective indices 2.426 and 1.703, index sensitivities 0.15 and 0.50, and bulk sensitivities 54 and 206 nm per RIU">
+  <figcaption><span class="capnum">Figure 34.1.</span> <strong>Where the sensor's light is.</strong> Power density of (a) the TE<sub>0</sub> and (b) the TM<sub>0</sub> mode of the 500 × 220 nm silicon strip on oxide under water, at 1550 nm, computed with femwell (the same model as the sensitivities, on a coarser mesh, which smooths the jumps of the TM field at the top and bottom faces); contours at half and 1/e² of the peak. The TE mode sits mostly in the silicon; the TM mode's tail reaches about twice as far into the water (decay length 229 against 121 nm), so a change in the water's index moves its effective index 0.50 times as much, against 0.15 for TE. Drawn by <code>figsrc/ch34_figs.py</code> from <code>figsrc/ch34_fields.py</code>.</figcaption>
+</figure>
 
 The shift alone does not set the detection limit; the precision of tracking the resonance does. A higher Q gives a narrower dip whose centre can be found more precisely. Temperature control is essential: at 75 pm/K ([Chapter 18]({% link chapters/18_thermal.md %})), a millikelvin drift is comparable to the signal from a $$10^{-6}$$ RIU change, so sensors use reference rings, which see the temperature but not the analyte. For molecular detection the waveguide surface is coated with capture molecules, antibodies or DNA probes, that bind only the target.
 
@@ -57,7 +62,12 @@ If the resonance can be tracked to $$\sigma_\lambda = 1$$ pm, the limit of detec
 
 ## <span class="secnum">34.2</span>LiDAR and optical phased arrays
 
-**Optical phased arrays** (OPAs) steer a beam without moving parts. A row of grating emitters, each fed through its own phase shifter ([Chapter 18]({% link chapters/18_thermal.md %})), radiates waves that add up in the direction where the path difference compensates the phase step: $$\sin\theta = \Delta\phi\,\lambda/(2\pi d)$$ for emitters a pitch $$d$$ apart. The beam's width is set by the aperture: about $$0.886\,\lambda/(Nd)$$ radians between the half-power points, broadening as $$1/\cos\theta$$ when steered. The central difficulty is **grating lobes**: unless $$d \le \lambda/2$$ (0.78 µm at 1550 nm), the same phases add up in other directions too, and silicon waveguides couple when packed that closely. Designs use non-uniform spacing, waveguides of alternating widths that do not couple, or accept a limited steering range. Steering in the other direction comes from the wavelength, through the emitters' grating angle ([Chapter 15]({% link chapters/15_gc.md %})).
+**Optical phased arrays** (OPAs) steer a beam without moving parts ([Figure 34.2](#fig-34-2)). A row of grating emitters, each fed through its own phase shifter ([Chapter 18]({% link chapters/18_thermal.md %})), radiates waves that add up in the direction where the path difference compensates the phase step: $$\sin\theta = \Delta\phi\,\lambda/(2\pi d)$$ for emitters a pitch $$d$$ apart. The beam's width is set by the aperture: about $$0.886\,\lambda/(Nd)$$ radians between the half-power points, broadening as $$1/\cos\theta$$ when steered. The central difficulty is **grating lobes**: unless $$d \le \lambda/2$$ (0.78 µm at 1550 nm), the same phases add up in other directions too, and silicon waveguides couple when packed that closely. Designs use non-uniform spacing, waveguides of alternating widths that do not couple, or accept a limited steering range. Steering in the other direction comes from the wavelength, through the emitters' grating angle ([Chapter 15]({% link chapters/15_gc.md %})).
+
+<figure id="fig-34-2">
+  <img src="{{ '/assets/figs/ch34_opa.svg' | relative_url }}" style="width:640px" alt="(a) Top view of an eight-channel optical phased array: a tree of splitters, a phase shifter on every arm, and a fan-in to closely spaced grating emitters. (b) Far field of 16 emitters steered to 20 degrees: with a pitch of half a wavelength one beam 6.75 degrees wide; with a 2 µm pitch a beam 2.6 degrees wide and an equally strong grating lobe at minus 25.7 degrees">
+  <figcaption><span class="capnum">Figure 34.2.</span> <strong>An optical phased array.</strong> (a) Layout of an eight-channel array (schematic): a splitter tree feeds every emitter through its own phase shifter, and the waveguides fan in to the emitter pitch \(d\). (b) Far field of 16 emitters steered to 20° (array factor). At \(d = \lambda/2\) the beam is 6.75° wide and alone; at \(d\) = 2 µm it is 2.6° wide, as \(0.886\,\lambda/(Nd\cos\theta)\) predicts, but a grating lobe as strong as the main beam appears at −25.7°. Drawn by <code>figsrc/ch34_figs.py</code>.</figcaption>
+</figure>
 
 **Try it.** Change the number of emitters, their pitch and the phase step; watch the main beam steer and the grating lobes appear.
 
@@ -67,7 +77,7 @@ If the resonance can be tracked to $$\sigma_\lambda = 1$$ pm, the limit of detec
 
 $$f_b = \frac{2RB}{cT},$$
 
-which a photodiode and an FFT measure. The range resolution is $$c/(2B)$$, and the Doppler shift gives the target's velocity in the same measurement. The laser must stay coherent over the round trip ([Chapter 25]({% link chapters/25_dynamics.md %})).
+which a photodiode and an FFT measure ([Figure 34.3](#fig-34-3)). The range resolution is $$c/(2B)$$, and the Doppler shift gives the target's velocity in the same measurement. The laser must stay coherent over the round trip ([Chapter 25]({% link chapters/25_dynamics.md %})).
 
 <div class="tbox tbox-example" markdown="1">
 <div class="tbox-title">Worked Example 34.2 · An FMCW chirp</div>
@@ -76,9 +86,14 @@ A 1 GHz sweep in 10 µs gives a range resolution of $$3\times10^8/(2\times10^9) 
 
 </div>
 
+<figure id="fig-34-3">
+  <img src="{{ '/assets/figs/ch34_fmcw.svg' | relative_url }}" style="width:640px" alt="(a) Sawtooth frequency sweep of 1 GHz in 10 µs, with the echo from 100 m delayed by 0.667 µs. (b) Zoom showing the 66.7 MHz frequency difference between outgoing and returning light. (c) Spectrum of the beat signal with peaks at 26.7 MHz for a target at 40 m and 66.7 MHz for one at 100 m, with a range axis on top">
+  <figcaption><span class="capnum">Figure 34.3.</span> <strong>FMCW ranging.</strong> (a) The laser frequency is swept by 1 GHz in 10 µs (Worked Example 34.2); the echo from a target at 100 m returns 0.667 µs later. (b) At any instant the echo and the outgoing light differ by \(f_b = 2RB/(cT)\) = 66.7 MHz. (c) The spectrum of the beat signal over one sweep (Hann window) for targets at 40 m and 100 m, the nearer one with an illustrative half amplitude: each range becomes a frequency, 0.667 MHz per metre, and the 100 kHz frequency resolution of a 10 µs record is the 15 cm range resolution \(c/2B\). Drawn by <code>figsrc/ch34_figs.py</code>.</figcaption>
+</figure>
+
 ## <span class="secnum">34.3</span>Quantum photonics
 
-Integrated photonics is one of the leading platforms for quantum information with light:
+Integrated photonics is one of the leading platforms for quantum information with light ([Figure 34.4](#fig-34-4)):
 
 - **Sources**: spontaneous four-wave mixing in silicon or silicon-nitride rings converts two pump photons into a signal–idler pair, heralded single photons and entangled pairs, on a chip ([Chapter 7]({% link chapters/07_loss.md %}) describes the nonlinearity).
 - **Circuits**: meshes of MZIs implement arbitrary unitary transformations on photons in many waveguides, the linear optics of quantum gates and boson sampling, with heaters as the knobs ([Chapter 11]({% link chapters/11_mzi.md %})).
@@ -86,13 +101,28 @@ Integrated photonics is one of the leading platforms for quantum information wit
 
 Loss is the enemy: every lost photon is a lost qubit, so low-loss SiN and careful coupling ([Chapters 15]({% link chapters/15_gc.md %}) and [16]({% link chapters/16_edge.md %})) matter even more than in datacom.
 
+<figure id="fig-34-4">
+  <img src="{{ '/assets/figs/ch34_quantum.svg' | relative_url }}" style="width:640px" alt="(a) Schematic of a quantum-photonic chip: a pump laser split to two microring photon-pair sources, pump filters and signal-idler splitters, a mesh of MZIs, and four superconducting nanowire detectors in a cryogenic region. (b) Spectrum of four-wave mixing: idler and signal lines placed symmetrically about the pump">
+  <figcaption><span class="capnum">Figure 34.4.</span> <strong>A quantum-photonic circuit.</strong> (a) A pump laser drives two microring sources in which spontaneous four-wave mixing creates photon pairs; filters remove the pump and separate signal from idler; a mesh of MZIs set by heaters performs the linear-optical transformation; superconducting nanowire single-photon detectors (SNSPDs), cooled to cryogenic temperature, count the photons. (b) Energy conservation in the source: two pump photons become a signal and an idler photon placed symmetrically about the pump. Schematic. Drawn by <code>figsrc/ch34_figs.py</code>.</figcaption>
+</figure>
+
 ## <span class="secnum">34.4</span>Photonic computing
 
-A mesh of $$N(N-1)/2$$ MZIs, each with two phase shifters, plus $$N$$ phase shifters at its outputs, can implement any $$N\times N$$ unitary matrix ([Chapter 11]({% link chapters/11_mzi.md %})). Light passing through it performs a matrix–vector multiplication in one pass, at the speed of light and with little energy per operation once the weights are set. That is attractive for the linear layers of neural networks. Other architectures use WDM, with rings weighting each wavelength before a photodiode sums them, or delay lines. The challenges are the conversions in and out of the optical domain, the precision (a few bits) set by noise and fabrication errors ([Chapter 29]({% link chapters/29_fab.md %})), and the nonlinear functions that light does poorly.
+A mesh of $$N(N-1)/2$$ MZIs, each with two phase shifters, plus $$N$$ phase shifters at its outputs, can implement any $$N\times N$$ unitary matrix ([Chapter 11]({% link chapters/11_mzi.md %}), [Figure 34.5](#fig-34-5)). Light passing through it performs a matrix–vector multiplication in one pass, at the speed of light and with little energy per operation once the weights are set. That is attractive for the linear layers of neural networks. Other architectures use WDM, with rings weighting each wavelength before a photodiode sums them, or delay lines. The challenges are the conversions in and out of the optical domain, the precision (a few bits) set by noise and fabrication errors ([Chapter 29]({% link chapters/29_fab.md %})), and the nonlinear functions that light does poorly.
+
+<figure id="fig-34-5">
+  <img src="{{ '/assets/figs/ch34_mesh.svg' | relative_url }}" style="width:640px" alt="(a) One MZI cell: an external phase shifter phi, a 50:50 coupler, an internal phase shifter theta and a second 50:50 coupler. (b) A rectangular mesh of 15 such cells on six waveguides, in six alternating columns, followed by six output phase shifters, mapping inputs x1 to x6 to outputs y1 to y6">
+  <figcaption><span class="capnum">Figure 34.5.</span> <strong>An MZI mesh for linear algebra.</strong> (a) The unit cell: two 50:50 couplers around an internal phase θ, which sets the split between bar and cross, and an external phase φ: together any 2 × 2 unitary. (b) A rectangular mesh for N = 6: 15 cells and 6 output phase shifters, 36 phases in all, as many as the real parameters of a 6 × 6 unitary. Light entering as the vector x leaves as y = Ux in one pass. Schematic. Drawn by <code>figsrc/ch34_figs.py</code>.</figcaption>
+</figure>
 
 ## <span class="secnum">34.5</span>Microwave photonics and frequency combs
 
-Light can carry and process radio-frequency signals. Ring filters ([Chapter 12]({% link chapters/12_rings.md %})) tunable over gigahertz, true-time delays for phased-array antennas, and low-noise optoelectronic oscillators are all built from the same blocks. **Kerr frequency combs** in high-Q silicon-nitride rings convert a continuous laser into hundreds of equally spaced lines by four-wave mixing. They are sources for dense WDM ([Chapter 26]({% link chapters/26_tunable.md %})), for spectroscopy, for optical clocks and for low-noise microwave generation from the comb spacing.
+Light can carry and process radio-frequency signals. Ring filters ([Chapter 12]({% link chapters/12_rings.md %})) tunable over gigahertz, true-time delays for phased-array antennas, and low-noise optoelectronic oscillators are all built from the same blocks. **Kerr frequency combs** in high-Q silicon-nitride rings convert a continuous laser into hundreds of equally spaced lines by four-wave mixing ([Figure 34.6](#fig-34-6)). They are sources for dense WDM ([Chapter 26]({% link chapters/26_tunable.md %})), for spectroscopy, for optical clocks and for low-noise microwave generation from the comb spacing.
+
+<figure id="fig-34-6">
+  <img src="{{ '/assets/figs/ch34_comb.svg' | relative_url }}" style="width:600px" alt="(a) A silicon nitride ring beside a bus waveguide, with a continuous-wave pump entering and a comb leaving; the line spacing equals the ring's free spectral range. (b) Schematic comb spectrum: equally spaced lines under a sech-squared envelope centred on a stronger pump line">
+  <figcaption><span class="capnum">Figure 34.6.</span> <strong>A Kerr microcomb.</strong> (a) A continuous-wave pump coupled into a high-Q silicon-nitride ring creates, by four-wave mixing, new lines on the ring's resonances, spaced by its free spectral range. (b) The spectrum of a soliton comb: equally spaced lines under a sech² envelope around the pump. Schematic, without scales. Drawn by <code>figsrc/ch34_figs.py</code>.</figcaption>
+</figure>
 
 ## <span class="secnum">34.6</span>Visible and mid-infrared photonics
 

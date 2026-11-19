@@ -69,7 +69,7 @@ A photonic platform is a material system plus a manufacturing process plus a des
 
 Three properties decide most platform choices:
 
-- **Index contrast** sets how tightly light is confined, and therefore how small waveguides and bends can be. Silicon against silica ($$\Delta n \approx 2$$) is at one extreme; InGaAsP against InP ($$\Delta n \approx 0.2$$ in the vertical direction) at the other, which is why InP waveguides are etched deeply to confine light sideways.
+- **Index contrast** sets how tightly light is confined, and therefore how small waveguides and bends can be ([Figure 4.3](#fig-4-3)). Silicon against silica ($$\Delta n \approx 2$$) is at one extreme; InGaAsP against InP ($$\Delta n \approx 0.2$$ in the vertical direction) at the other, which is why InP waveguides are etched deeply to confine light sideways.
 - **The electro-optic effect** decides how fast and efficiently a phase can be changed. Only non-centrosymmetric crystals (LiNbO₃, BaTiO₃, the III–Vs) have a Pockels effect, a change of index proportional to the applied field. Silicon must instead move free carriers, which changes both index and absorption.
 - **The bandgap** decides absorption and gain. Light can only be generated efficiently in a direct-gap semiconductor, and detected in one whose gap is below the photon energy.
 
@@ -114,6 +114,13 @@ The price is in the passive parts. The vertical index contrast between an InGaAs
   <figcaption><span class="capnum">Figure 4.2.</span> <strong>Typical waveguides, to scale.</strong> Silicon strip (500 × 220 nm) and rib (90 nm slab) on buried oxide; a moderately confining SiN waveguide; a TFLN ridge etched halfway into a 400 nm film; a schematic BTO-on-silicon waveguide (arrangements vary); and an InP deep ridge through a 0.5 µm InGaAsP core. Light blue is silica. Dimensions are representative, not those of a particular process. Drawn by <code>figsrc/part1_figs.py</code>.</figcaption>
 </figure>
 
+The contrast sets the size of the mode itself as well as that of the waveguide ([Figure 4.3](#fig-4-3)): no silicon-nitride, lithium-niobate or InP core, however thin or thick, squeezes the light as tightly as silicon in oxide.
+
+<figure id="fig-4-3">
+  <img src="{{ '/assets/figs/ch04_modesize.svg' | relative_url }}" style="width:640px" alt="(a) Mode width against core thickness on log axes for Si in SiO2, LiNbO3 in SiO2, Si3N4 in SiO2 and InGaAsP in InP, each with a minimum: 0.32, 0.64, 0.73 and 0.90 µm. (b) Vertical intensity profiles at the typical thicknesses of 220, 400, 400 and 500 nm, with widths of 0.33, 0.65, 0.73 and 0.90 µm">
+  <figcaption><span class="capnum">Figure 4.3.</span> <strong>Index contrast sets the mode size.</strong> (a) Width of the fundamental TE mode (1/e² of the intensity) of slab waveguides at 1550 nm against core thickness, for the material pairs of Figure 4.2 (lithium niobate with its extraordinary index); dotted where the slab guides a second mode. Every curve has a minimum, 0.32 µm for silicon in oxide and 0.64–0.90 µm for the others, which scales as \(\lambda/\mathrm{NA}\) with \(\mathrm{NA} = \sqrt{n_1^2 - n_2^2}\); thinner cores only push the light out into the cladding. (b) The intensity profiles at the typical thicknesses (dots in a), to one scale: the field's tail reaches 101 nm into the cladding for silicon, 253 nm for SiN and 311 nm for InGaAsP in InP. Exact slab solutions. Drawn by <code>figsrc/ch04_figs.py</code>.</figcaption>
+</figure>
+
 **Try it.** Compare any two platforms: their cross-sections, typical loss and bend radius, index contrast and native capabilities.
 
 {% include demos/platforms.html %}
@@ -125,7 +132,12 @@ When no single platform does everything, the chip combines them. The vocabulary 
 - **Heterogeneous** integration bonds unprocessed material, such as an InP die or wafer, onto a patterned silicon wafer and then processes it there with wafer-scale lithography, so that the III–V devices are aligned to the silicon circuits lithographically {% include cite.html keys="komljenovic2016" %}.
 - **Micro-transfer printing** sits between the two: finished micro-devices are picked from their source wafer and printed onto the target wafer in parallel.
 
-[Chapter 27]({% link chapters/27_lasersonsi.md %}) compares these for lasers. Silicon nitride layers in silicon processes, TFLN bonded onto silicon, and BTO grown on silicon are all heterogeneous combinations of the same kind.
+[Chapter 27]({% link chapters/27_lasersonsi.md %}) compares these for lasers. Silicon nitride layers in silicon processes, TFLN bonded onto silicon, and BTO grown on silicon are all heterogeneous combinations of the same kind ([Figure 4.4](#fig-4-4)).
+
+<figure id="fig-4-4">
+  <img src="{{ '/assets/figs/ch04_combined.svg' | relative_url }}" style="width:640px" alt="Cross-section of one silicon-on-insulator wafer carrying four materials, to scale: a silicon nitride waveguide 200 nm above a narrow silicon tip, a silicon nitride waveguide alone, a lithium niobate film bonded over a silicon nitride waveguide with two metal electrodes 5 µm apart, and an InP stack with quantum wells bonded over a silicon waveguide in an opening of the oxide, with n and p contacts">
+  <figcaption><span class="capnum">Figure 4.4.</span> <strong>Several materials on one silicon wafer.</strong> A representative heterogeneous stack, to scale: a silicon nitride layer 200 nm above the 220 nm silicon, coupled to it where a narrow silicon tip runs under a SiN waveguide; a SiN waveguide on its own; a lithium niobate film bonded onto the planarised oxide over a SiN waveguide, with electrodes 5 µm apart for a Pockels phase shifter; and an InP stack with quantum wells bonded onto a silicon waveguide through a thin layer, in an opening of the oxide (Chapter 27). Dimensions are representative, not those of a particular process, and the devices sit far apart on a real chip. Drawn by <code>figsrc/ch04_figs.py</code>.</figcaption>
+</figure>
 
 ### Open PDKs used in this tutorial
 

@@ -288,7 +288,7 @@ def numbers():
     print(f"  85 C with APC only: P0 {p0*1e3:.2f} P1 {p1*1e3:.2f} mW, ER {10*np.log10(p1/p0):.2f} dB (target 6.02 dB)")
 
 
-# ============================================================== Figure 24.1: VCSEL cross-section and standing wave
+# ============================================================== Figure 24.6: VCSEL cross-section and standing wave
 def field_profile(lam):
     """|E|^2 along the axis for light from the top (air), via characteristic matrices from the substrate up."""
     stack = list(reversed(TOP)) + [(NC, LCAV)] + BOT        # top (air side) to bottom
@@ -377,7 +377,7 @@ def fig_vcsel():
           f" ~{LPEN_T:.2f} um (phase penetration depth)")
 
 
-# ============================================================== Figure 24.2: VCSEL L-I and threshold vs temperature
+# ============================================================== Figure 24.7: VCSEL L-I and threshold vs temperature
 def fig_vcsel_li():
     fig, (a, b) = plt.subplots(1, 2, figsize=FULL, gridspec_kw=dict(width_ratios=[1.25, 1]))
     Is = np.linspace(0, 18e-3, 721)
@@ -442,7 +442,7 @@ def fig_bw():
     savefig(fig, "ch25_bw")
 
 
-# ============================================================== Figure 25.2: choosing the zero level
+# ============================================================== Figure 25.6: choosing the zero level
 def fig_zerolevel():
     I1 = 8e-3; I0s = np.arange(0, 5.01e-3, 0.25e-3)
     W = np.array([drive(i0, I1, SPB) for i0 in I0s]); Tj = np.array([tj_for(i0, I1) for i0 in I0s])
@@ -475,7 +475,7 @@ def fig_zerolevel():
     savefig(fig, "ch25_zerolevel")
 
 
-# ============================================================== Figure 25.3: eyes with and without equalisation
+# ============================================================== Figure 25.7: eyes with and without equalisation
 TAPS = (-0.1, 0.9, 0.1, 0.1)       # pre-cursor, main, two post-cursors: best of a grid search (step 0.05) on this model
 
 
