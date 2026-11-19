@@ -37,11 +37,16 @@ An atom or ion has discrete energy levels. A solid has bands of allowed energies
 
 ## <span class="secnum">22.2</span>Absorption and emission
 
-Take two levels, 1 below 2, separated by $$h\nu$$, with populations $$N_1$$ and $$N_2$$ per unit volume. Einstein recognised three processes:
+Take two levels, 1 below 2, separated by $$h\nu$$, with populations $$N_1$$ and $$N_2$$ per unit volume. Einstein recognised three processes ([Figure 22.1](#fig-22-1)):
 
 - **Absorption**: a photon lifts an electron from 1 to 2, at a rate $$B_{12}\rho(\nu)N_1$$ proportional to the spectral energy density of the light $$\rho(\nu)$$.
 - **Stimulated emission**: a photon induces the drop from 2 to 1 and a second photon is emitted, identical in frequency, direction, phase and polarisation, at a rate $$B_{21}\rho(\nu)N_2$$. This is the amplifying process: the **L** and **A** of LASER.
 - **Spontaneous emission**: the electron drops on its own, at a rate $$A_{21}N_2$$, emitting a photon in a random direction and phase. Its inverse $$\tau_{sp} = 1/A_{21}$$ is the spontaneous lifetime.
+
+<figure id="fig-22-1">
+  <img src="{{ '/assets/figs/ch22_processes.svg' | relative_url }}" style="width:600px" alt="Three two-level diagrams: in absorption an incoming photon lifts an electron from level 1 to level 2; in stimulated emission an incoming photon makes the electron drop and two identical photons leave; in spontaneous emission the electron drops on its own and one photon leaves in any direction">
+  <figcaption><span class="capnum">Figure 22.1.</span> <strong>The three radiative processes.</strong> (a) Absorption: a photon of energy \(h\nu = E_2 - E_1\) lifts an electron from level 1 to level 2 (dashed circle: where it was). (b) Stimulated emission: an incoming photon makes the electron drop, and a second photon leaves with the same frequency, direction, phase and polarisation; this is the amplifying process. (c) Spontaneous emission: the electron drops on its own after a time of order \(\tau_{sp}\), and its photon leaves in any direction (dashed arrows) with a random phase. Drawn by <code>figsrc/ch22_figs.py</code>.</figcaption>
+</figure>
 
 Requiring that the three rates reproduce the thermal equilibrium of the levels (Boltzmann) and of the radiation (Planck) gives the **Einstein relations** {% include cite.html keys="salehteich,siegman" %}:
 
@@ -65,11 +70,16 @@ $$\gamma(\nu) = \sigma(\nu)\,(N_2 - N_1), \qquad \sigma(\nu) = \frac{\lambda^2}{
 
 </div>
 
-where $$\sigma$$ is the **transition cross-section** and $$g(\nu)$$ the normalised lineshape (Section 22.4). The intensity grows as $$e^{\gamma z}$$ when $$\gamma > 0$$, which needs **population inversion**, $$N_2 > N_1$$. In thermal equilibrium the lower level is always the fuller one, so inversion must be pumped. How hard depends on the level scheme:
+where $$\sigma$$ is the **transition cross-section** and $$g(\nu)$$ the normalised lineshape (Section 22.4). The intensity grows as $$e^{\gamma z}$$ when $$\gamma > 0$$, which needs **population inversion**, $$N_2 > N_1$$. In thermal equilibrium the lower level is always the fuller one, so inversion must be pumped. How hard depends on the level scheme ([Figure 22.2](#fig-22-2)):
 
 - **Two levels**: the pump drives absorption and stimulated emission equally, so at best $$N_2 \to N_1$$: transparency, never gain.
 - **Three levels** (pump 1 → 3, fast 3 → 2, laser 2 → 1): the lower laser level is the ground state, so more than half of all the atoms must be pumped out of it before there is any gain. The pump rate must exceed the spontaneous rate.
 - **Four levels** (pump 0 → 3, fast 3 → 2, laser 2 → 1, fast 1 → 0): the lower laser level empties as fast as it fills, so any pumping gives inversion.
+
+<figure id="fig-22-2">
+  <img src="{{ '/assets/figs/ch22_levels.svg' | relative_url }}" style="width:600px" alt="Energy-level schemes: a two-level system with pump, stimulated and spontaneous arrows; erbium ions in silica drawn to scale with 980 nm and 1480 nm pump arrows, a fast non-radiative decay and the 1530 nm emission to the ground state; a four-level system with fast decays above and below the laser transition">
+  <figcaption><span class="capnum">Figure 22.2.</span> <strong>Two-, three- and four-level schemes.</strong> (a) Two levels: the pump drives absorption and stimulated emission equally, so the populations can at best become equal. (b) Erbium in silica, the three-level system of Worked Example 22.1, with energies to scale: a 980 nm pump (1.27 eV) lifts ions to the \(^4\)I\(_{11/2}\) level, which decays quickly and without light to \(^4\)I\(_{13/2}\); from there the 1530 nm transition (0.81 eV) ends on the ground state. Pumping at 1480 nm (0.84 eV) instead lifts ions straight into the top of the upper manifold (<a href="{% link chapters/28_soa.md %}">Chapter 28</a>). The shaded bands stand for each manifold's spread of sublevels in the glass, with illustrative widths. (c) Four levels: the lower laser level 1 empties quickly into the ground state. Drawn by <code>figsrc/ch22_figs.py</code>.</figcaption>
+</figure>
 
 **Try it.** Pump each system and watch the populations and the inversion; then add a strong signal and see the inversion, and the gain, saturate.
 
@@ -86,16 +96,26 @@ Inversion has a second, subtler limit. Stimulated emission by the amplified ligh
 
 ## <span class="secnum">22.4</span>Lineshape and gain spectrum
 
-No transition has a single frequency. The lineshape $$g(\nu)$$ comes from two kinds of broadening:
+No transition has a single frequency. The lineshape $$g(\nu)$$ comes from two kinds of broadening ([Figure 22.3](#fig-22-3)):
 
 - **Homogeneous broadening** affects every emitter alike. The finite lifetime of the states, and collisions or phonons that interrupt the phase, give a Lorentzian line. A strong signal at one frequency saturates the whole line.
 - **Inhomogeneous broadening** comes from emitters that differ: ions at different sites in a glass, or quantum dots of different sizes. Each emitter has its own centre frequency, and the line is the sum, usually close to a Gaussian. A signal saturates only the emitters that match it, burning a "hole" in the gain spectrum.
+
+<figure id="fig-22-3">
+  <img src="{{ '/assets/figs/ch22_lineshape.svg' | relative_url }}" style="width:600px" alt="Lorentzian and Gaussian lineshapes of equal width and area, a homogeneous line pulled down everywhere by a strong signal, and an inhomogeneous line made of narrow packets in which the signal burns a spectral hole">
+  <figcaption><span class="capnum">Figure 22.3.</span> <strong>Lineshapes and saturation.</strong> (a) A Lorentzian (homogeneous) and a Gaussian (inhomogeneous) line with the same full width \(\Delta\nu\) and the same area: the Gaussian peaks 1.48 times higher, the Lorentzian has far stronger wings. (b) A homogeneous line under a strong signal 0.6 \(\Delta\nu\) from its centre: every emitter feels the signal, so the whole line drops (here by 55 %). (c) An inhomogeneous line built from narrow homogeneous packets (thin curves, width 0.15 \(\Delta\nu\)) with different centres: the same signal saturates only the packets near its frequency and burns a spectral hole, halving the local gain, while the rest of the line keeps its gain. Widths and signal strength illustrative. Drawn by <code>figsrc/ch22_figs.py</code>.</figcaption>
+</figure>
 
 The cross-section formula says that a broad line has a small peak cross-section: the same total strength is spread over more frequencies. Semiconductors are a special case: their gain spectrum is shaped mostly by how the bands fill with carriers ([Chapter 23]({% link chapters/23_gain.md %})), and it is tens of nanometres wide, which is what makes widely tunable lasers possible ([Chapter 26]({% link chapters/26_tunable.md %})).
 
 ## <span class="secnum">22.5</span>Direct and indirect band gaps
 
-In a semiconductor, the lowest conduction-band states and the highest valence-band states may sit at the same crystal momentum (a **direct gap**, as in GaAs and InP-based alloys) or at different momenta (an **indirect gap**, as in silicon and germanium). Because the photon carries almost no momentum, an electron at the bottom of an indirect conduction band cannot drop to the top of the valence band by emitting a photon alone. It needs a phonon to supply the momentum, a far less likely three-body process.
+In a semiconductor, the lowest conduction-band states and the highest valence-band states may sit at the same crystal momentum (a **direct gap**, as in GaAs and InP-based alloys) or at different momenta (an **indirect gap**, as in silicon and germanium). Because the photon carries almost no momentum, an electron at the bottom of an indirect conduction band cannot drop to the top of the valence band by emitting a photon alone. It needs a phonon to supply the momentum, a far less likely three-body process ([Figure 22.4](#fig-22-4)).
+
+<figure id="fig-22-4">
+  <img src="{{ '/assets/figs/ch22_bandgaps.svg' | relative_url }}" style="width:600px" alt="Energy against crystal momentum for three semiconductors: a direct-gap InGaAsP alloy where electrons at the conduction-band minimum drop straight down by emitting a 1550 nm photon; silicon, whose conduction-band minimum lies near the zone edge so the drop needs a phonon as well as a photon; germanium, whose lowest valley at the zone edge lies 0.14 eV below its direct valley at k = 0">
+  <figcaption><span class="capnum">Figure 22.4.</span> <strong>Direct and indirect band gaps.</strong> Electrons (filled dots) collect at the lowest conduction-band states, holes (open circles) at the top of the valence band. (a) In a direct-gap material, here the InGaAsP alloy with a 0.80 eV gap, both sit at \(k = 0\): the electron drops straight down and emits a 1550 nm photon, whose momentum is too small to show on this axis. (b) In silicon (1.12 eV) the conduction-band minimum lies near the zone edge, so the drop also needs a phonon to carry the momentum. (c) Germanium's lowest valleys sit at the zone edge (0.66 eV), but its direct valley is only 0.14 eV higher (0.80 eV); strain and n-doping fill it. Parabolic valleys; energies to scale (band gaps from Appendix B), the momentum axis schematic. Drawn by <code>figsrc/ch22_figs.py</code>.</figcaption>
+</figure>
 
 The consequence is in the radiative recombination coefficient: about $$10^{-10}$$ cm³/s in InGaAsP but about $$10^{-14}$$ cm³/s in silicon. At $$10^{18}$$ carriers per cm³ the radiative lifetime is 10 ns in InGaAsP and 100 µs in silicon, so in silicon defects and Auger recombination, which take microseconds or less, win almost every time: silicon emits a percent of its electrons as light at best, usually far less. Other routes to light on silicon follow:
 
