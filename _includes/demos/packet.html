@@ -7,9 +7,21 @@
     <label class="bd-sl"><span>group index n<sub>g</sub> <b data-v="ng"></b></span><input type="range" data-k="ng" min="1" max="5" step="0.01" value="4.2" aria-label="group index"></label>
     <label class="bd-sl"><span>group-velocity dispersion (spreading) <b data-v="gvd"></b></span><input type="range" data-k="gvd" min="0" max="1" step="0.01" value="0" aria-label="dispersion"></label>
   </div>
-  <div class="bd-scope tall"><canvas data-c="p" aria-hidden="true"></canvas><span class="bd-tag">field along the guide (x in vacuum wavelengths)</span></div>
-  <div class="bd-read" aria-live="polite"><span>v<sub>p</sub> = c/n <b data-o="vp">–</b></span><span>v<sub>g</sub> = c/n<sub>g</sub> <b data-o="vg">–</b></span><span>delay of 1 cm <b data-o="t">–</b></span></div>
+  <div class="bd-scope tall"><canvas data-c="p" aria-hidden="true"></canvas><span class="bd-tag">field along the guide: red +, blue − (x in λ₀)</span></div>
+  <div class="bd-read" aria-live="polite"><span>v<sub>p</sub> = c/n <b data-o="vp">–</b></span><span>v<sub>g</sub> = c/n<sub>g</sub> <b data-o="vg">–</b></span><span>delay of 1 cm <b data-o="t">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Follow one crest.</b> At the defaults, a silicon wire (n = 2.44, n<sub>g</sub> = 4.20), watch the white dot: it is born at the tail of the packet and dies at its head, because v<sub>p</sub> = 0.410c beats v<sub>g</sub> = 0.238c.</li>
+    <li><b>Remove the dispersion.</b> Set n<sub>g</sub> = n = 2.44: the crests ride with the envelope, and the delay of 1 cm falls from 140 ps to 81 ps.</li>
+    <li><b>Spread the packet.</b> Raise the group-velocity dispersion to 0.5 and press restart: the packet widens and its peak drops as it travels, as a pulse does over kilometres of fibre (Worked Example 2.5).</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>A 500 × 220 nm silicon wire has n<sub>eff</sub> ≈ 2.4 and n<sub>g</sub> ≈ 4.2. How long does a bit take to cross 1 cm of it?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="Energy and information travel with the envelope at c/n_g, so the time of flight is n_g L/c = 4.2 × 1 cm / c = 140 ps.">About 140 ps, set by the group index</button>
+      <button type="button" data-why="n_eff sets the speed of the crests, which carry no information; a pulse travels with its envelope, at c/n_g.">About 80 ps, set by the effective index</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -30,15 +42,20 @@
       xs.push(x); env.push(e); envn.push(-e); ys.push(e * Math.cos(k * (x - xcrest)));
     }
     BD.line(f, xs, env, 'rgba(224,184,90,.6)', 1.2, [4, 3]); BD.line(f, xs, envn, 'rgba(224,184,90,.6)', 1.2, [4, 3]);
-    BD.line(f, xs, ys, BD.C.blue, 1.5);
+    // the carrier in the field colours: red where it is positive, blue where it is negative
+    var gp = dv.g, yz = f.Y(0), pw = dv.w - f.p.l - f.p.r;
+    BD.line(f, xs, ys, BD.C.dim, 1.5);
+    gp.save(); gp.beginPath(); gp.rect(f.p.l, f.p.t, pw, yz - 0.8 - f.p.t); gp.clip(); BD.line(f, xs, ys, '#ff6a50', 1.5); gp.restore();
+    gp.save(); gp.beginPath(); gp.rect(f.p.l, yz + 0.8, pw, dv.h - f.p.b - yz - 0.8); gp.clip(); BD.line(f, xs, ys, '#58aaff', 1.5); gp.restore();
     // mark one crest (moves at vp, wraps inside the packet) and the envelope peak (moves at vg)
     var lam = 1 / S.n, off = ((xcrest - xc) % lam + lam) % lam, xcr = xc + off - (off > lam / 2 ? lam : 0);
     BD.dot(f, xc, 0, BD.C.gold, 4);
-    if (xcr > 0 && xcr < X) BD.dot(f, xcr, amp * Math.exp(-Math.pow(xcr - xc, 2) / (2 * sig * sig)), BD.C.red, 4);
-    dv.g.fillStyle = BD.C.gold; dv.g.fillText('● envelope (v_g)', f.p.l + 6, f.p.t + 12); dv.g.fillStyle = BD.C.red; dv.g.fillText('● one crest (v_p)', f.p.l + 120, f.p.t + 12);
+    if (xcr > 0 && xcr < X) BD.dot(f, xcr, amp * Math.exp(-Math.pow(xcr - xc, 2) / (2 * sig * sig)), BD.C.white, 4);
+    dv.g.fillStyle = BD.C.gold; dv.g.fillText('● envelope (v_g)', f.p.l + 6, f.p.t + 12); dv.g.fillStyle = BD.C.white; dv.g.fillText('● one crest (v_p)', f.p.l + 120, f.p.t + 12);
     q('[data-o="vp"]').textContent = (vp).toFixed(3) + ' c';
     q('[data-o="vg"]').textContent = (vg).toFixed(3) + ' c';
     q('[data-o="t"]').textContent = (S.ng * 0.01 / 3e8 * 1e12).toFixed(0) + ' ps';
+    BD.pill(q('[data-o="pill"]'), S.ng > S.n + 0.05 ? 'crests run forward' : S.ng < S.n - 0.05 ? 'crests slip back' : 'crests ride along', '');
     var c = 'The crests travel at the phase velocity c/n, the envelope (and the energy and information) at the group velocity c/n<sub>g</sub>. ';
     if (S.ng > S.n + 0.05) c += 'Here n<sub>g</sub> > n, so the crests run forward through the packet, appearing at its tail and vanishing at its head. This is the normal case in silicon waveguides, where n ≈ 2.4 but n<sub>g</sub> ≈ 4.2.';
     else if (S.ng < S.n - 0.05) c += 'With n<sub>g</sub> < n the crests slip backwards through the envelope.';

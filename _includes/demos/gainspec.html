@@ -10,8 +10,21 @@
     <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">gain (+) or absorption (−) against wavelength</span></div>
   </div>
   <div class="bd-scope"><canvas data-c="p" aria-hidden="true"></canvas><span class="bd-tag">peak gain against carrier density</span></div>
-  <div class="bd-read" aria-live="polite"><span>quasi-Fermi separation − E<sub>g</sub> <b data-o="df">–</b></span><span>peak gain <b data-o="gp">–</b></span><span>peak wavelength <b data-o="lp">–</b></span><span>transparency density <b data-o="nt">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>quasi-Fermi separation − E<sub>g</sub> <b data-o="df">–</b></span><span>peak gain <b data-o="gp">–</b></span><span>peak wavelength <b data-o="lp">–</b></span><span>transparency density <b data-o="nt">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Find transparency.</b> Lower N to 1.3 × 10¹⁸ cm⁻³: the peak gain is about zero, at the transparency density the readout gives. At 1.0 × 10¹⁸ the material absorbs at every wavelength.</li>
+    <li><b>Feed the Chapter 24 laser.</b> At N = 2.7 × 10¹⁸ the peak gain is 730 /cm at 1444 nm, just above the 725 /cm its Fabry–Pérot laser needs. At 5 × 10¹⁸ it reaches 1718 /cm at 1357 nm.</li>
+    <li><b>Heat it.</b> Keep N = 2.7 × 10¹⁸ and raise the temperature to 350 K: the peak gain falls to 531 /cm and moves 45 nm longer, and transparency now needs 1.54 × 10¹⁸.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>At room temperature you double the carrier density from 2.5 to 5 × 10¹⁸ cm⁻³. Which way does the gain peak move?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="Band filling: the quasi-Fermi levels move apart, the gain window between Eg and EFc − EFv widens, and the peak follows it to higher photon energy, from 1454 to 1357 nm.">To shorter wavelengths</button>
+      <button type="button" data-why="Heating does that, by shrinking the gap, and so does band-gap renormalisation, which this model leaves out; more carriers alone fill the bands to higher energies.">To longer wavelengths</button>
+      <button type="button" data-why="The gain is zero at the band gap itself, where the density of states vanishes; the peak sits inside the window between Eg and EFc − EFv, which widens with N.">Nowhere: it stays at the band gap</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -107,6 +120,7 @@
     q('[data-o="gp"]').textContent = pk.g.toFixed(0) + ' /cm';
     q('[data-o="lp"]').textContent = (1239.84 / pk.E).toFixed(0) + ' nm';
     q('[data-o="nt"]').textContent = (ntr / 1e18).toFixed(2) + ' × 10¹⁸ cm⁻³';
+    BD.pill(q('[data-o="pill"]'), pk.g > 10 ? 'gain' : pk.g < -10 ? 'absorbs' : 'transparent', pk.g > 10 ? 'ok' : pk.g < -10 ? 'bad' : 'warn');
     var c = 'Injected electrons fill the bottom of the conduction band and holes the top of the valence band, up to the quasi-Fermi levels. Photons between E<sub>g</sub> and E<sub>Fc</sub> − E<sub>Fv</sub> are amplified (the Bernard–Duraffourg condition, shaded); above that window the material still absorbs. ';
     if (pk.g < 0) c += 'Here the density is below transparency (' + (ntr / 1e18).toFixed(2) + ' × 10¹⁸ cm⁻³): the material still absorbs everywhere. ';
     else c += 'More carriers widen the window, so the gain grows and its peak moves to shorter wavelengths (band filling). ';

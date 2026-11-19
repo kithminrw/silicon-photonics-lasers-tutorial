@@ -15,8 +15,21 @@
     <div class="bd-scope tall"><canvas data-c="m" aria-hidden="true"></canvas><span class="bd-tag">received power against sensitivity + penalties</span></div>
     <div class="bd-scope tall"><canvas data-c="e" aria-hidden="true"></canvas><span class="bd-tag">energy per bit, where the picojoules go</span></div>
   </div>
-  <div class="bd-read" aria-live="polite"><span>received power <b data-o="rx">–</b></span><span>margin after penalties <b data-o="mg">–</b></span><span>energy per bit <b data-o="e">–</b></span><span>targets <b data-o="ok">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>received power <b data-o="rx">–</b></span><span>margin after penalties <b data-o="mg">–</b></span><span>energy per bit <b data-o="e">–</b></span><span>targets <b data-o="ok">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Use the measured couplers.</b> Set the grating-coupler loss to 4 dB each, the PDK design: the received power falls to −4.7 dBm and the margin to 3.9 dB.</li>
+    <li><b>Spend the margin on power.</b> Back at 3 dB, lower the laser to +7.5 dBm: 3.4 dB of margin is left, and the energy falls from 3.65 to 3.07 pJ/bit.</li>
+    <li><b>Use a poor laser.</b> Drop the wall-plug efficiency to 5 %: the lasers alone cost 4.0 pJ/bit, the total reaches 6.32 pJ/bit, and the energy target fails although the budget still closes.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>Better grating couplers save 1 dB at each end of the link. What is the best use of it?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="Both couplers are in the path, so 2 dB of margin can be traded for laser power: at +8 dBm the margin is still 5.9 dB and the energy falls to 3.16 pJ/bit.">Lower the laser by 2 dB: same margin, about 0.5 pJ/bit less</button>
+      <button type="button" data-why="Every decibel of loss saved can be turned into laser power saved, and the lasers are the largest term in the energy per bit.">Nothing for the energy: couplers are passive</button>
+      <button type="button" data-why="The light crosses both couplers, so the saving is 2 dB, not 1.">Lower the laser by 1 dB</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -73,6 +86,7 @@
     q('[data-o="mg"]').textContent = margin.toFixed(1) + ' dB';
     q('[data-o="e"]').textContent = etot.toFixed(2) + ' pJ/bit';
     q('[data-o="ok"]').textContent = (margin >= 0 ? 'budget closes' : 'budget fails') + ', ' + (etot <= 5 ? 'energy met' : 'energy over');
+    BD.pill(q('[data-o="pill"]'), margin < 0 ? 'budget fails' : etot > 5 ? 'energy over' : 'budget closes', margin < 0 ? 'bad' : etot > 5 ? 'warn' : 'ok');
     var c = 'Each block subtracts its loss in decibels; what reaches the receiver must exceed its sensitivity plus penalties for crosstalk, dispersion, drift and ageing (the extinction-ratio penalty is already inside the −11.6 dBm of Chapter 21). ';
     c += 'The lasers dominate the energy: ' + (Math.pow(10, S.pl / 10)).toFixed(0) + ' mW of light per lane at ' + S.wp.toFixed(0) + ' % wall-plug efficiency costs ' + E[0][1].toFixed(2) + ' pJ/bit, so every decibel of margin can be traded for laser power. ';
     if (margin < 0) c += '<b>The budget does not close:</b> lower a loss, raise the laser power, or improve the receiver (FEC buys about 3 dB). ';

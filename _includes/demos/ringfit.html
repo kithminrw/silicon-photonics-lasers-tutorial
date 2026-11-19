@@ -12,8 +12,21 @@
     <div class="bd-scope tall"><canvas data-c="m" aria-hidden="true"></canvas><span class="bd-tag">misfit χ² over loss and coupling (dark = good)</span></div>
   </div>
   <div class="bd-scope short"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: two equally good fits (gap enlarged)</span></div>
-  <div class="bd-read" aria-live="polite"><span>solution A (under-coupled) <b data-o="a">–</b></span><span>solution B (over-coupled) <b data-o="b">–</b></span><span>truth <b data-o="t">–</b></span><span>loaded Q <b data-o="q">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>solution A (under-coupled) <b data-o="a">–</b></span><span>solution B (over-coupled) <b data-o="b">–</b></span><span>truth <b data-o="t">–</b></span><span>loaded Q <b data-o="q">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Compare the two answers.</b> The truth is 2.00 dB/cm with κ² = 0.50 %, over-coupled. Solution B finds it; solution A claims 3.50 dB/cm and 0.29 %: loss and coupling swapped, the same spectrum.</li>
+    <li><b>Make the ring under-coupled.</b> Lower κ² to 0.20 %: now solution A matches the truth, 1.94 dB/cm and 0.20 %, and the loaded Q rises to about 218 000.</li>
+    <li><b>Couple it critically.</b> Set κ² to 0.29 %, the coupling that equals the round-trip loss: the two valleys merge on the dashed line and the dip reaches zero.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>One through-port spectrum fits 3.50 dB/cm with κ² = 0.29 % as well as 1.94 dB/cm with 0.52 %. Which measurement tells them apart?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="The coupling changes with the gap and the loss does not, so only one of the two solutions stays consistent across the series (Section 12.5).">Rings with different gaps on the same chip</button>
+      <button type="button" data-why="The ambiguity is exact: the all-pass formula is symmetric in a and t, so even a perfect spectrum fits both solutions equally well.">The same ring measured with less noise</button>
+      <button type="button" data-why="The symmetry holds at every wavelength, so more of the same spectrum adds no information about which solution is right.">A wider wavelength span around the resonance</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -71,6 +84,8 @@
     q('[data-o="a"]').textContent = fmt(bestU); q('[data-o="b"]').textContent = fmt(bestO);
     q('[data-o="t"]').textContent = Math.pow(10, S.lo).toFixed(2) + ' dB/cm, κ² ' + (100 * k2).toFixed(2) + ' %';
     q('[data-o="q"]').textContent = (LAM / fw).toFixed(0);
+    var lr = 1 - a0 * a0, kind = Math.abs(k2 - lr) < 0.1 * lr ? 'critical' : k2 > lr ? 'over-coupled' : 'under-coupled';   // the truth: coupling against round-trip loss
+    BD.pill(q('[data-o="pill"]'), kind, kind === 'critical' ? 'ok' : '');
     var c = 'The all-pass response is symmetric in a and t: swap the round-trip loss and the coupling and the spectrum is the same. The misfit map therefore has two valleys mirrored about the critical-coupling line, and one spectrum cannot tell an under-coupled ring (A) from an over-coupled one (B). ';
     c += 'Fitting gives both; deciding which is right needs more information: rings with different gaps (the coupling changes, the loss does not), an add-drop ring, or the phase response (Chapter 12). ';
     if (S.n > 2.5) c += 'With this much noise the valleys broaden, and the extracted loss carries a wide error bar. ';

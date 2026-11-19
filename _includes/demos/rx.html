@@ -13,8 +13,21 @@
     <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">receiver, and the signal at the decision circuit</span></div>
     <div class="bd-scope tall"><canvas data-c="b" aria-hidden="true"></canvas><span class="bd-tag">bit-error ratio against received power</span></div>
   </div>
-  <div class="bd-read" aria-live="polite"><span>Q now <b data-o="Q">–</b></span><span>BER now <b data-o="ber">–</b></span><span>sensitivity <b data-o="sen">–</b></span><span>margin in the reference link <b data-o="mar">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>Q now <b data-o="Q">–</b></span><span>BER now <b data-o="ber">–</b></span><span>sensitivity <b data-o="sen">–</b></span><span>margin in the reference link <b data-o="mar">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Find the sensitivity.</b> Lower the received power to −11.5 dBm: Q is just above 7.03 and the BER just below 10⁻¹². One step further, at −11.6 dBm, Q is 6.99 and the errors are too many: the sensitivity lies in between.</li>
+    <li><b>Add FEC.</b> Switch the target to 2.4 × 10⁻⁴: Q need only be 3.49, the sensitivity moves to −14.7 dBm and the margin grows from 8.9 to 12.0 dB.</li>
+    <li><b>Try an APD.</b> Switch to APD and sweep the gain: the sensitivity is best, −19.2 dBm, near M = 13. At M = 20 the multiplication noise has pushed it back to −18.9 dBm.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>The TIA's input noise halves, from 20 to 10 pA/√Hz. By about how much does the PIN receiver's sensitivity improve?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="With the TIA's noise dominant, the OMA needed is proportional to the noise current, so half the noise needs half the power: −14.5 dBm in the demo, a little under 3 dB because shot noise remains.">About 3 dB</button>
+      <button type="button" data-why="The noise power falls by 6 dB, but the photocurrent is proportional to the optical power, not to its square, so the optical power needed falls by only 3 dB.">About 6 dB</button>
+      <button type="button" data-why="With thermal noise dominant the power needed scales directly with the noise current, not with its square root.">About 1.5 dB</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -74,6 +87,7 @@
     q('[data-o="ber"]').textContent = b < 1e-15 ? '< 10⁻¹⁵' : b.toExponential(1);
     q('[data-o="sen"]').textContent = sens.toFixed(1).replace('-', '−') + ' dBm';
     q('[data-o="mar"]').textContent = (PRX - sens).toFixed(1).replace('-', '−') + ' dB';
+    BD.pill(q('[data-o="pill"]'), b <= tgt ? 'error-free' : 'too many errors', b <= tgt ? 'ok' : 'bad');
     var c = 'The error ratio is set by Q, the gap between the 0 and 1 currents divided by the sum of their noises: BER = ½ erfc(Q/√2), so Q = ' + qt.toFixed(2) + ' for the target. ';
     if (det === 'pin') c += 'With a PIN diode the TIA\'s noise dominates, so a quieter TIA or a larger extinction ratio buys sensitivity decibel for decibel. ';
     else c += 'An APD multiplies the photocurrent before the TIA adds its noise, but adds multiplication noise of its own (excess noise F = ' + (KA * S.M + (1 - KA) * (2 - 1 / S.M)).toFixed(1) + '): beyond an optimum gain, more M makes it worse. ';

@@ -8,16 +8,32 @@
     <label class="bd-sl"><span>input offset from centre <b data-v="x0"></b></span><input type="range" data-k="x0" min="0" max="3" step="0.01" value="0" aria-label="input offset"></label>
     <label class="bd-sl"><span>wavelength λ <b data-v="lam"></b></span><input type="range" data-k="lam" min="1.5" max="1.6" step="0.001" value="1.55" aria-label="wavelength"></label>
   </div>
-  <div class="bd-scope short"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top view, width stretched</span></div>
-  <div class="bd-scope tall"><canvas data-c="m" aria-hidden="true"></canvas><span class="bd-tag">intensity in the MMI (top view, length squeezed)</span></div>
-  <div class="bd-scope short"><canvas data-c="o" aria-hidden="true"></canvas><span class="bd-tag">intensity across the output end</span></div>
-  <div class="bd-read" aria-live="polite"><span>guided modes <b data-o="n">–</b></span><span>beat length L<sub>π</sub> <b data-o="lp">–</b></span><span>1 × 2 length <b data-o="l12">–</b></span><span>power in upper / lower half <b data-o="ud">–</b></span></div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag" data-o="tag">field (red +, blue −), top view</span></div>
+  <div class="bd-status"><span data-o="fst"></span></div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="m" aria-hidden="true"></canvas><span class="bd-tag">intensity in the MMI, length squeezed</span></div>
+    <div class="bd-scope tall"><canvas data-c="o" aria-hidden="true"></canvas><span class="bd-tag">intensity across the output end</span></div>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>guided modes <b data-o="n">–</b></span><span>beat length L<sub>π</sub> <b data-o="lp">–</b></span><span>1 × 2 length <b data-o="l12">–</b></span><span>power in upper / lower half <b data-o="ud">–</b></span><span class="bd-pill ok" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Split 50/50.</b> Press 1 × 2: L = 3L<sub>π</sub>/8 = 33.7 µm puts two images of the centred input on the output guides at ±W/4, and the 50/50 pill lights up. The crests in the two outputs are in step.</li>
+    <li><b>Offset the input.</b> Set the offset to 1.5 µm (W/4) and press 2 × 2: two images again, 50/50, but now a quarter period apart, as in a 3 dB coupler. Press single image: the mirrored image leaves by the lower guide.</li>
+    <li><b>Double the width.</b> At W = 12 µm, L<sub>π</sub> grows four-fold to 356 µm and the 1 × 2 splitter needs 133.5 µm: wide MMIs are long.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>The 6 µm section of Worked Example 10.1 comes out 1 % too wide. How far do its two images move?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="Lπ grows with the square of the effective width, so a 1 % wider section moves the images 2 % further along: from 33.7 to about 34.4 µm. Check it with the W slider.">About 0.7 µm further along</button>
+      <button type="button" data-why="That would be true if Lπ grew in proportion to the width, but it grows with its square: 1 % wider means 2 % longer.">About 0.3 µm further along</button>
+      <button type="button" data-why="The images move whenever Lπ changes, and Lπ depends on the width; only the split of a centred input is fixed, by symmetry.">They stay where they are</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
   var root = document.getElementById('bdMmi'); if (!root || !window.BD) return;
-  var q = function (s) { return root.querySelector(s); }, snap = 0;
+  var q = function (s) { return root.querySelector(s); }, snap = 0, nfr = 0;
   // effective-index model of a 220 nm Si MMI in oxide: slab index nr, cladding nc, TE
   var nr = 2.85, nc = 1.444, win = 0.9;   // input waveguide mode ~ Gaussian with 0.9 um waist (tapered access)
   var S = BD.bind(root, {
@@ -33,6 +49,7 @@
     if (!snap) return; var G = geom(S.lam), L = [0, 3 * G.Lp / 8, 3 * G.Lp / 2, 3 * G.Lp][snap];
     var el = q('[data-k="L"]'); el.max = Math.max(400, Math.ceil(L * 1.05)); el.value = L; el.dispatchEvent(new Event('input'));
   }
+  var FV = BD.field(q('[data-c="g"]'), { button: q('.bd-status'), hz: 1.1 });
   BD.seg(root, 'snap', function (v) { snap = +v; if (snap === 1) { q('[data-k="x0"]').value = 0; q('[data-k="x0"]').dispatchEvent(new Event('input')); } applySnap(); draw(); });
   // modes of the ideal multimode section: sin((nu+1) pi x / We), x in [0, We]; beta_nu = k nr - (nu+1)^2 pi lam / (4 nr We^2)
   function fieldAt(z, coef, G, lam, xs) {
@@ -77,25 +94,86 @@
       xt: [[-G.We / 4, '−W/4'], [0, '0'], [G.We / 4, 'W/4']], yt: [[0, '0'], [1, 'max']] });
     BD.line(f2, xo, Io, BD.C.gold, 2);
     var up = 0, dn = 0; Iout.forEach(function (v, k) { if (xs[k] > G.We / 2) up += v; else dn += v; });
-    // ---- geometry: top view; length to scale, width magnified so it stays visible
+    // ---- the optical field in the top view, from the same modal expansion: the sum of c_nu sin((nu+1) pi x / We) e^{-j beta_nu z}
+    // in the multimode section; before it, the input guide's mode (the same Gaussian); after it, each output guide's mode times
+    // the overlap of the output field with that mode, so the outputs light up only where an image lands on them
     (function () {
-      var dg = BD.setup(q('[data-c="g"]')), g = dg.g, Lio = Math.min(Math.max(0.22 * L, 8), 60), wA = 1.5;
-      var sx = (dg.w - 30) / (L + 2 * Lio), top = 26, bot = dg.h - 22, sy = Math.min((bot - top) / (S.W + 2), 22), k = sy / sx;
-      var x0 = 15, X = function (z) { return x0 + z * sx; }, yc = (top + bot) / 2, Y = function (y) { return yc - y * sy; };
-      g.fillStyle = BD.GEO.ox; g.fillRect(0, top - 4, dg.w, bot - top + 8);
-      g.fillStyle = BD.GEO.si;
-      g.fillRect(X(0), Y(S.x0 + wA / 2), Lio * sx, wA * sy);                       // input access waveguide
-      g.fillRect(X(Lio), Y(S.W / 2), L * sx, S.W * sy);                             // multimode section
-      [S.W / 4, -S.W / 4].forEach(function (yo) { g.fillRect(X(Lio + L), Y(yo + wA / 2), Lio * sx, wA * sy); });   // output ports at +-W/4
-      g.fillStyle = BD.GEO.glow + '0.9)'; g.beginPath(); g.arc(X(0) + 3, Y(S.x0), 3, 0, 7); g.fill();
-      BD.dim(g, X(Lio + 0.1 * L), Y(S.W / 2), X(Lio + 0.1 * L), Y(-S.W / 2), 'W = ' + S.W.toFixed(1) + ' µm', '#172036', 10);
-      g.textAlign = 'left';
-      BD.dim(g, X(Lio), bot + 10, X(Lio + L), bot + 10, 'L = ' + L.toFixed(1) + ' µm', BD.C.gold, -6);
+      var cv = q('[data-c="g"]'), Wc = cv.clientWidth, nar = Wc < 480;
+      cv.style.height = (nar ? 210 : 230) + 'px';
+      var H = cv.clientHeight, Lio = Math.min(Math.max(0.22 * L, 8), 60), wA = 1.5, x0 = 14;
+      var sx = (Wc - 2 * x0) / (L + 2 * Lio), top = 34, bot = H - 26, sy = Math.min((bot - top) / (S.W + 2), 22), k = sy / sx;
+      var X = function (z) { return x0 + z * sx; }, yc = (top + bot) / 2, Y = function (y) { return yc - y * sy; };
+      var cr = BD.crests(lam / nr * sx, 6), bd = 2 * Math.PI * nr / (lam * cr.n);   // display phase per um of the common carrier
+      var cmax = 0, act = [], db = [], j, ii, m;
+      for (m = 0; m < coef.length; m++) cmax = Math.max(cmax, Math.abs(coef[m]));
+      for (m = 0; m < coef.length; m++) if (Math.abs(coef[m]) > 1e-4 * cmax) { act.push(m); db.push((m + 1) * (m + 1) * Math.PI * lam / (4 * nr * G.We * G.We)); }
+      // the output field at z = L (envelope, without the carrier) and its overlap with the modes of the output guides at +-W/4
+      var eR = new Float64Array(nx), eI = new Float64Array(nx), pE = 0;
+      for (m = 0; m < act.length; m++) {
+        var cR = coef[act[m]] * Math.cos(db[m] * L), cIm = coef[act[m]] * Math.sin(db[m] * L);
+        for (ii = 0; ii < nx; ii++) { var sn = Math.sin((act[m] + 1) * Math.PI * xs[ii] / G.We); eR[ii] += cR * sn; eI[ii] += cIm * sn; }
+      }
+      for (ii = 0; ii < nx; ii++) pE += eR[ii] * eR[ii] + eI[ii] * eI[ii];
+      var ovl = function (c) {
+        var ar = 0, ai = 0, gg = 0;
+        for (var n = 0; n < nx; n++) { var gv = Math.exp(-Math.pow((xs[n] - G.We / 2 - c) / win, 2)); ar += eR[n] * gv; ai += eI[n] * gv; gg += gv * gv; }
+        return { re: ar / gg, im: ai / gg, eta: (ar * ar + ai * ai) / (gg * pE) };   // amplitude in the guide's mode, and the share of the power
+      };
+      var oU = ovl(S.W / 4), oD = ovl(-S.W / 4);
+      FV.grid(0, top, Wc, bot - top);
+      var ny = FV.ny, nxp = FV.nx, re = FV.re, im = FV.im, na = act.length;
+      var phi = new Float64Array(na * ny), yv = new Float64Array(ny), inW = new Uint8Array(ny), Ar = new Float64Array(na), Ai = new Float64Array(na);
+      for (j = 0; j < ny; j++) {
+        var y = (yc - (top + j + 0.5)) / sy; yv[j] = y; inW[j] = Math.abs(y) <= S.W / 2 ? 1 : 0;
+        for (m = 0; m < na; m++) phi[m * ny + j] = inW[j] ? Math.sin((act[m] + 1) * Math.PI * (y + G.We / 2) / G.We) : 0;
+      }
+      for (ii = 0; ii < nxp; ii++) {
+        var z = (ii + 0.5 - x0) / sx - Lio, cp = Math.cos(bd * z), sp = Math.sin(bd * z), p, gu, gd;
+        if (z < 0) {            // input access waveguide: its mode times e^{-j beta z}
+          for (j = 0; j < ny; j++) { gu = Math.exp(-Math.pow((yv[j] - S.x0) / win, 2)); if (gu < 1e-4) continue; p = j * nxp + ii; re[p] = gu * cp; im[p] = -gu * sp; }
+        } else if (z <= L) {    // multimode section: c_nu e^{+j dbeta_nu z} e^{-j beta z}
+          for (m = 0; m < na; m++) { var ph = db[m] * z - bd * z; Ar[m] = coef[act[m]] * Math.cos(ph); Ai[m] = coef[act[m]] * Math.sin(ph); }
+          for (j = 0; j < ny; j++) {
+            if (!inW[j]) continue;
+            var sr = 0, si = 0;
+            for (m = 0; m < na; m++) { var fm = phi[m * ny + j]; sr += fm * Ar[m]; si += fm * Ai[m]; }
+            p = j * nxp + ii; re[p] = sr; im[p] = si;
+          }
+        } else {                // output guides: overlap amplitude times each guide's mode, carrier continued
+          for (j = 0; j < ny; j++) {
+            gu = Math.exp(-Math.pow((yv[j] - S.W / 4) / win, 2)); gd = Math.exp(-Math.pow((yv[j] + S.W / 4) / win, 2)); if (gu + gd < 1e-4) continue;
+            var ar2 = gu * oU.re + gd * oD.re, ai2 = gu * oU.im + gd * oD.im; p = j * nxp + ii;
+            re[p] = ar2 * cp + ai2 * sp; im[p] = ai2 * cp - ar2 * sp;
+          }
+        }
+      }
+      q('[data-o="tag"]').textContent = cr.n > 1 ? 'field (red +, blue −) · ' + cr.note : 'field (red +, blue −), top view';
+      var st = ['width ×' + k.toFixed(1)];
+      if (cr.n > 1) st.push('crests drawn 1 per ' + cr.n + ' λ (real ones ' + (lam / nr * sx).toFixed(1) + ' px apart)');
+      st.push('modal expansion over ' + G.N + ' modes, not a full-wave solve');
+      var fst = q('[data-o="fst"]'), stTxt = st.join(' · '), msTxt = function () { return FV.ms ? ' · frame ' + FV.ms.toFixed(1) + ' ms' : ''; };
+      fst.textContent = stTxt + msTxt();
       var tot = up + dn;
-      BD.label(g, 'upper ' + (100 * up / tot).toFixed(0) + ' %', dg.w - 6, Y(S.W / 4 + wA / 2) - 4, BD.C.white, 'right');
-      BD.label(g, 'lower ' + (100 * dn / tot).toFixed(0) + ' %', dg.w - 6, Y(-S.W / 4 - wA / 2) + 12, BD.C.white, 'right');
-      BD.label(g, 'input', X(0), Y(S.x0 - wA / 2) + 12, BD.C.gold);
-      if (k > 1.05) BD.label(g, (dg.w < 420 ? 'width ×' : 'width drawn ×') + k.toFixed(1), dg.w - 6, top - 8, BD.C.dim, 'right');   // short on a phone, clear of the panel tag
+      FV.overlay = function (gx) {
+        // outlines: the input guide, the multimode section and the output guides at +-W/4
+        gx.strokeStyle = 'rgba(215,230,247,.5)'; gx.lineWidth = 1;
+        var hl = function (xa, xb, yy) { gx.beginPath(); gx.moveTo(xa, yy); gx.lineTo(xb, yy); gx.stroke(); };
+        hl(0, X(Lio), Y(S.x0 + wA / 2)); hl(0, X(Lio), Y(S.x0 - wA / 2));
+        gx.strokeRect(X(Lio), Y(S.W / 2), L * sx, S.W * sy);
+        [S.W / 4, -S.W / 4].forEach(function (yo) { hl(X(Lio + L), Wc, Y(yo + wA / 2)); hl(X(Lio + L), Wc, Y(yo - wA / 2)); });
+        BD.label(gx, 'in', 3, Math.min(Y(S.x0 - wA / 2) + 12, bot + 8), BD.C.gold);
+        BD.label(gx, 'W = ' + S.W.toFixed(2) + ' µm', X(Lio) + 4, Y(S.W / 2) - 5, BD.C.axis);
+        BD.label(gx, 'upper ' + (100 * up / tot).toFixed(0) + ' %', Wc - 4, Y(S.W / 4 + wA / 2) - 4, BD.C.white, 'right');
+        BD.label(gx, 'lower ' + (100 * dn / tot).toFixed(0) + ' %', Wc - 4, Y(-S.W / 4 - wA / 2) + 12, BD.C.white, 'right');
+        BD.dim(gx, X(Lio), bot + 12, X(Lio + L), bot + 12, 'L = ' + L.toFixed(1) + ' µm', BD.C.gold, -6);
+        if (++nfr % 30 === 0) fst.textContent = stTxt + msTxt();
+      };
+      FV.render();
+      // the pill: an image lands on the output guides (95 % of the light couples into them)
+      var eu = oU.eta, ed = oD.eta, pl = '';
+      if (eu + ed > 0.95 && Math.abs(eu - ed) < 0.05 * (eu + ed)) pl = '50/50';
+      else if (Math.max(eu, ed) > 0.95 && S.x0 >= 0.05) pl = eu > ed ? 'bar' : 'cross';
+      BD.pill(q('[data-o="pill"]'), pl, 'ok');
     })();
     // ---- readouts
     q('[data-o="n"]').textContent = G.N;

@@ -8,13 +8,27 @@
     <label class="bd-sl"><span>drive swing <b data-v="V"></b></span><input type="range" data-k="V" min="0.3" max="6" step="0.05" value="2" aria-label="drive swing"></label>
     <label class="bd-sl"><span>bias phase <b data-v="b"></b></span><input type="range" data-k="b" min="0" max="180" step="1" value="90" aria-label="bias phase"></label>
   </div>
-  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: arm length to scale, widths stretched</span></div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag" data-o="tag">field (red +, blue −), arm length to scale</span></div>
+  <div class="bd-status"><span class="bd-seg" role="group" aria-label="Drive level shown in the field"><button type="button" data-lv="lo" aria-pressed="true">low drive</button><button type="button" data-lv="hi" aria-pressed="false">high drive</button></span><span data-o="fst"></span></div>
   <div class="bd-row">
     <div class="bd-scope tall"><canvas data-c="t" aria-hidden="true"></canvas><span class="bd-tag">transfer curve, bias and swing</span></div>
     <div class="bd-scope tall"><canvas data-c="e" aria-hidden="true"></canvas><span class="bd-tag">optical eye (2 symbols)</span></div>
   </div>
-  <div class="bd-read" aria-live="polite"><span>V<sub>π</sub> <b data-o="vpi">–</b></span><span>bandwidth <b data-o="bw">–</b></span><span>extinction <b data-o="er">–</b></span><span>insertion loss <b data-o="il">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>V<sub>π</sub> <b data-o="vpi">–</b></span><span>bandwidth <b data-o="bw">–</b></span><span>extinction <b data-o="er">–</b></span><span>insertion loss <b data-o="il">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>See the drive in the arms.</b> At the defaults (silicon, 3 mm, 2 Vpp, quadrature), flip the field between low and high drive: the arms' crests slip from 51° to 129° apart, and the output falls from 38 % to 9 % of the input.</li>
+    <li><b>Lengthen the silicon modulator to 6 mm.</b> V<sub>π</sub> halves to 2.33 V, but the loss grows to 9.7 dB and the bandwidth falls to 8 GHz: each bit has no time to settle, and the eye starts to close.</li>
+    <li><b>Switch to thin-film LiNbO₃ at 10 mm.</b> V<sub>π</sub> is 2.60 V, the bandwidth 100 GHz and the loss 3.3 dB, almost all of it from sitting at quadrature: the eye opens wide, with 14.7 dB of extinction.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>Why is a Mach–Zehnder modulator biased at quadrature (90°)?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="Around 90° a given swing changes the output most, and most evenly. At 0° or 180° the swing sits on the flat top or bottom of the cosine, and the extinction collapses: try the bias slider.">The response is steepest and most linear there</button>
+      <button type="button" data-why="The loss is lowest at 0°, but there the curve is flat: with the bias slider at 0° the extinction is 0 dB.">The insertion loss is lowest there</button>
+      <button type="button" data-why="The bias does not change the electrodes' bandwidth; it only sets where on the cosine the swing sits.">The bandwidth is highest there</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -27,6 +41,11 @@
   var S = BD.bind(root, { L: { fmt: function (x) { return x.toFixed(1) + ' mm'; } }, V: { fmt: function (x) { return x.toFixed(2) + ' Vpp'; } }, b: { fmt: function (x) { return x.toFixed(0) + '°'; } } }, function () { draw(); });
   BD.seg(root, 'pf', function (v) { pf = v; draw(); });
   BD.seg(root, 'fm', function (v) { fm = v; draw(); });
+  var fld = 'lo';   // drive level drawn in the field view: 'lo' = -Vpp/2, 'hi' = +Vpp/2
+  BD.seg(root, 'lv', function (v) { fld = v; draw(); });
+  // index used only for the drawn crest spacing: the Si rib of Chapter 19 (femwell); for TFLN the material n_e (its mode index is a little lower)
+  var NE = { si: 2.57, ln: 2.14 };
+  var FV = BD.field(q('[data-c="g"]'), { button: q('.bd-status'), hz: 1.1 }), nfr = 0;
   function draw() {
     var P = PF[pf], vpi = P.vpl * 10 / S.L, bw = P.f0 * Math.pow(P.L0 / S.L, 2), ilp = P.loss * S.L, phb = S.b * Math.PI / 180;
     var T = function (v) { return Math.pow(Math.cos((phb + Math.PI * v / vpi) / 2), 2); };
@@ -41,23 +60,55 @@
     for (k = 20; k < sym.length; k++) { var li = lev.indexOf(sym[k]); lv[li][0] += opt[k * ns + ns - 4]; lv[li][1]++; }
     var means = lv.map(function (x) { return x[0] / Math.max(1, x[1]); }), hi = Math.max.apply(null, means), lo = Math.min.apply(null, means);
     var er = 10 * Math.log10(hi / Math.max(lo, 1e-6)), avg = means.reduce(function (s, x) { return s + x; }, 0) / means.length, il = -10 * Math.log10(avg);
-    // ---- geometry
+    // ---- top view with the optical field. The drive held at one level (fld) gives the arms a phase difference
+    // dph = bias + pi v / V_pi, split +-dph/2 between them (push-pull); the arms then add to cos(dph/2) times the
+    // field left after the loss, i.e. the T(v) and loss of the model above.
     (function () {
-      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, x0 = 50, x1 = dv.w - 50, cy = dv.h / 2 + 6, sep = 26, Lpx = x1 - x0 - 98, scl = Lpx / 20;   // the 20 mm ruler spans the straight arms
-      var ea = x0 + 58, eb = ea + S.L * scl;
-      var up = [[x0 - 40, cy], [x0, cy], [x0 + 40, cy - sep], [x1 - 40, cy - sep], [x1, cy], [x1 + 40, cy]];
-      var dn = [[x0, cy], [x0 + 40, cy + sep], [x1 - 40, cy + sep], [x1, cy]];
-      BD.glow(g, up, 0.7, 7); BD.glow(g, dn, 0.7, 7);
-      BD.wgr(g, up, 3, BD.GEO.si, 30); BD.wgr(g, dn, 3, BD.GEO.si, 30);
-      // GSG travelling-wave electrodes over length L
-      g.fillStyle = 'rgba(216,220,228,.85)';
-      g.fillRect(ea, cy - sep - 16, eb - ea, 8); g.fillRect(ea, cy - 5, eb - ea, 10); g.fillRect(ea, cy + sep + 8, eb - ea, 8);
-      BD.label(g, 'G', ea - 12, cy - sep - 9, BD.C.axis); BD.label(g, 'S', ea - 12, cy + 4, BD.C.axis); BD.label(g, 'G', ea - 12, cy + sep + 16, BD.C.axis);
-      g.fillStyle = BD.C.gold; g.beginPath(); g.moveTo(ea - 26, cy); g.lineTo(ea - 18, cy - 4); g.lineTo(ea - 18, cy + 4); g.fill();
-      BD.label(g, 'RF in', ea - 18, cy + 18, BD.C.gold); BD.label(g, '50 Ω', eb + 6, cy + 4, BD.C.axis);
-      BD.dim(g, ea, cy + sep + 30, eb, cy + sep + 30, 'L = ' + S.L.toFixed(1) + ' mm', BD.C.gold, 0);
-      BD.label(g, '0', ea, dv.h - 4, BD.C.dim); BD.label(g, '20 mm', ea + 20 * scl, dv.h - 4, BD.C.dim, 'right');
-      g.strokeStyle = BD.C.dim; g.beginPath(); g.moveTo(ea, dv.h - 14); g.lineTo(ea + 20 * scl, dv.h - 14); g.stroke();
+      var cv = q('[data-c="g"]'), W = cv.clientWidth, H = cv.clientHeight, x0 = 50, x1 = W - 50, cy = H / 2 + 6, sep = 26, Lpx = x1 - x0 - 98, scl = Lpx / 20;   // the 20 mm ruler spans the straight arms
+      var ea = x0 + 58, eb = ea + S.L * scl, xa = x0 + 40, xb = x1 - 40, half = 3, rmp = 16;
+      var vd = fld === 'hi' ? S.V / 2 : -S.V / 2, dpd = Math.PI * vd / vpi, dph = phb + dpd, la = Math.pow(10, -ilp / 20), out = loss * T(vd);
+      var cr = BD.crests(1.55 / NE[pf] * scl / 1000, 14), beta = 2 * Math.PI / cr.px;   // display phase per px of path; crests 14 px apart or more, so the arms' phase slip shows
+      var fr = function (x, a, b) { return Math.max(0, Math.min(1, (x - a) / (b - a))); };
+      function arm(sg) {   // sg = +1 upper, -1 lower: cosine S-bends and a straight part sampled every ~4 px
+        var pts = BD.sbend(x0, cy, xa, cy - sg * sep, 24), n = Math.max(2, Math.ceil((xb - xa) / 4));
+        for (var jj = 1; jj <= n; jj++) pts.push([xa + (xb - xa) * jj / n, cy - sg * sep]);
+        return pts.concat(BD.sbend(xb, cy - sg * sep, x1, cy, 24).slice(1));
+      }
+      var up = arm(1), dn = arm(-1), sa = [0];
+      for (var jj = 1; jj < up.length; jj++) sa.push(sa[jj - 1] + Math.hypot(up[jj][0] - up[jj - 1][0], up[jj][1] - up[jj - 1][1]));
+      var Sa = sa[sa.length - 1];
+      // the input fades out and the arms fade in over rmp px past the splitter (and the reverse at the combiner), so the
+      // overlapping guides hand the field over without a bright spot where they meet
+      var inP = [[0, cy], [x0, cy], [x0 + rmp, cy]], outP = [[x1 - rmp, cy], [x1, cy], [W, cy]];
+      FV.grid(0, cy - sep - 14, W, 2 * sep + 28);
+      FV.guide(inP, { half: half, decay: 1.5, amp: function (n) { return [n < 2 ? 1 : 0, 0]; }, phase: function (n) { return beta * (inP[n][0] - x0); } });
+      [[up, 1], [dn, -1]].forEach(function (A) {
+        var pts = A[0], sg = A[1];
+        FV.guide(pts, { half: half, decay: 1.5,
+          amp: function (n) { var x = pts[n][0]; return [Math.SQRT1_2 * Math.min(1, sa[n] / rmp, (Sa - sa[n]) / rmp) * Math.pow(la, fr(x, ea, eb)), 0]; },
+          phase: function (n) { var x = pts[n][0]; return beta * sa[n] + sg * (phb * fr(x, xa, xb) + dpd * fr(x, ea, eb)) / 2; } });
+      });
+      FV.guide(outP, { half: half, decay: 1.5, amp: function (n) { return [n ? la * Math.cos(dph / 2) : 0, 0]; }, phase: function (n) { return beta * (Sa + outP[n][0] - x1); } });
+      q('[data-o="tag"]').textContent = 'field (red +, blue −) · ' + (cr.n > 1 ? cr.note : 'top view');
+      var deg = function (r) { return (r * 180 / Math.PI).toFixed(0) + '°'; };
+      var stTxt = 'Δφ = ' + deg(dph).replace('-', '−') + ' between the arms · length to scale, widths stretched' + (cr.n > 1 ? ', crests 1 per ' + cr.n + ' λ' : '') + ' · arm phases from the model (bias along the arms, drive under the electrodes), not a full-wave solve';
+      var fst = q('[data-o="fst"]'), msTxt = function () { return FV.ms ? ' · frame ' + FV.ms.toFixed(1) + ' ms' : ''; };
+      fst.textContent = stTxt + msTxt();
+      FV.overlay = function (g) {
+        BD.edges(g, [[0, cy], [x0, cy]], half); BD.edges(g, up, half); BD.edges(g, dn, half); BD.edges(g, [[x1, cy], [W, cy]], half);
+        // GSG travelling-wave electrodes over length L
+        g.fillStyle = 'rgba(216,220,228,.85)';
+        g.fillRect(ea, cy - sep - 16, eb - ea, 8); g.fillRect(ea, cy - 5, eb - ea, 10); g.fillRect(ea, cy + sep + 8, eb - ea, 8);
+        BD.label(g, 'G', ea - 12, cy - sep - 9, BD.C.axis); BD.label(g, 'S', ea - 12, cy + 4, BD.C.axis); BD.label(g, 'G', ea - 12, cy + sep + 16, BD.C.axis);
+        g.fillStyle = BD.C.gold; g.beginPath(); g.moveTo(ea - 26, cy); g.lineTo(ea - 18, cy - 4); g.lineTo(ea - 18, cy + 4); g.fill();
+        BD.label(g, 'RF in', ea - 18, cy + 18, BD.C.gold); BD.label(g, '50 Ω', eb + 6, cy + 4, BD.C.axis);
+        BD.label(g, 'in', 4, cy - half - 5, BD.C.white); BD.label(g, 'out ' + (100 * out).toFixed(0) + ' %', W - 4, cy - half - 5, BD.C.gold, 'right');
+        BD.dim(g, ea, cy + sep + 30, eb, cy + sep + 30, 'L = ' + S.L.toFixed(1) + ' mm', BD.C.gold, 0);
+        BD.label(g, '0', ea, H - 4, BD.C.dim); BD.label(g, '20 mm', ea + 20 * scl, H - 4, BD.C.dim, 'right');
+        g.strokeStyle = BD.C.dim; g.beginPath(); g.moveTo(ea, H - 14); g.lineTo(ea + 20 * scl, H - 14); g.stroke();
+        if (++nfr % 30 === 0) fst.textContent = stTxt + msTxt();
+      };
+      FV.render();
     })();
     // ---- transfer curve with bias and swing
     var d2 = BD.setup(q('[data-c="t"]')), vr = Math.max(vpi * 1.2, S.V), f2 = BD.frame(d2, { x: [-vr, vr], y: [0, 1.05], pad: { l: 34, b: 22, t: 30 },
@@ -65,6 +116,8 @@
     var xs = [], ys = []; for (var i2 = 0; i2 <= 300; i2++) { var vv = -vr + 2 * vr * i2 / 300; xs.push(vv); ys.push(T(vv)); }
     d2.g.fillStyle = 'rgba(224,184,90,.12)'; d2.g.fillRect(f2.X(-S.V / 2), f2.p.t, f2.X(S.V / 2) - f2.X(-S.V / 2), d2.h - f2.p.t - f2.p.b);
     BD.line(f2, xs, ys, BD.C.blue, 2); BD.dot(f2, 0, T(0), BD.C.white, 4); BD.dot(f2, -S.V / 2, T(-S.V / 2), BD.C.gold, 3.5); BD.dot(f2, S.V / 2, T(S.V / 2), BD.C.gold, 3.5);
+    var vfd = fld === 'hi' ? S.V / 2 : -S.V / 2;   // ring round the drive level drawn in the field view
+    d2.g.strokeStyle = BD.C.white; d2.g.lineWidth = 1.2; d2.g.beginPath(); d2.g.arc(f2.X(vfd), f2.Y(T(vfd)), 7, 0, 7); d2.g.stroke(); d2.g.lineWidth = 1;
     // ---- eye: overlay 2-symbol windows
     var d3 = BD.setup(q('[data-c="e"]')), f3 = BD.frame(d3, { x: [0, 2], y: [0, Math.max(0.05, loss * 1.05)], pad: { l: 34, b: 22, t: 30 }, xt: [[0, '0'], [1, '1 UI'], [2, '2']], yt: [[0, '0']] }), g3 = d3.g;
     f3.clipIn(); g3.strokeStyle = 'rgba(127,224,160,.18)'; g3.lineWidth = 1;
@@ -80,6 +133,13 @@
     q('[data-o="bw"]').textContent = bw.toFixed(0) + ' GHz';
     q('[data-o="er"]').textContent = er.toFixed(1) + ' dB';
     q('[data-o="il"]').textContent = il.toFixed(1) + ' dB';
+    // vertical eye opening at the same sampling instant as the levels, as a fraction of the ideal level spacing
+    var smp = lev.map(function () { return []; });
+    for (k = 20; k < sym.length; k++) smp[lev.indexOf(sym[k])].push(opt[k * ns + ns - 4]);
+    var ord = smp.map(function (sa, n) { return [means[n], Math.min.apply(null, sa), Math.max.apply(null, sa)]; }).sort(function (p1, p2) { return p1[0] - p2[0]; });
+    var eye = Infinity; for (k = 1; k < ord.length; k++) eye = Math.min(eye, ord[k][1] - ord[k - 1][2]);
+    var eyef = hi > lo ? eye / ((hi - lo) / (lev.length - 1)) : 0;
+    BD.pill(q('[data-o="pill"]'), eyef > 0.5 ? 'open eye' : eyef > 0.2 ? 'eye closing' : 'eye closed', eyef > 0.5 ? 'ok' : eyef > 0.2 ? 'warn' : 'bad');
     var c = 'A longer modulator needs less voltage (V<sub>π</sub> = V<sub>π</sub>L / L) but loses more light and, with lossy electrodes, bandwidth: ';
     c += pf === 'si' ? 'silicon\'s free carriers cost about 1 dB/mm, and its electrodes limit a 3 mm modulator to about 30 GHz. ' : 'thin-film LiNbO₃ loses almost nothing and its velocity-matched electrodes reach about 100 GHz at 10 mm, so it can be long and driven with little voltage. ';
     if (Math.abs(S.b - 90) > 25) c += 'Away from quadrature (90°) the swing sits on a curved part of the response, and the levels bunch up. ';

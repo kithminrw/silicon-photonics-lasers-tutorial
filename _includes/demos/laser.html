@@ -8,14 +8,28 @@
     <label class="bd-sl"><span>front-facet reflectivity R<sub>1</sub> <b data-v="R"></b></span><input type="range" data-k="R" min="0.02" max="0.95" step="0.01" value="0.32" aria-label="reflectivity"></label>
     <label class="bd-sl"><span>temperature T <b data-v="T"></b></span><input type="range" data-k="T" min="10" max="95" step="1" value="25" aria-label="temperature"></label>
   </div>
-  <div class="bd-scope short"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: side view, cavity length to scale</span></div>
+  <div class="bd-scope short"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag" data-o="tag">cavity field (red +, blue −), side view</span></div>
+  <div class="bd-status"><span data-o="fst"></span></div>
   <div class="bd-row">
     <div class="bd-scope tall"><canvas data-c="li" aria-hidden="true"></canvas><span class="bd-tag">L–I: front-facet power against current</span></div>
     <div class="bd-scope tall"><canvas data-c="tr" aria-hidden="true"></canvas><span class="bd-tag">switch-on: current stepped from 0 to I at t = 0</span></div>
   </div>
   <div class="bd-scope short"><canvas data-c="sp" aria-hidden="true"></canvas><span class="bd-tag">spectrum: longitudinal modes under the gain</span></div>
-  <div class="bd-read" aria-live="polite"><span>I<sub>th</sub> <b data-o="ith">–</b></span><span>slope <b data-o="se">–</b></span><span>η<sub>d</sub> <b data-o="ed">–</b></span><span>α<sub>m</sub> <b data-o="am">–</b></span><span>τ<sub>p</sub> <b data-o="tp">–</b></span><span>mode spacing <b data-o="dl">–</b></span><span>P at I <b data-o="p">–</b></span><span>f<sub>r</sub> <b data-o="fr">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>I<sub>th</sub> <b data-o="ith">–</b></span><span>slope <b data-o="se">–</b></span><span>η<sub>d</sub> <b data-o="ed">–</b></span><span>α<sub>m</sub> <b data-o="am">–</b></span><span>τ<sub>p</sub> <b data-o="tp">–</b></span><span>mode spacing <b data-o="dl">–</b></span><span>P at I <b data-o="p">–</b></span><span>f<sub>r</sub> <b data-o="fr">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Cross threshold.</b> Lower the current below 19.2 mA: the pill reads BELOW THRESHOLD and the cavity goes dark. At 50 mA the front facet gives 6.45 mW, the 6.5 mW of Worked Example 24.1.</li>
+    <li><b>Coat the rear facet.</b> Switch to the HR-coated rear: the mirror loss falls, the threshold drops to 13.9 mA and the front facet now gets 92 % of the light. The standing wave is almost complete near the rear mirror.</li>
+    <li><b>Heat the laser.</b> At 85 °C the threshold climbs to 52.3 mA (T<sub>0</sub> = 60 K), so the 40 mA drive no longer lases. Raise the current to bring it back.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>You raise the drive from 40 to 80 mA. What happens to the carrier density and the gain inside the cavity?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="Above threshold the gain is clamped at the losses, Γg = αi + αm: any more gain would make the light grow without limit. Every extra electron becomes a photon, which is why the L–I line is straight.">They stay clamped at their threshold values</button>
+      <button type="button" data-why="If the gain rose above the losses, the light would grow on every round trip without limit; the extra stimulated emission pulls the carrier density back down to N_th.">Both double, so the output quadruples</button>
+      <button type="button" data-why="Gain compression lowers the gain slightly at high power, but to first order the gain and carrier density stay pinned at threshold while the output grows linearly.">The gain falls, so the output saturates</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -30,6 +44,7 @@
     R: { fmt: function (x) { return (100 * x).toFixed(0) + ' %'; } }, T: { fmt: function (x) { return x.toFixed(0) + ' °C'; } }
   }, function () { draw(); });
   BD.seg(root, 'hr', function (v) { hr = +v; draw(); });
+  var FV = BD.field(q('[data-c="g"]'), { button: q('.bd-status'), hz: 1 }), nfr = 0;
   function model() {
     var L = S.L * 1e-4, R1 = S.R, R2 = hr ? 0.9 : S.R, V = L * w * dAct;
     var am = Math.log(1 / (R1 * R2)) / (2 * L), tp = 1 / (vg * (alpha_i + am)), Ntr = Ntr0 * Math.exp((S.T - 25) / T0N);   // T0N = 143 K gives the threshold itself T0 = 60 K (Ith ~ AN + BN² + CN³)
@@ -90,29 +105,48 @@
     mm.forEach(function (p) { var y = 10 * Math.log10(p[1] / smax); d3.g.strokeStyle = BD.C.blue; d3.g.lineWidth = 2; d3.g.beginPath(); d3.g.moveTo(f3.X(p[0]), f3.Y(-50)); d3.g.lineTo(f3.X(p[0]), f3.Y(Math.max(y, -50))); d3.g.stroke(); });
     d3.g.lineWidth = 1;
     var smsr = NaN; if (mm.length > 2) { var sorted = mm.map(function (p) { return p[1]; }).sort(function (a, b) { return b - a; }); smsr = 10 * Math.log10(sorted[0] / sorted[1]); }
-    // ---- geometry: cavity length to scale, facet reflectivities, glow ~ photon density, output arrow ~ power
+    // ---- geometry: cavity length to scale, facet reflectivities, output arrow ~ power, and the lasing mode's standing wave.
+    // At threshold the round trip closes: a forward wave growing as e^(αm z/2) (net modal gain Γg − αi = αm) and the wave
+    // reflected by the front facet (r1 = √R1) growing back towards the rear, where r2 = √R2 closes the loop (r1 r2 e^(αm L) = 1).
+    // Their sum is the cavity field; above threshold its shape no longer changes (the gain is clamped), only its size.
     (function () {
-      var dv2 = BD.setup(q('[data-c="g"]')), gg = dv2.g, x0 = 40, xmax = dv2.w - 120, sx = (xmax - x0) / 1500, Lp = S.L * sx, yc = dv2.h / 2 + 8;
-      var R1 = S.R, R2 = hr ? 0.9 : S.R;
-      gg.fillStyle = 'rgba(201,194,176,.55)'; gg.fillRect(x0, yc - 22, Lp, 44);                          // InP chip
-      var lit = Math.min(1, Pnow / 20);
-      gg.fillStyle = 'rgba(142,127,90,1)'; gg.fillRect(x0, yc - 4, Lp, 8);                               // active layer
-      gg.fillStyle = BD.GEO.glow + (0.15 + 0.8 * lit).toFixed(2) + ')'; gg.fillRect(x0, yc - 3, Lp, 6);
-      gg.fillStyle = 'rgba(215,230,247,' + (0.3 + 0.7 * R2).toFixed(2) + ')'; gg.fillRect(x0 - 3 - 6 * R2, yc - 22, 3 + 6 * R2, 44);   // rear facet
-      gg.fillStyle = 'rgba(215,230,247,' + (0.3 + 0.7 * R1).toFixed(2) + ')'; gg.fillRect(x0 + Lp, yc - 22, 3 + 6 * R1, 44);         // front facet
-      if (Pnow > 0.01) {
-        var w = 1 + Math.min(8, Pnow / 3), xa = x0 + Lp + 12, xb = xa + 60;
-        gg.strokeStyle = BD.C.gold; gg.lineWidth = w; gg.beginPath(); gg.moveTo(xa, yc); gg.lineTo(xb - 6, yc); gg.stroke(); gg.lineWidth = 1;
-        gg.fillStyle = BD.C.gold; gg.beginPath(); gg.moveTo(xb + 4, yc); gg.lineTo(xb - 8, yc - 6 - w / 2); gg.lineTo(xb - 8, yc + 6 + w / 2); gg.fill();
-        BD.label(gg, Pnow.toFixed(1) + ' mW', xa, yc - 10 - w / 2, BD.C.gold);
+      var cv = q('[data-c="g"]'), W = cv.clientWidth, H = cv.clientHeight, x0 = 40, xmax = W - 120, sx = (xmax - x0) / 1500, Lp = S.L * sx, yc = H / 2 + 8;
+      var R1 = S.R, R2 = hr ? 0.9 : S.R, r1 = Math.sqrt(R1), lasing = S.I * 1e-3 > Ith;
+      var NPH = 3.6, cr = BD.crests(1.55 / NPH * sx, 6), md = Math.max(1, Math.round(2 * S.L / (cr.n * 1.55 / NPH))), bd = Math.PI * md / S.L;   // display β (rad/µm): a whole number of half-periods in L
+      var ga = M.am / 2 * 1e-4, nv = 48, pts = [];   // amplitude gain per µm; vertices along the active layer
+      for (var j = 0; j <= nv; j++) pts.push([x0 + Lp * j / nv, yc]);
+      FV.grid(x0, yc - 18, Lp, 36);
+      if (lasing) {
+        FV.guide(pts, { half: 4, decay: 3, phase: function (n) { return bd * S.L * n / nv; }, amp: function (n) { return [Math.exp(ga * S.L * n / nv), 0]; } });
+        FV.guide(pts, { half: 4, decay: 3, phase: function (n) { return -bd * S.L * n / nv; }, amp: function (n) { return [r1 * Math.exp(ga * (2 * S.L - S.L * n / nv)), 0]; } });
       }
-      BD.dim(gg, x0, yc + 32, x0 + Lp, yc + 32, 'L = ' + S.L.toFixed(0) + ' µm', BD.C.gold, -6);
-      // R1 one row up when a short cavity brings it onto R2; the glow note right of the chip (clear of the L label), else under it
-      var r2 = 'R₂ ' + (100 * R2).toFixed(0) + ' %' + (hr ? ' (HR)' : ''), r1x = x0 + Lp - 10;
-      BD.label(gg, r2, x0 - 10, yc - 28, BD.C.axis);
-      BD.label(gg, 'R₁ ' + (100 * R1).toFixed(0) + ' %', r1x, r1x < x0 - 4 + gg.measureText(r2).width ? yc - 40 : yc - 28, BD.C.axis);
-      var al = 'active layer: glow ∝ output power', ax = Math.max(x0 + Lp + 12, x0 + Lp / 2 + gg.measureText('L = ' + S.L.toFixed(0) + ' µm').width / 2 + 8);
-      if (ax + gg.measureText(al).width <= dv2.w - 4) BD.label(gg, al, ax, yc + 22, BD.C.dim); else BD.label(gg, al, x0 - 10, yc + 48, BD.C.dim);
+      var ef = Math.exp(ga * S.L), front = (1 - R1) * ef * ef, rear = (1 - R2) * Math.pow(r1 * ef * ef, 2), share = front / (front + rear);   // power out of each facet
+      q('[data-o="tag"]').textContent = cr.n > 1 ? 'cavity field (red +, blue −) · ' + cr.note : 'cavity field (red +, blue −), side view';
+      var st = [lasing ? 'standing wave at threshold (forward + reflected wave): ' + (100 * share).toFixed(0) + ' % leaves by the front facet' : 'below threshold: no lasing mode, only weak spontaneous emission'];
+      st.push('thickness not to scale'); if (cr.n > 1) st.push('1 crest per ' + cr.n + ' λ (real ones ' + (1.55 / NPH * sx).toFixed(2) + ' px apart)');
+      var fst = q('[data-o="fst"]'), stTxt = st.join(' · '), msTxt = function () { return FV.ms ? ' · frame ' + FV.ms.toFixed(1) + ' ms' : ''; };
+      fst.textContent = stTxt + msTxt();
+      FV.overlay = function (gg) {
+        gg.fillStyle = 'rgba(201,194,176,.12)'; gg.fillRect(x0, yc - 22, Lp, 44);                         // InP chip
+        gg.strokeStyle = 'rgba(201,194,176,.5)'; gg.lineWidth = 1; gg.strokeRect(x0 + 0.5, yc - 21.5, Lp - 1, 43);
+        gg.strokeStyle = 'rgba(215,230,247,.35)'; gg.beginPath(); gg.moveTo(x0, yc - 4.5); gg.lineTo(x0 + Lp, yc - 4.5); gg.moveTo(x0, yc + 4.5); gg.lineTo(x0 + Lp, yc + 4.5); gg.stroke();   // active layer
+        gg.fillStyle = 'rgba(215,230,247,' + (0.3 + 0.7 * R2).toFixed(2) + ')'; gg.fillRect(x0 - 3 - 6 * R2, yc - 22, 3 + 6 * R2, 44);   // rear facet
+        gg.fillStyle = 'rgba(215,230,247,' + (0.3 + 0.7 * R1).toFixed(2) + ')'; gg.fillRect(x0 + Lp, yc - 22, 3 + 6 * R1, 44);         // front facet
+        if (Pnow > 0.01) {
+          var w = 1 + Math.min(8, Pnow / 3), xa = x0 + Lp + 12, xb = xa + 60;
+          gg.strokeStyle = BD.C.gold; gg.lineWidth = w; gg.beginPath(); gg.moveTo(xa, yc); gg.lineTo(xb - 6, yc); gg.stroke(); gg.lineWidth = 1;
+          gg.fillStyle = BD.C.gold; gg.beginPath(); gg.moveTo(xb + 4, yc); gg.lineTo(xb - 8, yc - 6 - w / 2); gg.lineTo(xb - 8, yc + 6 + w / 2); gg.fill();
+          BD.label(gg, Pnow.toFixed(1) + ' mW', xa, yc - 10 - w / 2, BD.C.gold);
+        }
+        if (!lasing) BD.label(gg, 'below threshold', x0 + Lp + 12, Pnow > 0.01 ? yc + 18 : yc + 4, BD.C.dim);
+        BD.dim(gg, x0, yc + 32, x0 + Lp, yc + 32, 'L = ' + S.L.toFixed(0) + ' µm', BD.C.gold, -6);
+        // R1 one row up when a short cavity brings it onto R2
+        var r2s = 'R₂ ' + (100 * R2).toFixed(0) + ' %' + (hr ? ' (HR)' : ''), r1x = x0 + Lp - 10;
+        BD.label(gg, r2s, x0 - 10, yc - 28, BD.C.axis);
+        BD.label(gg, 'R₁ ' + (100 * R1).toFixed(0) + ' %', r1x, r1x < x0 - 4 + gg.measureText(r2s).width ? yc - 40 : yc - 28, BD.C.axis);
+        if (++nfr % 30 === 0) fst.textContent = stTxt + msTxt();
+      };
+      FV.render();
     })();
     // ---- readouts
     var se = eta_i * M.am / (alpha_i + M.am) * hv / qe * M.F1;
@@ -125,6 +159,7 @@
     q('[data-o="p"]').textContent = Pnow.toFixed(2) + ' mW';
     var Sop = Pnow * 1e-3 / (M.V / Gam * vg * M.am * hv * M.F1), fr = S.I * 1e-3 > Ith ? Math.sqrt(vg * g0 / M.Nth * Sop / M.tp) / (2 * Math.PI) : NaN;
     q('[data-o="fr"]').textContent = isFinite(fr) ? (fr / 1e9).toFixed(1) + ' GHz' : 'below threshold';
+    BD.pill(q('[data-o="pill"]'), S.I * 1e-3 > Ith ? 'lasing' : 'below threshold', S.I * 1e-3 > Ith ? 'ok' : 'bad');
     var cap;
     if (S.I * 1e-3 < Ith) cap = '<b>Below threshold</b>: the gain has not reached the losses, so the output is weak spontaneous emission spread over many modes. Raise the current past ' + (Ith * 1e3).toFixed(1) + ' mA.';
     else cap = 'Above threshold the carrier density clamps at N<sub>th</sub> and every extra electron becomes a photon, so the L–I curve turns into a straight line with slope η<sub>d</sub>hν/q. The switch-on shows a delay while the carriers build up, then relaxation oscillations at about ' + (fr / 1e9).toFixed(1) + ' GHz as photons and carriers trade energy. ';

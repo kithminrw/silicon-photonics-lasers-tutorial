@@ -12,8 +12,21 @@
     <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">drop-port spectrum now, and the laser</span></div>
   </div>
   <div class="bd-scope tall"><canvas data-c="t" aria-hidden="true"></canvas><span class="bd-tag">history: ambient T, heater power, dropped power</span></div>
-  <div class="bd-read" aria-live="polite"><span>dropped power <b data-o="pd">–</b></span><span>heater <b data-o="ph">–</b></span><span>resonance − laser <b data-o="dl">–</b></span><span>state <b data-o="st">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>dropped power <b data-o="pd">–</b></span><span>heater <b data-o="ph">–</b></span><span>resonance − laser <b data-o="dl">–</b></span><span>state <b data-o="st">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Open the loop.</b> Turn the loop off: the heater stops, the ring falls back 1.5 nm blue of the laser and wanders ±0.6 nm with the ±8 K room, and the dropped power falls by 10 to 16 dB.</li>
+    <li><b>Overheat the room.</b> With the loop on, raise the ambient swing to 25 K, past the 20 K that a 1.5 nm offset covers at 74 pm/K: at each hot peak the ring sits red of the laser with the heater already off, and the lock is lost until the room cools.</li>
+    <li><b>Start too far blue.</b> Set the cold offset to −3 nm and press reset: so far from the peak the dither barely changes the photodiode signal, so the loop crawls, and once locked the heater would spend about 12 mW all the time.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>Why is each ring made blue of its laser, rather than exactly on it?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="Heating moves a silicon ring red, never blue, so the ring must start blue of the laser by more than the hottest drift; the heater pays for the offset all the time.">A heater can only heat, which moves the ring red</button>
+      <button type="button" data-why="The Q does not depend on which side of the laser the ring sits. The offset is there because a heater can only push the ring red.">A ring blue of its laser has a higher Q</button>
+      <button type="button" data-why="The dither finds the slope on either side of the peak. The offset is there because a heater can only push the ring red.">The dither needs a slope to lock on to</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -84,6 +97,8 @@
     q('[data-o="dl"]').textContent = (1000 * dl).toFixed(0).replace('-', '−') + ' pm';
     var state = !loop ? 'free-running' : locked ? 'locked' : (Pb >= PMAX - 0.2 ? 'heater at maximum' : (Pb <= 0.2 && dl > 0 ? 'heater off, ring too red' : 'acquiring'));
     q('[data-o="st"]').textContent = state;
+    BD.pill(q('[data-o="pill"]'), { 'free-running': 'drifting', locked: 'locked', 'heater at maximum': 'out of range', 'heater off, ring too red': 'too red', acquiring: 'acquiring' }[state],
+      locked ? 'ok' : state === 'acquiring' ? 'warn' : 'bad');
     var c;
     if (!loop) c = 'Without control the ring follows the ambient temperature at 74 pm/K, and a few kelvin move its 0.64 nm passband off the laser. ';
     else if (locked) c = '<b>Locked.</b> A small 20 kHz dither on the heater makes the photodiode signal wobble; a lock-in reads which side of the peak the ring is on, and an integrator moves the heater power to the top. ';

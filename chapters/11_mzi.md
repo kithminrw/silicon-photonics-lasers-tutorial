@@ -81,7 +81,7 @@ In 500 × 220 nm silicon strips at 1550 nm ($$n_g = 4.18$$, [Chapter 6]({% link 
 
 </div>
 
-**Try it.** Set the arm-length difference, the splitter ratios, the loss and the phase; the top view shows the delay loop and where the light goes.
+**Try it.** Set the arm-length difference, the splitter ratios, the loss and the phase, and watch the field show where the light goes.
 
 {% include demos/mzi.html %}
 

@@ -13,8 +13,21 @@
     <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">transmission to the two outputs</span></div>
     <div class="bd-scope tall" style="overflow:auto"><pre data-o="net" style="margin:0;padding:26px 10px 8px;font:10.5px/1.45 'IBM Plex Mono',monospace;color:rgba(170,205,240,.85);white-space:pre"></pre><span class="bd-tag">netlist (instances, models and connections)</span></div>
   </div>
-  <div class="bd-read" aria-live="polite"><span>FSR <b data-o="fsr">–</b></span><span>bar port at 1550 nm <b data-o="b">–</b></span><span>cross port at 1550 nm <b data-o="x">–</b></span><span>flat-top width (−1 dB) <b data-o="ft">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>FSR <b data-o="fsr">–</b></span><span>bar port at 1550 nm <b data-o="b">–</b></span><span>cross port at 1550 nm <b data-o="x">–</b></span><span>flat-top width (−1 dB) <b data-o="ft">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Halve the delay.</b> Set ΔL to 50 µm: the FSR doubles to 11.50 nm, λ²/(n<sub>g</sub>ΔL), and the delay in the netlist follows.</li>
+    <li><b>Flatten the passband.</b> Choose the 2-stage lattice and set the couplers to 78, 84 and 70 %: the cross port stays within 1 dB over 2.90 nm, against 1.73 nm for the MZI.</li>
+    <li><b>Unbalance the MZI.</b> Back on the MZI, set coupler 1 to 30 %: the two arms no longer carry equal power, so the cross port&#39;s nulls only reach about −14 dB.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>The MZI has a 5.75 nm FSR with ΔL = 100 µm. Which arm difference gives an FSR of about 2.9 nm?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="The FSR is λ²/(n_g ΔL), inversely proportional to the delay, so halving the FSR needs twice the arm difference.">About 200 µm</button>
+      <button type="button" data-why="A shorter delay gives a wider FSR: 50 µm doubles it to 11.5 nm.">About 50 µm</button>
+      <button type="button" data-why="The FSR falls as 1/ΔL, not as 1/√ΔL: 141 µm gives 4.1 nm.">About 141 µm</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -81,6 +94,7 @@
     var lev = x[im] - 1, edgeAt = function (i, j) { return x[j] === x[i] ? xs[i] : xs[i] + (xs[j] - xs[i]) * (lev - x[i]) / (x[j] - x[i]); };   // the -1 dB crossings, interpolated
     var fa = x[a] <= lev ? edgeAt(a, a + 1) : xs[a], fc = x[c] <= lev ? edgeAt(c, c - 1) : xs[c];
     q('[data-o="ft"]').textContent = (fc - fa).toFixed(2) + ' nm';
+    BD.pill(q('[data-o="pill"]'), (fc - fa) / (1550 * 1550 / (NG * S.dl * 1000)) > 0.4 ? 'flat top' : '', 'ok');   // a plain MZI holds 0.30 FSR within 1 dB
     var cap = 'Each block is a compact model: a coupler is a 2 × 2 matrix [[t, −jκ], [−jκ, t]], a delay a phase e<sup>−jβΔL</sup> with β from the femwell effective index and its dispersion. The circuit\'s response is their product, evaluated at each wavelength: the same thing SAX or a commercial circuit simulator does with full S-matrices. ';
     if (ck === 'mzi') cap += 'Two 50 % couplers and a delay make a sinusoidal filter with FSR = λ²/(n<sub>g</sub>ΔL). ';
     else cap += 'Lattice filters cascade delays of ΔL and 2ΔL; the right coupling ratios flatten the passband and steepen its edges, like a higher-order digital filter: try about 78 %, 84 % and 70 % for the 2-stage lattice, which gives a 2.9 nm flat top (within 1 dB) against 1.7 nm for a plain MZI, with a −20 dB stop band. ';

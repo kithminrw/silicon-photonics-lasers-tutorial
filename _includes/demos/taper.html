@@ -7,13 +7,27 @@
     <label class="bd-sl"><span>tip width <b data-v="w"></b></span><input type="range" data-k="w" min="0.08" max="0.5" step="0.002" value="0.16" aria-label="tip width"></label>
     <label class="bd-sl"><span>lateral fibre offset <b data-v="dx"></b></span><input type="range" data-k="dx" min="0" max="3" step="0.02" value="0" aria-label="lateral offset"></label>
   </div>
-  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top (width stretched), facet to scale</span></div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag" data-o="tag">field along the taper, and the facet to scale</span></div>
+  <div class="bd-status"><span data-o="fst"></span></div>
   <div class="bd-row">
     <div class="bd-scope tall"><canvas data-c="m" aria-hidden="true"></canvas><span class="bd-tag">mode-field diameter against tip width (femwell)</span></div>
     <div class="bd-scope tall"><canvas data-c="o" aria-hidden="true"></canvas><span class="bd-tag">fibre coupling against tip width (femwell)</span></div>
   </div>
-  <div class="bd-read" aria-live="polite"><span>n<sub>eff</sub> at the tip <b data-o="ne">–</b></span><span>mode size (1/e², x × y) <b data-o="mfd">–</b></span><span>coupling <b data-o="eta">–</b></span><span>1 dB lateral tolerance <b data-o="tol">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>n<sub>eff</sub> at the tip <b data-o="ne">–</b></span><span>mode size (1/e², x × y) <b data-o="mfd">–</b></span><span>coupling <b data-o="eta">–</b></span><span>1 dB lateral tolerance <b data-o="tol">–</b></span><span class="bd-pill" data-o="pill" hidden></span><span class="bd-pill" data-o="pill2" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Match a lensed fibre.</b> Choose the lensed fibre and set the tip to 180 nm: the mode is 2.9 × 2.8 µm and couples 92 % (−0.36 dB), with under 1 % of it below 2 µm.</li>
+    <li><b>Go for SMF-28.</b> Choose SMF-28 and narrow the tip to 140 nm. The overlap reaches 89 %, but 14 % of the mode now lies more than 2 µm below the core: on a 2 µm BOX that light leaks into the substrate.</li>
+    <li><b>Switch to TM.</b> At the same 160 nm tip the TM mode is only 2.2 µm and the UHNA coupling falls to 71 %. TM reaches the 4 µm spot at a narrower tip: try 120 nm (90 %).</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>Why does narrowing a silicon tip make its mode larger?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="The narrow strip can no longer hold the mode: n_eff falls towards 1.444, the evanescent decay constant shrinks and the field spreads into the oxide.">The mode no longer fits in the silicon, so its effective index falls towards the oxide’s and the field spreads out</button>
+      <button type="button" data-why="It is the other way round: a narrower strip has a lower n_eff, closer to the cladding index, and that is what lets the mode spread.">A narrower strip has a higher effective index, which pushes the mode outwards</button>
+      <button type="button" data-why="The taper is not a lens: it guides the light slowly into a larger mode, and it only works if it is long enough to be adiabatic.">The taper focuses the light like a lens</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -35,50 +49,79 @@
     var t = (w - R[i][0]) / (R[i + 1][0] - R[i][0]), a = R[i][col], b = R[i + 1][col];
     return logy ? Math.exp(Math.log(a) + t * (Math.log(b) - Math.log(a))) : a + t * (b - a);
   }
+  var FV = BD.field(q('[data-c="g"]'), { button: q('.bd-status'), hz: 1.0 }), nfr = 0, NFIB = 1.45;   // NFIB: index drawn inside the fibre
   function draw() {
     if (!DATA) return;
     var w = S.w, ne = at(w, 1), mx = at(w, 2, true), my = at(w, 3, true), eta0 = at(w, 4 + fib), sub = at(w, 7, true), fm = FIB[fib].mfd;
     var wx = mx / 2, wf = fm / 2, eta = eta0 * Math.exp(-2 * S.dx * S.dx / (wx * wx + wf * wf)), tol = Math.sqrt(0.1151 * (wx * wx + wf * wf));
-    // ---- geometry
+    // ---- the field along the taper in a top view, widths to scale (length compressed): at each width the mode has the femwell
+    // n_eff and horizontal MFD of the table, drawn as a Gaussian of that size and followed adiabatically; beyond the facet the fibre
+    // mode, at amplitude sqrt(eta). Beside it (or under it on a narrow panel) the facet cross-section to scale.
     (function () {
-      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, H = dv.h, split = Math.round(dv.w * 0.5);
-      var cmp = split + 18 + g.measureText('facet cross-section, to scale').width > dv.w - 96;   // narrow panel: short labels (the tag names both views)
-      // left: top view, length compressed and widths stretched (the 500 nm input drawn at 40 % of the height)
-      var lx0 = 16, lx1 = split - 40, cy = 30 + (H - 54) / 2, wIn = 0.5, k = 0.4 * (H - 54) / wIn;
-      g.fillStyle = BD.GEO.ox; g.fillRect(0, 18, split - 20, H - 18);
-      // light spreading out of the taper towards the facet
-      var spread = Math.min((H - 54) / 2, 6 + 3.2 * mx), grd = g.createLinearGradient(lx0 + 40, 0, lx1, 0);
-      grd.addColorStop(0, 'rgba(255,214,120,0)'); grd.addColorStop(1, 'rgba(255,214,120,.28)');
-      g.fillStyle = grd; g.beginPath(); g.moveTo(lx0 + 40, cy - wIn * k * 0.6); g.lineTo(lx1, cy - spread); g.lineTo(lx1, cy + spread); g.lineTo(lx0 + 40, cy + wIn * k * 0.6); g.fill();
-      g.fillStyle = BD.GEO.si; g.beginPath();
-      g.moveTo(lx0, cy - wIn * k / 2); g.lineTo(lx0 + 40, cy - wIn * k / 2); g.lineTo(lx1, cy - w * k / 2); g.lineTo(lx1, cy + w * k / 2); g.lineTo(lx0 + 40, cy + wIn * k / 2); g.lineTo(lx0, cy + wIn * k / 2); g.closePath(); g.fill();
-      g.strokeStyle = BD.GEO.edge; g.setLineDash([4, 3]); g.beginPath(); g.moveTo(lx1, 34); g.lineTo(lx1, H - 22); g.stroke(); g.setLineDash([]);
-      BD.label(g, 'facet', lx1 - 4, 44, BD.C.axis, 'right');
-      BD.dim(g, lx0 + 40, H - 12, lx1, H - 12, 'taper, ~200 µm', BD.C.gold, 0);
-      BD.label(g, '500 nm', lx0, cy - wIn * k / 2 - 6, BD.C.axis);
-      var tl = (1000 * w).toFixed(0) + ' nm tip', tup = lx1 - 4 - g.measureText(tl).width > lx0 + g.measureText('500 nm').width + 4;   // above the tip, or below it when it would meet the 500 nm label
-      BD.label(g, tl, lx1 - 4, tup ? cy - Math.max(w * k / 2, 4) - 8 : cy + Math.max(w * k / 2, 4) + 14, BD.C.white, 'right');
-      BD.label(g, cmp ? 'top view' : 'top view (widths stretched)', 8, 40, BD.C.dim);
-      // right: facet cross-section to scale, window 14 um
-      var rx0 = split, rw = dv.w - split - 8, sc = Math.min(rw, H - 26) / 14, cx = rx0 + rw / 2, yc = 22 + (H - 26) / 2;
-      g.save(); g.beginPath(); g.rect(rx0, 18, rw, H - 18); g.clip();
-      g.fillStyle = BD.GEO.ox; g.fillRect(rx0, 18, rw, H - 18);
-      var subY = yc + (2.0 + 0.11) * sc; g.fillStyle = 'rgba(157,179,204,.35)'; g.fillRect(rx0, subY, rw, H - subY);
-      // mode: elliptical Gaussian at 1/e^2 contour, drawn with a radial gradient
-      g.save(); g.translate(cx, yc); g.scale(1, my / mx);
-      var rg = g.createRadialGradient(0, 0, 0, 0, 0, wx * sc * 1.4);
-      rg.addColorStop(0, 'rgba(255,214,120,.75)'); rg.addColorStop(0.5, 'rgba(255,214,120,.35)'); rg.addColorStop(1, 'rgba(255,214,120,0)');
-      g.fillStyle = rg; g.beginPath(); g.arc(0, 0, wx * sc * 1.4, 0, 2 * Math.PI); g.fill();
-      g.strokeStyle = BD.C.gold; g.lineWidth = 1.2; g.beginPath(); g.arc(0, 0, wx * sc, 0, 2 * Math.PI); g.restore(); g.stroke(); g.lineWidth = 1;
-      // silicon tip, to scale (at least 1 px)
-      g.fillStyle = BD.GEO.si; g.fillRect(cx - Math.max(0.5, w * sc / 2), yc - 0.11 * sc, Math.max(1, w * sc), Math.max(1, 0.22 * sc));
-      // fibre mode (1/e^2 circle), offset laterally
-      g.strokeStyle = BD.C.blue; g.setLineDash([5, 4]); g.beginPath(); g.arc(cx + S.dx * sc, yc, wf * sc, 0, 2 * Math.PI); g.stroke(); g.setLineDash([]);
-      g.restore();
-      if (!cmp) BD.label(g, 'facet cross-section, to scale', rx0 + 8, 40, BD.C.dim);
-      BD.label(g, cmp ? FIB[fib].n.replace(' fibre', '') + ' ' + fm + ' µm (dashed)' : FIB[fib].n + ' mode ' + fm + ' µm (dashed)', rx0 + 8, 54, BD.C.blue);
-      BD.label(g, 'Si substrate (2 µm BOX)', rx0 + 8, H - 6, BD.C.axis);
-      BD.scalebar(g, dv.w - 96, 40, sc, 80);
+      var cv = q('[data-c="g"]'), W = cv.clientWidth, nar = W < 480;
+      cv.style.height = (nar ? 380 : 230) + 'px';
+      var H = cv.clientHeight, tw = nar ? W : W - Math.min(Math.max(210, H), W * 0.4) - 8, tb = nar ? 180 : H;
+      var by0 = 38, by1 = tb - 26, cy = (by0 + by1) / 2, Lin = 30, Lt = 200, Lf = 40, sz = (tw - 12) / (Lin + Lt + Lf), xa = 6, xt0 = xa + Lin * sz, xf = xt0 + Lt * sz;
+      var lostT = w < rows()[0][0] - 1e-9, Ym = 1.5 * Math.max(mx, fm) / 2 + S.dx + 0.4, sy = (by1 - by0) / (2 * Ym), k0 = 2 * Math.PI / 1.55;
+      var cr = BD.crests(1.55 / at(0.5, 1) * sz, 6), nn = cr.n, aF = lostT ? 0 : Math.sqrt(eta);
+      FV.grid(0, by0, tw, by1 - by0);
+      var nx = FV.nx, ny = FV.ny, re = FV.re, im = FV.im, ph = 0;
+      for (var i = 0; i < nx; i++) {
+        var z = (i + 0.5 - xa) / sz, ne2, rad, y0 = 0, amp = 1;
+        if (z < Lin) { ne2 = at(0.5, 1); rad = at(0.5, 2, true) / 2; }
+        else if (z <= Lin + Lt) { var wz = 0.5 + (w - 0.5) * (z - Lin) / Lt; ne2 = at(wz, 1); rad = at(wz, 2, true) / 2; }
+        else { ne2 = NFIB; rad = wf; y0 = S.dx; amp = aF; }
+        ph += k0 * ne2 / sz;
+        var c1 = Math.cos(ph / nn), s1 = Math.sin(ph / nn);
+        for (var j = 0; j < ny; j++) {
+          var yy = (cy - (by0 + j + 0.5)) / sy - y0, a = amp * Math.exp(-yy * yy / (rad * rad)), p = j * nx + i;
+          re[p] = a * c1; im[p] = -a * s1;
+        }
+      }
+      q('[data-o="tag"]').textContent = nn > 1 ? 'field along the taper · ' + cr.note : 'field along the taper, and the facet to scale';
+      var st = ['adiabatic mode: femwell n_eff and MFD at each width, drawn as a Gaussian', 'widths ×' + (sy / sz).toFixed(0) + ', taper 200 µm long'];
+      if (nn > 1) st.push('crests drawn 1 per ' + nn + ' λ');
+      st.push(lostT ? 'below ' + (1000 * rows()[0][0]).toFixed(0) + ' nm the mode is not guided (drawn at its last size)' : 'each z scaled to its peak; fibre mode at √η');
+      var fst = q('[data-o="fst"]'), stTxt = st.join(' · '), msTxt = function () { return FV.ms ? ' · frame ' + FV.ms.toFixed(1) + ' ms' : ''; };
+      fst.textContent = stTxt + msTxt();
+      FV.overlay = function (g) {
+        // top view: the silicon outline, the facet, the fibre mode
+        var Y = function (v) { return cy - v * sy; };
+        g.fillStyle = 'rgba(157,179,204,.18)'; g.strokeStyle = BD.GEO.edge; g.beginPath();
+        g.moveTo(0, Y(0.25)); g.lineTo(xt0, Y(0.25)); g.lineTo(xf, Y(w / 2)); g.lineTo(xf, Y(-w / 2)); g.lineTo(xt0, Y(-0.25)); g.lineTo(0, Y(-0.25)); g.fill(); g.stroke();
+        g.setLineDash([4, 3]); g.beginPath(); g.moveTo(xf, by0 - 4); g.lineTo(xf, by1 + 4); g.stroke();
+        g.strokeStyle = 'rgba(159,208,255,.8)'; g.setLineDash([5, 4]); g.beginPath();
+        g.moveTo(xf, Y(S.dx + wf)); g.lineTo(tw, Y(S.dx + wf)); g.moveTo(xf, Y(S.dx - wf)); g.lineTo(tw, Y(S.dx - wf)); g.stroke(); g.setLineDash([]);
+        BD.label(g, 'top view, widths ×' + (sy / sz).toFixed(0), 8, 32, BD.C.dim);
+        BD.label(g, (1000 * w).toFixed(0) + ' nm tip', xf - 4, 32, BD.C.white, 'right');
+        BD.label(g, '500 nm', xa + 2, Y(0.25) - 6, BD.C.axis);
+        BD.dim(g, xt0, tb - 10, xf, tb - 10, 'taper, ~200 µm', BD.C.gold, 0);
+        BD.label(g, 'facet', xf - 4, tb - 14 - (g.measureText('taper, ~200 µm').width / 2 > (xf - xt0) / 2 - 36 ? 12 : 0), BD.C.axis, 'right');
+        BD.label(g, 'fibre', tw - 4, tb - 14, BD.C.blue, 'right');
+        // facet cross-section to scale, window 14 um
+        var rx0 = nar ? 8 : tw + 8, rw = W - rx0 - 8, T = nar ? tb + 8 : 18, B = H;
+        var sc = Math.min(rw, B - T - 8) / 14, cx = rx0 + rw / 2, yc = T + 4 + (B - T - 8) / 2;
+        g.save(); g.beginPath(); g.rect(rx0, T, rw, B - T); g.clip();
+        g.fillStyle = BD.GEO.ox; g.fillRect(rx0, T, rw, B - T);
+        var subY = yc + (2.0 + 0.11) * sc; g.fillStyle = 'rgba(157,179,204,.35)'; g.fillRect(rx0, subY, rw, B - subY);
+        // mode: elliptical Gaussian at 1/e^2 contour, drawn with a radial gradient
+        g.save(); g.translate(cx, yc); g.scale(1, my / mx);
+        var rg = g.createRadialGradient(0, 0, 0, 0, 0, wx * sc * 1.4);
+        rg.addColorStop(0, 'rgba(255,214,120,.75)'); rg.addColorStop(0.5, 'rgba(255,214,120,.35)'); rg.addColorStop(1, 'rgba(255,214,120,0)');
+        g.fillStyle = rg; g.beginPath(); g.arc(0, 0, wx * sc * 1.4, 0, 2 * Math.PI); g.fill();
+        g.strokeStyle = BD.C.gold; g.lineWidth = 1.2; g.beginPath(); g.arc(0, 0, wx * sc, 0, 2 * Math.PI); g.restore(); g.stroke(); g.lineWidth = 1;
+        // silicon tip, to scale (at least 1 px)
+        g.fillStyle = BD.GEO.si; g.fillRect(cx - Math.max(0.5, w * sc / 2), yc - 0.11 * sc, Math.max(1, w * sc), Math.max(1, 0.22 * sc));
+        // fibre mode (1/e^2 circle), offset laterally
+        g.strokeStyle = BD.C.blue; g.setLineDash([5, 4]); g.beginPath(); g.arc(cx + S.dx * sc, yc, wf * sc, 0, 2 * Math.PI); g.stroke(); g.setLineDash([]);
+        g.restore();
+        BD.label(g, 'facet cross-section, to scale', rx0 + 8, T + 22, BD.C.dim);
+        BD.label(g, FIB[fib].n + ' mode ' + fm + ' µm (dashed)', rx0 + 8, T + 36, BD.C.blue);
+        BD.label(g, 'Si substrate (2 µm BOX)', rx0 + 8, B - 6, BD.C.axis);
+        BD.scalebar(g, W - 96, B - 22, sc, 80);
+        if (++nfr % 30 === 0) fst.textContent = stTxt + msTxt();
+      };
+      FV.render();
     })();
     // ---- MFD against width
     var R = rows(), W = R.map(function (r) { return r[0]; });
@@ -101,6 +144,8 @@
     d3.g.fillStyle = 'rgba(240,128,128,.8)'; d3.g.fillText('shaded: > 1 % below 2 µm', d3.w - 14, 64); d3.g.textAlign = 'left';
     // ---- readouts and caption
     var R0 = rows()[0][0], lost = w < R0 - 1e-9;
+    BD.pill(q('[data-o="pill"]'), lost ? 'not guided' : eta >= 0.9 ? 'mode matched' : '', lost ? 'bad' : 'ok');
+    BD.pill(q('[data-o="pill2"]'), !lost && sub > 0.01 ? 'substrate leak' : '', 'bad');
     q('[data-o="ne"]').textContent = lost ? '→ 1.444' : ne.toFixed(3);
     q('[data-o="mfd"]').textContent = lost ? '> ' + rows()[0][2].toFixed(0) + ' µm' : mx.toFixed(2) + ' × ' + my.toFixed(2) + ' µm';
     q('[data-o="eta"]').textContent = lost ? '–' : (10 * Math.log10(eta)).toFixed(2).replace('-', '−') + ' dB (' + (100 * eta).toFixed(0) + ' %)';

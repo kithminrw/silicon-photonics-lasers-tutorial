@@ -7,12 +7,27 @@
     <label class="bd-sl"><span>far-side index n<sub>2</sub> <b data-v="n2"></b></span><input type="range" data-k="n2" min="1" max="3.6" step="0.01" value="1.44" aria-label="n2"></label>
     <label class="bd-sl"><span>angle of incidence θ<sub>1</sub> <b data-v="th"></b></span><input type="range" data-k="th" min="0" max="89.5" step="0.1" value="30" aria-label="angle"></label>
   </div>
+  <div class="bd-scope"><canvas data-c="fv" aria-hidden="true"></canvas><span class="bd-tag">field (red +, blue −) at the interface, to scale</span></div>
+  <div class="bd-status"><span data-o="fst"></span></div>
   <div class="bd-row">
     <div class="bd-scope tall"><canvas data-c="ray" aria-hidden="true"></canvas><span class="bd-tag">rays (width ∝ power), field past the interface</span></div>
     <div class="bd-scope tall"><canvas data-c="rt" aria-hidden="true"></canvas><span class="bd-tag">reflected power R against angle</span></div>
   </div>
-  <div class="bd-read" aria-live="polite"><span>R <b data-o="R">–</b></span><span>T <b data-o="T">–</b></span><span>θ<sub>c</sub> <b data-o="tc">–</b></span><span>θ<sub>B</sub> <b data-o="tb">–</b></span><span>decay length at 1550 nm <b data-o="dp">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>R <b data-o="R">–</b></span><span>T <b data-o="T">–</b></span><span>θ<sub>c</sub> <b data-o="tc">–</b></span><span>θ<sub>B</sub> <b data-o="tb">–</b></span><span>decay length at 1550 nm <b data-o="dp">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Cross the critical angle.</b> With silicon over oxide (3.48 / 1.44), sweep θ<sub>1</sub> from 20° to 30°. Past θ<sub>c</sub> = 24.4° the transmitted wave becomes an evanescent one that only runs along the interface, and the pill reads TOTAL INTERNAL REFLECTION.</li>
+    <li><b>Squeeze the tail.</b> Still in total internal reflection, go from 25° to 55°: the decay length falls from 825 nm to 100 nm. At 55°, the ray angle of the 220 nm silicon slab, it is the 100 nm of Worked Example 2.4.</li>
+    <li><b>Find Brewster's angle.</b> Switch to p and set θ<sub>1</sub> = 22.5°. R drops to zero and the field above the interface is the incident wave alone, with no ripple from a reflection.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>Light in silicon meets the interface at 30°, beyond the critical angle. If air (n<sub>2</sub> = 1.00) replaces the oxide, what happens to the evanescent tail?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="The decay constant γ = k₀√(n₁²sin²θ₁ − n₂²) grows as n₂ falls, so the tail shrinks from 253 nm to 173 nm: more index contrast holds the field closer. Check it with the n₂ slider.">It gets shorter: about 173 nm instead of 253 nm</button>
+      <button type="button" data-why="Air gives more index contrast, not less, and more contrast holds the field closer to the interface. It is low-contrast platforms such as silicon nitride that have long tails.">It gets longer: about 380 nm</button>
+      <button type="button" data-why="Total internal reflection always leaves an evanescent field on the far side, whatever its index; only the decay length changes.">It disappears, because air cannot hold a field</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -31,6 +46,15 @@
     r = p === 's' ? (n1 * ci - n2 * ct) / (n1 * ci + n2 * ct) : (n2 * ci - n1 * ct) / (n2 * ci + n1 * ct);
     return r * r;
   }
+  // the same coefficient as a complex number, also beyond the critical angle, where cos(theta_2) is imaginary:
+  // r_s for E_y, and r_p (the chapter's form) for H_y, so the transmitted amplitude is t = 1 + r for both
+  function cdiv(a, b) { var m = b[0] * b[0] + b[1] * b[1]; return [(a[0] * b[0] + a[1] * b[1]) / m, (a[1] * b[0] - a[0] * b[1]) / m]; }
+  function rcx(n1, n2, a, p) {
+    var s1 = n1 * Math.sin(a) / n2, ct = s1 <= 1 ? [Math.sqrt(1 - s1 * s1), 0] : [0, -Math.sqrt(s1 * s1 - 1)];
+    var A = (p === 's' ? n1 : n2) * Math.cos(a), B = p === 's' ? n2 : n1;
+    return { r: cdiv([A - B * ct[0], -B * ct[1]], [A + B * ct[0], B * ct[1]]), ct: ct };
+  }
+  var FV = BD.field(q('[data-c="fv"]'), { button: q('.bd-status'), hz: 0.8 }), nfr = 0;
   function draw() {
     var n1 = S.n1, n2 = S.n2, a = S.th * Math.PI / 180, R = refl(n1, n2, a, pol), tir = n1 * Math.sin(a) >= n2;
     var tc = n1 > n2 ? Math.asin(n2 / n1) * 180 / Math.PI : NaN, tb = Math.atan(n2 / n1) * 180 / Math.PI;
@@ -73,6 +97,54 @@
     BD.vline(f, tb, BD.C.teal, [2, 3], 'θB', isFinite(tc) && Math.abs(f.X(tc) - f.X(tb)) < 24 ? 12 : 0);   // a second row when θc is close
     BD.dot(f, S.th, R, BD.C.gold, 4);
     d2.g.fillStyle = BD.C.dim; d2.g.textAlign = 'right'; d2.g.fillText('solid s · dashed p', d2.w - f.p.r - 6, d2.h - f.p.b - 8); d2.g.textAlign = 'left';
+    // ---- the field: incident + r × reflected above the interface, t × transmitted (or evanescent) below, t = 1 + r,
+    // from the same Fresnel coefficients as the readouts; drawn to scale at 1550 nm (a vacuum wavelength is h/2.6 px)
+    (function () {
+      var cv = q('[data-c="fv"]'), W = cv.clientWidth, H = cv.clientHeight, top = 20, h = H - top, yI = top + Math.round(h / 2), xc = W / 2;
+      var lp = h / 2.6, sc = lp / 1.55, kp = 2 * Math.PI / lp;   // px per vacuum wavelength, px per µm, k0 in rad per px
+      var cx2 = rcx(n1, n2, a, pol), rr = cx2.r, cth = cx2.ct, tt = [1 + rr[0], rr[1]];
+      var ku = n1 * kp * Math.sin(a), kv = n1 * kp * Math.cos(a), k2r = n2 * kp * cth[0], k2i = n2 * kp * cth[1];
+      FV.grid(0, top, W, h);
+      var nx = FV.nx, ny = FV.ny, Ur = new Float32Array(nx), Ui = new Float32Array(nx), i, j;
+      for (i = 0; i < nx; i++) { var u = i + 0.5 - xc; Ur[i] = Math.cos(ku * u); Ui[i] = -Math.sin(ku * u); }   // e^(−j k_u u): the same along the interface for all three waves (Snell)
+      for (j = 0; j < ny; j++) {
+        var v = yI - (top + j + 0.5), Vr, Vi;   // v: distance above the interface (px)
+        if (v >= 0) { var cp = Math.cos(kv * v), sp = Math.sin(kv * v);   // e^(+j k_v v) + r e^(−j k_v v)
+          Vr = cp + rr[0] * cp + rr[1] * sp; Vi = sp + rr[1] * cp - rr[0] * sp; }
+        else { var ev = Math.exp(-k2i * v), c2 = Math.cos(k2r * v) * ev, s2 = Math.sin(k2r * v) * ev;   // t e^(+j n2 k0 cos θ2 v); cos θ2 imaginary beyond θc
+          Vr = tt[0] * c2 - tt[1] * s2; Vi = tt[0] * s2 + tt[1] * c2; }
+        for (i = 0; i < nx; i++) { var pp = j * nx + i; FV.re[pp] = Ur[i] * Vr - Ui[i] * Vi; FV.im[pp] = Ur[i] * Vi + Ui[i] * Vr; }
+      }
+      var La = 0.36 * h, a2 = tir ? 0 : Math.asin(Math.min(1, n1 * Math.sin(a) / n2));
+      var arrow = function (gx, x0, y0, x1, y1) {
+        var an = Math.atan2(y1 - y0, x1 - x0), hx = x1 - 7 * Math.cos(an), hy = y1 - 7 * Math.sin(an);
+        [['rgba(5,16,32,.7)', 4], ['#ffffff', 1.6]].forEach(function (s) { gx.strokeStyle = s[0]; gx.lineWidth = s[1]; gx.beginPath(); gx.moveTo(x0, y0); gx.lineTo(hx, hy); gx.stroke(); });
+        gx.fillStyle = '#ffffff'; gx.beginPath(); gx.moveTo(x1, y1); gx.lineTo(hx - 3.5 * Math.sin(an), hy + 3.5 * Math.cos(an)); gx.lineTo(hx + 3.5 * Math.sin(an), hy - 3.5 * Math.cos(an)); gx.fill(); gx.lineWidth = 1;
+      };
+      var tag = function (gx, s, x, y, al, col) {   // a label on a dark backing, kept inside the panel
+        var w = gx.measureText(s).width, x0 = Math.max(4, Math.min(W - 4 - w, al === 'right' ? x - w : x));
+        gx.fillStyle = 'rgba(5,16,32,.62)'; gx.fillRect(x0 - 3, y - 9, w + 6, 12); BD.label(gx, s, x0, y, col || BD.C.white);
+      };
+      var st = [(pol === 's' ? 'E_y (s)' : 'H_y (p)') + ': incident + r × reflected above, t × ' + (tir ? 'evanescent' : 'transmitted') + ' below (t = 1 + r)', 'to scale at 1550 nm'];
+      var fst = q('[data-o="fst"]'), stTxt = st.join(' · '), msTxt = function () { return FV.ms ? ' · frame ' + FV.ms.toFixed(1) + ' ms' : ''; };
+      fst.textContent = stTxt + msTxt();
+      FV.overlay = function (gx) {
+        gx.strokeStyle = BD.C.axis; gx.lineWidth = 1; gx.beginPath(); gx.moveTo(0, yI); gx.lineTo(W, yI); gx.stroke();
+        gx.strokeStyle = BD.C.dim; gx.setLineDash([3, 3]); gx.beginPath(); gx.moveTo(xc, top); gx.lineTo(xc, H); gx.stroke(); gx.setLineDash([]);
+        arrow(gx, xc - La * Math.sin(a), yI - La * Math.cos(a), xc, yI);
+        arrow(gx, xc, yI, xc + La * Math.sin(a), yI - La * Math.cos(a));
+        if (tir) arrow(gx, xc, yI + 7, xc + La, yI + 7); else arrow(gx, xc, yI, xc + La * Math.sin(a2), yI + La * Math.cos(a2));
+        tag(gx, 'n₁ = ' + n1.toFixed(2), 6, top + 12, 'left', BD.C.axis);
+        tag(gx, 'n₂ = ' + n2.toFixed(2), 6, H - 6, 'left', BD.C.axis);
+        tag(gx, 'incident', xc - La * Math.sin(a) - 5, yI - La * Math.cos(a) - 4, 'right');
+        tag(gx, 'reflected ' + (100 * R).toFixed(0) + ' %', xc + La * Math.sin(a) + 5, yI - La * Math.cos(a) - 4, 'left');
+        if (tir) tag(gx, 'evanescent', xc + La + 5, yI + 12, 'left', BD.C.green);
+        else tag(gx, 'transmitted ' + (100 * (1 - R)).toFixed(0) + ' %', xc + La * Math.sin(a2) + 5, yI + La * Math.cos(a2) + 4, 'left');
+        BD.scalebar(gx, 74, H - 7, sc, 40);
+        if (++nfr % 30 === 0) fst.textContent = stTxt + msTxt();
+      };
+      FV.render();
+    })();
     // ---- readouts
     q('[data-o="R"]').textContent = (100 * R).toFixed(1) + ' %';
     q('[data-o="T"]').textContent = (100 * (1 - R)).toFixed(1) + ' %';
@@ -81,6 +153,8 @@
     var dpo = q('[data-o="dp"]');
     if (tir) { var kk = 2 * Math.PI / 1550 * Math.sqrt(n1 * n1 * Math.sin(a) * Math.sin(a) - n2 * n2); dpo.textContent = (1 / kk).toFixed(0) + ' nm (field)'; }
     else dpo.textContent = '–';
+    var brew = !tir && Math.abs(S.th - tb) < 1 && pol === 'p';
+    BD.pill(q('[data-o="pill"]'), tir ? 'total internal reflection' : brew ? 'Brewster angle' : R < 0.0005 ? 'no reflection' : 'partly transmitted', tir ? 'ok' : '');
     var c;
     if (tir) c = 'Beyond the critical angle all the power is reflected, yet the field does not stop at the interface: it decays exponentially into the low-index side. <b>This is how a waveguide confines light</b>, and the evanescent tail is what couplers, sensors and losses all interact with.';
     else if (Math.abs(S.th - tb) < 1 && pol === 'p') c = 'At Brewster\'s angle the p-polarised reflection vanishes, which is why polarisers and laser windows are tilted.';

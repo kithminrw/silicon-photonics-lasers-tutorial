@@ -13,8 +13,21 @@
     <div class="bd-scope tall"><canvas data-c="b" aria-hidden="true"></canvas><span class="bd-tag">3 dB bandwidth against Ge thickness</span></div>
     <div class="bd-scope tall"><canvas data-c="r" aria-hidden="true"></canvas><span class="bd-tag">responsivity against Ge thickness</span></div>
   </div>
-  <div class="bd-read" aria-live="polite"><span>capacitance <b data-o="C">–</b></span><span>transit / RC limit <b data-o="lim">–</b></span><span>bandwidth <b data-o="bw">–</b></span><span>responsivity <b data-o="R">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>capacitance <b data-o="C">–</b></span><span>transit / RC limit <b data-o="lim">–</b></span><span>bandwidth <b data-o="bw">–</b></span><span>responsivity <b data-o="R">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Thin the germanium.</b> At 0.3 µm the transit limit rises to 90 GHz, but the capacitance grows to 34 fF and the RC limit falls to 67 GHz: the bandwidth gains only 6 GHz, to 54 GHz, and the diode is now RC-limited.</li>
+    <li><b>Lower the load.</b> Then set the resistance to 50 Ω: the RC limit climbs to 94 GHz and the bandwidth to 65 GHz.</li>
+    <li><b>Light from above.</b> Switch to normal incidence: 0.5 µm of germanium absorbs only 14 % of the light (0.15 A/W). Thicken it to 2 µm for 0.48 A/W, and the bandwidth falls to 13 GHz.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>Why can a waveguide photodiode be thin, and so fast, and still absorb almost all the light?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="Fed from a waveguide, the light is absorbed along the detector's length, 15 µm here, so the thickness is free to be chosen for speed.">The light travels along its length, not across its thickness</button>
+      <button type="button" data-why="The absorption coefficient is a property of the germanium; only the path the light takes through it changes.">Germanium absorbs more strongly when fed from a waveguide</button>
+      <button type="button" data-why="Its capacitance is lower (22 fF against 56 fF for a 15 µm disc), but capacitance sets the speed, not how much light is absorbed.">Its capacitance is lower</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -69,6 +82,7 @@
     q('[data-o="lim"]').textContent = m.ft.toFixed(0) + ' / ' + m.frc.toFixed(0) + ' GHz';
     q('[data-o="bw"]').textContent = m.f.toFixed(0) + ' GHz';
     q('[data-o="R"]').textContent = m.R.toFixed(2) + ' A/W';
+    BD.pill(q('[data-o="pill"]'), m.frc < m.ft ? 'RC-limited' : 'transit-limited');
     var c = 'A thinner absorber lets carriers cross it sooner (transit limit ≈ 0.45 v<sub>sat</sub>/d) but raises the capacitance (RC limit); the bandwidth peaks between the two. ';
     c += il === 'wg' ? 'Fed from a waveguide, light is absorbed along the detector\'s length, not its thickness, so a thin, fast diode still absorbs almost everything: that is why integrated receivers use waveguide photodiodes. ' : 'At normal incidence, light crosses the absorber only once: a thin, fast diode lets much of the light through, so speed and responsivity fight each other. ';
     if (m.frc < m.ft) c += 'Here the RC limit dominates: make the detector smaller or the load lower. ';

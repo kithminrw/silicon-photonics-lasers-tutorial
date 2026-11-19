@@ -10,8 +10,21 @@
   </div>
   <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: cutback structures (schematic)</span></div>
   <div class="bd-scope tall"><canvas data-c="p" aria-hidden="true"></canvas><span class="bd-tag">loss against length, with a least-squares fit</span></div>
-  <div class="bd-read" aria-live="polite"><span>fitted loss <b data-o="fit">–</b></span><span>true loss <b data-o="true">–</b></span><span>coupler loss (intercept / 2) <b data-o="gc">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>fitted loss <b data-o="fit">–</b></span><span>true loss <b data-o="true">–</b></span><span>coupler loss (intercept / 2) <b data-o="gc">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Lengthen and add structures.</b> The default chip (4 structures up to 1.5 cm) gives 2.71 ± 0.57 dB/cm. Make the longest waveguide 5 cm and use 8 structures: the error bar shrinks to about ±0.1 dB/cm and the pill reads PRECISE.</li>
+    <li><b>Measure only two.</b> Set 2 structures: there is no error bar, and every coupler error goes into the slope. Press "measure a new chip" a few times and watch the answer jump.</li>
+    <li><b>Make the couplers identical.</b> Set σ = 0: the fit returns the true loss exactly, and the intercept gives the coupler loss of 4.50 dB, whatever the lengths.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>With 0.5 dB of coupler variation and four structures up to 1.5 cm, your error bar is too large. On average, which halves it?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="For a fixed number of structures the slope's uncertainty falls as σ/L, so twice the length span halves it on average.">Making the longest waveguide 3 cm</button>
+      <button type="button" data-why="Over the same span, twice as many structures cut the error bar on average by only about a fifth, since it falls roughly as 1/√N; one chip can do better or worse by chance.">Using eight structures instead of four</button>
+      <button type="button" data-why="Length helps more: the error falls as 1/L, but only as about 1/√N with the number of structures.">Either, they help equally</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -58,6 +71,7 @@
     q('[data-o="fit"]').textContent = r.b.toFixed(2) + (isFinite(r.se) ? ' ± ' + r.se.toFixed(2) : '') + ' dB/cm';
     q('[data-o="true"]').textContent = S.a.toFixed(2) + ' dB/cm';
     q('[data-o="gc"]').textContent = (r.a / 2).toFixed(2) + ' dB';
+    BD.pill(q('[data-o="pill"]'), n === 2 ? 'no error bar' : r.se > 0.3 * S.a ? 'noisy' : r.se <= 0.1 * S.a ? 'precise' : '', n === 2 ? 'warn' : r.se > 0.3 * S.a ? 'bad' : 'ok');
     var c = 'Each structure has the same two grating couplers and a different length, so the slope of insertion loss against length is the propagation loss and the intercept is the coupler loss. ';
     if (n === 2) c += '<b>With only two structures there is no error bar</b>: any coupler variation goes straight into the slope. ';
     else if (isFinite(r.se) && r.se > 0.3 * S.a) c += '<b>The error bar is large compared with the loss</b>: the coupler variation (σ = ' + S.sd.toFixed(2) + ' dB) swamps the propagation loss over these short lengths. Use longer waveguides or more structures. ';

@@ -9,10 +9,24 @@
     <label class="bd-sl"><span>fibre position after lens d<sub>2</sub> <b data-v="d2"></b></span><input type="range" data-k="d2" min="20" max="1500" step="1" value="430" aria-label="fibre distance"></label>
     <label class="bd-sl"><span>lateral fibre offset Δx <b data-v="dx"></b></span><input type="range" data-k="dx" min="0" max="12" step="0.05" value="0" aria-label="lateral offset"></label>
   </div>
-  <div class="bd-scope tall"><canvas data-c="b" aria-hidden="true"></canvas><span class="bd-tag">beam radius w(z), 1550 nm (vertical stretched)</span></div>
+  <div class="bd-scope tall"><canvas data-c="b" aria-hidden="true"></canvas><span class="bd-tag" data-o="tag">beam field and radius w(z), 1550 nm</span></div>
+  <div class="bd-status"><span data-o="fst"></span></div>
   <div class="bd-scope short"><canvas data-c="e" aria-hidden="true"></canvas><span class="bd-tag">coupling into the fibre against lateral offset</span></div>
-  <div class="bd-read" aria-live="polite"><span>z<sub>R</sub> <b data-o="zr">–</b></span><span>divergence <b data-o="div">–</b></span><span>image waist <b data-o="w2">–</b></span><span>at d<sub>2</sub> = <b data-o="z2">–</b></span><span>coupling <b data-o="eta">–</b></span><span>1 dB offset <b data-o="tol">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>z<sub>R</sub> <b data-o="zr">–</b></span><span>divergence <b data-o="div">–</b></span><span>image waist <b data-o="w2">–</b></span><span>at d<sub>2</sub> = <b data-o="z2">–</b></span><span>coupling <b data-o="eta">–</b></span><span>1 dB offset <b data-o="tol">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Image the spot.</b> At the start the lens forms a 4.94 µm waist 426 µm behind it, as in Worked Example 3.2, and the fibre at 430 µm collects 100 %. The crests are flat at the source and at the image waist, and curved in between.</li>
+    <li><b>Defocus.</b> Move the fibre to d<sub>2</sub> = 600 µm. It now meets a beam 18 µm wide with curved wavefronts, and the coupling falls to 26 %.</li>
+    <li><b>Change fibre.</b> Choose UHNA: the 4.94 µm spot puts only 48 % into its 2 µm mode. Set d<sub>1</sub> = 175 µm for a 2.0 µm waist, then d<sub>2</sub> = 233 µm to put the fibre on it: the coupling is back to 100 %.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>In the field view, where are the wavefronts flat?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="R(z) = z[1 + (z_R/z)²] is infinite at z = 0, so the crests are straight at every waist: the source and the image the lens forms.">At each waist: the source and the image waist</button>
+      <button type="button" data-why="At the lens the beam is widest and its wavefronts are curved with R ≈ d₁; the lens reverses that curvature so the beam converges.">At the lens, where the beam is widest</button>
+      <button type="button" data-why="One Rayleigh range from a waist is where the wavefronts are most curved: R(z) is smallest at z = z_R.">One Rayleigh range from each waist</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -36,6 +50,7 @@
     }
     return (re * re + im * im) / (p1 * p2);
   }
+  var FV = BD.field(q('[data-c="b"]'), { button: q('.bd-status'), hz: 1.0 }), nfr = 0, NF = 1.45;   // NF: index drawn inside the fibre
   function draw() {
     var zR = Math.PI * S.w0 * S.w0 / lam, q0 = [S.d1, zR];                  // q at the lens (source waist at z = 0)
     var qa = cdiv(q0, [1 - q0[0] / S.f, -q0[1] / S.f]);                     // thin lens: q' = q / (1 - q/f)
@@ -51,24 +66,57 @@
       zs.push(z); ws.push(w); wmax = Math.max(wmax, w);
     }
     wmax = Math.max(wmax, wf) * 1.15;
-    var d = BD.setup(q('[data-c="b"]')), f = BD.frame(d, { x: [0, zEnd], y: [-wmax, wmax], pad: { l: 46, b: 22 },
-      xt: [[0, ''], [S.d1, ''], [S.d1 + S.d2, '']], yt: [[-wmax / 1.15, '−' + wmax.toFixed(0)], [0, '0 µm'], [wmax / 1.15, wmax.toFixed(0)]] });
-    var g = d.g, xl = f.X(S.d1), xr = f.X(S.d1 + S.d2), lw = g.measureText('lens').width, fw = g.measureText('fibre').width, yb = d.h - f.p.b + 12;
-    // tick labels by hand: 'lens' and 'fibre' side by side when they are close, and the 0 only when it clears 'lens'
-    var near = xr - xl < (lw + fw) / 2 + 6, ll = near ? xl - 1 - lw : xl - lw / 2;
-    g.fillStyle = BD.C.axis; g.fillText('lens', ll, yb); g.fillText('fibre', Math.min(near ? xr + 1 : xr - fw / 2, d.w - fw - 2), yb);
-    if (ll > f.p.l + 8) BD.label(g, '0', f.p.l, yb, BD.C.axis, 'center');
-    f.clipIn(); g.beginPath();
-    for (k = 0; k <= 500; k++) g.lineTo(f.X(zs[k]), f.Y(ws[k]));
-    for (k = 500; k >= 0; k--) g.lineTo(f.X(zs[k]), f.Y(-ws[k]));
-    g.closePath(); g.fillStyle = 'rgba(224,184,90,.22)'; g.fill(); f.clipOut();
-    BD.line(f, zs, ws, BD.C.gold, 1.6); BD.line(f, zs, ws.map(function (v) { return -v; }), BD.C.gold, 1.6);
-    BD.vline(f, S.d1, BD.C.blue, [2, 2]);
-    // lens glyph and fibre core
-    g.strokeStyle = BD.C.blue; g.lineWidth = 2; g.beginPath(); g.ellipse(f.X(S.d1), f.Y(0), 4, (f.Y(-wmax * 0.9) - f.Y(wmax * 0.9)) / 2, 0, 0, 7); g.stroke(); g.lineWidth = 1;
-    var xf = f.X(S.d1 + S.d2); g.fillStyle = 'rgba(127,224,160,.25)'; g.fillRect(xf, f.Y(S.dx + wf), d.w - f.p.r - xf, f.Y(S.dx - wf) - f.Y(S.dx + wf));
-    g.strokeStyle = BD.C.green; g.strokeRect(xf, f.Y(S.dx + wf), d.w - f.p.r - xf, f.Y(S.dx - wf) - f.Y(S.dx + wf));
-    if (waistPos > 0) BD.vline(f, S.d1 + waistPos, BD.C.teal, [4, 3], 'image waist');
+    var fo = { x: [0, zEnd], y: [-wmax, wmax], pad: { l: 46, b: 22 },
+      xt: [[0, ''], [S.d1, ''], [S.d1 + S.d2, '']], yt: [[-wmax / 1.15, '−' + wmax.toFixed(0)], [0, '0 µm'], [wmax / 1.15, wmax.toFixed(0)]] };
+    // the envelope plot, redrawn over every frame of the field
+    FV.overlay = function (g, d) {
+      var f = BD.frame(d, fo), xl = f.X(S.d1), xr = f.X(S.d1 + S.d2), lw = g.measureText('lens').width, fw = g.measureText('fibre').width, yb = d.h - f.p.b + 12;
+      // tick labels by hand: 'lens' and 'fibre' side by side when they are close, and the 0 only when it clears 'lens'
+      var near = xr - xl < (lw + fw) / 2 + 6, ll = near ? xl - 1 - lw : xl - lw / 2;
+      g.fillStyle = BD.C.axis; g.fillText('lens', ll, yb); g.fillText('fibre', Math.min(near ? xr + 1 : xr - fw / 2, d.w - fw - 2), yb);
+      if (ll > f.p.l + 8) BD.label(g, '0', f.p.l, yb, BD.C.axis, 'center');
+      BD.line(f, zs, ws, BD.C.gold, 1.6); BD.line(f, zs, ws.map(function (v) { return -v; }), BD.C.gold, 1.6);
+      BD.vline(f, S.d1, BD.C.blue, [2, 2]);
+      // lens glyph and fibre core
+      g.strokeStyle = BD.C.blue; g.lineWidth = 2; g.beginPath(); g.ellipse(f.X(S.d1), f.Y(0), 4, (f.Y(-wmax * 0.9) - f.Y(wmax * 0.9)) / 2, 0, 0, 7); g.stroke(); g.lineWidth = 1;
+      var xf = f.X(S.d1 + S.d2); g.fillStyle = 'rgba(127,224,160,.07)'; g.fillRect(xf, f.Y(S.dx + wf), d.w - f.p.r - xf, f.Y(S.dx - wf) - f.Y(S.dx + wf));
+      g.strokeStyle = BD.C.green; g.strokeRect(xf, f.Y(S.dx + wf), d.w - f.p.r - xf, f.Y(S.dx - wf) - f.Y(S.dx + wf));
+      if (waistPos > 0) BD.vline(f, S.d1 + waistPos, BD.C.teal, [4, 3], 'image waist');
+      if (++nfr % 30 === 0) fst.textContent = stTxt + msTxt();
+    };
+    // ---- the field Re{E e^{jwt}} from the same q-parameters: E = (C/q) exp(-jk x^2/2q) e^{-jkz}, before and after the lens,
+    // so it carries the amplitude, the curvature 1/R and the Gouy phase; inside the fibre, its mode at amplitude sqrt(eta)
+    var dv = BD.setup(q('[data-c="b"]')), f0 = BD.frame(dv, fo), gx0 = f0.p.l, gy0 = f0.p.t, gw = dv.w - f0.p.l - f0.p.r, gh = dv.h - f0.p.t - f0.p.b;
+    var sxz = gw / zEnd, syx = gh / (2 * wmax), kk = 2 * Math.PI / lam, cr = BD.crests(lam / NF * sxz, 6), nc = cr.n;
+    var aq1 = Math.atan2(zR, S.d1), aqa = Math.atan2(qa[1], qa[0]), zfib = S.d1 + S.d2;
+    FV.grid(gx0, gy0, gw, gh);
+    var nx = FV.nx, ny = FV.ny, re = FV.re, im = FV.im, xs0 = [];
+    for (var j = 0; j < ny; j++) xs0.push(wmax - (j + 0.5) / syx);   // transverse position of each row (um)
+    var qe = [qa[0] + S.d2, qa[1]], psiF = kk * zfib + Math.atan2(qe[1], qe[0]) - Math.PI / 2 - aqa + aq1;   // on-axis phase at the fibre face
+    var aF = Math.sqrt(eta);
+    for (var i = 0; i < nx; i++) {
+      var zz = (i + 0.5) / sxz, base, cc, iw2, amp = 1, x0 = 0;
+      if (zz <= S.d1) {          // from the source waist: q = z + j zR
+        var den = zz * zz + zR * zR; cc = kk * zz / den / 2; iw2 = Math.PI * zR / (lam * den);
+        base = kk * zz + Math.atan2(zR, zz) - Math.PI / 2;
+      } else if (zz <= zfib) {   // after the lens: q = qa + (z - d1), phase made continuous through the lens
+        var qr = qa[0] + zz - S.d1, den2 = qr * qr + qa[1] * qa[1]; cc = kk * qr / den2 / 2; iw2 = Math.PI * qa[1] / (lam * den2);
+        base = kk * zz + Math.atan2(qa[1], qr) - Math.PI / 2 - aqa + aq1;
+      } else {                   // in the fibre: its mode, flat phase, index NF
+        cc = 0; iw2 = 1 / (wf * wf); amp = aF; x0 = S.dx; base = psiF + kk * NF * (zz - zfib);
+      }
+      for (j = 0; j < ny; j++) {
+        var xx = xs0[j] - x0, a = amp * Math.exp(-xx * xx * iw2), ps = (base + cc * xx * xx) / nc, p = j * nx + i;
+        re[p] = a * Math.cos(ps); im[p] = -a * Math.sin(ps);
+      }
+    }
+    q('[data-o="tag"]').textContent = nc > 1 ? 'beam field and w(z) · ' + cr.note : 'beam field and radius w(z), 1550 nm';
+    var st = ['Gaussian-beam field from q (paraxial)', 'transverse ×' + (syx / sxz).toFixed(syx / sxz < 10 ? 1 : 0)];
+    if (nc > 1) st.push('crests drawn 1 per ' + nc + ' λ');
+    st.push('each z scaled to its peak; fibre mode at √η');
+    var fst = q('[data-o="fst"]'), stTxt = st.join(' · '), msTxt = function () { return FV.ms ? ' · frame ' + FV.ms.toFixed(1) + ' ms' : ''; };
+    fst.textContent = stTxt + msTxt();
+    FV.render();
     // ---- coupling against offset
     var d2 = BD.setup(q('[data-c="e"]')), xmax = Math.max(3 * Math.sqrt(bf.w * bf.w + wf * wf) / 2, 2), f2 = BD.frame(d2, { x: [0, xmax], y: [-10, 0], pad: { l: 46, b: 22 },
       xt: [[0, '0'], [xmax / 2, (xmax / 2).toFixed(1)], [xmax, xmax.toFixed(1) + ' µm']], yt: [[-10, '−10'], [-5, '−5'], [0, '0 dB']] });
@@ -85,9 +133,16 @@
     q('[data-o="z2"]').textContent = 'w ' + um(bf.w);
     var eo = q('[data-o="eta"]'); eo.textContent = (100 * eta).toFixed(0) + ' % (' + (10 * Math.log10(eta)).toFixed(2) + ' dB)'; eo.className = eta > 0.8 ? 'ok' : eta < 0.4 ? 'bad' : '';
     q('[data-o="tol"]').textContent = isFinite(tol) ? '± ' + um(tol) : '> ' + um(xmax);
+    var far = waistPos > 0 && Math.abs(S.d2 - waistPos) > 2 * zR2, mis = Math.abs(w2 / wf - 1) > 0.5;
+    var pl = q('[data-o="pill"]');
+    if (eta >= 0.9) BD.pill(pl, 'mode matched', 'ok');
+    else if (far) BD.pill(pl, 'off the waist', 'warn');
+    else if (mis) BD.pill(pl, 'spot mismatch', 'warn');
+    else if (isFinite(tol) && S.dx > tol) BD.pill(pl, 'offset', 'warn');
+    else BD.pill(pl, '');
     var c = 'A thin lens images the source waist to a new waist; the fibre collects the most light when it sits at that waist and the two spot sizes match. ';
-    if (waistPos > 0 && Math.abs(S.d2 - waistPos) > 2 * zR2) c += '<b>The fibre is far from the image waist</b>: move d<sub>2</sub> towards ' + um(waistPos) + '. ';
-    else if (Math.abs(w2 / wf - 1) > 0.5) c += 'The image waist (' + um(w2) + ') does not match the fibre mode (' + um(wf) + '): change f or d<sub>1</sub> to change the magnification. ';
+    if (far) c += '<b>The fibre is far from the image waist</b>: move d<sub>2</sub> towards ' + um(waistPos) + '. ';
+    else if (mis) c += 'The image waist (' + um(w2) + ') does not match the fibre mode (' + um(wf) + '): change f or d<sub>1</sub> to change the magnification. ';
     else c += 'Spot sizes and position match well. ';
     c += 'The 1 dB offset tolerance grows with the spot size: large spots are easy to align, which is one reason fibre-to-chip couplers expand the mode.';
     q('[data-o="cap"]').innerHTML = c;

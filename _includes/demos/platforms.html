@@ -10,7 +10,21 @@
     <div class="bd-scope tall"><canvas data-c="r" aria-hidden="true"></canvas><span class="bd-tag">typical ranges (log scales)</span></div>
   </div>
   <div class="bd-scope short"><canvas data-c="c" aria-hidden="true"></canvas><span class="bd-tag">● native  ◐ with added material  ○ no</span></div>
+  <div class="bd-read" aria-live="polite"><span>capabilities native to A or B <b data-o="nat">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Silicon against InP.</b> Set B to InP. Its ridge dwarfs the silicon strip, because its index contrast is 0.19 against silicon's 2.04, but together the two have all five capabilities: the case for III–V lasers on silicon (Chapter 27).</li>
+    <li><b>Lowest loss.</b> Back to Si against SiN: the SiN loss bar starts three decades lower, at 0.001 dB/cm, but its bends need 20 µm to a millimetre, against silicon's few micrometres.</li>
+    <li><b>Pockels without silicon.</b> Set A to TFLN and B to BTO-on-Si: both modulate natively, but the pair covers only two of the five capabilities, with no native gain, detectors or CMOS foundry.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>Why is the InP waveguide so much larger than the silicon strip?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="InGaAsP on InP confines light weakly, so the core must be thick and the ridge etched deep to hold the light sideways (Section 4.7).">Its index contrast is only about 0.2, so it needs a thick core and a deep etch</button>
+      <button type="button" data-why="InP's band gap, 1.34 eV, is well above the 0.80 eV of a 1550 nm photon, so it is transparent there. The size comes from the low index contrast.">InP absorbs at 1550 nm, so the light must be spread out</button>
+      <button type="button" data-why="Lithography is not the limit: even a perfectly patterned InP waveguide must be large, because its index contrast is low.">InP foundries use coarser lithography</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -79,6 +93,11 @@
       });
     }
     var pa = P[A], pb = P[B], c;
+    // capabilities that neither platform has natively, and a pill naming the first gap
+    var miss = CAPS.map(function (s, i) { return Math.max(pa.caps[i], pb.caps[i]) < 2; });
+    var nmiss = miss.filter(function (m) { return m; }).length, gap = ['needs a laser', 'no detectors', 'no fast modulator', 'no heater', 'no CMOS foundry'][miss.indexOf(true)];
+    q('[data-o="nat"]').textContent = (5 - nmiss) + ' of 5';
+    BD.pill(q('[data-o="pill"]'), nmiss ? gap : 'all five', nmiss ? 'warn' : 'ok');
     c = pa.name + ' against ' + pb.name + ': ';
     var ra = pa.core / pa.clad, rb = pb.core / pb.clad;
     c += (ra > rb ? pa.name : pb.name) + ' has the higher index contrast, so tighter bends and smaller devices; ';

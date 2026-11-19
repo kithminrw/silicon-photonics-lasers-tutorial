@@ -18,8 +18,21 @@
     <button type="button" class="bd-toggle" data-act="reveal" aria-pressed="false">reveal the coupling map</button>
     <button type="button" class="bd-btn" data-act="new">new chip</button>
   </div>
-  <div class="bd-read" aria-live="polite"><span>loopback power <b data-o="p">–</b></span><span>moves <b data-o="n">0</b></span><span>best possible <b data-o="best">–</b></span><span>1 dB radius per coupler <b data-o="tol">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>loopback power <b data-o="p">–</b></span><span>moves <b data-o="n">0</b></span><span>best possible <b data-o="best">–</b></span><span>1 dB radius per coupler <b data-o="tol">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Search blind.</b> Press new chip and step with the arrows. Until the array is within about 13 µm of the couplers the meter reads only noise, and no direction looks better than another.</li>
+    <li><b>Let the machine do it.</b> Press auto: a spiral with a 3 µm pitch, finer than the 10 µm mode, finds first light, then hill-climbing in halving steps reaches the peak, usually in 10 to 35 moves.</li>
+    <li><b>Correct the yaw.</b> Each chip sits at a small random yaw. Once aligned, move the yaw slider in small steps and re-peak: every degree of error moves the second fibre, 127 µm away, 2.2 µm off its coupler, about 0.9 dB.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>The array is shifted so that both fibres are off their couplers by the same amount, and the loopback reads 1 dB below its best. How far off is each fibre?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="The loopback is the product of two couplings, so each coupler loses half a decibel; the loss grows as the square of the offset, so that is 2.35/√2 = 1.7 µm.">About 1.7 µm</button>
+      <button type="button" data-why="At 2.35 µm each coupler loses 1 dB, so the loopback loses 2 dB: each coupler's 1 dB circle counts twice.">About 2.35 µm, the 1 dB radius</button>
+      <button type="button" data-why="At 4.7 µm each coupler loses 4 dB, 8 dB for the loopback: the loss grows as the square of the offset.">About 4.7 µm</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -87,6 +100,7 @@
     // ---- readouts
     var pnow = hist[hist.length - 1]; q('[data-o="p"]').textContent = pnow <= floor + 0.1 ? '< ' + floor + ' dBm (noise)' : pnow.toFixed(2) + ' dBm';
     q('[data-o="best"]').textContent = bestP.toFixed(1) + ' dBm';
+    BD.pill(q('[data-o="pill"]'), pnow <= floor + 0.1 ? 'no light' : pnow > bestP - 0.5 ? 'aligned' : 'first light', pnow <= floor + 0.1 ? 'bad' : pnow > bestP - 0.5 ? 'ok' : 'warn');
     var r1 = Math.sqrt(0.115 * (wF * wF + wG * wG)); q('[data-o="tol"]').textContent = '± ' + r1.toFixed(2) + ' µm';
     var rotLoss = 10 * Math.log10(eta(Math.pow(pitch * Math.sin((S.rot - trot) * Math.PI / 180), 2)) / eta(0));
     var c;

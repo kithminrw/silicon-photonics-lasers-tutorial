@@ -68,7 +68,7 @@ Because $$\nu(\nu + 2)$$ is always either even or odd times a fixed step, all th
 - **Paired interference** (input at $$\pm W_e/6$$, where some modes are not excited): images at $$L_\pi$$, two-fold at $$L_\pi/2$$; shorter 2 × 2 couplers.
 - **Symmetric interference** (centred input, only even modes): $$N$$-fold images at $$3L_\pi/(4N)$$, four times shorter; a 1 × 2 splitter needs only $$3L_\pi/8$$.
 
-**Try it.** Change the MMI's width, length and input offset; the top view shows the device to scale, and the map shows the images form.
+**Try it.** Change the MMI's width, length and input offset, and watch the self-images form in the field and in the intensity map.
 
 {% include demos/mmi.html %}
 

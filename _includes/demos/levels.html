@@ -10,8 +10,21 @@
     <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">energy levels, populations and rates</span></div>
     <div class="bd-scope tall"><canvas data-c="p" aria-hidden="true"></canvas><span class="bd-tag">inversion (N₂ − N₁)/N against pump rate</span></div>
   </div>
-  <div class="bd-read" aria-live="polite"><span>upper level N₂/N <b data-o="n2">–</b></span><span>lower level N₁/N <b data-o="n1">–</b></span><span>inversion <b data-o="inv">–</b></span><span>gain or loss <b data-o="g">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>upper level N₂/N <b data-o="n2">–</b></span><span>lower level N₁/N <b data-o="n1">–</b></span><span>inversion <b data-o="inv">–</b></span><span>gain or loss <b data-o="g">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Pump a two-level system hard.</b> Choose two-level and push the pump to 100 A<sub>21</sub>: the upper level creeps up to 49.8 % but never passes half, and the inversion stays at −0.5 %.</li>
+    <li><b>Find transparency.</b> In the three-level system, lower the pump to W<sub>p</sub> = A<sub>21</sub> (1.0): both levels hold 50 % and the medium is transparent. At 0.5 it absorbs.</li>
+    <li><b>Saturate the gain.</b> Four-level system, pump 2.0: the inversion is 65.9 %. Raise the signal to 10 A<sub>21</sub> and it falls to 15.2 %, because the signal itself empties the upper level.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>A three-level medium is pumped at 2 A<sub>21</sub>. What happens to its inversion as the signal grows without limit?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="The signal stimulates emission and absorption at the same rate, so it drives the two levels towards equal populations: 4.3 % at 10 A21, 1.5 % at 32 A21. The gain saturates towards zero but never turns into loss.">It falls towards zero: the medium tends to transparency</button>
+      <button type="button" data-why="Absorption and stimulated emission are the same process run in opposite directions, so a signal alone can only equalise the two levels, never refill the lower one past half.">It turns negative: the medium starts to absorb</button>
+      <button type="button" data-why="Every stimulated emission takes an atom out of the upper level, so a strong signal pulls the inversion down: that is gain saturation.">It stays at 33 %, set by the pump</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -70,6 +83,7 @@
     q('[data-o="n1"]').textContent = (100 * P.n1).toFixed(1) + ' %';
     q('[data-o="inv"]').textContent = (100 * inv).toFixed(1) + ' %';
     q('[data-o="g"]').textContent = inv > 0.001 ? 'gain' : inv < -0.001 ? 'absorption' : 'transparent';
+    BD.pill(q('[data-o="pill"]'), inv > 0.001 ? 'inverted' : inv < -0.001 ? 'no inversion' : 'transparent', inv > 0.001 ? 'ok' : inv < -0.001 ? 'bad' : 'warn');
     var c;
     if (sys === 2) c = 'In a two-level system the pump stimulates emission as readily as absorption, so at best the two levels become equally full: <b>no inversion, whatever the pump</b>. ';
     else if (sys === 3) c = 'In a three-level system the laser\'s lower level is the ground state, so more than half of all the atoms must be pumped up before the medium even becomes transparent: the pump must beat spontaneous emission, W<sub>p</sub> > A<sub>21</sub>. Erbium in glass at 1530 nm behaves like this. ';

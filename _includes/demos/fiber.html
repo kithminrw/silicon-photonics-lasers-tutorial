@@ -12,8 +12,21 @@
     <div class="bd-scope tall"><canvas data-c="b" aria-hidden="true"></canvas><span class="bd-tag">normalised propagation constant b against V</span></div>
     <div class="bd-scope tall"><canvas data-c="f" aria-hidden="true"></canvas><span class="bd-tag">LP01 field: exact (solid), Gaussian fit (dashed)</span></div>
   </div>
-  <div class="bd-read" aria-live="polite"><span>V <b data-o="v">–</b></span><span>guided LP modes <b data-o="m">–</b></span><span>single-mode cut-off λ<sub>c</sub> <b data-o="lc">–</b></span><span>MFD (Marcuse) <b data-o="mfd">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>V <b data-o="v">–</b></span><span>guided LP modes <b data-o="m">–</b></span><span>single-mode cut-off λ<sub>c</sub> <b data-o="lc">–</b></span><span>MFD (Marcuse) <b data-o="mfd">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Find the cut-off.</b> On standard SMF, slide λ below 1318 nm: V passes 2.405, LP11 joins LP01 and the pill changes to multimode.</li>
+    <li><b>Shrink the core.</b> Set a = 2.5 µm. V falls to 1.25 and the MFD grows to 12.9 µm, larger than with the 4.1 µm core: the weakly guided mode spreads into the cladding.</li>
+    <li><b>Raise the NA.</b> Choose the high-NA fibre (a = 1.25 µm, NA 0.35). It is still single-mode, with a 3.6 µm MFD, close to the spots of on-chip edge couplers.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>A fibre is single-mode at 1550 nm. What keeps it single-mode at a shorter wavelength?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="V = 2πa·NA/λ grows as λ falls, so a smaller core or a lower NA is needed to keep V below 2.405.">A smaller core or a lower NA</button>
+      <button type="button" data-why="Below the cut-off wavelength λc, V passes 2.405 and LP11 is guided too: single-mode at 1550 nm does not mean single-mode at 1310 nm.">Nothing: single-mode at 1550 nm means single-mode everywhere</button>
+      <button type="button" data-why="A higher NA raises V = 2πa·NA/λ, so it guides more modes, not fewer.">A higher NA</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -97,6 +110,7 @@
     q('[data-o="m"]').textContent = ms.length ? ms.map(function (m) { return 'LP' + m.l + m.m; }).join(', ') : 'none';
     q('[data-o="lc"]').textContent = (1000 * lc).toFixed(0) + ' nm';
     q('[data-o="mfd"]').textContent = (2 * w0).toFixed(2) + ' µm';
+    BD.pill(q('[data-o="pill"]'), ms.length > 1 ? 'multimode' : ms.length ? 'single-mode' : '', ms.length > 1 ? 'warn' : 'ok');
     var c = 'A step-index fibre guides one mode, LP01, while V = 2πa·NA/λ is below 2.405, the first zero of J₀. ';
     if (V < 2.405) c += 'This fibre is single-mode here. ' + (V < 1.5 ? '<b>V is small</b>: the mode spreads far into the cladding, the MFD grows and the fibre becomes sensitive to bends.' : 'Its LP01 mode is close to a Gaussian, which is why Gaussian-beam overlaps (Section 3.5) predict fibre coupling so well.');
     else c += '<b>Several modes are guided</b> (' + ms.length + '); light launched into this fibre can split between them and arrive at different times.';

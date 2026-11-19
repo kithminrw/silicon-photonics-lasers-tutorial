@@ -7,17 +7,31 @@
     <label class="bd-sl"><span>phase step between emitters Δφ <b data-v="ph"></b></span><input type="range" data-k="ph" min="-180" max="180" step="1" value="60" aria-label="phase step"></label>
   </div>
   <div class="bd-row">
-    <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: emitters to scale and their beams</span></div>
-    <div class="bd-scope tall"><canvas data-c="f" aria-hidden="true"></canvas><span class="bd-tag">far field against angle</span></div>
+    <div><div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">emitters and their near field (red +, blue −)</span></div>
+      <div class="bd-status"><span data-o="fst"></span></div></div>
+    <div class="bd-scope tall" style="align-self:start"><canvas data-c="f" aria-hidden="true"></canvas><span class="bd-tag">far field against angle</span></div>
   </div>
-  <div class="bd-read" aria-live="polite"><span>steering angle <b data-o="th">–</b></span><span>beam width <b data-o="bw">–</b></span><span>grating lobes <b data-o="gl">–</b></span><span>grating-lobe-free range <b data-o="fr">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>steering angle <b data-o="th">–</b></span><span>beam width <b data-o="bw">–</b></span><span>grating lobes <b data-o="gl">–</b></span><span>grating-lobe-free range <b data-o="fr">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Lose the grating lobes.</b> At the default 2 µm pitch the main beam at 7.4° comes with two grating lobes, and the near field is a criss-cross of wavefronts. Close the pitch to 0.75 µm: one clean set of tilted wavefronts is left, now at 20.1°.</li>
+    <li><b>Steer.</b> At 0.75 µm, raise the phase step from 60° to 120°: the beam swings from 20.1° to 43.5° and broadens as 1/cos θ, from 6.98° to 9.05°.</li>
+    <li><b>Narrow the beam.</b> Back at 2 µm and 60°, go from 16 to 64 emitters: the 128 µm aperture makes the beam four times narrower, 0.62° instead of 2.48°.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>Why do integrated phased arrays struggle to avoid grating lobes?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="No grating lobes at any angle needs d ≤ λ/2, 0.78 µm at 1550 nm; silicon waveguides that close together couple, so designs use alternating widths, non-uniform spacing or a limited steering range.">The pitch must be below 0.78 µm, where waveguides couple</button>
+      <button type="button" data-why="More emitters narrow each beam, but the grating lobes stay: their directions depend only on the pitch and the phase step.">They have too few emitters</button>
+      <button type="button" data-why="Grating lobes appear even with perfect phases: they are other directions in which the same phase steps add up, whenever the pitch exceeds λ/2.">Their phase shifters are not precise enough</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
   var root = document.getElementById('bdOpa'); if (!root || !window.BD) return;
   var q = function (s) { return root.querySelector(s); };
-  var LAM = 1.55;
+  var LAM = 1.55, FA = BD.field(q('[data-c="g"]'), { button: q('.bd-status'), hz: 1 }), nfr = 0;
   var S = BD.bind(root, { N: { fmt: function (x) { return x.toFixed(0); } }, d: { fmt: function (x) { return x.toFixed(2) + ' µm'; } }, ph: { fmt: function (x) { return x.toFixed(0) + '°'; } } }, function () { draw(); });
   function af(th) { var psi = 2 * Math.PI / LAM * S.d * Math.sin(th) - S.ph * Math.PI / 180, den = S.N * Math.sin(psi / 2); return Math.abs(den) < 1e-9 ? 1 : Math.pow(Math.sin(S.N * psi / 2) / den, 2); }
   function lobes() {   // all orders m with |sin| <= 1
@@ -27,24 +41,50 @@
   }
   function draw() {
     var L = lobes(), main = L.filter(function (l) { return l.m === 0; })[0];
-    // ---- geometry: emitters along x, beams in the plane
+    // ---- geometry: emitters along x, the field they radiate in the plane above them, and the beam directions.
+    // The field is the sum of N point sources (2D cylindrical waves e^(−jkr)/√(kr)), emitter n driven with e^(−jnΔφ):
+    // the same array as the far-field plot, here close up, where the beam forms. Drawn to scale, at least 6 px per λ.
     (function () {
-      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, span = Math.max(S.N * S.d, 10), sc = Math.min((dv.w - 40) / span, 30), x0 = dv.w / 2 - S.N * S.d * sc / 2, y = dv.h - 34;
-      for (var i = 0; i < S.N; i++) {
-        var ph = ((i * S.ph) % 360 + 360) % 360, hue = 'hsl(' + ph.toFixed(0) + ',70%,60%)';
-        g.fillStyle = hue; g.fillRect(x0 + (i + 0.25) * S.d * sc, y - 4, Math.max(1.5, 0.5 * S.d * sc), 8);
+      var cv = q('[data-c="g"]'), W = cv.clientWidth, H = cv.clientHeight, span = Math.max(S.N * S.d, 10);
+      var sc = Math.max(Math.min((W - 40) / span, 30), 6 / LAM), x0 = W / 2 - S.N * S.d * sc / 2, y = H - 34, cx = W / 2, Rr = y - 40;
+      var top = 18, fh = y - 4 - top, kp = 2 * Math.PI / (LAM * sc), lamp = LAM * sc;   // k per px, λ in px
+      FA.grid(0, top, W, fh);
+      var xn = [], cr = [], ci = [];
+      for (var n = 0; n < S.N; n++) { xn.push(x0 + (n + 0.5) * S.d * sc); cr.push(Math.cos(n * S.ph * Math.PI / 180)); ci.push(-Math.sin(n * S.ph * Math.PI / 180)); }
+      // e^(−jkr)/√r tabulated against r in steps of 1/16 px (r clamped at λ/2, the size of a grating emitter)
+      var rmax = Math.hypot(Math.max(W - xn[0], xn[S.N - 1], W) + 2, y) + 2, NT = Math.ceil(rmax * 16) + 2, tr = new Float32Array(NT), ti = new Float32Array(NT);
+      for (var t = 0; t < NT; t++) { var rr = t / 16, a = 1 / Math.sqrt(Math.max(rr, lamp / 2)); tr[t] = a * Math.cos(kp * rr); ti[t] = -a * Math.sin(kp * rr); }
+      var re = FA.re, im = FA.im, nx = FA.nx;
+      for (var j = 0; j < FA.ny; j++) {
+        var dy = y - (top + j + 0.5), dy2 = dy * dy, row = j * nx;
+        for (var i = 0; i < nx; i++) {
+          var px = i + 0.5, sr = 0, si = 0;
+          for (n = 0; n < S.N; n++) { var dx = px - xn[n], k = (Math.sqrt(dx * dx + dy2) * 16 + 0.5) | 0, er = tr[k], ei = ti[k]; sr += er * cr[n] - ei * ci[n]; si += er * ci[n] + ei * cr[n]; }
+          re[row + i] = sr; im[row + i] = si;
+        }
       }
-      var cx = dv.w / 2, Rr = y - 40;
-      L.forEach(function (l) {
-        var col = l.m === 0 ? BD.C.gold : 'rgba(240,138,106,.85)', ex = cx + Rr * Math.sin(l.th), ey = y - Rr * Math.cos(l.th);
-        g.strokeStyle = col; g.lineWidth = l.m === 0 ? 3 : 2; g.beginPath(); g.moveTo(cx, y - 6); g.lineTo(ex, ey); g.stroke(); g.lineWidth = 1;
-        // label at the beam's end, or, for a steep beam on a narrow panel, further down the beam (just under it) so it stays inside
-        var lab = l.m === 0 ? 'main beam' : 'grating lobe', sn = Math.abs(Math.sin(l.th)), tl = sn > 0.05 ? Math.min(1, (dv.w / 2 - 10 - g.measureText(lab).width) / (Rr * sn)) : 1;
-        BD.label(g, lab, cx + tl * (ex - cx) + (l.th > 0 ? 6 : -6), y - 6 + tl * (ey - y + 6) + (tl < 1 ? 10 : 0), col, l.th > 0 ? 'left' : 'right');
-      });
-      g.strokeStyle = BD.C.dim; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(cx, y - 6); g.lineTo(cx, 30); g.stroke(); g.setLineDash([]);
-      BD.label(g, 'colour = phase', 8, 36, BD.C.dim); BD.label(g, 'aperture ' + (S.N * S.d).toFixed(0) + ' µm', cx, y + 22, BD.C.axis, 'center');
-      BD.scalebar(g, dv.w - 100, dv.h - 10, sc, 80);   // bottom right: the beams all point upwards, so nothing reaches it
+      var crop = S.N * S.d * sc > W - 4, st = ['sum of ' + S.N + ' point sources with this pitch and phase step: near field, not a full-wave solve'];
+      if (crop) st.push('the central ' + (W / sc).toFixed(0) + ' µm of the ' + (S.N * S.d).toFixed(0) + ' µm aperture shown');
+      var fst = q('[data-o="fst"]'), stTxt = st.join(' · '), msTxt = function () { return FA.ms ? ' · frame ' + FA.ms.toFixed(1) + ' ms' : ''; };
+      fst.textContent = stTxt + msTxt();
+      FA.overlay = function (g) {
+        for (var i2 = 0; i2 < S.N; i2++) {
+          var ph = ((i2 * S.ph) % 360 + 360) % 360, hue = 'hsl(' + ph.toFixed(0) + ',70%,60%)';
+          g.fillStyle = hue; g.fillRect(x0 + (i2 + 0.25) * S.d * sc, y - 4, Math.max(1.5, 0.5 * S.d * sc), 8);
+        }
+        L.forEach(function (l) {
+          var col = l.m === 0 ? BD.C.gold : 'rgba(240,138,106,.85)', ex = cx + Rr * Math.sin(l.th), ey = y - Rr * Math.cos(l.th);
+          g.strokeStyle = col; g.lineWidth = 1.5; g.setLineDash([5, 4]); g.beginPath(); g.moveTo(cx, y - 6); g.lineTo(ex, ey); g.stroke(); g.setLineDash([]); g.lineWidth = 1;
+          // label at the beam's end, or, for a steep beam on a narrow panel, further down the beam (just under it) so it stays inside
+          var lab = l.m === 0 ? 'main beam' : 'grating lobe', sn = Math.abs(Math.sin(l.th)), tl = sn > 0.05 ? Math.min(1, (W / 2 - 10 - g.measureText(lab).width) / (Rr * sn)) : 1;
+          BD.label(g, lab, cx + tl * (ex - cx) + (l.th > 0 ? 6 : -6), y - 6 + tl * (ey - y + 6) + (tl < 1 ? 10 : 0), col, l.th > 0 ? 'left' : 'right');
+        });
+        g.strokeStyle = BD.C.dim; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(cx, y - 6); g.lineTo(cx, 30); g.stroke(); g.setLineDash([]);
+        BD.label(g, 'colour = phase', 8, 36, BD.C.dim); BD.label(g, 'aperture ' + (S.N * S.d).toFixed(0) + ' µm', cx, y + 22, BD.C.axis, 'center');
+        BD.scalebar(g, W - 100, H - 10, sc, 80);   // bottom right: the beams all point upwards, so nothing reaches it
+        if (++nfr % 30 === 0) fst.textContent = stTxt + msTxt();
+      };
+      FA.render();
     })();
     // ---- far field
     var xs = [], ys = []; for (var i = 0; i <= 1440; i++) { var th = -Math.PI / 2 + Math.PI * i / 1440; xs.push(th * 180 / Math.PI); ys.push(10 * Math.log10(Math.max(af(th), 1e-4))); }
@@ -57,12 +97,13 @@
     q('[data-o="th"]').textContent = main ? (th0 * 180 / Math.PI).toFixed(1) + '°' : '–';
     q('[data-o="bw"]').textContent = bw.toFixed(2) + '°';
     q('[data-o="gl"]').textContent = nl;
+    BD.pill(q('[data-o="pill"]'), !main ? 'no main beam' : nl ? 'grating lobes' : 'single beam', !main ? 'warn' : nl ? 'bad' : 'ok');
     var sl = LAM / S.d - 1; q('[data-o="fr"]').textContent = S.d <= LAM / 2 ? 'all angles' : sl <= 0 ? 'none (d ≥ λ)' : '±' + (Math.asin(Math.min(1, sl)) * 180 / Math.PI).toFixed(1) + '°';
     var c = 'Each emitter radiates with a phase Δφ more than its neighbour, so the waves add up in the direction where the path difference d sin θ makes up that phase: sin θ = Δφ λ/(2πd). ';
     c += 'A wider aperture (more emitters) makes a narrower beam, about 0.886 λ/(Nd) radians. ';
     if (S.d > LAM / 2) c += 'With a pitch larger than λ/2 = 0.78 µm, the same phases also add up in other directions, the <b>grating lobes</b>, which waste power and confuse a LiDAR; silicon waveguides are hard to pack closer than about 1–2 µm without coupling, which is the central difficulty of integrated phased arrays. ';
     else c += 'With a pitch of λ/2 or less there are no grating lobes at any steering angle. ';
-    c += ' <i>Array factor of identical point emitters; real grating antennas add an element pattern, and steering along the other axis comes from the wavelength.</i>';
+    c += ' <i>Array factor of identical point emitters (the near field sums their cylindrical waves); real grating antennas add an element pattern, and steering along the other axis comes from the wavelength.</i>';
     q('[data-o="cap"]').innerHTML = c;
   }
   BD.observe(root, draw);

@@ -7,7 +7,7 @@
 .bd-seg{display:inline-flex;border:1px solid rgba(230,190,95,.45);border-radius:30px;overflow:hidden;}
 .bd-seg button{font:inherit;letter-spacing:.06em;color:rgba(233,208,143,.7);background:transparent;border:0;padding:3px 10px;cursor:pointer;}
 .bd-seg button[aria-pressed="true"]{background:rgba(230,190,95,.22);color:#f3d48a;}
-.bd-sliders{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:6px 18px;margin:0 2px 10px;}
+.bd-sliders{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:6px 18px;margin:12px 2px 0;}
 .bd-sl{display:grid;grid-template-columns:1fr;gap:2px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:rgba(170,205,240,.82);}
 .bd-sl > span{display:block;position:relative;padding-right:84px;min-height:1.3em;}
 .bd-sl b{position:absolute;right:0;top:0;color:#fff;font-weight:500;white-space:nowrap;}
@@ -19,9 +19,15 @@
 .bd-tag{position:absolute;top:5px;left:8px;font-family:"IBM Plex Mono",monospace;font-size:9.5px;color:rgba(170,205,240,.75);pointer-events:none;}
 .bd-tag.r{left:auto;right:8px;color:#e9d08f;}
 .bd-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px;}
-.bd-read{display:flex;gap:6px 18px;flex-wrap:wrap;margin:9px 2px 0;font-family:"IBM Plex Mono",monospace;font-size:11px;color:rgba(170,205,240,.75);}
-.bd-read b{color:#fff;font-weight:500;white-space:nowrap;}
+/* Readouts as stat cards: each <span>label <b>value</b></span> becomes a card, label over a large mono value.
+   Cards size to their content (one-line labels, so the values line up) and grow to fill the row. Labels keep
+   their case on purpose: n and N, L_x and L_X, µ and Μ mean different things. */
+.bd-read{display:flex;gap:6px;flex-wrap:wrap;margin:10px 2px 0;font-family:"IBM Plex Mono",monospace;font-size:10px;line-height:1.35;color:rgba(170,205,240,.8);}
+.bd-read > span:not(.bd-pill){flex:1 1 auto;min-width:0;padding:6px 10px 7px;border:1px solid rgba(120,170,225,.24);border-radius:8px;background:rgba(5,16,32,.3);letter-spacing:.02em;}
+.bd-read b{display:block;margin-top:3px;font-size:15.5px;line-height:1.2;letter-spacing:0;color:#fff;font-weight:500;}   /* a card is as wide as its value, so a value wraps only if it is wider than the whole demo (a list of fibre modes) */
+.bd-read > span:has(> b ~ b) > b{display:inline;font-size:13px;white-space:nowrap;}   /* two values in one card (bend demo) */
 .bd-read .ok{color:#7fe0a0;}.bd-read .bad{color:#f39a7c;}
+@container (max-width:360px){.bd-read b{font-size:14px;}}
 .bd-controls{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px;}
 .bd-btn,.bd-toggle{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:rgba(205,225,248,.85);background:transparent;border:1px solid rgba(140,190,240,.35);border-radius:30px;padding:5px 12px;cursor:pointer;}
 .bd-btn:hover,.bd-toggle:hover{color:#fff;border-color:#9fd0ff;}
@@ -38,3 +44,59 @@
 @container (max-width:640px){.bd-row{grid-template-columns:minmax(0,1fr);}}
 /* On the narrowest phones (320 px) a wrapped panel tag would run into the plot: keep it to one line. */
 @container (max-width:300px){.bd-tag{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:calc(100% - 16px);}}
+
+/* ---- Picture first. The demo is a flex column and `order` sorts its direct children, so every demo gets
+   this without markup changes: header rows, then the panels (scopes, rows, status lines) in source order,
+   then the readout cards, sliders and buttons, caption, "things to try" and "check yourself".
+   Source order (and so the keyboard order) is unchanged; nothing focusable sits in the panels. */
+.bd{display:flex;flex-direction:column;}
+.bd > .bd-head{order:-1;}
+.bd > .bd-read{order:2;}
+.bd > .bd-sliders,.bd > .bd-controls{order:3;}
+.bd > .bd-caption{order:4;}
+.bd > .bd-try{order:5;}
+.bd > .bd-check{order:6;}
+
+/* ---- Status pill for a result (fill it from JS with BD.pill(el, text, 'ok' | 'bad' | 'warn')).
+   Keep the text a plain word or ratio: it is shown in capitals. */
+.bd-pill{display:inline-block;align-self:center;font-family:"IBM Plex Mono",monospace;font-size:10px;font-weight:600;line-height:1.2;letter-spacing:.09em;text-transform:uppercase;white-space:nowrap;padding:4px 11px;border:1.5px solid currentColor;border-radius:30px;color:#9fd0ff;background:rgba(159,208,255,.08);}
+.bd-pill.ok{color:#7fe0a0;background:rgba(127,224,160,.1);}
+.bd-pill.bad{color:#f39a7c;background:rgba(243,154,124,.1);}
+.bd-pill.warn{color:#f3d48a;background:rgba(243,212,138,.1);}
+.bd-pill[hidden]{display:none;}
+
+/* ---- Status line under a panel (e.g. the field view's play/pause button and frame time) */
+.bd-status{display:flex;align-items:center;flex-wrap:wrap;gap:3px 10px;margin:5px 2px 0;font-family:"IBM Plex Mono",monospace;font-size:10px;line-height:1.4;color:rgba(170,205,240,.62);}
+.bd-play{display:inline-flex;align-items:center;gap:6px;font-family:"IBM Plex Mono",monospace;font-size:10px;line-height:1;color:rgba(205,225,248,.9);background:rgba(5,16,32,.45);border:1px solid rgba(140,190,240,.35);border-radius:30px;padding:4px 9px;cursor:pointer;}
+.bd-play:hover{color:#fff;border-color:#9fd0ff;}
+.bd-play::before{content:"";display:inline-block;box-sizing:border-box;width:8px;height:8px;border-left:3px solid currentColor;border-right:3px solid currentColor;}   /* pause: two bars */
+.bd-play[data-on="0"]::before{width:0;height:0;border-left:7px solid currentColor;border-right:0;border-top:4px solid transparent;border-bottom:4px solid transparent;}   /* play: a triangle */
+.bd-scope > .bd-play{position:absolute;right:6px;top:4px;padding:4px 6px;}
+.bd-scope > .bd-play .w{display:none;}
+
+/* ---- "Three things to try": <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol><li>…</li></ol></div> */
+.bd-try,.bd-check{margin:12px 2px 0;padding:9px 12px 10px;border-radius:8px;font-size:13.5px;line-height:1.5;color:rgba(215,230,247,.94);}
+.bd-try{border:1px solid rgba(230,190,95,.32);background:rgba(230,190,95,.06);}
+.bd .bd-try-h,.bd .bd-check-h{display:block;margin:0 0 4px !important;font-family:"IBM Plex Mono",monospace;font-size:10px !important;letter-spacing:.1em;text-transform:uppercase;color:#e9d08f;}
+.bd .bd-try ol{list-style:none;counter-reset:bdtry;margin:0;padding:0;}
+.bd .bd-try ol > li{counter-increment:bdtry;position:relative;margin:5px 0 0;padding-left:27px;font-size:13.5px;}
+.bd .bd-try ol > li::before{content:counter(bdtry);position:absolute;left:0;top:1px;width:19px;height:19px;border:1px solid rgba(230,190,95,.6);border-radius:50%;font-family:"IBM Plex Mono",monospace;font-size:10px !important;line-height:17px;text-align:center;color:#f3d48a;}
+.bd .bd-try b,.bd .bd-check b{color:#fff;font-weight:600;}
+
+/* ---- "Check yourself": a question, option buttons (the right one has data-correct; each may carry its own
+   one-line explanation in data-why) and a feedback line. demos.js wires every .bd-check on the page. */
+.bd-check{border:1px solid rgba(120,170,225,.3);background:rgba(5,16,32,.3);}
+.bd-check .bd-check-h{color:#9fd0ff;}
+.bd .bd-check-q{margin:0 !important;font-size:13.5px;}
+.bd-check-opts{display:flex;flex-direction:column;gap:5px;margin-top:8px;}
+.bd-check-opts button{display:flex;align-items:baseline;gap:8px;width:100%;text-align:left;font:inherit;font-size:13px;line-height:1.4;color:rgba(215,230,247,.94);background:rgba(120,170,225,.06);border:1px solid rgba(140,190,240,.3);border-radius:7px;padding:6px 10px;cursor:pointer;}
+.bd-check-opts button:hover{border-color:#9fd0ff;color:#fff;}
+.bd-check-opts button::after{content:"";margin-left:auto;font-family:"IBM Plex Mono",monospace;font-weight:600;}
+.bd-check-opts button[data-state="right"]{border-color:#7fe0a0;background:rgba(127,224,160,.12);color:#fff;}
+.bd-check-opts button[data-state="right"]::after{content:"✓ right";color:#7fe0a0;}
+.bd-check-opts button[data-state="wrong"]{border-color:rgba(243,154,124,.8);background:rgba(243,154,124,.08);}
+.bd-check-opts button[data-state="wrong"]::after{content:"✗ not this";color:#f39a7c;}
+.bd .bd-check-fb{margin:7px 0 0 !important;font-size:13px;min-height:1.4em;color:rgba(215,230,247,.9);}
+.bd-check-fb .ok{color:#7fe0a0;font-weight:600;}.bd-check-fb .bad{color:#f39a7c;font-weight:600;}
+.bd-check-opts button:focus-visible,.bd-play:focus-visible{outline:2px solid #9fd0ff;outline-offset:2px;}
+@container (max-width:640px){.bd-try,.bd-check,.bd .bd-try ol > li,.bd .bd-check-q{font-size:12.5px;}.bd-check-opts button{font-size:12.5px;}}

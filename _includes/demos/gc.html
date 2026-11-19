@@ -7,13 +7,27 @@
     <label class="bd-sl"><span>fill factor (unetched fraction) <b data-v="ff"></b></span><input type="range" data-k="ff" min="0.2" max="0.9" step="0.01" value="0.5" aria-label="fill factor"></label>
     <label class="bd-sl"><span>fibre angle θ (in air) <b data-v="th"></b></span><input type="range" data-k="th" min="-5" max="25" step="0.1" value="8" aria-label="fibre angle"></label>
   </div>
-  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: side view to scale, fibre at angle θ</span></div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag" data-o="tag">field at 1550 nm (red +, blue −), side view</span></div>
+  <div class="bd-status"><span data-o="fst"></span></div>
   <div class="bd-row">
     <div class="bd-scope tall"><canvas data-c="k" aria-hidden="true"></canvas><span class="bd-tag">wavevector diagram at the centre wavelength</span></div>
     <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">relative coupling against wavelength</span></div>
   </div>
-  <div class="bd-read" aria-live="polite"><span>grating n<sub>eff</sub> <b data-o="ne">–</b></span><span>centre wavelength <b data-o="lc">–</b></span><span>1 dB bandwidth <b data-o="bw">–</b></span><span>angle in cladding <b data-o="tc">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>grating n<sub>eff</sub> <b data-o="ne">–</b></span><span>centre wavelength <b data-o="lc">–</b></span><span>1 dB bandwidth <b data-o="bw">–</b></span><span>angle in cladding <b data-o="tc">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Detune the period.</b> Set Λ to 630 nm. The centre moves to 1595 nm, and at 1550 nm the beam now leaves at 13.5° in air, well off the 8° fibre: the pill reads mismatched.</li>
+    <li><b>Stand the fibre up.</b> Set θ to 0°: the peak jumps to 1615 nm. Bring it back with Λ = 576 nm. The beam now goes straight up, but that period also meets the second-order Bragg condition, so the grating reflects light back into the waveguide.</li>
+    <li><b>Take the oxide off.</b> Choose air clad. The centre wavelength stays at 1550 nm, because only the angle in air enters the phase matching, but the beam now leaves the grating at 8.0° instead of 5.5°, with its crests further apart.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>Your coupler peaks at 1530 nm instead of 1550 nm. Which change moves the peak up to 1550 nm?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="λ = Λ(n_eff − sin θ) grows with the period: about 10 nm more period moves the peak 20 nm up.">A slightly longer period</button>
+      <button type="button" data-why="A larger angle makes sin θ larger, so λ = Λ(n_eff − sin θ) falls: the peak moves further down.">Tilting the fibre further from vertical</button>
+      <button type="button" data-why="The BOX thickness sets how much of the light goes up (Section 15.2), not the wavelength at which the beam meets the fibre.">A thinner BOX</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -32,6 +46,8 @@
   }
   // angle of the first diffracted order in air (Snell through a flat top cladding): sin(theta_air) = neff - lambda/Lambda
   function sAir(lam) { return neff(lam) - lam / S.P; }
+  function erf(x) { var t = 1 / (1 + 0.3275911 * Math.abs(x)), y = 1 - ((((1.061405429 * t - 1.453152027) * t + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x); return x < 0 ? -y : y; }
+  var FV = BD.field(q('[data-c="g"]'), { button: q('.bd-status'), hz: 1.0 }), nfr = 0;
   function draw() {
     var st = Math.sin(S.th * Math.PI / 180), lc = lam0;
     for (var it = 0; it < 30; it++) lc = S.P * (neff(lc) - st);   // phase matching: lambda = Lambda (neff - sin theta)
@@ -69,36 +85,83 @@
     if (cbb > cba) { d2.g.fillStyle = 'rgba(224,184,90,.1)'; d2.g.fillRect(cba, f.p.t, cbb - cba, d2.h - f.p.t - f.p.b);
       if (cba + 2 + d2.g.measureText('C band').width <= d2.w - f.p.r) { d2.g.fillStyle = 'rgba(233,208,143,.7)'; d2.g.fillText('C band', cba + 2, d2.h - f.p.b - 6); } }
     BD.line(f, xs, ys, BD.C.blue, 2); BD.hline(f, -1, BD.C.dim, [3, 3]);
-    // ---- geometry: cross-section of the shallow-etched grating and the tilted fibre
+    // ---- the field at 1550 nm in a side view to scale: the guided mode in the grating and the beam the grating emits at the
+    // phase-matched angle, sin(theta_air) = n_eff - lambda/Lambda, up into the cladding and down into the BOX. The beam is a Gaussian
+    // with the fibre's waist, the assumption behind the bandwidth curve; the guided mode fades as that beam takes its power.
     (function () {
-      var dv2 = BD.setup(q('[data-c="g"]')), gg = dv2.g, nT = 9, sc = (dv2.w * 0.62) / (nT * S.P + 1.2), base = dv2.h - 34, x0 = 14 + 1.2 * sc;
-      var tSi = 0.22, etch = 0.07;
-      gg.fillStyle = BD.GEO.ox; gg.fillRect(0, base, dv2.w, dv2.h - base);
-      if (nc > 1.2) { gg.fillStyle = 'rgba(160,200,240,.07)'; gg.fillRect(0, 22, dv2.w, base - 22); }
-      gg.fillStyle = BD.GEO.si; gg.fillRect(14, base - tSi * sc, 1.2 * sc, tSi * sc);   // input waveguide
-      for (var i = 0; i < nT; i++) {
-        var xa = x0 + i * S.P * sc;
-        gg.fillRect(xa, base - tSi * sc, S.ff * S.P * sc, tSi * sc);                                     // tooth
-        gg.fillRect(xa + S.ff * S.P * sc, base - (tSi - etch) * sc, (1 - S.ff) * S.P * sc + 0.5, (tSi - etch) * sc);   // etched groove
-      }
-      var xg = x0 + nT * S.P * sc; gg.fillRect(xg, base - (tSi - etch) * sc, dv2.w * 0.05, (tSi - etch) * sc);
-      BD.dim(gg, x0, base + 12, x0 + S.P * sc, base + 12, 'Λ = ' + (1000 * S.P).toFixed(0) + ' nm', BD.C.gold, 10);
-      var lamW = gg.measureText('Λ = ' + (1000 * S.P).toFixed(0) + ' nm').width;   // the fill label starts clear of the Λ label
-      BD.label(gg, 'fill ' + (100 * S.ff).toFixed(0) + ' %, 70 nm etch', Math.max(x0 + 2 * S.P * sc, x0 + S.P * sc / 2 + lamW / 2 + 8), base + 26, BD.C.axis);
-      // fibre: axis tilted by theta (in air) from the normal, aimed at the grating centre
-      var xc = x0 + nT * S.P * sc / 2, th = S.th * Math.PI / 180, Lf = Math.max(40, base - 70), ux = Math.sin(th), uy = -Math.cos(th);
-      var fx = xc + ux * Lf, fy = base + uy * Lf, half = Math.min(4.5 * sc, 60);
-      gg.save(); gg.beginPath(); gg.rect(0, 22, dv2.w, dv2.h - 22); gg.clip(); gg.translate(fx, fy); gg.rotate(th); gg.fillStyle = 'rgba(127,184,240,.15)'; gg.fillRect(-half * 1.6, -60, 3.2 * half, 60);
-      gg.fillStyle = 'rgba(127,184,240,.35)'; gg.fillRect(-half / 1.7, -60, 2 * half / 1.7, 60); gg.restore();
-      gg.strokeStyle = BD.C.green; gg.setLineDash([4, 3]); gg.beginPath(); gg.moveTo(xc, base - tSi * sc); gg.lineTo(fx, fy); gg.stroke(); gg.setLineDash([]);
-      gg.strokeStyle = BD.C.dim; gg.beginPath(); gg.moveTo(xc, base - tSi * sc); gg.lineTo(xc, fy); gg.stroke();
-      // the fibre's label right of the fibre, or left of it when it would run into the scale bar's label or off the panel
-      var fl = 'fibre, θ = ' + S.th.toFixed(1) + '°', flw = gg.measureText(fl).width, sbp = BD.nice(80 / sc) * sc, sbx = dv2.w - 110 + sbp / 2, sbw = 30;
-      var hit = fx + 10 + flw > dv2.w - 4 || (fx + 10 < sbx + sbw && fx + 10 + flw > sbx - sbw && Math.abs(fy + 14 - (base - 45)) < 11);
-      BD.label(gg, fl, hit ? fx - 10 : fx + 10, fy + 14, BD.C.white, hit ? 'right' : 'left');
-      BD.label(gg, nc > 1.2 ? 'oxide cladding' : 'air', dv2.w - 8, 34, BD.C.dim, 'right');
-      BD.label(gg, 'BOX', dv2.w - 8, dv2.h - 6, BD.C.dim, 'right');
-      BD.scalebar(gg, dv2.w - 110, base - 40, sc, 80);
+      var cv = q('[data-c="g"]'), W = cv.clientWidth, nar = W < 480;
+      cv.style.height = (nar ? 240 : 250) + 'px';
+      var H = cv.clientHeight, tSi = 0.22, etch = 0.07, nT = Math.round(20 / S.P), Lg = nT * S.P, Lin = 2.4;
+      var sc = (W - 14) / (Lin + Lg + 1.6), x0 = Lin * sc, base = H - 34, ytop = base - tSi * sc, xc = x0 + Lg * sc / 2;
+      var k0 = 2 * Math.PI / lam0, ng = neff(lam0), s15 = sAir(lam0), cr = BD.crests(lam0 / nHi * sc, 6), nn = cr.n;
+      var up = Math.abs(s15) < nc, se = up ? s15 / nc : 0, ce = Math.sqrt(1 - se * se), sb = s15 / 1.444, cb = Math.sqrt(1 - sb * sb);
+      var psiX = function (x) { return k0 * (nHi * Math.min(x, x0) + ng * Math.max(0, x - x0)) / sc; };   // guided phase at canvas x (rad)
+      var psi0 = psiX(xc), foot = Math.SQRT2 * ce / (w0 * sc);   // footprint of the beam on the surface: exp(-2 (dx cos / w0)^2)
+      FV.grid(0, 22, W, H - 22);
+      var nx = FV.nx, ny = FV.ny, re = FV.re, im = FV.im;
+      var beam = function (n, sn, cs, y0, dirUp) {   // Gaussian beam (paraxial, from q) leaving the grating centre, phase psi0 there
+        var kc = k0 * n, zr = Math.PI * w0 * w0 * n / lam0;
+        for (var j = 0; j < ny; j++) {
+          var yy = 22 + j + 0.5, h = (dirUp ? y0 - yy : yy - y0) / sc; if (h < 0) continue;
+          for (var i = 0; i < nx; i++) {
+            var dx = (i + 0.5 - xc) / sc, u = dx * sn + h * cs, v = dx * cs - h * sn, den = u * u + zr * zr, ww = w0 * w0 * den / (zr * zr);
+            var a = Math.pow(w0 * w0 / ww, 0.25) * Math.exp(-v * v / ww); if (a < 1e-3) continue;
+            var ps = (psi0 + kc * u + kc * v * v * u / (2 * den) - Math.atan(u / zr)) / nn, p = j * nx + i;
+            re[p] += a * Math.cos(ps); im[p] -= a * Math.sin(ps);
+          }
+        }
+      };
+      if (up) beam(nc, se, ce, ytop, true);
+      beam(1.444, sb, cb, base, false);
+      var pts = []; for (var x = 0; x <= W + 3; x += 3) pts.push([x, (ytop + base) / 2]);
+      FV.guide(pts, { half: tSi * sc / 2, decay: sc / (k0 * Math.sqrt(nHi * nHi - 1.444 * 1.444)),
+        amp: function (i) { return [Math.sqrt(Math.max(0, 0.5 * (1 - erf(foot * (pts[i][0] - xc))))), 0]; }, phase: function (i) { return psiX(pts[i][0]) / nn; } });
+      var aAir = Math.abs(s15) < 1 ? Math.asin(s15) * 180 / Math.PI : NaN;
+      q('[data-o="tag"]').textContent = nn > 1 ? 'field at 1550 nm, side view · ' + cr.note : 'field at 1550 nm (red +, blue −), side view';
+      var st = ['guided mode and Gaussian beam (w₀ 5.2 µm, as the fibre) at the phase-matched angle, up and into the BOX',
+        isFinite(aAir) ? 'at 1550 nm the beam leaves at ' + aAir.toFixed(1) + '° in air, the fibre sits at ' + S.th.toFixed(1) + '°' : 'no beam leaves upwards at 1550 nm'];
+      if (nn > 1) st.push('crests drawn 1 per ' + nn + ' λ');
+      st.push('mode and beams each scaled to 1; not a full-wave solve');
+      var fst = q('[data-o="fst"]'), stTxt = st.join(' · '), msTxt = function () { return FV.ms ? ' · frame ' + FV.ms.toFixed(1) + ' ms' : ''; };
+      fst.textContent = stTxt + msTxt();
+      var thf = Math.asin(Math.min(1, Math.sin(S.th * Math.PI / 180) / nc)), ux = Math.sin(thf), uy = -Math.cos(thf);   // fibre axis, refracted into the cladding
+      var Lf = Math.max(40, ytop - 70), fx = xc + ux * Lf, fy = ytop + uy * Lf, hw = w0 * sc, Lt = (ytop - 22) / Math.cos(thf) + hw;
+      FV.overlay = function (gg) {
+        // silicon as an outline over the field: input waveguide, teeth, and the etched slab beyond the grating
+        gg.beginPath(); gg.moveTo(0, ytop); gg.lineTo(x0, ytop);
+        for (var t = 0; t < nT; t++) { var xa = x0 + t * S.P * sc, xb = xa + S.ff * S.P * sc, xe = xa + S.P * sc;
+          gg.lineTo(xb, ytop); gg.lineTo(xb, ytop + etch * sc); gg.lineTo(xe, ytop + etch * sc); if (t < nT - 1) gg.lineTo(xe, ytop); }
+        gg.lineTo(W, ytop + etch * sc); gg.lineTo(W, base); gg.lineTo(0, base); gg.closePath();
+        gg.fillStyle = 'rgba(157,179,204,.12)'; gg.fill(); gg.strokeStyle = BD.GEO.edge; gg.lineWidth = 1; gg.stroke();
+        BD.dim(gg, x0, base + 12, x0 + S.P * sc, base + 12, 'Λ = ' + (1000 * S.P).toFixed(0) + ' nm', BD.C.gold, 10);
+        var lamW = gg.measureText('Λ = ' + (1000 * S.P).toFixed(0) + ' nm').width;   // the fill label starts clear of the Λ label
+        BD.label(gg, 'fill ' + (100 * S.ff).toFixed(0) + ' %, 70 nm etch', Math.max(x0 + 2 * S.P * sc, x0 + S.P * sc / 2 + lamW / 2 + 8), base + 26, BD.C.axis);
+        // the fibre: its axis and its mode (1/e² edges), refracted into the cladding, aimed at the grating centre
+        gg.strokeStyle = BD.C.dim; gg.beginPath(); gg.moveTo(xc, ytop); gg.lineTo(xc, fy); gg.stroke();
+        gg.strokeStyle = BD.C.green; gg.setLineDash([4, 3]); gg.beginPath(); gg.moveTo(xc, ytop); gg.lineTo(fx, fy); gg.stroke();
+        gg.save(); gg.beginPath(); gg.rect(0, 22, W, H - 22); gg.clip();
+        gg.setLineDash([5, 4]); BD.edges(gg, [[xc, ytop], [xc + ux * Lt, ytop + uy * Lt]], hw, 'rgba(159,208,255,.8)'); gg.setLineDash([]);
+        gg.translate(fx, fy); gg.rotate(thf);
+        gg.fillStyle = 'rgba(127,184,240,.10)'; gg.fillRect(-hw, -Lt, 2 * hw, Lt); gg.strokeStyle = 'rgba(159,208,255,.8)'; gg.beginPath(); gg.moveTo(-hw, 0); gg.lineTo(hw, 0); gg.stroke(); gg.restore();
+        // the fibre's label right of the fibre end, or left of it, or short, clear of the scale bar and the panel edges
+        var sbp = BD.nice(80 / sc) * sc, sbx = W - 110 + sbp / 2, sbw = 30, sby = ytop - 40;
+        var short = 'fibre, θ = ' + S.th.toFixed(1) + '°', long = short + (nc > 1.2 ? ' (' + (thf * 180 / Math.PI).toFixed(1) + '° in oxide)' : '');
+        var cands = [[long, 1], [long, -1], [short, 1], [short, -1]], pick = null, lx0 = fx + hw + 6, rx0 = fx - hw - 6;
+        for (var ci = 0; ci < cands.length && !pick; ci++) {
+          var wl = gg.measureText(cands[ci][0]).width, xl = cands[ci][1] > 0 ? lx0 : rx0 - wl;
+          var clash = Math.abs(fy + 4 - sby) < 16 && xl < sbx + sbw && xl + wl > sbx - sbw;
+          if (xl >= 4 && xl + wl <= W - 4 && !clash) pick = [cands[ci][0], xl];
+        }
+        if (!pick) pick = [short, Math.max(4, Math.min(W - 4 - gg.measureText(short).width, fx + 10))];
+        BD.label(gg, pick[0], pick[1], fy + 4, BD.C.white);
+        BD.label(gg, nc > 1.2 ? 'oxide cladding' : 'air', W - 8, 34, BD.C.dim, 'right');
+        BD.label(gg, 'BOX', W - 8, H - 6, BD.C.dim, 'right');
+        BD.scalebar(gg, W - 110, sby, sc, 80);
+        if (++nfr % 30 === 0) fst.textContent = stTxt + msTxt();
+      };
+      FV.render();
+      var e15 = isFinite(aAir) ? Math.exp(-Math.pow(Math.PI * w0 * (aAir - S.th) * Math.PI / 180 / lam0, 2)) : 0;   // the coupling at 1550 nm, as in the spectrum
+      BD.pill(q('[data-o="pill"]'), e15 > Math.pow(10, -0.1) ? 'phase-matched' : 'mismatched', e15 > Math.pow(10, -0.1) ? 'ok' : 'warn');
     })();
     var tcl = Math.asin(Math.min(1, st / nc)) * 180 / Math.PI;
     q('[data-o="ne"]').textContent = ne.toFixed(3);

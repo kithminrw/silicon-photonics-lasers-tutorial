@@ -9,12 +9,26 @@
     <label class="bd-sl"><span>laser detuning <b data-v="d"></b></span><input type="range" data-k="d" min="-300" max="300" step="1" value="-100" aria-label="detuning"></label>
   </div>
   <div class="bd-row">
-    <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: ring with PN junction, to scale</span></div>
+    <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag" data-o="tag">field (red +, blue −), ring to scale</span></div>
     <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">through port for the 0 and 1 levels, and laser</span></div>
   </div>
+  <div class="bd-status"><span class="bd-seg" role="group" aria-label="Drive level shown in the field"><button type="button" data-lv="lo" aria-pressed="true">low bias</button><button type="button" data-lv="hi" aria-pressed="false">high bias</button></span><span data-o="fst"></span></div>
   <div class="bd-scope"><canvas data-c="o" aria-hidden="true"></canvas><span class="bd-tag">extinction (blue), loss (gold) against detuning</span></div>
-  <div class="bd-read" aria-live="polite"><span>extinction <b data-o="er">–</b></span><span>insertion loss <b data-o="il">–</b></span><span>optical bandwidth <b data-o="bw">–</b></span><span>reference target <b data-o="ok">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>extinction <b data-o="er">–</b></span><span>insertion loss <b data-o="il">–</b></span><span>optical bandwidth <b data-o="bw">–</b></span><span>reference target <b data-o="ok">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Meet the target.</b> Set the junction efficiency to 50 pm/V and the detuning to −109 pm: 4.3 dB of extinction at 3.0 dB of loss. The target is met, but slowly: c/(λQ) is only 24 GHz.</li>
+    <li><b>Watch the ring fill.</b> At the defaults, flip the field between low and high bias. At low bias the resonance sits nearer the laser: the ring holds 15 times the bus power and only 28 % gets through; at high bias, 7 times and 68 %.</li>
+    <li><b>Trade Q for speed.</b> Lower the loaded Q to 5000: the bandwidth rises to 39 GHz, but the dip widens, and even at 50 pm/V and −109 pm the loss reaches 4.0 dB.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>What extinction does the demo give with the laser exactly on the resonance (detuning 0)?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="The drive moves the dip the same distance red and blue of the laser, so the two levels transmit the same power. The laser must sit on the side of the dip, where the slope is steep.">0 dB: the two levels are the same</button>
+      <button type="button" data-why="The dip is deepest there, but a symmetric dip moved either way by the same amount gives the same power: there is no contrast, only loss (8.3 dB).">The most, because the dip is deepest there</button>
+      <button type="button" data-why="That is the operating point on the side of the dip. On the resonance the two levels are equal, so the extinction is 0 dB.">About 4 dB, as at the operating point</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -23,6 +37,9 @@
   var LAM = 1550, R = 7.2, NG = 3.89, FSR = LAM * LAM / (NG * 2 * Math.PI * R * 1000);   // nm
   var S = BD.bind(root, { eff: { fmt: function (x) { return x.toFixed(0) + ' pm/V'; } }, Qi: { fmt: function (x) { return x.toFixed(0); } }, Q: { fmt: function (x) { return x.toFixed(0); } },
     V: { fmt: function (x) { return x.toFixed(2) + ' Vpp'; } }, d: { fmt: function (x) { return x.toFixed(0) + ' pm'; } } }, function () { draw(); });
+  var NEFF = 2.568, lvl = 'lo';   // n_eff of the 500 x 220 nm rib (90 nm slab) of Chapter 19 (femwell): sets only the drawn crest spacing
+  BD.seg(root, 'lv', function (v) { lvl = v; draw(); });
+  var FV = BD.field(q('[data-c="g"]'), { button: q('.bd-status'), hz: 1.1 }), nfr = 0;
   function ring(Ql) {   // Lorentzian all-pass response; Q_c from 1/Ql = 1/Qi + 1/Qc
     var QI = S.Qi, qc = 1 / Math.max(1e-9, 1 / Ql - 1 / QI), tmin = Math.pow((1 / QI - 1 / qc) / (1 / QI + 1 / qc), 2), fw = LAM / Ql * 1000;   // pm
     return { tmin: tmin, fw: fw, T: function (dl) { return 1 - (1 - tmin) / (1 + Math.pow(2 * dl / fw, 2)); } };
@@ -34,24 +51,49 @@
   function draw() {
     var Ql = Math.min(S.Q, S.Qi * 0.98), r = ring(Ql), L = levels(r, S.d), er = 10 * Math.log10(L.hi / Math.max(L.lo, 1e-6)), il = -10 * Math.log10((L.hi + L.lo) / 2);
     var fopt = 3e8 / (LAM * 1e-9) / Ql / 1e9;   // GHz, photon-lifetime limit c/(lambda Q)
-    // ---- geometry: ring to scale, junction along 80 % of the ring
+    // ---- top view to scale with the optical field, at one drive level (lvl), from the same Lorentzian all-pass model in
+    // coupled-mode form: with x the laser's detuning in half-linewidths (frequency), r_i = Q_L/Q_i and r_c = 1 - r_i, the
+    // through field is t = (jx + r_i - r_c)/(jx + 1), so |t|^2 = T above, and the ring field is -j sqrt(2 r_c F/pi)/(1 + jx)
+    // times the bus field (F the finesse). Junction along 80 % of the ring.
     (function () {
-      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, sc = Math.min(dv.w - 20, dv.h - 60) / 22, cx = dv.w / 2, cy = 44 + (dv.h - 60) / 2 - 0.8 * sc, Rp = R * sc, wpx = Math.max(2, 0.5 * sc);
-      g.fillStyle = BD.GEO.ox; g.fillRect(0, 18, dv.w, dv.h - 18);
-      var a0 = 0.62 * Math.PI, a1 = 2.38 * Math.PI;
-      g.lineWidth = Math.max(2, 0.9 * sc); g.strokeStyle = 'rgba(240,150,170,.6)'; g.beginPath(); g.arc(cx, cy, Rp - 0.45 * sc, a0, a1); g.stroke();   // P: inner half of the rib
-      g.strokeStyle = 'rgba(120,170,240,.6)'; g.beginPath(); g.arc(cx, cy, Rp + 0.45 * sc, a0, a1); g.stroke();                                      // N: outer half
-      g.lineWidth = 1.5; g.setLineDash([3, 3]);
-      g.strokeStyle = 'rgba(240,120,150,.9)'; g.beginPath(); g.arc(cx, cy, Rp - 2 * sc, a0, a1); g.stroke();      // P++ contact ring
-      g.strokeStyle = 'rgba(90,140,240,.9)'; g.beginPath(); g.arc(cx, cy, Rp + 2 * sc, a0, a1); g.stroke(); g.setLineDash([]);
-      g.lineWidth = wpx; g.strokeStyle = BD.GEO.si; g.beginPath(); g.arc(cx, cy, Rp, 0, 2 * Math.PI); g.stroke(); g.lineWidth = 1;
-      var by = cy + Rp + 0.75 * sc; BD.wg(g, [[0, by], [dv.w, by]], wpx, BD.GEO.si);
-      BD.glow(g, [[dv.w / 2, by], [dv.w, by]], (L.a + L.b) / 2, wpx * 3);
-      BD.label(g, 'P', cx, cy - Rp + 2.2 * sc, 'rgba(240,150,170,1)', 'center');
-      BD.label(g, 'N', cx, cy - Rp - 1.2 * sc, 'rgba(120,170,240,1)', 'center');
-      BD.label(g, 'junction on 80 % of the ring', 8, 50, BD.C.dim);
-      BD.label(g, 'radius 7.2 µm, FSR ' + FSR.toFixed(1) + ' nm', 8, 36, BD.C.axis);
-      BD.scalebar(g, dv.w - 96, 36, sc, 80);
+      var cv = q('[data-c="g"]'), W = cv.clientWidth, H = cv.clientHeight, sc = Math.min(W - 20, H - 60) / 22, cx = W / 2, cy = 44 + (H - 60) / 2 - 0.8 * sc, Rp = R * sc;
+      var by = cy + Rp + 0.75 * sc, half = 0.25 * sc, dec = LAM / 1000 / (2 * Math.PI * Math.sqrt(NEFF * NEFF - 1.444 * 1.444)) * sc;   // 1/e tails (px)
+      var shv = S.eff * S.V / 2, dl = lvl === 'hi' ? S.d - shv : S.d + shv, xf = -2 * dl / r.fw, ri = Ql / S.Qi, rc = 1 - ri, F = FSR * 1000 / r.fw;
+      var den = 1 + xf * xf, tr = [(ri - rc + xf * xf) / den, xf * (1 - ri + rc) / den], K = Math.sqrt(2 * rc * F / Math.PI), er0 = [-K * xf / den, -K / den];
+      var art = 1 - ri * Math.PI / F, rtp = xf * Math.PI / F;   // round-trip field and phase (from the detuning) in the ring
+      var cr = BD.crests(LAM / 1000 / NEFF * sc, 6), md = Math.max(1, Math.round(NEFF * 2 * Math.PI * R / (LAM / 1000) / cr.n)), beta = md / Rp;   // drawn crests round the ring, and per px
+      var a0 = 0.62 * Math.PI, a1 = 2.38 * Math.PI, N = Math.max(60, Math.ceil(2 * Math.PI * Rp / 2)), ringP = [], busP = [[0, by]], Lc = 2 * sc;
+      for (var n = 0; n <= N; n++) { var al = 2 * Math.PI * n / N; ringP.push([cx + Rp * Math.sin(al), cy + Rp * Math.cos(al)]); }   // from the coupler, with the bus light
+      for (n = 0; n <= 40; n++) busP.push([cx - Lc + 2 * Lc * n / 40, by]);
+      busP.push([W, by]);
+      FV.grid(0, cy - Rp - 12, W, by - cy + Rp + 24);
+      FV.guide(busP, { half: half, decay: dec, phase: function (k) { return beta * busP[k][0]; },
+        amp: function (k) { var u = Math.max(0, Math.min(1, (busP[k][0] - cx + Lc) / (2 * Lc))), w = u * u * (3 - 2 * u); return [1 - w + w * tr[0], w * tr[1]]; } });   // 1 before the coupler, t after
+      FV.guide(ringP, { half: half, decay: dec, phase: function (k) { var al = 2 * Math.PI * k / N; return beta * cx + md * al + rtp * k / N; },
+        amp: function (k) { var f = Math.pow(art, k / N); return [er0[0] * f, er0[1] * f]; } });
+      var Tt = tr[0] * tr[0] + tr[1] * tr[1], bu = K * K / den;
+      q('[data-o="tag"]').textContent = cr.n > 1 ? 'field · ' + cr.note + ', ring to scale' : 'field (red +, blue −), ring to scale';
+      var stTxt = (lvl === 'hi' ? 'high' : 'low') + ' bias: laser ' + Math.abs(dl).toFixed(0) + ' pm ' + (dl < 0 ? 'blue' : 'red') + ' of the resonance · ' +
+        (cr.n > 1 ? 'crests 1 per ' + cr.n + ' λ (n_eff 2.57, Chapter 19) · ' : '') + 'coupled-mode field of the demo\'s ring model, not a full-wave solve';
+      var fst = q('[data-o="fst"]'), msTxt = function () { return FV.ms ? ' · frame ' + FV.ms.toFixed(1) + ' ms' : ''; };
+      fst.textContent = stTxt + msTxt();
+      FV.overlay = function (g) {
+        g.lineWidth = 0.6 * sc; g.strokeStyle = 'rgba(240,150,170,.14)'; g.beginPath(); g.arc(cx, cy, Rp - 0.6 * sc, a0, a1); g.stroke();   // P: inner side of the rib
+        g.strokeStyle = 'rgba(120,170,240,.14)'; g.beginPath(); g.arc(cx, cy, Rp + 0.6 * sc, a0, a1); g.stroke();                       // N: outer side
+        g.lineWidth = 1.5; g.setLineDash([3, 3]);
+        g.strokeStyle = 'rgba(240,120,150,.9)'; g.beginPath(); g.arc(cx, cy, Rp - 2 * sc, a0, a1); g.stroke();      // P++ contact ring
+        g.strokeStyle = 'rgba(90,140,240,.9)'; g.beginPath(); g.arc(cx, cy, Rp + 2 * sc, a0, a1); g.stroke(); g.setLineDash([]); g.lineWidth = 1;
+        BD.edges(g, ringP, half); BD.edges(g, [[0, by], [W, by]], half);
+        BD.label(g, 'P', cx, cy - Rp + 2.2 * sc, 'rgba(240,150,170,1)', 'center');
+        BD.label(g, 'N', cx, cy - Rp - 1.2 * sc, 'rgba(120,170,240,1)', 'center');
+        BD.label(g, 'ring power ×' + bu.toFixed(0), cx, cy + 4, BD.C.white, 'center');
+        BD.label(g, 'in', 4, by - half - 5, BD.C.white); BD.label(g, 'through ' + (100 * Tt).toFixed(0) + ' %', W - 4, by - half - 5, BD.C.gold, 'right');
+        BD.label(g, 'junction on 80 % of the ring', 8, 50, BD.C.dim);
+        BD.label(g, 'radius 7.2 µm, FSR ' + FSR.toFixed(1) + ' nm', 8, 36, BD.C.axis);
+        BD.scalebar(g, W - 96, 36, sc, 80);
+        if (++nfr % 30 === 0) fst.textContent = stTxt + msTxt();
+      };
+      FV.render();
     })();
     // ---- spectra
     var span = Math.max(400, 3 * r.fw), d2 = BD.setup(q('[data-c="s"]')), f2 = BD.frame(d2, { x: [-span, span], y: [0, 1.05], pad: { l: 30, b: 22, t: 30 },
@@ -60,6 +102,7 @@
     for (var i = 0; i <= 300; i++) { var x = -span + 2 * span * i / 300; xs.push(x); y0.push(r.T(x + sh)); y1.push(r.T(x - sh)); }
     BD.line(f2, xs, y0, BD.C.blue, 1.8); BD.line(f2, xs, y1, BD.C.red, 1.8);
     BD.vline(f2, S.d, BD.C.gold, [3, 3], 'laser'); BD.dot(f2, S.d, L.a, BD.C.blue, 4); BD.dot(f2, S.d, L.b, BD.C.red, 4);
+    d2.g.strokeStyle = BD.C.white; d2.g.lineWidth = 1.2; d2.g.beginPath(); d2.g.arc(f2.X(S.d), f2.Y(lvl === 'hi' ? L.b : L.a), 7, 0, 7); d2.g.stroke(); d2.g.lineWidth = 1;   // the level drawn in the field view
     d2.g.fillStyle = BD.C.blue; d2.g.fillText('low bias', 36, d2.h - 50); d2.g.fillStyle = BD.C.red; d2.g.fillText('high bias (red-shifted)', 36, d2.h - 36);
     // ---- extinction and loss against detuning
     var d3 = BD.setup(q('[data-c="o"]')), f3 = BD.frame(d3, { x: [-300, 300], y: [0, 12], pad: { l: 40, b: 22, t: 26 },
@@ -74,6 +117,7 @@
     q('[data-o="il"]').textContent = il.toFixed(1) + ' dB';
     q('[data-o="bw"]').textContent = fopt.toFixed(0) + ' GHz';
     q('[data-o="ok"]').textContent = ok ? (fopt >= 30 ? 'met' : 'met, but slow') : 'not met';
+    BD.pill(q('[data-o="pill"]'), ok ? (fopt >= 30 ? 'target met' : 'met, but slow') : 'target missed', ok ? (fopt >= 30 ? 'ok' : 'warn') : 'bad');
     var c = 'Reverse bias depletes the junction and moves the resonance red by ' + (S.eff * S.V).toFixed(0) + ' pm; a laser parked on the side of the dip sees its power change. ';
     c += 'A higher Q makes the dip narrower and steeper, so a small shift gives a large extinction, but light then lives longer in the ring: the photon lifetime limits the bandwidth to about c/(λQ) = ' + fopt.toFixed(0) + ' GHz. ';
     if (S.Q > S.Qi * 0.98) c += 'The loaded Q cannot exceed the intrinsic Q: it is held just below it. ';

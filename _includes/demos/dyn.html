@@ -12,8 +12,21 @@
     <div class="bd-scope tall"><canvas data-c="r" aria-hidden="true"></canvas><span class="bd-tag">relative intensity noise</span></div>
   </div>
   <div class="bd-scope"><canvas data-c="w" aria-hidden="true"></canvas><span class="bd-tag">Henry linewidth against output power</span></div>
-  <div class="bd-read" aria-live="polite"><span>f<sub>r</sub> <b data-o="fr">–</b></span><span>3 dB bandwidth <b data-o="f3">–</b></span><span>RIN peak <b data-o="rin">–</b></span><span>linewidth <b data-o="lw">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>f<sub>r</sub> <b data-o="fr">–</b></span><span>3 dB bandwidth <b data-o="f3">–</b></span><span>RIN peak <b data-o="rin">–</b></span><span>linewidth <b data-o="lw">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Raise the bias.</b> From 50 to 120 mA, f<sub>r</sub> grows from 4.7 to 8.4 GHz and the bandwidth from 7.2 to 12.6 GHz, as √(I − I<sub>th</sub>); the response peak flattens as the damping grows.</li>
+    <li><b>Shorten the cavity.</b> At 50 mA, go from 400 to 200 µm: f<sub>r</sub> rises to 5.6 GHz and the bandwidth to 8.4 GHz, but the linewidth almost triples, to 5.9 MHz, because the photons leave sooner.</li>
+    <li><b>Switch off the α-factor.</b> Set α = 0: the linewidth falls from 2.08 to 0.12 MHz, the Schawlow–Townes value, seventeen times narrower (1 + α² = 17).</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>The laser runs at 50 mA with a 19 mA threshold. Roughly what current doubles its relaxation-oscillation frequency?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="f_r grows as the square root of I − I_th, so doubling it needs four times the current above threshold: 19 + 4 × 31 ≈ 143 mA, a little more with gain compression, and beyond this slider's range.">About 143 mA</button>
+      <button type="button" data-why="Twice the current above threshold raises f_r by only √2, to about 6.6 GHz: f_r grows as the square root of I − I_th.">About 81 mA</button>
+      <button type="button" data-why="Doubling the total current gives 2.6 times the current above threshold, so f_r rises by about √2.6 = 1.6, not 2.">100 mA</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -58,6 +71,7 @@
       xt: [[0, '0'], [10e9, '10'], [20e9, '20'], [30e9, '30'], [40e9, '40 GHz']], yt: [[-170, '−170'], [-150, '−150'], [-130, '−130'], [-110, '−110 dB/Hz']] });
     var d4 = BD.setup(q('[data-c="w"]')), f4 = BD.frame(d4, { x: [0.1, 30], y: [0.1, 100], xlog: true, ylog: true, pad: { l: 48, b: 22, t: 26 },
       xt: [[0.1, '0.1'], [1, '1'], [10, '10 mW']], yt: [[0.1, '0.1'], [1, '1'], [10, '10'], [100, '100 MHz']] });
+    BD.pill(q('[data-o="pill"]'), o.below ? 'below threshold' : '', 'bad');
     if (o.below) {
       ['fr', 'f3', 'rin', 'lw'].forEach(function (k) { q('[data-o="' + k + '"]').textContent = '–'; });
       q('[data-o="cap"]').innerHTML = 'Below threshold (' + (o.Ith * 1e3).toFixed(1) + ' mA for this length): raise the bias.'; return;

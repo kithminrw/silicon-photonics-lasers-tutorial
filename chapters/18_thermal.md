@@ -125,7 +125,7 @@ A 7.2 µm ring has an FSR of 13.7 nm (rib, $$n_g = 3.89$$). With $$2P_\pi = 52$$
 
 </div>
 
-**Try it.** Lock a drop ring to its laser while the room temperature swings; push the room past the lock range, or set the cold ring too far from the laser.
+**Try it.** Lock a drop ring to its laser while the room temperature swings.
 
 {% include demos/lock.html %}
 

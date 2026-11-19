@@ -9,21 +9,36 @@
     <label class="bd-sl"><span>phase shifter on the long arm <b data-v="ph"></b></span><input type="range" data-k="ph" min="0" max="2" step="0.01" value="0" aria-label="phase shift"></label>
     <label class="bd-sl"><span>waveguide loss <b data-v="a"></b></span><input type="range" data-k="a" min="0" max="20" step="0.1" value="3" aria-label="loss"></label>
   </div>
-  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top view (glow ∝ power at 1550 nm)</span></div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag" data-o="tag">field (red +, blue −), top view</span></div>
+  <div class="bd-status"><span data-o="fst"></span></div>
   <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">transmission against wavelength</span></div>
-  <div class="bd-read" aria-live="polite"><span>FSR <b data-o="fsr">–</b></span><span>extinction (bar port) <b data-o="er">–</b></span><span>n<sub>g</sub> <b>4.18</b></span><span>excess loss <b data-o="il">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>FSR <b data-o="fsr">–</b></span><span>extinction (bar port) <b data-o="er">–</b></span><span>n<sub>g</sub> <b>4.18</b></span><span>excess loss <b data-o="il">–</b></span><span class="bd-pill ok" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Build a switch.</b> Set ΔL to 0: the arms are balanced and all the light leaves by the cross port. Raise the heater to 1.00π and it moves to the bar port; at 0.50π it splits 50/50.</li>
+    <li><b>Set the FSR.</b> ΔL = 100 µm gives fringes 5.75 nm apart, as in Worked Example 11.2. Shorten it to 90 µm for the 6.4 nm of an interleaver.</li>
+    <li><b>Unbalance a splitter.</b> Set the second splitter to 55 % and switch to the dB scale: the nulls fill in and the extinction falls to about 26 dB, as in Worked Example 11.1.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>The first splitter sends 45 % to the lower arm and the second 55 %. Which output still has deep nulls?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="The bar port's two paths carry t1t2 and κ1κ2, which are equal when κ1² + κ2² = 1, so they still cancel; set both splitters and read the bar-port extinction.">The bar port</button>
+      <button type="button" data-why="The cross port's two paths carry t1κ2 and κ1t2, which are equal only when the two splitters are the same; at 45 and 55 % its nulls fill in.">The cross port</button>
+      <button type="button" data-why="Unequal splitters do not always spoil the nulls: the bar port cancels whenever κ1² + κ2² = 1, the cross port whenever κ1² = κ2².">Neither: unequal splitters fill both</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
   var root = document.getElementById('bdMzi'); if (!root || !window.BD) return;
-  var q = function (s) { return root.querySelector(s); }, db = false;
+  var q = function (s) { return root.querySelector(s); }, db = false, nfr = 0;
   var neff0 = 2.446, ng = 4.18, lam0 = 1.55, L0 = 200;   // um; L0 = length of the short arm
   var S = BD.bind(root, {
     dL: { fmt: function (x) { return x.toFixed(1) + ' µm'; } }, k1: { fmt: function (x) { return (100 * x).toFixed(1) + ' %'; } },
     k2: { fmt: function (x) { return (100 * x).toFixed(1) + ' %'; } }, ph: { fmt: function (x) { return x.toFixed(2) + 'π'; } },
     a: { fmt: function (x) { return x.toFixed(1) + ' dB/cm'; } }
   }, function () { draw(); });
+  var FV = BD.field(q('[data-c="g"]'), { button: q('.bd-status'), hz: 1.1 });
   BD.seg(root, 'port', function (v) { db = v === 'db'; draw(); });
   // returns [bar, cross] power for input at port 1; couplers [[t, -jk], [-jk, t]]
   function mzi(lam) {
@@ -50,61 +65,135 @@
     BD.line(f, xs, b.map(tr), BD.C.gold, 1.6);
     // the legend above the plot's top-right corner, off the fringes (dense on a narrow panel)
     var wcr = dv.g.measureText('cross').width; BD.label(dv.g, 'cross', dv.w - f.p.r, f.p.t - 6, BD.C.blue, 'right'); BD.label(dv.g, 'bar', dv.w - f.p.r - wcr - 8, f.p.t - 6, BD.C.gold, 'right');
-    // ---- geometry: top view. Waveguides have one width; the warm glow underneath shows the power at 1550 nm.
+    // ---- the optical field at 1550 nm in the top view, from the same matrices: each coupler turns the pair of amplitudes
+    // gradually (coupled-mode rotation to t, -j kappa), the arms multiply by a e^{-j phi}; the lower arm's extra phase is
+    // beta dL + the heater's phase, so the two arms meet the second coupler with the model's phase difference
     (function () {
-      var dg = BD.setup(q('[data-c="g"]')), g = dg.g, roomy = dg.w > 520;
-      var Lst = 14, Lb = 24, Lc = 18, sep = 26, D = S.dL / 2, wl = 26;                    // um: stubs, bends, coupler, arm spacing, loop width
-      var xi = Lst, xa = xi + 2 * Lb + Lc, xb = xa + L0, xc = xb + 2 * Lb + Lc, Xt = xc + Lst;
-      var top = 34, bot = dg.h - 26, padR = roomy ? 96 : 70, sx = (dg.w - 16 - padR) / Xt;
-      var sy = Math.min(sx, (bot - top) / (sep + D + 4)), k = sy / sx, wPx = 2.6, rPx = Math.min(7 * sx, 7 * sy) + 3;
-      var X = function (x) { return 8 + x * sx; }, Y = function (y) { return top + (sep / 2 + 2 - y) * sy; };
-      var yC = Math.max(1.1 * sy, (wPx + 3) / 2);                                          // half centre spacing in the couplers (px)
-      var r = mzi(lam0), pu = 1 - S.k1, pl = S.k1, xm = (xa + xb) / 2;
-      // a coupler: S-bends in, straight section, S-bends out; returns [upper-in, upper-out, lower-in, lower-out] point lists
-      function coupler(x0) {
-        var out = [];
-        [1, -1].forEach(function (sg) {
-          var yo = Y(sg * sep / 2), yi = Y(0) - sg * yC, xmid = X(x0 + Lb + Lc / 2);
-          var inn = BD.sbend(X(x0), yo, X(x0 + Lb), yi, 20).concat([[xmid, yi]]);
-          var outp = [[xmid, yi], [X(x0 + Lb + Lc), yi]].concat(BD.sbend(X(x0 + Lb + Lc), yi, X(x0 + 2 * Lb + Lc), yo, 20));
-          out.push(inn, outp);
-        });
+      var cv = q('[data-c="g"]'), Wc = cv.clientWidth, roomy = Wc > 520;
+      cv.style.height = (roomy ? 240 : 250) + 'px';
+      var H = cv.clientHeight, Lst = 14, Lb = 24, Lc = 18, sep = 26, D = S.dL / 2, wl = 26, yCu = 0.35;   // um: stubs, bends, coupler, arm spacing, loop width, half spacing in the coupler
+      var xi = Lst, xa = xi + 2 * Lb + Lc, xb = xa + L0, xc = xb + 2 * Lb + Lc, Xt = xc + Lst, xm = (xa + xb) / 2;
+      var top = 40, bot = H - 26, padR = roomy ? 96 : 70, sx = (Wc - 16 - padR) / Xt;
+      var sy = Math.min(3 * sx, (bot - top) / (sep + D + 4)), k = sy / sx, hw = 3.2, yCp = hw + 3;   // px: guide half-width, half spacing in the couplers
+      var X = function (x) { return 8 + x * sx; }, Yl = function (y) { return top + (sep / 2 + 2 - y) * sy; }, y0 = Yl(0);
+      var Y = function (y) {   // lateral position: to scale (x k) at the arms and below, the couplers' gap opened up to stay visible
+        var a = Math.abs(y); if (a >= sep / 2) return Yl(y);
+        return y0 - (y < 0 ? -1 : 1) * (yCp + (a - yCu) / (sep / 2 - yCu) * (sep / 2 * sy - yCp));
+      };
+      var r = mzi(lam0), neff = neff0, beta = 2 * Math.PI * neff / lam0, alpha = S.a / 4.343 * 1e-4 / 2;
+      var t1 = Math.sqrt(1 - S.k1), c1 = Math.sqrt(S.k1), t2 = Math.sqrt(1 - S.k2), c2 = Math.sqrt(S.k2);
+      var a1 = Math.exp(-alpha * L0), a2 = Math.exp(-alpha * (L0 + S.dL));
+      var cr = BD.crests(lam0 / neff * sx, 6), bd = beta / cr.n;   // display phase per um of path
+      // one guide's path in um: [x, y, part] with part 0 input stub, 1 coupler 1, 2 arm, 3 coupler 2, 4 output stub
+      function cosb(xs0, ys0, xs1, ys1, part, out) { for (var n = 1; n <= 24; n++) { var t = n / 24; out.push([xs0 + (xs1 - xs0) * t, ys0 + (ys1 - ys0) * (1 - Math.cos(Math.PI * t)) / 2, part]); } }
+      function coupler(x0, sg, part, out) {
+        cosb(x0, sg * sep / 2, x0 + Lb, sg * yCu, part, out);
+        for (var n = 1; n <= 6; n++) out.push([x0 + Lb + Lc * n / 6, sg * yCu, part]);
+        cosb(x0 + Lb + Lc, sg * yCu, x0 + 2 * Lb + Lc, sg * sep / 2, part, out);
+      }
+      function arc(cx, cy, rr, a0, a1, part, out) { for (var n = 1; n <= 8; n++) { var an = a0 + (a1 - a0) * n / 8; out.push([cx + rr * Math.cos(an), cy + rr * Math.sin(an), part]); } }
+      function path(sg) {
+        var o = [[-8 / sx, sg * sep / 2, 0], [xi, sg * sep / 2, 0]], ya = sg * sep / 2, n;
+        coupler(xi, sg, 1, o);
+        if (sg < 0) o.push([hxa, ya, 2], [hxb, ya, 2]);   // the heater's ends
+        if (sg < 0 && D > 0.5) {   // the delay loop, its corners rounded
+          var rr = Math.min(4, D / 2.5, wl / 4), xl = xm - wl / 2, xr = xm + wl / 2, yb = ya - D, h = Math.PI / 2;
+          o.push([xl - rr, ya, 2]); arc(xl - rr, ya - rr, rr, h, 0, 2, o);
+          o.push([xl, yb + rr, 2]); arc(xl + rr, yb + rr, rr, Math.PI, 3 * h, 2, o);
+          o.push([xr - rr, yb, 2]); arc(xr - rr, yb + rr, rr, 3 * h, 2 * Math.PI, 2, o);
+          o.push([xr, ya - rr, 2]); arc(xr + rr, ya - rr, rr, Math.PI, h, 2, o);
+        }
+        for (n = 1; n <= 4; n++) { var xx = xa + (xb - xa) * n / 4; if (xx > (sg < 0 && D > 0.5 ? xm + wl / 2 + 4 : hxb)) o.push([xx, ya, 2]); }
+        coupler(xb, sg, 3, o);
+        o.push([Xt, ya, 4]);
+        var s = [0];
+        for (n = 1; n < o.length; n++) s.push(s[n - 1] + Math.hypot(o[n][0] - o[n - 1][0], o[n][1] - o[n - 1][1]));
+        return { p: o, s: s, px: o.map(function (v) { return [X(v[0]), Y(v[1])]; }) };
+      }
+      var hxa = xa + 10, hxb = Math.min(xm - wl / 2 - 6, xa + 70), U = path(1), Lo = path(-1);
+      // coupling turned on where the guides are close: weight e^{-2 gamma (|y| - yCu)} (the Chapter 9 gap law), integrated along the coupler
+      function theta(P, part, th) {
+        var w = [], tot = 0, i0 = -1, n;
+        for (n = 0; n < P.p.length; n++) if (P.p[n][2] === part) { if (i0 < 0) i0 = n - 1; }
+        var idx = []; for (n = i0; n < P.p.length && (n === i0 || P.p[n][2] === part); n++) idx.push(n);
+        for (n = 0; n < idx.length; n++) w.push(Math.exp(-17.5 * (Math.abs(P.p[idx[n]][1]) - yCu)));
+        var out = {}, cum = 0; out[idx[0]] = 0;
+        for (n = 1; n < idx.length; n++) { cum += (w[n] + w[n - 1]) / 2 * (P.s[idx[n]] - P.s[idx[n - 1]]); out[idx[n]] = cum; }
+        for (n = 0; n < idx.length; n++) out[idx[n]] = th * out[idx[n]] / cum;
         return out;
       }
-      var c1 = coupler(xi), c2 = coupler(xb);
-      var loopPts = D > 0.5 ? [[X(xa), Y(-sep / 2)], [X(xm - wl / 2), Y(-sep / 2)], [X(xm - wl / 2), Y(-sep / 2 - D)], [X(xm + wl / 2), Y(-sep / 2 - D)], [X(xm + wl / 2), Y(-sep / 2)], [X(xb), Y(-sep / 2)]]
-                            : [[X(xa), Y(-sep / 2)], [X(xb), Y(-sep / 2)]];
-      var paths = [   // [points, power]
-        [[[X(0), Y(sep / 2)], [X(xi), Y(sep / 2)]], 1], [[[X(0), Y(-sep / 2)], [X(xi), Y(-sep / 2)]], 0],
-        [c1[0], 1], [c1[1], pu], [c1[2], 0], [c1[3], pl],
-        [[[X(xa), Y(sep / 2)], [X(xb), Y(sep / 2)]], pu], [loopPts, pl],
-        [c2[0], pu], [c2[1], r[0]], [c2[2], pl], [c2[3], r[1]],
-        [[[X(xc), Y(sep / 2)], [X(Xt), Y(sep / 2)]], r[0]], [[[X(xc), Y(-sep / 2)], [X(Xt), Y(-sep / 2)]], r[1]]
-      ];
-      paths.forEach(function (pp) { BD.glow(g, pp[0], pp[1], rPx); });
-      paths.forEach(function (pp) { BD.wgr(g, pp[0], wPx, BD.GEO.si, rPx); });
-      // heater (TiN strip with two contact pads) on the straight part of the long arm
-      var hx0 = X(xa + 10), hx1 = X(Math.min(xm - wl / 2 - 6, xa + 70)), hy = Y(-sep / 2), heat = 0.3 + 0.65 * (S.ph % 2) / 2;
-      g.fillStyle = 'rgba(224,138,58,' + heat.toFixed(2) + ')'; g.fillRect(hx0, hy - 4, hx1 - hx0, 8);
-      g.fillStyle = BD.GEO.metal; g.fillRect(hx0 - 4, hy + 6, 8, 8); g.fillRect(hx1 - 4, hy + 6, 8, 8);
-      g.strokeStyle = BD.GEO.metal; g.beginPath(); g.moveTo(hx0, hy + 4); g.lineTo(hx0, hy + 6); g.moveTo(hx1, hy + 4); g.lineTo(hx1, hy + 6); g.stroke();
-      // labels
-      BD.label(g, 'in', X(0), Y(sep / 2) - 7, BD.C.white);
-      if (roomy) {
-        BD.label(g, 'κ² ' + (100 * S.k1).toFixed(0) + ' %', X(xi + Lb + Lc / 2), Y(-sep / 2) + 16, BD.C.axis, 'center');
-        BD.label(g, 'κ² ' + (100 * S.k2).toFixed(0) + ' %', X(xb + Lb + Lc / 2), Y(-sep / 2) + 16, BD.C.axis, 'center');
+      var th1 = Math.asin(c1), th2 = Math.asin(c2), T1u = theta(U, 1, th1), T1l = theta(Lo, 1, th1), T2u = theta(U, 3, th2), T2l = theta(Lo, 3, th2);
+      // arm extents (drawn path lengths) and the heater span on the lower arm
+      function armEnds(P) { var i0 = -1, i1 = -1; for (var n = 0; n < P.p.length; n++) if (P.p[n][2] === 2) { if (i0 < 0) i0 = n - 1; i1 = n; } return [P.s[i0], P.s[i1]]; }
+      var eU = armEnds(U), eL = armEnds(Lo);
+      var dlt = beta * S.dL - bd * ((eL[1] - eL[0]) - (eU[1] - eU[0]));
+      dlt = dlt - 2 * Math.PI * Math.round(dlt / (2 * Math.PI));   // the true extra phase beta dL, less what the drawn crests already carry
+      var sh0 = eL[0] + hxa - xa, sh1 = eL[0] + hxb - xa;   // the heater along the lower guide's path (on its first straight)
+      var phL = function (n) {   // display phase along the lower guide: carrier, the rest of beta dL spread over the arm, the heater's phase across the heater
+        var s = Lo.s[n], g = Math.min(1, Math.max(0, (s - eL[0]) / (eL[1] - eL[0]))), hh = Math.min(1, Math.max(0, (s - sh0) / (sh1 - sh0)));
+        return bd * s + dlt * g + Math.PI * S.ph * hh;
+      };
+      var dP = bd * (eL[1] - eU[1]) + dlt + Math.PI * S.ph;   // lower minus upper display phase at the second coupler (eU, eL start equal)
+      var eR = Math.cos(dP), eI = Math.sin(dP);
+      var Uu = [t1 * a1, 0], Ll = [0, -c1 * a2];
+      function ampU(n) {
+        var v = U.p[n], part = v[2], f;
+        if (part === 0) return [1, 0];
+        if (part === 1) return [Math.cos(T1u[n]), 0];
+        if (part === 2) { f = (U.s[n] - eU[0]) / (eU[1] - eU[0]); return [t1 * Math.pow(a1, f), 0]; }
+        var th = part === 3 ? T2u[n] : th2, cs = Math.cos(th), sn = Math.sin(th);
+        // cos(th) U - j sin(th) L e^{-j dP}
+        var lr = Ll[0] * eR + Ll[1] * eI, li = Ll[1] * eR - Ll[0] * eI;
+        return [cs * Uu[0] + sn * li, cs * Uu[1] - sn * lr];
       }
-      BD.label(g, 'bar ' + (100 * r[0]).toFixed(0) + ' %', X(Xt) + 6, Y(sep / 2) + 3, BD.C.gold);
-      BD.label(g, 'cross ' + (100 * r[1]).toFixed(0) + ' %', X(Xt) + 6, Y(-sep / 2) + 3, BD.C.blue);
-      if (roomy) {
-        BD.label(g, 'arm L = ' + L0 + ' µm', X(xm), Y(sep / 2) - 8, BD.C.axis, 'center');
-        BD.label(g, 'heater ' + S.ph.toFixed(2) + 'π', (hx0 + hx1) / 2, hy + 26, BD.C.gold, 'center');
+      function ampL(n) {
+        var v = Lo.p[n], part = v[2], f;
+        if (part === 0) return [0, 0];
+        if (part === 1) return [0, -Math.sin(T1l[n])];
+        if (part === 2) { f = (Lo.s[n] - eL[0]) / (eL[1] - eL[0]); return [0, -c1 * Math.pow(a2, f)]; }
+        var th = part === 3 ? T2l[n] : th2, cs = Math.cos(th), sn = Math.sin(th);
+        // -j sin(th) U e^{+j dP} + cos(th) L
+        var ur = Uu[0] * eR - Uu[1] * eI, ui = Uu[0] * eI + Uu[1] * eR;
+        return [cs * Ll[0] + sn * ui, cs * Ll[1] - sn * ur];
       }
-      if (D > 0.5) BD.dim(g, X(xm + wl / 2) + 12, Y(-sep / 2), X(xm + wl / 2) + 12, Y(-sep / 2 - D), (roomy ? 'ΔL/2 = ' : 'ΔL/2 ') + D.toFixed(roomy ? 1 : 0) + ' µm', BD.C.gold, roomy ? -46 : -30);
-      BD.scalebar(g, dg.w - padR + 4, dg.h - 8, sx, 60);
-      // beside the panel tag, or under it when the tag reaches that far
-      var vl = 'vertical ×' + k.toFixed(2), tagEl = q('[data-c="g"]').parentElement.querySelector('.bd-tag'), tagR = tagEl ? tagEl.offsetLeft + tagEl.offsetWidth : 0;
-      if (k < 0.98) BD.label(g, vl, dg.w - 8, dg.w - 8 - g.measureText(vl).width > tagR + 6 ? 14 : 28, BD.C.dim, 'right');
+      var dec = Math.max(1.4, lam0 / (2 * Math.PI * Math.sqrt(neff * neff - 1.444 * 1.444)) * sy);
+      FV.grid(0, top - 14, Wc, bot - top + 28);
+      FV.guide(U.px, { half: hw, decay: dec, amp: ampU, phase: function (n) { return bd * U.s[n]; } });
+      FV.guide(Lo.px, { half: hw, decay: dec, amp: ampL, phase: phL });
+      q('[data-o="tag"]').textContent = cr.n > 1 ? 'field (red +, blue −) · ' + cr.note : 'field (red +, blue −), top view';
+      var st = [];
+      if (Math.abs(k - 1) > 0.02) st.push('vertical ×' + k.toFixed(2));
+      st.push('widths and coupler gaps not to scale');
+      if (cr.n > 1) st.push('crests drawn 1 per ' + cr.n + ' λ');
+      st.push('coupled-mode field at 1550 nm, not a full-wave solve');
+      var fst = q('[data-o="fst"]'), stTxt = st.join(' · '), msTxt = function () { return FV.ms ? ' · frame ' + FV.ms.toFixed(1) + ' ms' : ''; };
+      fst.textContent = stTxt + msTxt();
+      var hx0 = X(hxa), hx1 = X(hxb), hy = Y(-sep / 2), heat = 0.15 + 0.5 * (S.ph % 2) / 2;
+      FV.overlay = function (g) {
+        BD.edges(g, U.px, hw); BD.edges(g, Lo.px, hw);
+        // heater (TiN strip with two contact pads) over the straight part of the long arm
+        g.fillStyle = 'rgba(224,138,58,' + heat.toFixed(2) + ')'; g.fillRect(hx0, hy - hw - 3, hx1 - hx0, 2 * hw + 6);
+        g.strokeStyle = 'rgba(224,138,58,.85)'; g.strokeRect(hx0, hy - hw - 3, hx1 - hx0, 2 * hw + 6);
+        g.fillStyle = BD.GEO.metal; g.fillRect(hx0 - 4, hy + hw + 6, 8, 8); g.fillRect(hx1 - 4, hy + hw + 6, 8, 8);
+        g.strokeStyle = BD.GEO.metal; g.beginPath(); g.moveTo(hx0, hy + hw + 3); g.lineTo(hx0, hy + hw + 6); g.moveTo(hx1, hy + hw + 3); g.lineTo(hx1, hy + hw + 6); g.stroke();
+        BD.label(g, 'in', X(0), Y(sep / 2) - 8, BD.C.white);
+        if (roomy) {
+          BD.label(g, 'κ² ' + (100 * S.k1).toFixed(0) + ' %', X(xi + Lb + Lc / 2), Y(-sep / 2) + 16, BD.C.axis, 'center');
+          BD.label(g, 'κ² ' + (100 * S.k2).toFixed(0) + ' %', X(xb + Lb + Lc / 2), Y(-sep / 2) + 16, BD.C.axis, 'center');
+        }
+        BD.label(g, 'bar ' + (100 * r[0]).toFixed(0) + ' %', X(Xt) + 6, Y(sep / 2) + 3, BD.C.gold);
+        BD.label(g, 'cross ' + (100 * r[1]).toFixed(0) + ' %', X(Xt) + 6, Y(-sep / 2) + 3, BD.C.blue);
+        if (roomy) {
+          BD.label(g, 'arm L = ' + L0 + ' µm', X(xm), Y(sep / 2) - 9, BD.C.axis, 'center');
+          BD.label(g, 'heater ' + S.ph.toFixed(2) + 'π', (hx0 + hx1) / 2, hy + hw + 26, BD.C.gold, 'center');
+        }
+        if (D > 0.5) BD.dim(g, X(xm + wl / 2) + 12, Y(-sep / 2), X(xm + wl / 2) + 12, Y(-sep / 2 - D), (roomy ? 'ΔL/2 = ' : 'ΔL/2 ') + D.toFixed(roomy ? 1 : 0) + ' µm', BD.C.gold, roomy ? -46 : -30);
+        BD.scalebar(g, Wc - padR + 4, H - 8, sx, 60);
+        if (++nfr % 30 === 0) fst.textContent = stTxt + msTxt();
+      };
+      FV.render();
+      var tb = r[0] / (r[0] + r[1]);
+      BD.pill(q('[data-o="pill"]'), tb > 0.95 ? 'bar' : tb < 0.05 ? 'cross' : Math.abs(tb - 0.5) < 0.05 ? '50/50' : '', 'ok');
     })();
     var fsr = S.dL > 0 ? lam0 * lam0 / (ng * S.dL) : Infinity;
     q('[data-o="fsr"]').textContent = isFinite(fsr) ? (1000 * fsr).toFixed(2) + ' nm' : '∞ (balanced)';

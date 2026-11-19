@@ -59,7 +59,7 @@ $$T(\phi) = \frac{a^2 - 2at\cos\phi + t^2}{1 - 2at\cos\phi + (at)^2}$$
 
 Off resonance $$T \approx 1$$; on resonance ($$\phi = 2\pi m$$) it dips to $$T_\mathrm{min} = (a - t)^2/(1 - at)^2$$. The dip reaches zero when $$t = a$$, **critical coupling**: the light coupled back out of the ring then exactly cancels the light that passed by, because the coupler's loss of transmission equals the ring's loss per round trip. For $$t > a$$ the ring is **under-coupled** (it loses more than it couples, giving a narrow, shallow dip); for $$t < a$$ it is **over-coupled** (a broad, shallow dip).
 
-**Try it.** Change the radius, gap and loss; the top view shows the ring to scale, with a magnified inset of the gap.
+**Try it.** Change the radius, gap and loss, and tune the laser across a resonance to watch the light build up in the ring.
 
 {% include demos/ring.html %}
 

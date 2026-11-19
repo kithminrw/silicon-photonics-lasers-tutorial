@@ -14,8 +14,21 @@
     <div class="bd-scope tall"><canvas data-c="m" aria-hidden="true"></canvas><span class="bd-tag">tuning map: lasing λ against the two heaters</span></div>
     <div class="bd-scope tall"><canvas data-c="z" aria-hidden="true"></canvas><span class="bd-tag">zoom: filter peak and cavity modes</span></div>
   </div>
-  <div class="bd-read" aria-live="polite"><span>FSR<sub>1</sub> / FSR<sub>2</sub> <b data-o="f">–</b></span><span>Vernier FSR <b data-o="v">–</b></span><span>lasing at <b data-o="l">–</b></span><span>next-best supermode <b data-o="s">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>FSR<sub>1</sub> / FSR<sub>2</sub> <b data-o="f">–</b></span><span>Vernier FSR <b data-o="v">–</b></span><span>lasing at <b data-o="l">–</b></span><span>next-best supermode <b data-o="s">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Step the wavelength.</b> Move ring 2's heater from 0 to 0.20π, a 0.83 nm shift: lasing jumps from 1542.26 to 1551.38 nm, one ring-1 FSR. Halfway, at 0.10π, two supermodes tie.</li>
+    <li><b>Break the Vernier.</b> Set R<sub>2</sub> = 12 µm: the Vernier FSR shrinks to 46 nm, inside the gain window, and the next coincidence is only 1.3 dB weaker. The laser can hop.</li>
+    <li><b>Sharpen the rings.</b> With R<sub>2</sub> back at 11 µm, lower κ² from 15 % to 5 %: the next-best supermode falls from −21 to −40 dB. At 40 % it is only 4.9 dB down.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>With the 10 and 11 µm rings, ring 2's heater shifts its comb by 0.83 nm. How far does the lasing wavelength move?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="0.83 nm is the difference between the two FSRs, so the coincidence moves to the next pair of resonances, one FSR of ring 1 away: a gearing of 11, as in Worked Example 26.1.">About 9.15 nm, one ring FSR</button>
+      <button type="button" data-why="That would be true of one ring alone; with two, the coincidence of the combs moves much further than either comb, a gearing of FSR/ΔFSR = 11.">0.83 nm, the same as the ring</button>
+      <button type="button" data-why="91 nm is the spacing between coincidences, the Vernier FSR; a 0.83 nm shift moves the coincidence by one ring FSR, a tenth of that.">About 91 nm, one Vernier FSR</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -117,6 +130,7 @@
     if (rival > 0.5 * gain(res[0])) cap += '<b>The Vernier FSR is shorter than the gain window</b>: the next coincidence of the two combs sees almost as much gain, so two supermodes compete and the laser can hop between them. Make the radii closer.';
     else if (res[2] / res[1] > 0.5) cap += '<b>A neighbouring supermode is almost as strong</b>: the filter barely discriminates. Lower κ² (narrower ring resonances) or adjust a heater.';
     else cap += 'Tuning one heater makes the wavelength jump by one ring FSR (the coarse steps across the map); tuning both together moves it continuously (the stripes).';
+    BD.pill(q('[data-o="pill"]'), rival > 0.5 * gain(res[0]) ? 'hops' : res[2] / res[1] > 0.5 ? 'marginal' : 'single-mode', rival > 0.5 * gain(res[0]) ? 'bad' : res[2] / res[1] > 0.5 ? 'warn' : 'ok');
     q('[data-o="cap"]').innerHTML = cap;
   }
   BD.observe(root, draw);

@@ -12,8 +12,21 @@
     <div class="bd-scope tall"><canvas data-c="n" aria-hidden="true"></canvas><span class="bd-tag">Δn_eff (×10⁻⁴) against reverse bias</span></div>
     <div class="bd-scope tall"><canvas data-c="p" aria-hidden="true"></canvas><span class="bd-tag">phase shift of the whole length against bias</span></div>
   </div>
-  <div class="bd-read" aria-live="polite"><span>depletion width <b data-o="W">–</b></span><span>V<sub>π</sub>L <b data-o="vpl">–</b></span><span>loss <b data-o="a">–</b></span><span>capacitance <b data-o="C">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>depletion width <b data-o="W">–</b></span><span>V<sub>π</sub>L <b data-o="vpl">–</b></span><span>loss <b data-o="a">–</b></span><span>capacitance <b data-o="C">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Change the doping.</b> At 1.0 × 10¹⁸ cm⁻³ V<sub>π</sub>L improves to 1.11 V·cm, but the loss more than doubles, to 24.8 dB/cm. At 2.0 × 10¹⁷ it is 2.05 V·cm for only 3.4 dB/cm, as in Table 19.1.</li>
+    <li><b>Turn up the bias.</b> At the default doping, 1 V gives 1.24 V·cm, 2 V 1.42 and 4 V 1.73: the depletion region widens only as √(V<sub>bi</sub> + V). The capacitance falls as it widens, from 0.23 to 0.14 fF/µm.</li>
+    <li><b>Reach a π shift.</b> Lengthen the phase shifter to 6 mm and raise the bias to about 2.6 V: the phase passes π, for 6.4 dB of loss.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>Why do modulator junctions put more of the mode in the p-type side?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="At 10¹⁸ cm⁻³ holes lower the index by 2.1 × 10⁻³ against 0.9 × 10⁻³ for electrons, and absorb less: about three times the index change for the same loss (Section 19.1).">Holes change the index about three times more for the same loss</button>
+      <button type="button" data-why="A depletion modulator's speed is set by its RC time, not by the carriers; and holes are in fact the slower carriers.">Holes move faster, so the junction switches sooner</button>
+      <button type="button" data-why="Silicon is centrosymmetric and has no Pockels effect at all; its modulators work only by moving free carriers.">Holes give silicon a Pockels effect</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -79,6 +92,7 @@
     q('[data-o="vpl"]').textContent = isFinite(vpl) ? vpl.toFixed(2) + ' V·cm' : '–';
     q('[data-o="a"]').textContent = lossdB.toFixed(1) + ' dB/cm (' + (lossdB * S.L / 10).toFixed(1) + ' dB)';
     q('[data-o="C"]').textContent = Cfu.toFixed(2) + ' fF/µm';
+    BD.pill(q('[data-o="pill"]'), 2 * dn * S.L * 1e-3 / LAM >= 0.995 ? '180° reached' : '', 'ok');
     var c = 'Reverse bias widens the depletion region, sweeping out holes and electrons where the mode is strongest; fewer carriers means a higher index (Soref–Bennett). ';
     c += 'Holes change the index about three times more than electrons for the same loss, ';
     c += S.xj > 0.02 ? 'and moving the junction towards the N side, as here, puts more of the mode on the P side. ' : 'which is why junctions are often offset towards the N side. ';

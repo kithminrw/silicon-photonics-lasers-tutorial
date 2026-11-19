@@ -14,8 +14,21 @@
     <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">measured spectrum, 1500–1600 nm</span></div>
     <div class="bd-scope tall"><canvas data-c="z" aria-hidden="true"></canvas><span class="bd-tag">zoom on one resonance near 1550 nm</span></div>
   </div>
-  <div class="bd-read" aria-live="polite"><span>peak power received <b data-o="pk">–</b></span><span>noise floor <b data-o="nf">–</b></span><span>fringe ripple <b data-o="rp">–</b></span><span>measured extinction <b data-o="er">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>peak power received <b data-o="pk">–</b></span><span>noise floor <b data-o="nf">–</b></span><span>fringe ripple <b data-o="rp">–</b></span><span>measured extinction <b data-o="er">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Twist the polarisation.</b> Raise the error from 10° to 45°: only cos² of the light couples into the TE grating, so the peak falls from −9.0 to −11.9 dBm.</li>
+    <li><b>Add reflections.</b> Set the coupler reflection to −12 dB: the fringe ripple grows from 0.17 to 1.10 dB peak to peak, enough to pass for a shallow resonance. At −30 dB it is 0.02 dB.</li>
+    <li><b>Calibrate.</b> Switch to the loopback-calibrated view: the coupler envelope is gone and the dips sit on 0 dB. Averaging 16 sweeps lowers the noise floor from −75 to −81 dBm.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>Dividing the device&#39;s spectrum by the loopback removes most of the setup. What does it not remove?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="The loopback is a separate pair of couplers; fabrication variation and fibre position make them differ from the device&#39;s by a few tenths of a decibel, and noise is not repeatable.">Noise, and any difference between the two paths&#39; couplers</button>
+      <button type="button" data-why="That is exactly what the loopback removes: the same two couplers&#39; passbands multiply both spectra.">The grating couplers&#39; envelope</button>
+      <button type="button" data-why="The same laser sweep feeds both measurements, so its variation divides out with the couplers.">The laser&#39;s power against wavelength</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -78,6 +91,7 @@
     q('[data-o="nf"]').textContent = (FLOOR - 5 * Math.log10(S.n)).toFixed(0) + ' dBm';
     q('[data-o="rp"]').textContent = rip.toFixed(2) + ' dB p-p';
     q('[data-o="er"]').textContent = (zmax - zmin).toFixed(1) + ' dB';
+    BD.pill(q('[data-o="pill"]'), S.pol > 25 ? 'polarisation off' : S.r > -18 ? 'fringes' : vw === 'cal' ? 'calibrated' : '', S.pol > 25 || S.r > -18 ? 'warn' : 'ok');
     var c = 'The raw spectrum is the device response multiplied by two grating-coupler envelopes (−4.5 dB each, 30 nm 1 dB bandwidth), Fabry–Pérot fringes between the couplers, and a polarisation factor; at the edges of the band the signal sinks towards the detector\'s noise floor. ';
     if (vw === 'cal') c += 'Dividing by the loopback, measured on the same chip, removes the couplers\' envelope and leaves the ring\'s own response; what the loopback cannot remove is noise and any difference between the two paths. ';
     if (S.pol > 25) c += '<b>The polarisation is off:</b> only cos² of the light couples into the TE grating, so the whole spectrum drops by ' + (-10 * Math.log10(Math.pow(Math.cos(S.pol * Math.PI / 180), 2))).toFixed(1) + ' dB; set the polarisation controller for maximum power first. ';

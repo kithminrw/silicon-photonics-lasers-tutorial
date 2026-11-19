@@ -7,19 +7,34 @@
     <label class="bd-sl"><span>small-signal modal gain Γg₀ (drive) <b data-v="g"></b></span><input type="range" data-k="g" min="5" max="60" step="0.5" value="35" aria-label="modal gain"></label>
     <label class="bd-sl"><span>saturation power <b data-v="ps"></b></span><input type="range" data-k="ps" min="3" max="40" step="0.5" value="12" aria-label="saturation power"></label>
   </div>
-  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top view to scale, width stretched</span></div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag" data-o="tag">amplified wave (red +, blue −), top view</span></div>
+  <div class="bd-status"><span data-o="fst"></span></div>
   <div class="bd-row">
     <div class="bd-scope tall"><canvas data-c="c" aria-hidden="true"></canvas><span class="bd-tag">gain against output power</span></div>
     <div class="bd-scope tall"><canvas data-c="z" aria-hidden="true"></canvas><span class="bd-tag">power and local gain along the amplifier</span></div>
   </div>
-  <div class="bd-read" aria-live="polite"><span>small-signal gain <b data-o="g0">–</b></span><span>gain now <b data-o="gn">–</b></span><span>output power at −3 dB <b data-o="psat">–</b></span><span>noise figure <b data-o="nf">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>small-signal gain <b data-o="g0">–</b></span><span>gain now <b data-o="gn">–</b></span><span>output power at −3 dB <b data-o="psat">–</b></span><span>noise figure <b data-o="nf">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Saturate it.</b> Raise the input from −15 to −1.3 dBm: the gain falls by 3 dB, to 10.0 dB, with 8.7 dBm out, as in Worked Example 28.1. Towards the output the crests grow more slowly: the gain is saturating there.</li>
+    <li><b>Make it longer.</b> Back at −15 dBm, double the length to 2 mm: the small-signal gain doubles in decibels, to 26.1 dB, but the −3 dB output power stays near 8.3 dBm.</li>
+    <li><b>Raise the saturation power.</b> At 1 mm, go from 12 to 24 mW: the −3 dB output power rises by 3 dB, to 11.7 dBm, while the small-signal gain stays at 13.0 dB.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>Why does doubling the length of an SOA hardly change its −3 dB output power?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="The power is highest at the output end, so that is where the gain saturates first; a longer amplifier only reaches the same saturated output from a smaller input. Raising P_sat is what moves it.">Saturation is set at the output end, where the power is highest</button>
+      <button type="button" data-why="The small-signal gain does change, from 13.0 to 26.1 dB; it is the output power at which the gain compresses that stays put.">Because the small-signal gain does not change either</button>
+      <button type="button" data-why="Internal loss grows with length but is small here (5 /cm against 35 /cm of gain); the output saturation comes from the carriers at the output end.">Because the extra length adds only loss</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
   var root = document.getElementById('bdSoa'); if (!root || !window.BD) return;
   var q = function (s) { return root.querySelector(s); };
   var AI = 5, NSP = 2, NZ = 200;   // internal loss (1/cm), population-inversion factor
+  var FV = BD.field(q('[data-c="g"]'), { button: q('.bd-status'), hz: 1 }), nfr = 0;
   var S = BD.bind(root, { pin: { fmt: function (x) { return x.toFixed(1) + ' dBm'; } }, L: { fmt: function (x) { return x.toFixed(0) + ' µm'; } },
     g: { fmt: function (x) { return x.toFixed(1) + ' /cm'; } }, ps: { fmt: function (x) { return x.toFixed(1) + ' mW'; } } }, function () { draw(); });
   function run(PinmW) {   // integrate dP/dz = (G0/(1+P/Ps) - ai) P along the length
@@ -37,22 +52,30 @@
     var lo = -40, hi = 25; for (var it = 0; it < 50; it++) { var m = (lo + hi) / 2, pp = Math.pow(10, m / 10); if (run(pp).out / pp > G0 / 2) lo = m; else hi = m; }
     var p3 = Math.pow(10, lo / 10) * G0 / 2;
     var gav = S.g, nf = 10 * Math.log10(2 * NSP * (G - 1) / G * gav / Math.max(0.1, gav - AI));
-    // ---- geometry: angled SOA, power along it
+    // ---- geometry: angled SOA, and the guided wave along it with an amplitude √P(z) from the same integration
     (function () {
-      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, x0 = 70, sc = (dv.w - 150) / 2000, len = S.L * sc, cy = dv.h / 2 + 4, tilt = Math.tan(8 * Math.PI / 180) * 8;
-      g.fillStyle = BD.GEO.ox; g.fillRect(0, 18, dv.w, dv.h - 18);
-      var pmax = Math.max.apply(null, r.Ps);
-      for (var i = 0; i < NZ; i++) {
-        var xa = x0 + r.zs[i] * sc, xb = x0 + r.zs[i + 1] * sc, a = 0.15 + 0.8 * r.Ps[i] / pmax;
-        g.fillStyle = 'rgba(255,214,120,' + a.toFixed(3) + ')'; g.fillRect(xa, cy - 5 - tilt * (r.zs[i] / S.L - 0.5), xb - xa + 0.6, 10);
-      }
-      g.strokeStyle = BD.C.white; g.strokeRect(x0, cy - 7 - tilt * 0.5, len, 14 + tilt);
-      g.strokeStyle = 'rgba(255,255,255,.7)'; g.lineWidth = 2;
-      g.beginPath(); g.moveTo(x0 - 4, cy - 14); g.lineTo(x0 + 4, cy + 14); g.stroke(); g.beginPath(); g.moveTo(x0 + len - 4, cy - 14); g.lineTo(x0 + len + 4, cy + 14); g.stroke(); g.lineWidth = 1;
-      BD.label(g, 'in ' + S.pin.toFixed(1) + ' dBm', 6, cy + 4, BD.C.axis); BD.label(g, 'out ' + (10 * Math.log10(r.out)).toFixed(1) + ' dBm', x0 + len + 10, cy + 4, BD.C.gold);
-      BD.label(g, 'angled, AR-coated facets', x0 + len / 2, cy - 18, BD.C.dim, 'center');
-      BD.label(g, '0', x0, dv.h - 4, BD.C.dim); BD.label(g, '2 mm', x0 + 2000 * sc, dv.h - 4, BD.C.dim, 'right');
-      g.strokeStyle = BD.C.dim; g.beginPath(); g.moveTo(x0, dv.h - 14); g.lineTo(x0 + 2000 * sc, dv.h - 14); g.stroke();
+      var cv = q('[data-c="g"]'), W = cv.clientWidth, H = cv.clientHeight, x0 = 70, sc = (W - 150) / 2000, len = S.L * sc, cy = H / 2 + 4, tilt = Math.tan(8 * Math.PI / 180) * 8;
+      var pmax = Math.max.apply(null, r.Ps), NPH = 3.6, cr = BD.crests(1.55 / NPH * sc, 6), bd = 2 * Math.PI / (cr.n * 1.55 / NPH), pts = [], amp = [];   // display β, rad/µm
+      for (var i = 0; i <= NZ; i += 5) { pts.push([x0 + r.zs[i] * sc, cy - tilt * (r.zs[i] / S.L - 0.5)]); amp.push(Math.sqrt(r.Ps[i] / pmax)); }
+      FV.grid(x0, cy - 16, len, 32);
+      FV.guide(pts, { half: 4, decay: 3, phase: function (n) { return bd * r.zs[5 * n]; }, amp: function (n) { return [amp[n], 0]; } });
+      q('[data-o="tag"]').textContent = cr.n > 1 ? 'amplified wave (red +, blue −) · ' + cr.note : 'amplified wave (red +, blue −), top view';
+      var st = ['guided wave with amplitude √P(z) from the saturating gain equation', 'width stretched'];
+      if (cr.n > 1) st.push('1 crest per ' + cr.n + ' λ (real ones ' + (1.55 / NPH * sc).toFixed(2) + ' px apart)');
+      var fst = q('[data-o="fst"]'), stTxt = st.join(' · '), msTxt = function () { return FV.ms ? ' · frame ' + FV.ms.toFixed(1) + ' ms' : ''; };
+      fst.textContent = stTxt + msTxt();
+      FV.overlay = function (g) {
+        g.fillStyle = 'rgba(160,200,240,.06)'; g.fillRect(0, 18, W, H - 18);
+        g.strokeStyle = BD.C.white; g.strokeRect(x0, cy - 7 - tilt * 0.5, len, 14 + tilt);
+        g.strokeStyle = 'rgba(255,255,255,.7)'; g.lineWidth = 2;
+        g.beginPath(); g.moveTo(x0 - 4, cy - 14); g.lineTo(x0 + 4, cy + 14); g.stroke(); g.beginPath(); g.moveTo(x0 + len - 4, cy - 14); g.lineTo(x0 + len + 4, cy + 14); g.stroke(); g.lineWidth = 1;
+        BD.label(g, 'in ' + S.pin.toFixed(1) + ' dBm', 6, cy + 4, BD.C.axis); BD.label(g, 'out ' + (10 * Math.log10(r.out)).toFixed(1) + ' dBm', x0 + len + 10, cy + 4, BD.C.gold);
+        BD.label(g, 'angled, AR-coated facets', x0 + len / 2, cy - 18, BD.C.dim, 'center');
+        BD.label(g, '0', x0, H - 4, BD.C.dim); BD.label(g, '2 mm', x0 + 2000 * sc, H - 4, BD.C.dim, 'right');
+        g.strokeStyle = BD.C.dim; g.beginPath(); g.moveTo(x0, H - 14); g.lineTo(x0 + 2000 * sc, H - 14); g.stroke();
+        if (++nfr % 30 === 0) fst.textContent = stTxt + msTxt();
+      };
+      FV.render();
     })();
     // ---- gain against output power
     var xs = [], ys = []; for (var k = 0; k <= 120; k++) { var pd = -35 + 45 * k / 120, pw = Math.pow(10, pd / 10), rr = run(pw); xs.push(10 * Math.log10(rr.out)); ys.push(10 * Math.log10(rr.out / pw)); }
@@ -70,6 +93,8 @@
     q('[data-o="gn"]').textContent = (10 * Math.log10(G)).toFixed(1) + ' dB';
     q('[data-o="psat"]').textContent = (10 * Math.log10(p3)).toFixed(1) + ' dBm';
     q('[data-o="nf"]').textContent = isFinite(nf) ? nf.toFixed(1) + ' dB' : '–';
+    var drop = 10 * Math.log10(G0 / G);
+    BD.pill(q('[data-o="pill"]'), drop >= 2.95 ? 'saturated' : drop >= 1 ? 'saturating' : 'linear', drop >= 2.95 ? 'bad' : drop >= 1 ? 'warn' : 'ok');
     var c = 'At low input the gain is exponential in the length, e<sup>(Γg₀ − α<sub>i</sub>)L</sup>. As the output grows, stimulated emission uses up carriers faster than the current replaces them and the gain saturates, first near the output end. ';
     if (G < G0 / 2) c += '<b>Saturated:</b> the gain is more than 3 dB below its small-signal value; a booster amplifier runs here on purpose, a pre-amplifier must not. ';
     c += 'The noise figure can never be below 3 dB for a high-gain amplifier: spontaneous emission adds noise even with full inversion (n<sub>sp</sub> = 1), and real SOAs, with n<sub>sp</sub> ≈ 2 and internal loss, sit at 5–7 dB before any coupling loss. ';

@@ -71,7 +71,7 @@ With $$\kappa = 12.6$$ mm⁻¹ and 300 periods ($$L = 95$$ µm), $$\kappa L = 1.
 
 Real gratings are rarely uniform, so they are modelled by cutting them into sections, each described by the 2 × 2 matrix that relates forward and backward amplitudes at its two ends, and multiplying the matrices. The reflectivity of the whole grating is read from the product. This **transfer-matrix method** handles apodisation, chirp and phase shifts with no extra effort, and it is what the demo below computes, section by section.
 
-**Try it.** Change the period, coupling and number of periods, apodise the grating or add a quarter-wave shift; the geometry shows a magnified stretch linked to the whole grating.
+**Try it.** Change the period, coupling and number of periods, apodise the grating or add a quarter-wave shift, and probe the field along it at any wavelength.
 
 {% include demos/bragg.html %}
 

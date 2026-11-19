@@ -7,12 +7,27 @@
     <label class="bd-sl"><span>loaded Q <b data-v="Q"></b></span><input type="range" data-k="Q" min="3" max="6" step="0.01" value="4.3" aria-label="Q"></label>
     <label class="bd-sl"><span>resonance-tracking noise σ <b data-v="s"></b></span><input type="range" data-k="s" min="0.1" max="10" step="0.1" value="1" aria-label="tracking noise"></label>
   </div>
+  <div class="bd-scope"><canvas data-c="z" aria-hidden="true"></canvas><span class="bd-tag">side view: guided mode in water (red +, blue −)</span></div>
+  <div class="bd-status"><span data-o="fst"></span></div>
   <div class="bd-row">
     <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: in water, to scale, evanescent field</span></div>
     <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">resonance before (blue) and after (gold)</span></div>
   </div>
-  <div class="bd-read" aria-live="polite"><span>bulk sensitivity <b data-o="S">–</b></span><span>resonance shift <b data-o="sh">–</b></span><span>linewidth <b data-o="fw">–</b></span><span>limit of detection (3σ) <b data-o="lod">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>bulk sensitivity <b data-o="S">–</b></span><span>resonance shift <b data-o="sh">–</b></span><span>linewidth <b data-o="fw">–</b></span><span>limit of detection (3σ) <b data-o="lod">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Switch to TM.</b> The same 5 × 10⁻⁴ RIU change moves the resonance by 103 pm instead of 27 pm. In the side view the field reaches about twice as far into the water, and its strongest part sits just outside the silicon.</li>
+    <li><b>Sharpen the resonance.</b> Raise the Q from 20 000 to 100 000: the dip narrows from 77.7 to 15.5 pm, so even the TE shift is now well clear of the linewidth.</li>
+    <li><b>Find the limit.</b> With TE and 1 pm of tracking noise, lower the index change until the pill reads IN THE NOISE: below 5.6 × 10⁻⁵ RIU the shift is under 3σ.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>Why is the TM ring about four times as sensitive as the TE ring?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="TM light reaches much further into the water above the strip, so half of a change in the water's index appears in its effective index, against 15 % for TE: 206 against 54 nm/RIU.">More of its field is in the water</button>
+      <button type="button" data-why="The Q is set by the ring's loss and coupling, a separate slider here; it narrows the dip but does not change the shift per RIU.">It has a higher Q</button>
+      <button type="button" data-why="TM's group index is lower (3.74 against 4.24), which helps a little through λ/n_g, but the factor of four comes from the overlap with the water.">Its group index is higher</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -20,7 +35,7 @@
   var q = function (s) { return root.querySelector(s); };
   // figsrc/ch34_sensor.py: 500 x 220 nm strip, oxide below, water (1.318) above, 1550 nm
   var P = { TE: { S: 54, neff: 2.4263, ng: 4.235 }, TM: { S: 206, neff: 1.7031, ng: 3.740 } }, NW = 1.318, K0 = 2 * Math.PI / 1.55;
-  var pl = 'TE';
+  var pl = 'TE', FZ = BD.field(q('[data-c="z"]'), { button: q('.bd-status'), hz: 1 }), nfr = 0;
   var S = BD.bind(root, { dn: { fmt: function (x) { return x.toFixed(1) + ' × 10⁻⁴ RIU'; } }, Q: { fmt: function (x) { return Math.round(Math.pow(10, x)).toLocaleString('en'); } }, s: { fmt: function (x) { return x.toFixed(1) + ' pm'; } } }, function () { draw(); });
   BD.seg(root, 'pl', function (v) { pl = v; draw(); });
   function draw() {
@@ -42,6 +57,43 @@
       var dl = 'tail 1/γ = ' + (1000 / gam).toFixed(0) + ' nm'; BD.label(g, dl, Math.min(X(0.3), dv.w - 4 - g.measureText(dl).width), Y(0.5), BD.C.gold);
       BD.scalebar(g, dv.w - 100, 36, sc, 80);
     })();
+    // ---- side view along the strip: the guided mode and its evanescent tails, to scale. The tails decay as e^(−γ|y|) with
+    // γ = k0 √(n_eff² − n²) from the femwell n_eff (the same γ as the cross-section's label); the core profile is the
+    // slab-like cosine that joins them (κt = atan(A/κ) + atan(B/κ)). TE: E lies along the surface and is continuous.
+    // TM: E is normal to it, so it jumps by (n_Si/n)² at each face (worked through H, which is continuous).
+    (function () {
+      var cv = q('[data-c="z"]'), W = cv.clientWidth, H = cv.clientHeight, NSI = 3.476, NOX = 1.444, T = 0.22, yLo = -0.55, yHi = T + 0.75;
+      var sc = (H - 30) / (yHi - yLo), top = 22, Yp = function (y) { return top + (yHi - y) * sc; };
+      var gw = gam, go = K0 * Math.sqrt(M.neff * M.neff - NOX * NOX), tm = pl === 'TM';
+      var A = tm ? NSI * NSI / (NW * NW) * gw : gw, B = tm ? NSI * NSI / (NOX * NOX) * go : go, lo = 1e-6, hi = Math.PI / T - 1e-6;
+      for (var it = 0; it < 60; it++) { var km = (lo + hi) / 2; if (km * T - Math.atan(A / km) - Math.atan(B / km) < 0) lo = km; else hi = km; }
+      var kap = (lo + hi) / 2, phb = Math.atan(B / kap), ht = Math.cos(kap * T - phb), hb = Math.cos(phb);
+      function prof(y) {   // the field across the strip (H for TM, then divided by n²)
+        var h = y > T ? ht * Math.exp(-gw * (y - T)) : y < 0 ? hb * Math.exp(go * y) : Math.cos(kap * y - phb);
+        if (!tm) return h;
+        var n = y > T ? NW : y < 0 ? NOX : NSI; return h / (n * n);
+      }
+      var beta = 2 * Math.PI * M.neff / 1.55, bz = top, bh = H - 8 - top;
+      FZ.grid(0, bz, W, bh);
+      var P = new Float32Array(FZ.ny); for (var j = 0; j < FZ.ny; j++) P[j] = prof(yHi - (j + 0.5) / sc);
+      for (var i = 0; i < FZ.nx; i++) { var ph = beta * (i + 0.5) / sc, c = Math.cos(ph), s = -Math.sin(ph);
+        for (j = 0; j < FZ.ny; j++) { FZ.re[j * FZ.nx + i] = P[j] * c; FZ.im[j * FZ.nx + i] = P[j] * s; } }   // P(y) e^(−jβz)
+      var ratio = tm ? NSI * NSI / (NW * NW) : 1;
+      var st = ['side view to scale: tails from the femwell n_eff, core from a slab fit, not a full-wave solve'];
+      st.push(tm ? 'TM: E is normal to the surface and jumps ×' + ratio.toFixed(1) + ' into the water' : 'TE: E lies along the surface');
+      var fst = q('[data-o="fst"]'), stTxt = st.join(' · '), msTxt = function () { return FZ.ms ? ' · frame ' + FZ.ms.toFixed(1) + ' ms' : ''; };
+      fst.textContent = stTxt + msTxt();
+      FZ.overlay = function (g) {
+        g.fillStyle = 'rgba(127,184,240,.05)'; g.fillRect(0, bz, W, Yp(T) - bz); g.fillStyle = 'rgba(160,200,240,.08)'; g.fillRect(0, Yp(0), W, bz + bh - Yp(0));
+        g.strokeStyle = 'rgba(215,230,247,.6)'; g.lineWidth = 1; g.beginPath(); g.moveTo(0, Yp(T) + 0.5); g.lineTo(W, Yp(T) + 0.5); g.moveTo(0, Yp(0) - 0.5); g.lineTo(W, Yp(0) - 0.5); g.stroke();
+        BD.label(g, 'water (analyte), n = 1.318', 8, Yp(T) - 0.5 * sc, BD.C.blue); BD.label(g, 'Si 220 nm', 8, Yp(T / 2) + 3, BD.C.white); BD.label(g, 'oxide', 8, bz + bh - 6, BD.C.dim);
+        var xd = W - 120, tl = 'tail 1/γ = ' + (1000 / gw).toFixed(0) + ' nm';
+        BD.dim(g, xd, Yp(T) - 1, xd, Yp(T + 1 / gw), '', BD.C.gold); BD.label(g, tl, xd + 6, Yp(T + 0.5 / gw) + 3, BD.C.gold);
+        BD.scalebar(g, W - 100, bz + bh - 8, sc, 80);
+        if (++nfr % 30 === 0) fst.textContent = stTxt + msTxt();
+      };
+      FZ.render();
+    })();
     // ---- resonance before and after
     var span = Math.max(3 * fw, 1.5 * sh + 2 * fw), d2 = BD.setup(q('[data-c="s"]')), f2 = BD.frame(d2, { x: [-span / 2, span], y: [0, 1.05], pad: { l: 30, b: 22, t: 30 },
       xt: [[-span / 2, (-span / 2).toFixed(0)], [0, '0'], [span, '+' + span.toFixed(0) + ' pm']], yt: [[0, '0'], [1, '1']] });
@@ -52,11 +104,12 @@
     q('[data-o="sh"]').textContent = sh.toFixed(1) + ' pm';
     q('[data-o="fw"]').textContent = fw.toFixed(1) + ' pm';
     q('[data-o="lod"]').textContent = lod.toExponential(1) + ' RIU';
+    BD.pill(q('[data-o="pill"]'), sh >= 3 * S.s ? 'detected' : 'in the noise', sh >= 3 * S.s ? 'ok' : 'bad');   // shift against 3σ, the same test as the limit of detection
     var c = 'Molecules or a change in the fluid alter the index the evanescent field sees, and the resonance moves by S × Δn. ';
     c += pl === 'TE' ? 'TE light is tightly confined in the silicon: only 0.15 of a change in the water\'s index appears in its effective index, so S = 54 nm/RIU. ' : 'TM light reaches much further into the water above the strip: half of a change in the water\'s index (0.50) appears in its effective index, giving S = 206 nm/RIU, about four times TE. ';
     c += 'What matters is not the shift alone but the shift against the noise in tracking the resonance: the limit of detection is 3σ/S. A higher Q gives a narrower dip, which can be tracked more precisely, so σ falls with Q and with the signal-to-noise ratio. ';
     if (sh < fw / 2) c += 'Here the shift is smaller than half the linewidth: it is still measurable, by fitting the resonance (Chapter 32). ';
-    c += ' <i>Bulk sensitivities computed with femwell; the field picture is a sketch of the exponential tails.</i>';
+    c += ' <i>Bulk sensitivities computed with femwell; the glow in the cross-section is a sketch of the exponential tails, while the side view uses the femwell decay lengths.</i>';
     q('[data-o="cap"]').innerHTML = c;
   }
   BD.observe(root, draw);

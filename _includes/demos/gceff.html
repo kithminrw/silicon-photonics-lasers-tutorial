@@ -8,13 +8,27 @@
     <label class="bd-sl"><span>fibre position along the grating <b data-v="zf"></b></span><input type="range" data-k="zf" min="0" max="16" step="0.05" value="3.8" aria-label="fibre position"></label>
     <label class="bd-sl"><span>BOX thickness <b data-v="t"></b></span><input type="range" data-k="t" min="1" max="3.5" step="0.005" value="2" aria-label="BOX thickness"></label>
   </div>
-  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: side view to scale (Si 4× thicker)</span></div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag" data-o="tag">field, side view to scale (Si 4× thicker)</span></div>
+  <div class="bd-status"><span data-o="fst"></span></div>
   <div class="bd-row">
     <div class="bd-scope tall"><canvas data-c="p" aria-hidden="true"></canvas><span class="bd-tag">emission and fibre mode along the grating</span></div>
     <div class="bd-scope tall"><canvas data-c="d" aria-hidden="true"></canvas><span class="bd-tag">directionality against BOX thickness</span></div>
   </div>
-  <div class="bd-read" aria-live="polite"><span>directionality <b data-o="D">–</b></span><span>emitted before the end <b data-o="E">–</b></span><span>mode overlap <b data-o="M">–</b></span><span>coupling efficiency <b data-o="CE">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>directionality <b data-o="D">–</b></span><span>emitted before the end <b data-o="E">–</b></span><span>mode overlap <b data-o="M">–</b></span><span>coupling efficiency <b data-o="CE">–</b></span><span class="bd-pill" data-o="pill" hidden></span><span class="bd-pill" data-o="pill2" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Tune the BOX.</b> Move it from 2 µm to 1.89 µm: the directionality rises from 62 % to 71 % as the substrate reflection returns in phase and the upward field brightens. At 2.16 µm it returns out of phase and only 29 % goes up.</li>
+    <li><b>Weaken the grating.</b> Set α to 0.04 µm⁻¹ and the fibre to 8 µm. The emission now spreads past the fibre mode, 20 % of the light leaves the end of the grating unused, and the efficiency falls to 34 % (Table 15.1).</li>
+    <li><b>Apodise and add the mirror.</b> Choose apodised and bottom mirror, then set α to its maximum, the fibre to 8 µm and the BOX to 1.89 µm. The emitted field now follows the fibre’s Gaussian: 99 % overlap and 95 % (−0.2 dB) in all.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>Even with a perfect bottom mirror, a uniform grating couples at most about 80 % into the fibre. Why?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="A uniform grating emits an exponentially decaying beam, and the best overlap of an exponential with the fibre's Gaussian is about 80 %.">Its emitted beam decays exponentially, and no exponential matches a Gaussian</button>
+      <button type="button" data-why="A strong enough uniform grating emits over 99 % of the light before its end; the loss is in the shape of the beam, not in light left over.">Some light always passes the end of the grating</button>
+      <button type="button" data-why="That is the directionality, and the bottom mirror is what fixes it: with the mirror nearly all the light goes up.">Half the light always goes down into the substrate</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -52,51 +66,97 @@
     }
     return { z: z, al: al, pw: pw, g: g, emitted: 1 - rem, overlap: ov * ov };
   }
+  var FV = BD.field(q('[data-c="g"]'), { button: q('.bd-status'), hz: 1.0 }), nfr = 0;
   function draw() {
     var m = model(), D = dirOf(S.t), mm = m.overlap / Math.max(m.emitted, 1e-9), CE = D * m.overlap;
-    // ---- geometry: side view, to scale horizontally and vertically except the Si layer (x4)
+    // ---- the field in the side view, to scale horizontally and vertically except the Si layer (x4), from the thin-sheet model:
+    // the guided mode loses power as the grating emits sqrt(p(z)) up and down; the downward wave reflects from the substrate with
+    // field reflection -r, interferes with the upward wave (the directionality) and stands in the BOX
     (function () {
-      var dv = BD.setup(q('[data-c="g"]')), g = dv.g, x0 = 70, sc = (dv.w - x0 - 30) / (L + 3);
-      var subTop = dv.h - 16, base = subTop - S.t * sc, tSi = 0.22 * 4 * sc, etch = 0.07 * 4 * sc;
-      g.fillStyle = r > 0.5 ? BD.GEO.metal : 'rgba(157,179,204,.35)'; g.fillRect(0, subTop, dv.w, dv.h - subTop);
-      g.fillStyle = BD.GEO.ox; g.fillRect(0, 18, dv.w, subTop - 18);
-      g.fillStyle = BD.GEO.si; g.fillRect(0, base - tSi, x0, tSi);   // input waveguide
-      var amax = 0.40;
-      for (var x = 0; x < L - 1e-9; x += P) {
-        var i = Math.min(N - 1, Math.floor((x + P / 2) / L * N)), depth = etch * Math.min(1, Math.sqrt(m.al[i] / amax) * 1.4);
-        var xa = x0 + x * sc;
-        g.fillRect(xa, base - tSi, 0.5 * P * sc + 0.5, tSi);
-        g.fillRect(xa + 0.5 * P * sc, base - tSi + depth, 0.5 * P * sc + 0.5, tSi - depth);
+      var cv = q('[data-c="g"]'), W = cv.clientWidth, nar = W < 480;
+      cv.style.height = (nar ? 260 : 250) + 'px';
+      var H = cv.clientHeight, x0 = 70, sc = (W - x0 - 30) / (L + 3);
+      var subTop = H - 16, base = subTop - S.t * sc, tSi = 0.22 * 4 * sc, etch = 0.07 * 4 * sc, ytop = base - tSi;
+      var k0 = 2 * Math.PI / lam, ngr = Math.sin(8 * Math.PI / 180) + lam / P;   // the grating mode's index, phase-matched to the fibre at 8 degrees
+      var kx = k0 * Math.sin(8 * Math.PI / 180), ky = k0 * nox * Math.cos(thOx), tn = Math.tan(thOx), gam = k0 * Math.sqrt(ngr * ngr - nox * nox);
+      var cr = BD.crests(lam / ngr * sc, 6), nn = cr.n, ag = 1 / Math.sqrt(0.22 + 2 / gam);   // guided field on the same power scale (1 / effective thickness)
+      var dz = L / N, A = new Float32Array(Math.ceil(W) + 2), rem = function (x) {   // power left in the waveguide at canvas x
+        var zz = (x - x0) / sc; if (zz <= 0) return 1; if (zz >= L) return 1 - m.emitted;
+        var i = Math.min(N - 1, Math.floor(zz / dz)); return m.pw[i] / (2 * m.al[i]);
+      };
+      for (var ix = 0; ix < A.length; ix++) { var zx = (ix + 0.5 - x0) / sc; A[ix] = zx > 0 && zx < L ? Math.sqrt(m.pw[Math.min(N - 1, Math.floor(zx / dz))] / 2) : 0; }   // emitted field, each way
+      var ph0 = (k0 * ngr - kx) * x0 / sc, cr2 = Math.cos(2 * ky * S.t), si2 = Math.sin(2 * ky * S.t), Mr = 1 - r * cr2, Mi = r * si2;   // above: (1 - r e^{-2j ky t})
+      FV.grid(0, 18, W, subTop - 18);
+      var nx = FV.nx, ny = FV.ny, re = FV.re, im = FV.im;
+      for (var j = 0; j < ny; j++) {
+        var yy = 18 + j + 0.5, hup = (ytop - yy) / sc, dn = (yy - base) / sc;
+        if (hup < 0 && dn < 0) continue;
+        for (var i = 0; i < nx; i++) {
+          var xx = i + 0.5, p = j * nx + i, a, ps;
+          if (hup >= 0) {   // above the grating: direct + reflected, one tilted plane wave with amplitude profile A
+            a = A[Math.max(0, Math.round(xx - hup * tn * sc))]; if (!a) continue;
+            ps = (kx * xx / sc + ky * hup + ph0) / nn;
+            var c1 = Math.cos(ps), s1 = Math.sin(ps); re[p] = a * (Mr * c1 + Mi * s1); im[p] = a * (Mi * c1 - Mr * s1);
+          } else {          // in the BOX: the downward wave and its reflection, a standing wave
+            a = A[Math.max(0, Math.round(xx - dn * tn * sc))]; if (!a) continue;
+            var pd = (kx * xx / sc + ky * dn + ph0) / nn, pr = (kx * xx / sc + ky * (2 * S.t - dn) + ph0) / nn;
+            re[p] = a * (Math.cos(pd) - r * Math.cos(pr)); im[p] = -a * (Math.sin(pd) - r * Math.sin(pr));
+          }
+        }
       }
-      g.fillRect(x0 + L * sc, base - tSi + etch, 3 * sc, tSi - etch);
-      // emitted power profile above the grating, and its downward twin
-      var pk = Math.max.apply(null, m.pw), hUp = Math.min(60, base - 70);
-      g.fillStyle = 'rgba(224,184,90,.35)'; g.beginPath(); g.moveTo(x0, base - tSi);
-      m.z.forEach(function (zz, k) { g.lineTo(x0 + zz * sc, base - tSi - hUp * m.pw[k] / pk); }); g.lineTo(x0 + L * sc, base - tSi); g.fill();
-      g.fillStyle = 'rgba(224,184,90,.14)'; g.beginPath(); g.moveTo(x0, base);
-      m.z.forEach(function (zz, k) { g.lineTo(x0 + zz * sc, base + Math.min(S.t * sc - 4, 0.6 * hUp) * m.pw[k] / pk); }); g.lineTo(x0 + L * sc, base); g.fill();
-      // reflected rays from the substrate
-      g.strokeStyle = 'rgba(224,184,90,.55)'; g.setLineDash([3, 3]);
-      for (var k = 1; k <= 3; k++) { var xr = x0 + (S.zf + (k - 2) * 3) * sc; if (xr < x0 || xr > x0 + L * sc) continue;
-        var dx = Math.tan(thOx) * S.t * sc; g.beginPath(); g.moveTo(xr, base); g.lineTo(xr - dx, subTop); g.lineTo(xr - 2 * dx, base); g.stroke(); }
-      g.setLineDash([]);
-      // fibre core (mode field diameter) tilted by 8 degrees from the normal, centred on zf
-      var xc = x0 + S.zf * sc, th = 8 * Math.PI / 180, top = 20, hgt = base - tSi - top - 6;
-      g.save(); g.beginPath(); g.rect(0, top, dv.w, base - tSi - top - 4); g.clip();
-      g.translate(xc, base - tSi - 6); g.rotate(th);
-      g.fillStyle = 'rgba(127,184,240,.12)'; g.fillRect(-w0 * sc * 1.8, -hgt * 1.3, 3.6 * w0 * sc, hgt * 1.3);
-      g.fillStyle = 'rgba(127,184,240,.32)'; g.fillRect(-w0 * sc, -hgt * 1.3, 2 * w0 * sc, hgt * 1.3);
-      g.restore();
-      // right of the core, else left of it, else the short form
-      var fc = [['fibre core (mode 10.4 µm)', 1], ['fibre core (mode 10.4 µm)', -1], ['fibre core', 1], ['fibre core', -1]].filter(function (c) {
-        var w = g.measureText(c[0]).width; return c[1] > 0 ? xc + w0 * sc + 8 + w <= dv.w - 4 : xc - w0 * sc - 8 - w >= 14 + BD.nice(50 / sc) * sc; })[0] || ['fibre core', 1];   // left: clear of the scale bar
-      BD.label(g, fc[0], xc + fc[1] * (w0 * sc + 8), top + 14, BD.C.blue, fc[1] > 0 ? 'left' : 'right');
-      BD.dim(g, x0, base + 12, x0 + L * sc, base + 12, 'grating ' + L + ' µm', BD.C.gold, 0);
-      BD.dim(g, dv.w - 24, base, dv.w - 24, subTop, '', BD.C.white, 0);
-      BD.label(g, 'BOX ' + S.t.toFixed(2) + ' µm', dv.w - 30, (base + subTop) / 2 + 4, BD.C.white, 'right');
-      BD.label(g, r > 0.5 ? 'bottom mirror' : 'silicon substrate', 8, dv.h - 4, r > 0.5 ? '#232a36' : BD.C.dim);
-      BD.label(g, 'Si waveguide', 6, base - tSi - 6, BD.C.axis);
-      BD.scalebar(g, 8, 34, sc, 50);
+      var pts = []; for (var x = 0; x <= W + 3; x += 3) pts.push([x, ytop + tSi / 2]);
+      FV.guide(pts, { half: tSi / 2, decay: 4 * sc / gam, amp: function (k) { return [ag * Math.sqrt(rem(pts[k][0])), 0]; }, phase: function (k) { return k0 * ngr * pts[k][0] / sc / nn; } });
+      q('[data-o="tag"]').textContent = nn > 1 ? 'field, side view (Si 4× thicker) · ' + cr.note : 'field, side view to scale (Si 4× thicker)';
+      var st = ['thin-sheet field: the grating emits √p(z) up and down, and the substrate reflection interferes above and stands in the BOX',
+        'no diffraction over the few µm drawn'];
+      if (nn > 1) st.push('crests drawn 1 per ' + nn + ' λ');
+      st.push('not a full-wave solve');
+      var fst = q('[data-o="fst"]'), stTxt = st.join(' · '), msTxt = function () { return FV.ms ? ' · frame ' + FV.ms.toFixed(1) + ' ms' : ''; };
+      fst.textContent = stTxt + msTxt();
+      FV.overlay = function (g) {
+        g.fillStyle = r > 0.5 ? BD.GEO.metal : 'rgba(157,179,204,.35)'; g.fillRect(0, subTop, W, H - subTop);
+        g.strokeStyle = BD.GEO.edge; g.beginPath(); g.moveTo(0, base + 0.5); g.lineTo(W, base + 0.5); g.stroke();
+        g.fillStyle = 'rgba(157,179,204,.2)'; g.fillRect(0, ytop, x0, tSi);   // input waveguide
+        var amax = 0.40;
+        for (var x = 0; x < L - 1e-9; x += P) {
+          var i = Math.min(N - 1, Math.floor((x + P / 2) / L * N)), depth = etch * Math.min(1, Math.sqrt(m.al[i] / amax) * 1.4);
+          var xa = x0 + x * sc;
+          g.fillRect(xa, ytop, 0.5 * P * sc + 0.5, tSi);
+          g.fillRect(xa + 0.5 * P * sc, ytop + depth, 0.5 * P * sc + 0.5, tSi - depth);
+        }
+        g.fillRect(x0 + L * sc, ytop + etch, 3 * sc, tSi - etch);
+        // emitted power profile above the grating, and its downward twin (outlines over the field)
+        var pk = Math.max.apply(null, m.pw), hUp = Math.min(60, base - 70);
+        g.strokeStyle = 'rgba(224,184,90,.85)'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(x0, ytop);
+        m.z.forEach(function (zz, k) { g.lineTo(x0 + zz * sc, ytop - hUp * m.pw[k] / pk); }); g.lineTo(x0 + L * sc, ytop); g.stroke();
+        g.strokeStyle = 'rgba(224,184,90,.45)'; g.beginPath(); g.moveTo(x0, base);
+        m.z.forEach(function (zz, k) { g.lineTo(x0 + zz * sc, base + Math.min(S.t * sc - 4, 0.6 * hUp) * m.pw[k] / pk); }); g.lineTo(x0 + L * sc, base); g.stroke(); g.lineWidth = 1;
+        // reflected rays from the substrate
+        g.strokeStyle = 'rgba(224,184,90,.55)'; g.setLineDash([3, 3]);
+        for (var k = 1; k <= 3; k++) { var xr = x0 + (S.zf + (k - 2) * 3) * sc; if (xr < x0 || xr > x0 + L * sc) continue;
+          var dx = tn * S.t * sc; g.beginPath(); g.moveTo(xr, base); g.lineTo(xr - dx, subTop); g.lineTo(xr - 2 * dx, base); g.stroke(); }
+        g.setLineDash([]);
+        // the fibre's mode (1/e² diameter 10.4 um), refracted into the oxide (8 degrees in air), centred on zf
+        var xc = x0 + S.zf * sc, top = 20, hgt = ytop - top - 6;
+        g.save(); g.beginPath(); g.rect(0, top, W, ytop - top - 4); g.clip();
+        g.translate(xc, ytop - 6); g.rotate(thOx);
+        g.fillStyle = 'rgba(127,184,240,.08)'; g.fillRect(-w0 * sc, -hgt * 1.3, 2 * w0 * sc, hgt * 1.3);
+        g.strokeStyle = 'rgba(159,208,255,.8)'; g.setLineDash([5, 4]); g.beginPath(); g.moveTo(-w0 * sc, 0); g.lineTo(-w0 * sc, -hgt * 1.3); g.moveTo(w0 * sc, 0); g.lineTo(w0 * sc, -hgt * 1.3); g.stroke(); g.setLineDash([]);
+        g.restore();
+        // right of the core, else left of it, else the short form
+        var fc = [['fibre mode (10.4 µm)', 1], ['fibre mode (10.4 µm)', -1], ['fibre mode', 1], ['fibre mode', -1]].filter(function (c) {
+          var w = g.measureText(c[0]).width; return c[1] > 0 ? xc + w0 * sc + 8 + w <= W - 4 : xc - w0 * sc - 8 - w >= 14 + BD.nice(50 / sc) * sc; })[0] || ['fibre mode', 1];   // left: clear of the scale bar
+        BD.label(g, fc[0], xc + fc[1] * (w0 * sc + 8), top + 14, BD.C.blue, fc[1] > 0 ? 'left' : 'right');
+        BD.dim(g, x0, base + 12, x0 + L * sc, base + 12, 'grating ' + L + ' µm', BD.C.gold, 0);
+        BD.dim(g, W - 24, base, W - 24, subTop, '', BD.C.white, 0);
+        var bl = 'BOX ' + S.t.toFixed(2) + ' µm', low = S.t * sc < 34 && x0 + L * sc > W - 34 - g.measureText(bl).width;   // a thin BOX: label in the substrate band, clear of the grating's dimension
+        BD.label(g, bl, W - 30, low ? H - 4 : (base + subTop) / 2 + 4, low && r > 0.5 ? '#232a36' : BD.C.white, 'right');
+        BD.label(g, r > 0.5 ? 'bottom mirror' : 'silicon substrate', 8, H - 4, r > 0.5 ? '#232a36' : BD.C.dim);
+        BD.label(g, 'Si waveguide', 6, ytop - 6, BD.C.axis);
+        BD.scalebar(g, 8, 34, sc, 50);
+        if (++nfr % 30 === 0) fst.textContent = stTxt + msTxt();
+      };
+      FV.render();
     })();
     // ---- emitted power against the fibre mode
     var d2 = BD.setup(q('[data-c="p"]')), pk = Math.max(Math.max.apply(null, m.pw), Math.max.apply(null, m.g)) * 1.1;
@@ -119,6 +179,9 @@
     q('[data-o="E"]').textContent = (100 * m.emitted).toFixed(0) + ' % (' + dB(m.emitted) + ')';
     q('[data-o="M"]').textContent = (100 * mm).toFixed(0) + ' % (' + dB(mm) + ')';
     q('[data-o="CE"]').textContent = (100 * CE).toFixed(0) + ' % (' + dB(CE) + ')';
+    var weak = prof === 'u' && S.a < 0.07, strong = prof === 'u' && S.a > 0.25;
+    BD.pill(q('[data-o="pill"]'), weak ? 'too weak' : strong ? 'too strong' : mm >= 0.9 ? 'mode matched' : '', weak || strong ? 'warn' : 'ok');
+    BD.pill(q('[data-o="pill2"]'), D > 0.6 ? 'in phase' : D < 0.4 ? 'out of phase' : '', D > 0.6 ? 'ok' : 'bad');
     var c = 'Efficiency = directionality × fraction emitted × mode overlap' + (prof === 'u' ? ' (here 1/α = ' + (1 / S.a).toFixed(1) + ' µm). ' : '. ');
     if (prof === 'u') {
       if (S.a < 0.07) c += '<b>Too weak:</b> the emission is spread over more than the fibre mode and ' + (100 * (1 - m.emitted)).toFixed(0) + ' % of the light passes the end of the grating unused. ';

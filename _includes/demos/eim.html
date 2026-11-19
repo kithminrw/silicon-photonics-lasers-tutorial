@@ -14,8 +14,20 @@
     <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: section to scale, fundamental |E|²</span></div>
     <div class="bd-scope tall"><canvas data-c="n" aria-hidden="true"></canvas><span class="bd-tag">effective index against width (lateral modes)</span></div>
   </div>
-  <div class="bd-read" aria-live="polite"><span>n<sub>eff</sub> (EIM) <b data-o="ne">–</b></span><span>n<sub>g</sub> <b data-o="ng">–</b></span><span>guided modes <b data-o="m">–</b></span><span>single-mode below W ≈ <b data-o="wc">–</b></span><span>step 1: n<sub>I</sub> / n<sub>II</sub> <b data-o="n12">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>n<sub>eff</sub> (EIM) <b data-o="ne">–</b></span><span>n<sub>g</sub> <b data-o="ng">–</b></span><span>guided modes <b data-o="m">–</b></span><span>single-mode below W ≈ <b data-o="wc">–</b></span><span>step 1: n<sub>I</sub> / n<sub>II</sub> <b data-o="n12">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Check it against the full solver.</b> The default 500 × 220 nm strip gives n<sub>eff</sub> = 2.492 and single-mode below 322 nm; femwell gives 2.446 and about 450 nm. Narrow W to 300 nm and the pill reads SINGLE-MODE.</li>
+    <li><b>Etch a rib.</b> Press Si rib 220/90: n<sub>II</sub> rises from 1.444 to 2.104, the lateral contrast falls, and the single-mode width grows from 322 to 406 nm. n<sub>eff</sub> = 2.600, against 2.568 from femwell (Table 6.1).</li>
+    <li><b>Switch to TM-like.</b> On the strip, n<sub>eff</sub> falls to 1.847 (femwell: 1.771). Its vertical slab index n<sub>I</sub> is only 2.054, so the guide stays single-mode up to 533 nm.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>In step 2 the EIM solves a lateral slab of width W. For the TE-like mode, which boundary conditions does that slab use?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="The lateral slab's interfaces are the side walls, and the TE-like mode's horizontal electric field is normal to them: that is the TM case for this slab.">TM, because the horizontal field is normal to the side walls</button>
+      <button type="button" data-why="The vertical slab of step 1 is TE because the horizontal field lies along its interfaces; turned on its side in step 2, the same field is normal to the side walls, so the lateral slab is TM.">TE, the same as the vertical slab of step 1</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -101,6 +113,7 @@
     q('[data-o="m"]').textContent = nm + ' ' + pol + '-like';
     q('[data-o="wc"]').textContent = isFinite(wc) ? um(wc - 0.0105) : '> 2 µm';
     q('[data-o="n12"]').textContent = (r.nI || NaN).toFixed(3) + ' / ' + r.nII.toFixed(3);
+    BD.pill(q('[data-o="pill"]'), !isFinite(r.ne) ? 'not guided' : nm > 1 ? 'multimode' : 'single-mode', !isFinite(r.ne) ? 'bad' : nm > 1 ? 'warn' : 'ok');
     var c = 'Step 1 solves a vertical slab for the core region (n<sub>I</sub>) and for the region beside it (n<sub>II</sub>: the remaining slab, or the cladding); step 2 solves a lateral slab of width W between them, with the other polarisation\'s boundary conditions. ';
     if (mat === 'si' && s < 0.002 && Math.abs(W - 0.5) < 0.006 && Math.abs(t - 0.22) < 0.003 && pol === 'TE' && Math.abs(lam - 1.55) < 0.003)
       c += 'For 500 × 220 nm at 1550 nm a full-vectorial solver (femwell) gives n<sub>eff</sub> = 2.446 and n<sub>g</sub> = 4.18, and puts the TE1 cut-off near 450 nm: the EIM overestimates n<sub>eff</sub> and underestimates the single-mode width, as it does for small high-contrast strips, but it gets the trends right. ';

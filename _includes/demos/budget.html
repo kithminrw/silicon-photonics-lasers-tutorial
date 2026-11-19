@@ -12,8 +12,21 @@
     <label class="bd-sl"><span>laser wall-plug efficiency <b data-v="wpe"></b></span><input type="range" data-k="wpe" min="0.05" max="0.4" step="0.01" value="0.15" aria-label="wall plug efficiency"></label>
   </div>
   <div class="bd-scope tall"><canvas data-c="w" aria-hidden="true"></canvas><span class="bd-tag">optical power after each block (dBm)</span></div>
-  <div class="bd-read" aria-live="polite"><span>total loss <b data-o="loss">–</b></span><span>received <b data-o="rx">–</b></span><span>margin <b data-o="m">–</b></span><span>laser electrical power <b data-o="pe">–</b></span><span>laser energy per bit (50 Gb/s) <b data-o="eb">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>total loss <b data-o="loss">–</b></span><span>received <b data-o="rx">–</b></span><span>margin <b data-o="m">–</b></span><span>laser electrical power <b data-o="pe">–</b></span><span>laser energy per bit (50 Gb/s) <b data-o="eb">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Lengthen the fibre.</b> Take it from 2 to 20 km: the margin falls only from 9.3 to 5.7 dB. Eighteen kilometres of fibre cost 3.6 dB, little more than one grating coupler.</li>
+    <li><b>Break the link.</b> Set each fibre coupler to 8 dB, as for a badly aligned fibre: the received power drops to −12.7 dBm, below the −12 dBm sensitivity, and the link fails.</li>
+    <li><b>Give the margin back.</b> From the defaults, lower the laser to +4 dBm: the margin is 3.3 dB and the laser's energy per bit falls from 1.33 to 0.33 pJ/bit. Half a decibel less and the margin is thin.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>A better grating coupler saves 1.5 dB at each end of the link. For the same margin, how far can the laser power drop?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="Both couplers are in the path, so the total loss falls by 3 dB, a factor of two: the laser can run at +7 dBm (5 mW), and its energy per bit halves.">By 3 dB, to half its power</button>
+      <button type="button" data-why="That counts only one coupler. The light passes through both, so their savings add up to 3 dB.">By 1.5 dB</button>
+      <button type="button" data-why="Every decibel of loss saved anywhere in the chain is a decibel the laser no longer has to supply.">Not at all: the couplers do not affect the laser</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -59,6 +72,7 @@
     q('[data-o="loss"]').textContent = loss.toFixed(1) + ' dB';
     q('[data-o="rx"]').textContent = rx.toFixed(1) + ' dBm';
     var mo = q('[data-o="m"]'); mo.textContent = margin.toFixed(1) + ' dB'; mo.className = margin >= 3 ? 'ok' : 'bad';
+    BD.pill(q('[data-o="pill"]'), margin < 0 ? 'link fails' : margin < 3 ? 'thin margin' : 'link closes', margin < 0 ? 'bad' : margin < 3 ? 'warn' : 'ok');
     q('[data-o="pe"]').textContent = pe.toFixed(1) + ' mW';
     q('[data-o="eb"]').textContent = (pe * 1e-3 / 50e9 * 1e12).toFixed(2) + ' pJ/bit';
     var c = 'In decibels a link budget is a subtraction: received power = laser power − the sum of every loss. ';

@@ -7,22 +7,39 @@
     <label class="bd-sl"><span>radius R <b data-v="R"></b></span><input type="range" data-k="R" min="3" max="60" step="0.1" value="10" aria-label="radius"></label>
     <label class="bd-sl"><span>coupling gap g (each coupler) <b data-v="g"></b></span><input type="range" data-k="g" min="0.08" max="0.6" step="0.005" value="0.25" aria-label="coupling gap"></label>
     <label class="bd-sl"><span>propagation loss <b data-v="a"></b></span><input type="range" data-k="a" min="0" max="100" step="0.1" value="45" aria-label="loss"></label>
+    <label class="bd-sl"><span>laser detuning <b data-v="det"></b></span><input type="range" data-k="det" min="-1" max="1" step="0.005" value="0" aria-label="laser detuning from the resonance"></label>
   </div>
-  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top view to scale, inset: the gap</span></div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag" data-o="tag">field (red +, blue −), top view</span></div>
+  <div class="bd-status"><span data-o="fst"></span></div>
   <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">transmission (dB) against wavelength</span></div>
-  <div class="bd-read" aria-live="polite"><span>κ² <b data-o="k2">–</b></span><span>FSR <b data-o="fsr">–</b></span><span>FWHM <b data-o="fw">–</b></span><span>loaded Q <b data-o="ql">–</b></span><span>intrinsic Q <b data-o="qi">–</b></span><span>extinction <b data-o="er">–</b></span><span>finesse <b data-o="fi">–</b></span><span>build-up |E<sub>ring</sub>/E<sub>in</sub>|² <b data-o="bu">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>κ² <b data-o="k2">–</b></span><span>FSR <b data-o="fsr">–</b></span><span>FWHM <b data-o="fw">–</b></span><span>loaded Q <b data-o="ql">–</b></span><span>intrinsic Q <b data-o="qi">–</b></span><span>extinction <b data-o="er">–</b></span><span>finesse <b data-o="fi">–</b></span><span>build-up |E<sub>ring</sub>/E<sub>in</sub>|² <b data-o="bu">–</b></span><span class="bd-pill" data-o="pill" hidden></span><span class="bd-pill" data-o="pill2" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Reach critical coupling.</b> At the 250 nm gap, raise the loss to 3.6 dB/cm, so that t = a: the CRITICAL pill lights up, the dip passes 40 dB and the through port goes dark, while the ring holds about 190 times the input power.</li>
+    <li><b>Detune the laser.</b> Slide the detuning to about 1 FWHM: the ring keeps only a fifth of its power and the through port refills. At the end of the slider, half an FSR away, the ring is dark and the light passes by.</li>
+    <li><b>Drop a channel.</b> Switch to add-drop and lower the loss to 0.3 dB/cm: on resonance the drop port takes almost all the light (t<sub>1</sub> ≈ t<sub>2</sub>a), and the field leaves to the left along the upper bus.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>An all-pass ring shows a 15 dB dip at its through port. Is it under- or over-coupled?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="The through-port transmission is symmetric in a and t, so an under-coupled ring with (a, t) and an over-coupled one with (t, a) give the same dip; you need several gaps, a drop port or the phase response (Section 12.5).">You cannot tell from that spectrum alone</button>
+      <button type="button" data-why="An under-coupled ring can give a 15 dB dip, but so can an over-coupled one with a and t swapped: the through port alone cannot tell them apart.">Under-coupled</button>
+      <button type="button" data-why="An over-coupled ring can give a 15 dB dip, but so can an under-coupled one with a and t swapped: the through port alone cannot tell them apart.">Over-coupled</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
   var root = document.getElementById('bdRing'); if (!root || !window.BD) return;
-  var q = function (s) { return root.querySelector(s); }, cfg = 'ap', zoom = false;
+  var q = function (s) { return root.querySelector(s); }, cfg = 'ap', zoom = false, nfr = 0;
   var neff0 = 2.446, ng = 4.18, lam0 = 1.55;
   var S = BD.bind(root, {
     R: { fmt: function (x) { return x.toFixed(1) + ' µm'; } },
     g: { fmt: function (x) { return (1000 * x).toFixed(0) + ' nm'; } },
-    a: { map: function (v) { return 0.3 * Math.pow(10, 2 * v / 100); }, fmt: function (x) { return x.toFixed(x < 10 ? 2 : 0) + ' dB/cm'; } }
+    a: { map: function (v) { return 0.3 * Math.pow(10, 2 * v / 100); }, fmt: function (x) { return x.toFixed(x < 10 ? 2 : 0) + ' dB/cm'; } },
+    det: { fmt: function () { return ''; } }   // labelled in draw(): its scale is the resonance width, out to half an FSR at either end
   }, function () { draw(); });
+  var FV = BD.field(q('[data-c="g"]'), { button: q('.bd-status'), hz: 1.1 });
   BD.seg(root, 'cfg', function (v) { cfg = v; draw(); });
   BD.seg(root, 'span', function (v) { zoom = v === 'zoom'; draw(); });
   // Point coupler between a ring and a straight bus (500 x 220 nm Si, TE): the femwell-fitted supermode model of the Chapter 9
@@ -34,6 +51,11 @@
     // resonance nearest 1550 nm, accounting for dispersion
     var lres = (function () { var x = neff0 * L / m0; for (var i = 0; i < 20; i++) { var ne = neff0 - (ng - neff0) * (x - lam0) / lam0; x = ne * L / m0; } return x; })();
     var ra = t1 * t2 * a, fw = (1 - ra) * lres * lres / (Math.PI * ng * L * Math.sqrt(ra));
+    // the laser: detuned from the resonance by a whole number of linewidths near the middle of the slider, half an FSR at its ends
+    var lasR = lres;   // the resonance itself, to well below a picometre (Newton on beta L = 2 pi m)
+    for (var it = 0; it < 4; it++) { var neR = neff0 - (ng - neff0) * (lasR - lam0) / lam0; lasR -= (neR * L / lasR - m0) / ((-(ng - neff0) / lam0 * lasR - neR) * L / (lasR * lasR)); }
+    var lasD = (S.det < 0 ? -1 : 1) * fw * (Math.pow(10, Math.abs(S.det) * Math.log10(fsr / (2 * fw) + 1)) - 1), lasL = lasR + lasD;
+    q('[data-v="det"]').textContent = Math.abs(lasD) < 1e-12 ? 'on resonance' : (lasD > 0 ? '+' : '−') + (Math.abs(lasD) < 1e-3 ? (Math.abs(lasD) * 1e6).toFixed(Math.abs(lasD) < 1e-5 ? 1 : 0) + ' pm' : (Math.abs(lasD) * 1e3).toFixed(2) + ' nm') + ' (' + (Math.abs(lasD) / fw).toFixed(Math.abs(lasD) < 10 * fw ? 2 : 0) + ' FWHM)';
     var span = zoom ? Math.max(8 * fw, 0.02 * fsr) : 3.2 * fsr, l0 = lres - span / 2, l1 = lres + span / 2;
     var xs = [], tp = [], td = [], N = 1600;
     for (var i = 0; i <= N; i++) {
@@ -49,36 +71,108 @@
     var f = BD.frame(dv, { x: [l0, l1], y: [ymin, 1], pad: { l: 44, b: 22 }, xt: xt, yt: [[-40, '−40'], [-30, '−30'], [-20, '−20'], [-10, '−10'], [0, '0 dB']] });
     if (cfg === 'ad') BD.line(f, xs, td, BD.C.blue, 1.7);
     BD.line(f, xs, tp, BD.C.gold, 1.9);
+    if (lasL >= l0 && lasL <= l1) {   // the laser wavelength of the field view
+      var neLs = neff0 - (ng - neff0) * (lasL - lam0) / lam0, cpL = Math.cos(2 * Math.PI * neLs * L / lasL), dnL = 1 - 2 * ra * cpL + ra * ra;
+      BD.vline(f, lasL, 'rgba(255,255,255,.55)', [2, 3]);
+      if (cfg === 'ad') BD.dot(f, lasL, Math.max(10 * Math.log10(Math.max((1 - t1 * t1) * (1 - t2 * t2) * a / dnL, 1e-7)), ymin), BD.C.blue, 3.5);
+      BD.dot(f, lasL, Math.max(10 * Math.log10(Math.max((t2 * t2 * a * a - 2 * t1 * t2 * a * cpL + t1 * t1) / dnL, 1e-7)), ymin), BD.C.gold, 3.5);
+    }
     dv.g.fillStyle = BD.C.gold; dv.g.fillText('through', f.p.l + 6, f.p.t + 12);
     if (cfg === 'ad') { dv.g.fillStyle = BD.C.blue; dv.g.fillText('drop', f.p.l + 62, f.p.t + 12); }
-    // ---- geometry: ring and bus(es) to scale, with a magnified inset of the gap
+    // ---- the optical field in the top view at the laser wavelength, from the same ring model: the coupler [[t, -j kappa],
+    // [-j kappa, t]] at the bottom (and at the top for add-drop), a e^{-j phi} per round trip. Ring just after the coupler:
+    // E0 = -j kappa1 / (1 - t1 t2 a e^{-j phi}); through (t1 - t2 a e^{-j phi}) / (1 - t1 t2 a e^{-j phi}); drop -j kappa2 E0 sqrt(a) e^{-j phi/2}
     (function () {
-      var dg = BD.setup(q('[data-c="g"]')), g = dg.g, ad = cfg === 'ad', wW = 0.5, cc = S.R + S.g + wW;   // centre-to-centre ring/bus
-      var leftW = dg.w * 0.6, top = 24, bot = dg.h - 14, spanY = 2 * cc + (ad ? 0 : wW) + 4, spanX = 2 * S.R + 24;
-      var sc = Math.min((bot - top) / spanY, (leftW - 30) / spanX), cx = leftW / 2, cy = ad ? (top + bot) / 2 : top + (S.R + 2) * sc;
-      var glow = Math.min(1, Math.log10(Math.max((1 - t1 * t1) / Math.pow(1 - ra, 2), 1)) / 3);
-      g.strokeStyle = 'rgba(255,214,120,' + (0.15 + 0.5 * glow).toFixed(2) + ')'; g.lineWidth = Math.max(6, wW * sc + 6); g.beginPath(); g.arc(cx, cy, S.R * sc, 0, 7); g.stroke();
-      g.strokeStyle = BD.GEO.si; g.lineWidth = Math.max(1.5, wW * sc); g.beginPath(); g.arc(cx, cy, S.R * sc, 0, 7); g.stroke(); g.lineWidth = 1;
-      var yb = cy + cc * sc; BD.wg(g, [[10, yb], [leftW - 10, yb]], Math.max(1.5, wW * sc));
-      BD.label(g, 'in →', 10, yb - 6, BD.C.white); BD.label(g, 'through', leftW - 10, yb - 6, BD.C.gold, 'right');
-      if (ad) { var yt = cy - cc * sc; BD.wg(g, [[10, yt], [leftW - 10, yt]], Math.max(1.5, wW * sc)); BD.label(g, '← drop', 10, yt - 6, BD.C.blue); }
-      BD.dim(g, cx, cy, cx + S.R * sc * 0.707, cy - S.R * sc * 0.707, 'R = ' + S.R.toFixed(1) + ' µm', BD.C.gold, -10);
-      BD.scalebar(g, 16, dg.h - 6, sc, Math.min(80, leftW / 3));
-      // inset: a 3 um wide window around the coupling point, magnified
-      var ix = leftW + 14, iw = dg.w - ix - 10, ih = bot - top, M = Math.min(iw / 3.2, ih / (wW * 2 + S.g + 1.2));
-      g.strokeStyle = BD.C.grid; g.strokeRect(ix, top, iw, ih); g.save(); g.beginPath(); g.rect(ix, top, iw, ih); g.clip();
-      var icx = ix + iw / 2, ibus = top + ih * 0.66, Rp = S.R * M;
-      g.fillStyle = BD.GEO.si; g.fillRect(ix, ibus - wW / 2 * M, iw, wW * M);
-      var ccy = ibus - (S.g + wW) * M - Rp;   // ring centre far above; draw its bottom arc
-      g.strokeStyle = BD.GEO.si; g.lineWidth = wW * M; g.beginPath(); g.arc(icx, ccy, Rp, Math.PI / 2 - 3.6 / S.R, Math.PI / 2 + 3.6 / S.R); g.stroke(); g.lineWidth = 1;
-      g.restore();
-      var y1 = ibus - wW / 2 * M, y0 = y1 - S.g * M;
-      // the gap's label just right of its dimension line, kept inside a narrow inset; the magnification note shortened to fit
-      var gl = 'g = ' + (1000 * S.g).toFixed(0) + ' nm', glw = g.measureText(gl).width, gx = Math.max(ix + 4, Math.min(icx + 18, dg.w - 10 - glw));
-      if (y1 - y0 >= 12) BD.dim(g, gx, y0, gx, y1, gl, BD.C.gold, -(glw / 2 + 6));   // a gap too thin to hold the label: label it under the bus
-      else { BD.dim(g, gx, y0, gx, y1, '', BD.C.gold, 0); BD.label(g, gl, gx, ibus + wW / 2 * M + 13, BD.C.gold); }
-      var mg = '×' + (M / sc).toFixed(0); mg = [mg + ' (500 nm wide waveguides)', mg + ', 500 nm wide', mg].filter(function (s) { return ix + 4 + g.measureText(s).width <= dg.w - 4; })[0] || mg;
-      BD.label(g, mg, ix + 4, top + 12, BD.C.dim);
+      var cv = q('[data-c="g"]'), W = cv.clientWidth, nar = W < 480, ad = cfg === 'ad', wW = 0.5;
+      cv.style.height = (nar ? 360 : 240) + 'px';
+      var H = cv.clientHeight, fw = nar ? W : Math.round(W * 0.6), fh = nar ? 220 : H;
+      var top = 28, yT = ad ? top + 20 : top + 2, yB = fh - 24, av = yB - yT, cx = fw / 2;   // room for the ring and bus(es); the scale bar below
+      var sc = Math.min(av / (2 * S.R + 2), (fw - 30) / (2 * S.R + 24)), half, gpx, it2;
+      for (it2 = 0; it2 < 3; it2++) {   // widths (and the gap) opened up to stay visible, and the ring scaled to leave room for them
+        half = Math.max(wW / 2 * sc, 3.2); gpx = Math.max(S.g * sc, 2.5);
+        sc = Math.min(sc, (av - (ad ? 6 * half + 2 * gpx : 4 * half + gpx)) / (2 * S.R));
+      }
+      half = Math.max(wW / 2 * sc, 3.2); gpx = Math.max(S.g * sc, 2.5);
+      var str = half / (wW / 2 * sc), ccp = S.R * sc + 2 * half + gpx, cy = ad ? (yT + yB) / 2 : yT + S.R * sc + half;
+      var neL = neff0 - (ng - neff0) * (lasL - lam0) / lam0, phi = 2 * Math.PI * neL * L / lasL, mm = Math.round(phi / (2 * Math.PI)), dlt = phi - 2 * Math.PI * mm;
+      var cr = BD.crests(lasL / neL * sc, 6), bd = 2 * Math.PI * neL / (lasL * cr.n), md = Math.max(1, Math.round(mm / cr.n)), Phd = 2 * Math.PI * md + dlt;
+      var k1 = Math.sqrt(1 - t1 * t1), k2 = Math.sqrt(1 - t2 * t2);
+      // complex helpers [re, im]
+      var cmul = function (x, y) { return [x[0] * y[0] - x[1] * y[1], x[0] * y[1] + x[1] * y[0]]; };
+      var cdiv = function (x, y) { var d = y[0] * y[0] + y[1] * y[1]; return [(x[0] * y[0] + x[1] * y[1]) / d, (x[1] * y[0] - x[0] * y[1]) / d]; };
+      var ejp = [Math.cos(phi), -Math.sin(phi)], den = [1 - ra * ejp[0], -ra * ejp[1]];
+      var E0 = cdiv([0, -k1], den), Et = cdiv([t1 - t2 * a * ejp[0], -t2 * a * ejp[1]], den);
+      var Ed = cmul([0, -k2], [E0[0] * Math.sqrt(a), E0[1] * Math.sqrt(a)]);   // in the display frame the carrier e^{-j phi/2} is the drawn phase
+      var pT = Et[0] * Et[0] + Et[1] * Et[1], pD = Ed[0] * Ed[0] + Ed[1] * Ed[1], pR = E0[0] * E0[0] + E0[1] * E0[1];
+      var Leff = Math.sqrt(2 * Math.PI * S.R / 8.75), thc = Math.min(1, Leff / S.R);   // the coupling region of the model's point coupler (um, rad)
+      var xL = -cx / sc, xR = (fw - cx) / sc, Pc = bd * (0 - xL);   // bus ends (um from the ring centre) and the carrier phase at the coupler
+      var yb = cy + ccp, yt = cy - ccp;
+      FV.grid(0, 16, fw, fh - 16);
+      // the bus: input, then the through field after the coupling region
+      var bus = [[0, yb], [cx - Leff / 2 * sc, yb], [cx + Leff / 2 * sc, yb], [fw, yb]], busA = [[1, 0], [1, 0], Et, Et];
+      var dec = Math.max(1.2, lasL / (2 * Math.PI * Math.sqrt(neL * neL - 1.444 * 1.444)) * sc * str);
+      FV.guide(bus, { half: half, decay: dec, amp: function (n) { return busA[n]; }, phase: function (n) { return bd * ((bus[n][0] - cx) / sc - xL); } });
+      // the ring, from the end of the bottom coupling region round to its start; a^(theta/2 pi), t2 at the top, and back
+      // across the coupling region to E0 (with the round-trip phase offset dlt, which is zero on resonance)
+      var th = [], nr = Math.max(96, Math.ceil(2 * Math.PI * S.R * sc / 3)), j;
+      for (j = 0; j <= nr; j++) th.push(thc / 2 + (2 * Math.PI - thc) * j / nr);
+      for (j = 1; j <= 6; j++) th.push(2 * Math.PI - thc / 2 + thc * j / 6);
+      var free = function (t) {   // ring amplitude without the bottom coupler's step
+        var g2 = !ad ? 1 : t < Math.PI - thc / 2 ? 1 : t > Math.PI + thc / 2 ? t2 : 1 + (t2 - 1) * (t - Math.PI + thc / 2) / thc, s = Math.pow(a, t / (2 * Math.PI)) * g2;
+        return [E0[0] * s, E0[1] * s];
+      };
+      var ringA = th.map(function (t) {
+        if (t <= 2 * Math.PI - thc / 2) return free(t);
+        var u = (t - 2 * Math.PI + thc / 2) / thc, A1 = free(t), s = Math.pow(a, (t - 2 * Math.PI) / (2 * Math.PI));
+        var A2 = cmul([E0[0] * s, E0[1] * s], [Math.cos(dlt), Math.sin(dlt)]);
+        return [(1 - u) * A1[0] + u * A2[0], (1 - u) * A1[1] + u * A2[1]];
+      });
+      var ring = th.map(function (t) { return [cx + S.R * sc * Math.sin(t), cy + S.R * sc * Math.cos(t)]; });
+      FV.guide(ring, { half: half, decay: dec, amp: function (n) { return ringA[n]; }, phase: function (n) { return Pc + Phd * th[n] / (2 * Math.PI); } });
+      if (ad) {   // the drop bus: light leaves to the left, nothing enters from the right (the add port)
+        var drop = [[fw, yt], [cx + Leff / 2 * sc, yt], [cx - Leff / 2 * sc, yt], [0, yt]], dropA = [[0, 0], [0, 0], Ed, Ed];
+        FV.guide(drop, { half: half, decay: dec, amp: function (n) { return dropA[n]; }, phase: function (n) { return Pc + Phd / 2 + bd * (cx - drop[n][0]) / sc; } });
+      }
+      // the field above the input amplitude drawn compressed (|E|^0.25), so the bus stays visible beside a ring that holds hundreds of times the power
+      var re = FV.re, im = FV.im;
+      for (j = 0; j < re.length; j++) { var A = re[j] * re[j] + im[j] * im[j]; if (A > 1) { var cf = Math.pow(A, -0.375); re[j] *= cf; im[j] *= cf; } }
+      q('[data-o="tag"]').textContent = cr.n > 1 ? 'field (red +, blue −) · ' + cr.note : 'field (red +, blue −), top view';
+      var st = [];
+      if (str > 1.05) st.push('widths and gap ×' + str.toFixed(1));
+      if (cr.n > 1) st.push('crests drawn 1 per ' + cr.n + ' λ');
+      st.push('field above the input level drawn as |E|^¼');
+      st.push('from the transfer function, not a full-wave solve');
+      var fst = q('[data-o="fst"]'), stTxt = st.join(' · '), msTxt = function () { return FV.ms ? ' · frame ' + FV.ms.toFixed(1) + ' ms' : ''; };
+      fst.textContent = stTxt + msTxt();
+      var pct = function (p) { return p >= 0.995 ? '100 %' : p < 0.0005 ? '0 %' : (100 * p).toFixed(p < 0.1 ? 1 : 0) + ' %'; };
+      FV.overlay = function (g) {
+        BD.edges(g, bus, half); BD.edges(g, ring, half); if (ad) BD.edges(g, drop, half);
+        BD.label(g, 'in →', 6, yb - half - 6, BD.C.white);
+        BD.label(g, 'through ' + pct(pT), fw - 6, yb - half - 6, BD.C.gold, 'right');
+        if (ad) BD.label(g, '← drop ' + pct(pD), 6, yt - half - 6, BD.C.blue);
+        var rl = 'ring ×' + (pR >= 10 ? pR.toFixed(0) : pR >= 1 ? pR.toFixed(1) : pR >= 0.01 ? pR.toFixed(2) : pR.toPrecision(1));
+        BD.dim(g, cx, cy, cx + S.R * sc * 0.707, cy - S.R * sc * 0.707, 'R = ' + S.R.toFixed(1) + ' µm', BD.C.gold, -10);
+        if (S.R * sc > 40) BD.label(g, rl, cx, cy + 16, BD.C.white, 'center');
+        else BD.label(g, rl, cx + S.R * sc + half + 6, cy + 4, BD.C.white);
+        var sbm = Math.min(80, fw / 3), sbp = BD.nice(sbm / sc) * sc; BD.scalebar(g, fw - 12 - sbp, fh - 6, sc, sbm);
+        // inset: a 3 um wide window around the coupling point, magnified; beside the field, or under it on a narrow panel
+        var ix = nar ? 8 : fw + 14, iw = W - ix - (nar ? 8 : 10), it = nar ? fh + 6 : top, ih = (nar ? H - 8 : fh - 16) - it, M = Math.min(iw / 3.2, ih / (wW * 2 + S.g + 1.2));
+        g.strokeStyle = BD.C.grid; g.strokeRect(ix, it, iw, ih); g.save(); g.beginPath(); g.rect(ix, it, iw, ih); g.clip();
+        var icx = ix + iw / 2, ibus = it + ih * (nar ? 0.72 : 0.66), Rp = S.R * M;
+        g.fillStyle = BD.GEO.si; g.fillRect(ix, ibus - wW / 2 * M, iw, wW * M);
+        var ccy = ibus - (S.g + wW) * M - Rp;   // ring centre far above; draw its bottom arc
+        g.strokeStyle = BD.GEO.si; g.lineWidth = wW * M; g.beginPath(); g.arc(icx, ccy, Rp, Math.PI / 2 - 3.6 / S.R, Math.PI / 2 + 3.6 / S.R); g.stroke(); g.lineWidth = 1;
+        g.restore();
+        var y1 = ibus - wW / 2 * M, y0 = y1 - S.g * M;
+        // the gap's label just right of its dimension line, kept inside a narrow inset; the magnification note shortened to fit
+        var gl = 'g = ' + (1000 * S.g).toFixed(0) + ' nm', glw = g.measureText(gl).width, gx = Math.max(ix + 4, Math.min(icx + 18, ix + iw - glw));
+        if (y1 - y0 >= 12) BD.dim(g, gx, y0, gx, y1, gl, BD.C.gold, -(glw / 2 + 6));   // a gap too thin to hold the label: label it under the bus
+        else { BD.dim(g, gx, y0, gx, y1, '', BD.C.gold, 0); BD.label(g, gl, gx, ibus + wW / 2 * M + 13, BD.C.gold); }
+        var mg = '×' + (M / sc).toFixed(0); mg = [mg + ' (500 nm wide waveguides)', mg + ', 500 nm wide', mg].filter(function (s) { return ix + 4 + g.measureText(s).width <= ix + iw - 4; })[0] || mg;
+        BD.label(g, mg, ix + 4, it + 12, BD.C.dim);
+        if (++nfr % 30 === 0) fst.textContent = stTxt + msTxt();
+      };
+      FV.render();
     })();
     // ---- readouts
     var tmin = (t2 * t2 * a * a - 2 * t1 * t2 * a + t1 * t1) / Math.pow(1 - ra, 2);
@@ -92,6 +186,9 @@
     var er = -10 * Math.log10(Math.max(tmin, 1e-7)); q('[data-o="er"]').textContent = er > 60 ? '> 60 dB' : er.toFixed(1) + ' dB';
     q('[data-o="fi"]').textContent = (fsr / fw).toFixed(0);
     q('[data-o="bu"]').textContent = bu.toFixed(0) + '×';
+    var tc = t2 * a, crit = Math.abs(t1 - tc) / (1 - tc + 1e-9) < 0.15;   // the through port's null needs t1 = t2 a (t = a for the all-pass ring)
+    BD.pill(q('[data-o="pill"]'), crit ? 'critical' : t1 > tc ? 'under-coupled' : 'over-coupled', crit ? 'ok' : 'warn');
+    BD.pill(q('[data-o="pill2"]'), Math.abs(lasD) <= fw / 2 ? 'on resonance' : 'off resonance', Math.abs(lasD) <= fw / 2 ? 'ok' : '');
     var c, ratio = t1 * t2 / a;
     if (cfg === 'ap') {
       if (Math.abs(t1 - a) / (1 - a + 1e-9) < 0.15) c = '<b>Near critical coupling</b> (t ≈ a): the light coupled out of the ring cancels the light passing by, and the through port drops to almost nothing.';

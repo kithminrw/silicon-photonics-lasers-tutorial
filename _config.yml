@@ -92,6 +92,7 @@ defaults:
       layout: "default"
 
 exclude:
+  - .claude/
   - tools/
   - figsrc/
   - labs/*.png

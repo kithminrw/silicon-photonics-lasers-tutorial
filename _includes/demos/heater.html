@@ -12,8 +12,21 @@
     <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">step response at the waveguide (log time)</span></div>
     <div class="bd-scope tall"><canvas data-c="m" aria-hidden="true"></canvas><span class="bd-tag">power for π against speed, all six designs</span></div>
   </div>
-  <div class="bd-read" aria-live="polite"><span>P<sub>π</sub> <b data-o="pp">–</b></span><span>waveguide ΔT <b data-o="dt">–</b></span><span>phase shift <b data-o="ph">–</b></span><span>10–90 % rise <b data-o="tr">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>P<sub>π</sub> <b data-o="pp">–</b></span><span>waveguide ΔT <b data-o="dt">–</b></span><span>phase shift <b data-o="ph">–</b></span><span>10–90 % rise <b data-o="tr">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Find P<sub>π</sub>.</b> With the plain TiN heater, raise the power to 26 mW: the phase reaches 1.00 π, a 180° shift. Now change the length: ΔT falls from 13.7 K at 300 µm to 4.1 K at 1 mm, but the phase does not move.</li>
+    <li><b>Isolate the heater.</b> Switch to trenches: P<sub>π</sub> falls to 16.4 mW and the rise slows only to 21 µs. Switch to undercut: 4.5 mW, but 179 µs.</li>
+    <li><b>Heat the waveguide itself.</b> Switch to doped silicon: P<sub>π</sub> is 22.1 mW, and the step response starts at once, reaching 10 % in 0.04 µs instead of 1.4 µs.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>A 1 mm heater replaces a 300 µm one with the same cross-section. What happens to P<sub>π</sub>?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="ΔT falls as 1/L while the phase accumulates over L, so the length cancels: only the cross-section, through G′, sets P_π (Section 18.3).">It stays the same</button>
+      <button type="button" data-why="The longer heater needs a smaller ΔT, but it has 3.3 times more waveguide to heat: the power is unchanged.">It falls 3.3 times</button>
+      <button type="button" data-why="There is more waveguide to heat, but each micrometre needs proportionally less temperature rise; the two cancel.">It rises 3.3 times</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -88,6 +101,7 @@
     q('[data-o="dt"]').textContent = dT.toFixed(1) + ' K';
     q('[data-o="ph"]').textContent = ph.toFixed(2) + ' π';
     q('[data-o="tr"]').textContent = ((C.t90 - C.t10) * 1e6).toFixed(1) + ' µs';
+    BD.pill(q('[data-o="pill"]'), Math.abs(ph - 1) < 0.03 ? '180° shift' : '', 'ok');
     var c = 'The phase shift is ' + ph.toFixed(2) + ' π whatever the length: a longer heater spreads the same power over more waveguide, so ΔT falls as 1/L while the phase grows as L. ';
     if (cf === 'plain') c += 'Most of the heat flows straight down through the 2 µm BOX into the silicon substrate, the heat sink. ';
     else if (cf === 'trench') c += 'Air trenches 3 µm away stop the heat spreading sideways in the oxide, so more of it stays near the waveguide: P<sub>π</sub> falls from ' + cs(ht, 'plain').P_pi.toFixed(0) + ' to ' + C.P_pi.toFixed(0) + ' mW. ';

@@ -14,6 +14,19 @@
   <div class="bd-scope short"><canvas data-c="x" aria-hidden="true"></canvas><span class="bd-tag">cross-section to scale: nominal and bluest die</span></div>
   <div class="bd-read" aria-live="polite"><span>σ of the shift <b data-o="s">–</b></span><span>full range <b data-o="rg">–</b></span><span>dies within ±1 nm <b data-o="y">–</b></span><span>heater power for the bluest die <b data-o="p">–</b></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Remove the thickness variation.</b> Set its range to 0: σ halves, from 2.26 to 1.11 nm, and the heater budget falls from 49 to 23 mW. Thickness counts 1.4 nm per nanometre, width 0.6.</li>
+    <li><b>Leave only the random part.</b> Set both wafer-scale ranges to 0: 72 % of the dies land within ±1 nm, but the full range is still 4.0 nm, and the bluest die still needs 22 mW.</li>
+    <li><b>Make new wafers.</b> At the default ranges, press new wafer a few times: the heater budget swings between about 44 and 58 mW. Budget for the worst wafer, not the average.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>Heaters only red-shift a ring. Which die sets the heater budget?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="The design is offset so that the reddest die needs no heating; the bluest must then be pulled red by the whole spread, here 8.8 nm or 49 mW at 0.18 nm/mW.">The bluest die, a full spread away from the reddest</button>
+      <button type="button" data-why="A die shifted to the red needs less heat, not more: only the distance from the reddest die counts, because heaters cannot blue-shift.">The die furthest from the wafer mean, in either direction</button>
+      <button type="button" data-why="The smooth patterns can put the extremes anywhere, often at the edge; it is the bluest die, wherever it is, that needs the most power.">The die at the centre of the wafer</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {

@@ -6,11 +6,25 @@
     <label class="bd-sl"><span>Euler fraction p <b data-v="p"></b></span><input type="range" data-k="p" min="0" max="1" step="0.01" value="1" aria-label="Euler fraction"></label>
   </div>
   <div class="bd-row">
-    <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top view to scale, 500 nm waveguides</span></div>
-    <div class="bd-scope tall"><canvas data-c="k" aria-hidden="true"></canvas><span class="bd-tag">curvature along the bend</span></div>
+    <div><div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag" data-o="tag">field (red +, blue −), top view, 500 nm guide</span></div>
+      <div class="bd-status"><span data-o="fst"></span></div></div>
+    <div class="bd-scope tall" style="align-self:start"><canvas data-c="k" aria-hidden="true"></canvas><span class="bd-tag">curvature along the bend</span></div>
   </div>
-  <div class="bd-read" aria-live="polite"><span>circular: radius <b data-o="rc">–</b>, length <b data-o="lc">–</b></span><span>Euler: minimum radius <b data-o="re">–</b>, length <b data-o="le">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>circular: radius <b data-o="rc">–</b>, length <b data-o="lc">–</b></span><span>Euler: minimum radius <b data-o="re">–</b>, length <b data-o="le">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Count the cost.</b> At the default R = 5 µm, the full Euler bend's tightest radius is 2.68 µm against 5.0 µm, and it is 8.41 µm long against 7.85 µm: 7 % longer for the same footprint.</li>
+    <li><b>Make it circular.</b> Set R = 2 µm and p = 0: the curvature jumps from 0 to 1/R at both ends, and the mode steps 100 nm outward where the straight guide meets the bend.</li>
+    <li><b>Go back to Euler.</b> At p = 1 the mode drifts out and back smoothly, leaning 140 nm out at the tightest radius of 1.07 µm. Below 2–3 µm a silicon strip starts to radiate, which this demo does not model.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>For a 5 µm footprint the full Euler bend reaches a tightest radius of only 2.68 µm. Why is it still usually the better choice in silicon strips?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="Radiation is negligible above 2–3 µm in a silicon strip, so the mode mismatch at the two junctions of a circular bend dominates, and the Euler bend has no junctions where the curvature jumps.">Its curvature never jumps, so the mode shifts gradually instead of being mismatched at two junctions</button>
+      <button type="button" data-why="It is longer, not shorter: 8.41 µm against 7.85 µm for the circular bend with the same footprint.">It is shorter, so there is less length to scatter</button>
+      <button type="button" data-why="Radiation loss grows as the radius shrinks, roughly as C₁e^(−C₂R); the Euler bend wins despite its tighter radius, not because of it.">A tighter radius radiates less</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -29,22 +43,101 @@
     var scale = R / x;   // scale the unit-curvature path so its end point lands at (R, R)
     return { pts: pts.map(function (p2) { return [p2[0] * scale, p2[1] * scale]; }), ks: ks.map(function (k) { return k / scale; }), ss: ss.map(function (s) { return s * scale; }), L: L * scale, kmax: km / scale };
   }
+  // Local mode of the bent guide, for the field view only. The strip is a 500 nm slab whose core index (2.667) gives
+  // the strip's n_eff = 2.446 at 1550 nm (femwell, Chapter 6), bent by the conformal map n'(x) = n(x)(1 + κx) with x
+  // outward, and solved by finite differences for a table of curvatures κ; the field is set to zero beyond the
+  // radiation caustic, so radiation and junction losses are not modelled. Rows are power-normalised.
+  var MT = (function () {
+    var k0 = 2 * Math.PI / 1.55, nc = 2.6669, ncl = 1.444, N = 241, xa = -1, dx = 2 / (N - 1), K = 50, kmax = 2, od = 1 / (dx * dx);
+    var rows = [], neff = [], peak = [];
+    for (var kk = 0; kk <= K; kk++) {
+      var kap = kmax * kk / K, xr = kap > 0 ? (2.446 / ncl - 1) / kap : 1e9, nU = N, i, it;
+      while (nU > 3 && xa + (nU - 1) * dx > 0.95 * xr) nU--;   // grid points inside the caustic
+      var dg = new Float64Array(nU), lo = 1e30, hi = -1e30;
+      for (i = 0; i < nU; i++) { var x = xa + i * dx, n = (Math.abs(x) <= 0.25 ? nc : ncl) * Math.max(0.05, 1 + kap * x);
+        dg[i] = k0 * k0 * n * n - 2 * od; lo = Math.min(lo, dg[i] - 2 * od); hi = Math.max(hi, dg[i] + 2 * od); }
+      var above = function (mu) { var c = 0, qq = 1; for (var m = 0; m < nU; m++) { qq = dg[m] - mu - (m ? od * od / qq : 0); if (qq === 0) qq = 1e-300; if (qq > 0) c++; } return c; };
+      for (it = 0; it < 64; it++) { var mid = (lo + hi) / 2; if (above(mid) > 0) lo = mid; else hi = mid; }   // largest eigenvalue (Sturm count)
+      var sig = hi + 1e-9 * Math.abs(hi), y = new Float64Array(nU).fill(1), cp = new Float64Array(nU), dp = new Float64Array(nU);
+      for (it = 0; it < 3; it++) {   // inverse iteration with a shift just above it (tridiagonal solve)
+        for (i = 0; i < nU; i++) { var mm = dg[i] - sig - (i ? od * cp[i - 1] : 0); cp[i] = od / mm; dp[i] = (y[i] - (i ? od * dp[i - 1] : 0)) / mm; }
+        y[nU - 1] = dp[nU - 1]; for (i = nU - 2; i >= 0; i--) y[i] = dp[i] - cp[i] * y[i + 1];
+        var nrm = 0; for (i = 0; i < nU; i++) nrm += y[i] * y[i]; nrm = Math.sqrt(nrm * dx); for (i = 0; i < nU; i++) y[i] /= nrm;
+      }
+      var row = new Float32Array(N), im = 0; if (y[(nU / 2) | 0] < 0) for (i = 0; i < nU; i++) y[i] = -y[i];
+      for (i = 0; i < nU; i++) { row[i] = y[i]; if (y[i] > y[im]) im = i; }
+      rows.push(row); neff.push(Math.sqrt(hi) / k0); peak.push(xa + im * dx);
+    }
+    var sc0 = 1 / Math.max.apply(null, rows[0]); rows.forEach(function (r) { for (var i = 0; i < N; i++) r[i] *= sc0; });   // straight guide: peak 1
+    var at = function (arr, kap) { var u = Math.max(0, Math.min(K, kap / kmax * K)), j = Math.min(K - 1, Math.floor(u)), w = u - j; return arr[j] * (1 - w) + arr[j + 1] * w; };
+    return {
+      neff: function (kap) { return at(neff, kap); }, peak: function (kap) { return at(peak, kap); },
+      f: function (kap, x) {   // the field at x (µm, outward) for curvature kap
+        var u = Math.max(0, Math.min(K, kap / kmax * K)), j = Math.min(K - 1, Math.floor(u)), w = u - j, v = (x - xa) / dx;
+        if (v < 0 || v > N - 1) return 0;
+        var i = Math.min(N - 2, Math.floor(v)), t = v - i, a = rows[j], b = rows[j + 1];
+        return (a[i] * (1 - t) + a[i + 1] * t) * (1 - w) + (b[i] * (1 - t) + b[i + 1] * t) * w;
+      }
+    };
+  })();
+  var FV = BD.field(q('[data-c="g"]'), { button: q('.bd-status'), hz: 1 }), nfr = 0, RA = null;
   function draw() {
     var R = S.R, e = euler(S.p, R), c = euler(0, R);
-    // ---- geometry
-    var dg = BD.setup(q('[data-c="g"]')), g = dg.g, pad = 30, sc = Math.min((dg.w - 2 * pad) / (R * 1.25), (dg.h - 2 * pad - 10) / (R * 1.25)), x0 = pad, y0 = dg.h - pad;
-    var X = function (x) { return x0 + x * sc; }, Y = function (y) { return y0 - y * sc; }, wPx = Math.max(1.5, 0.5 * sc);
-    g.fillStyle = BD.GEO.ox; g.fillRect(0, 22, dg.w, dg.h - 22);
-    // lead-in and lead-out straights
-    BD.wg(g, [[X(-0.4 * R / 1.25), Y(0)], [X(0), Y(0)]], wPx); BD.wg(g, [[X(R), Y(R)], [X(R), Y(R * 1.2)]], wPx);
-    BD.wg(g, c.pts.map(function (p) { return [X(p[0]), Y(p[1])]; }), wPx, 'rgba(127,184,240,.45)');
-    BD.wg(g, e.pts.map(function (p) { return [X(p[0]), Y(p[1])]; }), wPx, BD.GEO.si);
-    // colour the Euler path by curvature
-    for (var i = 1; i < e.pts.length; i += 3) { var t = e.ks[i] / e.kmax; g.fillStyle = 'rgba(255,214,120,' + (0.15 + 0.7 * t).toFixed(2) + ')'; g.fillRect(X(e.pts[i][0]) - 1.5, Y(e.pts[i][1]) - 1.5, 3, 3); }
-    BD.dim(g, X(0), Y(0) + 14, X(R), Y(0) + 14, 'R = ' + R.toFixed(1) + ' µm', BD.C.gold, 11);
-    BD.label(g, 'circular (faint)', X(R * 0.707) - 9 - wPx * 0.36, Y(R * 0.293) - 9 - wPx * 0.36, 'rgba(127,184,240,.9)', 'right');   // inside the arc's midpoint (the Euler path runs outside it)
-    BD.label(g, S.p > 0 ? 'Euler (glow ∝ curvature)' : '', X(R * 0.05), Y(R * 0.95), BD.C.gold);
-    BD.scalebar(g, dg.w - 90, 34, sc, 60);
+    // ---- top view to scale: the local bend mode (MT above) at each point of the Euler path, × e^(−jφ(s)) along it
+    (function () {
+      var cv = q('[data-c="g"]'), W = cv.clientWidth, H = cv.clientHeight, pad = 30, top = 20;
+      var sc = Math.min((W - 2 * pad) / (R * 1.25), (H - 2 * pad - 10) / (R * 1.25));
+      var k = Math.max(1, Math.min(2.5, 24 / (0.5 * sc))), half = 0.25 * sc * k, x0 = pad, y0 = H - Math.max(pad, half + 24);
+      var X = function (x) { return x0 + x * sc; }, Y = function (y) { return y0 - y * sc; };
+      // the path: lead-in straight, the bend (points about 4 px apart) and lead-out straight, each vertex with its curvature
+      var V = [], j, i, nb = e.pts.length - 1, stp = Math.max(1, Math.min(25, Math.round(4 / (e.L * sc / nb))));
+      for (j = 0; j <= 4; j++) V.push([-(x0 + 6) / sc * (1 - j / 4), 0, 0]);
+      for (j = 0; j <= nb; j += stp) V.push([e.pts[j][0], e.pts[j][1], j || S.p > 0 ? e.ks[j] : e.ks[1]]);   // a circular bend starts at full curvature
+      if (nb % stp) V.push([e.pts[e.pts.length - 1][0], e.pts[e.pts.length - 1][1], e.ks[e.ks.length - 1]]);
+      var Lo = (Y(R) - top + 6) / sc; for (j = 0; j <= 4; j++) V.push([R, R + Lo * j / 4, 0]);
+      var P = V.map(function (v) { return [X(v[0]), Y(v[1])]; }), cr = BD.crests(1.55 / 2.446 * sc, 6), ph = [0];
+      for (j = 1; j < V.length; j++) ph.push(ph[j - 1] + 2 * Math.PI / 1.55 * MT.neff((V[j][2] + V[j - 1][2]) / 2) * Math.hypot(V[j][0] - V[j - 1][0], V[j][1] - V[j - 1][1]) / cr.n);
+      FV.grid(0, top, W, H - top);
+      var nx = FV.nx, ny = FV.ny, n = nx * ny, Rb = 0.75 * sc * k, Rb2 = Rb * Rb;   // band: core + 4 decay lengths
+      if (!RA || RA.n !== n) RA = { n: n, d2: new Float32Array(n), sk: new Int32Array(n), st: new Float32Array(n), sg: new Int8Array(n) };
+      var d2 = RA.d2, sk = RA.sk, st = RA.st, sg = RA.sg; d2.fill(Rb2); sk.fill(-1);
+      for (var m = 0; m < P.length - 1; m++) {   // nearest segment, its parameter and the side (outward +) for each pixel
+        var ax = P[m][0], ay = P[m][1] - top, dx = P[m + 1][0] - P[m][0], dy = P[m + 1][1] - P[m][1], L2 = dx * dx + dy * dy;
+        if (!(L2 > 0)) continue;
+        var i0 = Math.max(0, Math.floor(Math.min(ax, ax + dx) - Rb)), i1 = Math.min(nx - 1, Math.ceil(Math.max(ax, ax + dx) + Rb));
+        var j0 = Math.max(0, Math.floor(Math.min(ay, ay + dy) - Rb)), j1 = Math.min(ny - 1, Math.ceil(Math.max(ay, ay + dy) + Rb));
+        for (j = j0; j <= j1; j++) for (i = i0; i <= i1; i++) {
+          var px = i + 0.5 - ax, py = j + 0.5 - ay, t = (px * dx + py * dy) / L2; t = t < 0 ? 0 : t > 1 ? 1 : t;
+          var ex = px - t * dx, ey = py - t * dy, q2 = ex * ex + ey * ey, pp = j * nx + i;
+          if (q2 < d2[pp]) { d2[pp] = q2; sk[pp] = m; st[pp] = t; sg[pp] = dx * ey - dy * ex > 0 ? 1 : -1; }
+        }
+      }
+      for (var pq = 0; pq < n; pq++) {
+        var sm = sk[pq]; if (sm < 0) continue;
+        var tt = st[pq], kap = V[sm][2] + tt * (V[sm + 1][2] - V[sm][2]), pr = MT.f(kap, sg[pq] * Math.sqrt(d2[pq]) / (sc * k)), PH = ph[sm] + tt * (ph[sm + 1] - ph[sm]);
+        FV.re[pq] = pr * Math.cos(PH); FV.im[pq] = -pr * Math.sin(PH);
+      }
+      var kx = Math.max.apply(null, e.ks), sh = 1000 * MT.peak(kx);
+      q('[data-o="tag"]').textContent = cr.n > 1 ? 'field (red +, blue −) · ' + cr.note : 'field (red +, blue −), top view, 500 nm guide';
+      var stx = ['local bend mode (500 nm slab, conformal map), not a full-wave solve', 'peak ' + sh.toFixed(0) + ' nm outward at the tightest point'];
+      if (k > 1.05) stx.push('widths ×' + k.toFixed(1));
+      if (cr.n > 1) stx.push('crests drawn 1 per ' + cr.n + ' λ');
+      stx.push('no radiation or junction loss');
+      var fst = q('[data-o="fst"]'), stTxt = stx.join(' · '), msTxt = function () { return FV.ms ? ' · frame ' + FV.ms.toFixed(1) + ' ms' : ''; };
+      fst.textContent = stTxt + msTxt();
+      var cp = c.pts.map(function (pt) { return [X(pt[0]), Y(pt[1])]; });
+      FV.overlay = function (g) {
+        BD.edges(g, cp, half, 'rgba(127,184,240,.5)');
+        BD.edges(g, P, half);
+        g.strokeStyle = 'rgba(255,255,255,.3)'; g.setLineDash([2, 4]); g.beginPath(); P.forEach(function (pt, ii) { if (ii) g.lineTo(pt[0], pt[1]); else g.moveTo(pt[0], pt[1]); }); g.stroke(); g.setLineDash([]);
+        BD.dim(g, X(0), Y(0) + half + 8, X(R), Y(0) + half + 8, 'R = ' + R.toFixed(1) + ' µm', BD.C.gold, 11);
+        BD.label(g, 'circular (faint)', X(R * 0.707) - 9 - half * 0.72, Y(R * 0.293) - 9 - half * 0.72, 'rgba(127,184,240,.9)', 'right');   // inside the arc's midpoint (the Euler path runs outside it)
+        BD.label(g, S.p > 0 ? 'Euler, p = ' + S.p.toFixed(2) : '', X(R * 0.05), Y(R * 0.95), BD.C.gold);
+        BD.scalebar(g, W - 90, 34, sc, 60);
+        if (++nfr % 30 === 0) fst.textContent = stTxt + msTxt();
+      };
+      FV.render();
+    })();
     // ---- curvature against path length
     var dk = BD.setup(q('[data-c="k"]')), Lm = Math.max(e.L, c.L), km = Math.max(e.kmax, c.kmax) * 1.15, f = BD.frame(dk, { x: [0, Lm], y: [0, km], pad: { l: 46, b: 22 },
       xt: [[0, '0'], [Lm / 2, (Lm / 2).toFixed(1)], [Lm, Lm.toFixed(1) + ' µm']], yt: [[0, '0'], [c.kmax, (1 / c.kmax).toFixed(1) + ' µm⁻¹ ·'], [e.kmax, '']] });
@@ -53,6 +146,7 @@
     dk.g.fillStyle = BD.C.dim; dk.g.fillText('curvature 1/r (µm⁻¹)', f.p.l + 6, f.p.t + 12);
     q('[data-o="rc"]').textContent = R.toFixed(1) + ' µm'; q('[data-o="lc"]').textContent = c.L.toFixed(2) + ' µm';
     q('[data-o="re"]').textContent = (1 / e.kmax).toFixed(2) + ' µm'; q('[data-o="le"]').textContent = e.L.toFixed(2) + ' µm';
+    BD.pill(q('[data-o="pill"]'), S.p > 0 ? 'no curvature jump' : 'curvature jumps', S.p > 0 ? 'ok' : 'warn');
     var cap = 'A circular bend jumps from zero curvature to 1/R at its ends, which shifts the mode suddenly and couples power into radiation and higher-order modes at each junction. An Euler bend ramps the curvature linearly, so the mode can follow. ';
     if (S.p > 0.05) cap += 'The price: for the same footprint its tightest radius is smaller (' + (1 / e.kmax).toFixed(2) + ' µm against ' + R.toFixed(1) + ' µm) and it is ' + (100 * (e.L / c.L - 1)).toFixed(0) + ' % longer. In silicon strips, where radiation is small above a few micrometres, removing the junction mismatch usually wins.';
     q('[data-o="cap"]').innerHTML = cap;

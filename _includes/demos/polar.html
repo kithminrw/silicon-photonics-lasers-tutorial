@@ -11,8 +11,21 @@
     <div class="bd-scope tall"><canvas data-c="e" aria-hidden="true"></canvas><span class="bd-tag">tip of E in the x–y plane (wave towards you)</span></div>
     <div class="bd-scope tall"><canvas data-c="t" aria-hidden="true"></canvas><span class="bd-tag">E<sub>x</sub>(t) and E<sub>y</sub>(t) over one period</span></div>
   </div>
-  <div class="bd-read" aria-live="polite"><span>state <b data-o="st">–</b></span><span>Jones vector <b data-o="j">–</b></span><span>orientation ψ <b data-o="psi">–</b></span><span>axial ratio <b data-o="ar">–</b></span></div>
+  <div class="bd-read" aria-live="polite"><span>state <b data-o="st">–</b></span><span>Jones vector <b data-o="j">–</b></span><span>orientation ψ <b data-o="psi">–</b></span><span>axial ratio <b data-o="ar">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Open the line into a circle.</b> From linear 45°, slide δ from 0 to 0.50π: the line opens into an ellipse and then a circle, and the axial ratio climbs from 0 to 1.00.</li>
+    <li><b>Flip the line.</b> Back at δ = 0, set δ = 1.00π: the two components are now half a period apart, and the line turns from ψ = 45° to −45°.</li>
+    <li><b>Reverse the rotation.</b> Press circular, then set δ = −0.50π: the circle is the same, but the field now turns counter-clockwise and the pill changes with it.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>Equal components a quarter-period apart give circular light. What do E<sub>x</sub> = 0.9, E<sub>y</sub> = 0.45 and δ = 0.5π give?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="A quarter-period apart, the components peak at different times and never cancel, so the tip traces an ellipse with its axes along x and y, half as tall as it is wide.">An ellipse with its axes along x and y and an axial ratio of 0.5</button>
+      <button type="button" data-why="A circle also needs equal amplitudes; with E_y half of E_x the circle is squashed into an ellipse.">A circle, because δ = π/2</button>
+      <button type="button" data-why="That is what δ = 0 gives: in phase, the components add to a line at tan ψ = 0.5. A quarter-period of delay opens the line into an ellipse.">A line at 26.6° to x</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -53,6 +66,7 @@
     q('[data-o="j"]').textContent = '[' + (ax / nrm).toFixed(2) + ', ' + (ay / nrm).toFixed(2) + ' e^{j' + S.d.toFixed(2) + 'π}]';
     q('[data-o="psi"]').textContent = (psi * 180 / Math.PI).toFixed(1) + '°';
     q('[data-o="ar"]').textContent = st === 'linear' ? '0 (a line)' : arat.toFixed(2);
+    BD.pill(q('[data-o="pill"]'), st === 'linear' ? '' : 'turns ' + hand, '');
     var c = 'Any polarisation is the sum of two orthogonal components with some amplitude ratio and relative phase δ. In phase (δ = 0 or π) they give a line; a quarter-period apart with equal amplitudes, a circle; anything else, an ellipse. ';
     if (st !== 'linear') c += 'Seen by a receiver looking back at the source, this field turns ' + hand + '. Whether that is called left- or right-handed differs between optics and engineering texts, so always say which convention you use. ';
     c += 'A single-mode fibre changes δ and the amplitude ratio as it bends and warms, which is why a chip with polarisation-dependent couplers needs the devices of Chapter 14.';

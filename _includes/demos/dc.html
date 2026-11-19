@@ -7,11 +7,27 @@
     <label class="bd-sl"><span>coupling length L <b data-v="L"></b></span><input type="range" data-k="L" min="0" max="80" step="0.1" value="16.4" aria-label="length"></label>
     <label class="bd-sl"><span>wavelength λ <b data-v="lam"></b></span><input type="range" data-k="lam" min="1.5" max="1.6" step="0.001" value="1.55" aria-label="wavelength"></label>
   </div>
-  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: top (gap enlarged), section to scale</span></div>
-  <div class="bd-scope tall"><canvas data-c="z" aria-hidden="true"></canvas><span class="bd-tag">power in each waveguide along the coupler</span></div>
-  <div class="bd-scope short"><canvas data-c="l" aria-hidden="true"></canvas><span class="bd-tag">cross-coupled power against wavelength</span></div>
-  <div class="bd-read" aria-live="polite"><span>Δn (even − odd) <b data-o="dn">–</b></span><span>cross-over length L<sub>x</sub> <b data-o="lx">–</b></span><span>split (cross / through) <b data-o="k">–</b></span><span>50/50 at L = <b data-o="l50">–</b></span></div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag" data-o="tag">field (red +, blue −), top view</span></div>
+  <div class="bd-status"><span data-o="fst"></span></div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="z" aria-hidden="true"></canvas><span class="bd-tag">power in each waveguide along the coupler</span></div>
+    <div class="bd-scope tall"><canvas data-c="l" aria-hidden="true"></canvas><span class="bd-tag">cross-coupled power against wavelength</span></div>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>Δn (even − odd) <b data-o="dn">–</b></span><span>cross-over length L<sub>x</sub> <b data-o="lx">–</b></span><span>split (cross / through) <b data-o="k">–</b></span><span>50/50 at L = <b data-o="l50">–</b></span><span class="bd-pill ok" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Make a 3 dB coupler.</b> At a 200 nm gap, set L to 16.4 µm: L<sub>x</sub>/2 = 18.9 µm, less the 2.5 µm the bends add. The 50/50 pill lights up. All along the coupler the crests in the lower guide trail a quarter period behind those in the upper one: that is the −j of Section 9.6.</li>
+    <li><b>Open the gap to 300 nm.</b> L<sub>x</sub> grows to about 91 µm, so the same 16.4 µm now sends only about 10 % across. Find the new 50/50 length; Worked Example 9.1 gets 43 µm.</li>
+    <li><b>Go all the way across and back.</b> At 200 nm, set L + 2.5 µm equal to L<sub>x</sub> (L = 35.3 µm): all the light leaves in the lower guide. Make it twice as long (L = 73.1 µm) and the light is back where it started.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>The 3 dB coupler of Worked Example 9.1 is designed for 1550 nm. At 1570 nm, which way does its split move?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="A longer wavelength pushes more of each mode into the gap, so Δn grows and the cross-over length shrinks from 37.8 to about 35 µm: more light crosses. Check it with the λ slider.">More light crosses: about 57 / 43</button>
+      <button type="button" data-why="That is what happens at 1530 nm (43.5 / 56.5). At a longer wavelength the modes spread further into the gap and couple more strongly.">Less light crosses: about 43 / 57</button>
+      <button type="button" data-why="Only the broadband designs of Section 9.5 stay close to 50/50; a directional coupler drifts by about 0.35 % per nanometre.">It stays at 50 / 50</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
 </div>
 <script>
 (function () {
@@ -26,8 +42,11 @@
   // 500 x 220 nm strips (figsrc/ch09_supermodes.py: L_x = 37.8 um at 200 nm, 2.4x per 100 nm, dn ~ lam^7.7); TM is illustrative.
   var M = { TE: { dn0: 0.0205, gam: 8.75, p: 7.7 }, TM: { dn0: 0.075, gam: 5.6, p: 3 } };
   var LB = 2.5;   // extra effective coupling length contributed by the bends at each end (um)
+  var NE = { TE: [2.446, 4.18], TM: [1.771, 3.74] };   // one strip alone at 1550 nm: n_eff and n_g (Chapter 6, femwell)
   function dn(g, lam) { var m = M[pol]; return m.dn0 * Math.pow(lam / 1.55, m.p) * Math.exp(-m.gam * (1.55 / lam) * (g - 0.2)); }
   function cross(L, g, lam) { var lx = lam / (2 * dn(g, lam)); return Math.pow(Math.sin(Math.PI * (L + LB) / (2 * lx)), 2); }
+  function neff(lam) { var e = NE[pol]; return e[0] - (e[1] - e[0]) * (lam - 1.55) / 1.55; }
+  var FV = BD.field(q('[data-c="g"]'), { button: q('.bd-status'), hz: 1.1 }), nfr = 0;
   function draw() {
     var g = S.g, lam = S.lam, L = S.L, d = dn(g, lam), lx = lam / (2 * d), k = cross(L, g, lam);
     // ---- along the coupler
@@ -37,11 +56,15 @@
     for (var i = 0; i <= 400; i++) { var z = zmax * i / 400, c = Math.pow(Math.sin(Math.PI * (z + LB) / (2 * lx)), 2); zs.push(z); p1.push(1 - c); p2.push(c); }
     var gg = dv.g; gg.fillStyle = 'rgba(127,184,240,.08)'; gg.fillRect(f.X(0), f.p.t, f.X(L) - f.X(0), dv.h - f.p.t - f.p.b);
     BD.line(f, zs, p1, BD.C.gold, 2); BD.line(f, zs, p2, BD.C.blue, 2);
-    // the legend on one row or (narrow panel) two, on the side away from the end-of-coupler line; that line's label below the legend if they would meet
-    var wi = gg.measureText('input (through) guide').width, wc = gg.measureText('coupled (cross) guide').width, two = f.p.l + 150 + wc > dv.w - f.p.r - 4;
-    var lw = two ? Math.max(wi, wc) : 144 + wc, xL = f.X(L), xr = dv.w - f.p.r - 6 - lw, hitsL = function (x) { return xL > x - 3 && xL < x + lw + 3; };
+    // the legend on one row or (narrow panel, or no side of one row clear of the end-of-coupler line) two, on the side away
+    // from that line; the line's label below the legend if they would meet
+    var wi = gg.measureText('input (through) guide').width, wc = gg.measureText('coupled (cross) guide').width, xL = f.X(L);
+    var hit = function (x, w) { return xL > x - 3 && xL < x + w + 3; }, w1 = 144 + wc;
+    var two = f.p.l + 150 + wc > dv.w - f.p.r - 4 || (hit(f.p.l + 6, w1) && hit(dv.w - f.p.r - 6 - w1, w1));
+    var lw = two ? Math.max(wi, wc) : w1, xr = dv.w - f.p.r - 6 - lw, hitsL = function (x) { return hit(x, lw); };
     var lgx = hitsL(f.p.l + 6) && !hitsL(xr) ? xr : f.p.l + 6;
-    var meet = xL + 4 < lgx + lw && xL + 4 + gg.measureText('end of coupler').width > lgx;
+    var tw = gg.measureText('end of coupler').width, la = xL + 4 + tw > dv.w - 2 ? xL - 4 - tw : xL + 4;   // where BD.vline puts the label (it flips left near the edge)
+    var meet = la < lgx + lw && la + tw > lgx;
     BD.vline(f, L, BD.C.white, [4, 3], 'end of coupler', meet ? (two ? 26 : 14) : 0);
     gg.fillStyle = BD.C.gold; gg.fillText('input (through) guide', lgx, f.p.t + 12);
     gg.fillStyle = BD.C.blue; gg.fillText('coupled (cross) guide', two ? lgx : lgx + 144, two ? f.p.t + 24 : f.p.t + 12);
@@ -51,35 +74,64 @@
     var ls = [], ks = [];
     for (i = 0; i <= 200; i++) { var lm = 1.5 + 0.1 * i / 200; ls.push(lm); ks.push(cross(L, g, lm)); }
     BD.line(f2, ls, ks, BD.C.blue, 2); BD.hline(f2, 0.5, BD.C.dim, [3, 3]); BD.dot(f2, lam, k, BD.C.gold, 4);
-    // ---- geometry: top view along the coupler, and the two 500 x 220 nm strips in cross-section
+    // ---- the optical field in the top view, built from the same coupled-mode model, and the two strips in cross-section
     (function () {
-      var dv2 = BD.setup(q('[data-c="g"]')), gg = dv2.g, Lb = 15, off = 3, leftW = dv2.w * 0.68, top = 30, bot = dv2.h - 24;
-      var sx = (leftW - 30) / (L + 2 * Lb), sy = (bot - top) / (2 * off + 2), X = function (z) { return 15 + z * sx; }, yc = (top + bot) / 2;
-      var yg = g / 2 + 0.25, Y = function (y) { return yc - y * sy; };   // guide centres at +-(g/2 + w/2) in the coupler
-      var path = function (sgn) { return BD.sbend(X(0), Y(sgn * (off + yg)), X(Lb), Y(sgn * yg), 18).concat([[X(Lb + L), Y(sgn * yg)]]).concat(BD.sbend(X(Lb + L), Y(sgn * yg), X(2 * Lb + L), Y(sgn * (off + yg)), 18)); };
-      BD.wg(gg, path(1), Math.max(2, 0.5 * sy)); BD.wg(gg, path(-1), Math.max(2, 0.5 * sy));
-      for (var i = 0; i < 60; i++) {   // power glow along the straight section
-        var z = L * (i + 0.5) / 60, c = Math.pow(Math.sin(Math.PI * (z + LB) / (2 * lx)), 2);
-        gg.fillStyle = BD.GEO.glow + (0.9 * (1 - c)).toFixed(2) + ')'; gg.fillRect(X(Lb + z - L / 120), Y(yg) - 2, L / 60 * sx + 1, 4);
-        gg.fillStyle = BD.GEO.glow + (0.9 * c).toFixed(2) + ')'; gg.fillRect(X(Lb + z - L / 120), Y(-yg) - 2, L / 60 * sx + 1, 4);
-      }
-      BD.label(gg, 'in', 2, Y(off + yg) - 6, BD.C.white);
-      BD.label(gg, 'through ' + (100 * (1 - k)).toFixed(0) + ' %', leftW - 4, Y(off + yg) - 6, BD.C.gold, 'right');
-      BD.label(gg, 'cross ' + (100 * k).toFixed(0) + ' %', leftW - 4, Y(-off - yg) + 14, BD.C.blue, 'right');
-      BD.dim(gg, X(Lb), bot + 12, X(Lb + L), bot + 12, 'L = ' + L.toFixed(1) + ' µm', BD.C.gold, -6);
-      // cross-section to scale
-      var cx0 = leftW + 12, cw = dv2.w - cx0 - 8, cs = Math.min(cw / (1.0 + g + 0.6), (bot - top) / 1.0), ccx = cx0 + cw / 2, base = yc + 0.15 * cs;
-      gg.fillStyle = BD.GEO.ox; gg.fillRect(cx0, top, cw, bot - top);
-      gg.fillStyle = BD.GEO.si; gg.fillRect(ccx - (g / 2 + 0.5) * cs, base - 0.22 * cs, 0.5 * cs, 0.22 * cs); gg.fillRect(ccx + g / 2 * cs, base - 0.22 * cs, 0.5 * cs, 0.22 * cs);
-      BD.dim(gg, ccx - g / 2 * cs, base - 0.32 * cs, ccx + g / 2 * cs, base - 0.32 * cs, (1000 * g).toFixed(0) + ' nm', BD.C.gold, -6);
-      BD.label(gg, 'cross-section', cx0 + 4, top + 12, BD.C.dim);
-      BD.scalebar(gg, cx0 + 6, bot - 6, cs, cw * 0.4);
+      var cv = q('[data-c="g"]'), W = cv.clientWidth, nar = W < 480;
+      cv.style.height = (nar ? 300 : 220) + 'px';
+      var H = cv.clientHeight, Lb = 15, off = 3, top = 34, bot = nar ? 176 : H - 26, fw = nar ? W : Math.round(W * 0.7), x0 = 14;
+      var sx = (fw - 2 * x0) / (L + 2 * Lb), sy = (bot - top) / (2 * off + 2), yc = (top + bot) / 2, yg = g / 2 + 0.25;
+      var X = function (zz) { return x0 + zz * sx; }, Y = function (yy) { return yc - yy * sy; };
+      var ne = neff(lam), dec = lam / (2 * Math.PI * Math.sqrt(ne * ne - 1.444 * 1.444));   // 1/e length of the evanescent tails (um)
+      var cr = BD.crests(lam / ne * sx, 6), beta = 2 * Math.PI * ne / (lam * cr.n);   // display phase per um of path
+      // coupling phase phi(z): kappa = pi/(2 L_x) in the straight section; each bend adds LB/2 of effective length, spread
+      // over the bend as the coupling falls with the local gap, exp(-gamma (1.55/lam) (gap - g)), the model's own gap law
+      var kap = Math.PI / (2 * lx), gp = M[pol].gam * 1.55 / lam, nb = 80, wb = [0], ns = Math.max(2, Math.ceil(L * sx / 3));
+      for (var j = 1; j <= nb; j++) { var ta = (j - 1) / nb, tb = j / nb;
+        wb.push(wb[j - 1] + (Math.exp(-gp * off * (1 + Math.cos(Math.PI * ta))) + Math.exp(-gp * off * (1 + Math.cos(Math.PI * tb)))) / 2); }
+      for (j = 0; j <= nb; j++) wb[j] /= wb[nb];   // cumulative share of a bend's coupling, 0 to 1 (first bend; the second mirrors it)
+      var V = [];   // vertices of the upper guide: z, |y| (um) and the coupling phase
+      V.push([-x0 / sx, off + yg, 0]);
+      for (j = 0; j <= nb; j++) V.push([Lb * j / nb, yg + off * (1 + Math.cos(Math.PI * j / nb)) / 2, kap * LB / 2 * wb[j]]);
+      for (j = 1; j <= ns; j++) V.push([Lb + L * j / ns, yg, kap * (LB / 2 + L * j / ns)]);
+      for (j = 1; j <= nb; j++) V.push([Lb + L + Lb * j / nb, yg + off * (1 - Math.cos(Math.PI * j / nb)) / 2, kap * (LB / 2 + L + LB / 2 * (1 - wb[nb - j]))]);
+      V.push([(fw - x0) / sx, off + yg, kap * (L + LB)]);
+      var sArc = [0];   // physical path length (um), the same for both guides
+      for (j = 1; j < V.length; j++) sArc.push(sArc[j - 1] + Math.hypot(V[j][0] - V[j - 1][0], V[j][1] - V[j - 1][1]));
+      var up = V.map(function (v) { return [X(v[0]), Y(v[1])]; }), dn2 = V.map(function (v) { return [X(v[0]), Y(-v[1])]; });
+      var half = 0.25 * sy, ph = function (n) { return beta * sArc[n]; };
+      FV.grid(0, top - 18, fw, bot - top + 36);
+      FV.guide(up, { half: half, decay: dec * sy, phase: ph, amp: function (n) { return [Math.cos(V[n][2]), 0]; } });
+      FV.guide(dn2, { half: half, decay: dec * sy, phase: ph, amp: function (n) { return [0, -Math.sin(V[n][2])]; } });
+      q('[data-o="tag"]').textContent = cr.n > 1 ? 'field (red +, blue −) · ' + cr.note : 'field (red +, blue −), top view';
+      var st = ['widths and gap ×' + (sy / sx).toFixed(1)];
+      if (cr.n > 1) st.push('crests drawn 1 per ' + cr.n + ' λ (real ones ' + (lam / ne * sx).toFixed(1) + ' px apart)');
+      st.push('coupled-mode field, not a full-wave solve');
+      var fst = q('[data-o="fst"]'), stTxt = st.join(' · '), msTxt = function () { return FV.ms ? ' · frame ' + FV.ms.toFixed(1) + ' ms' : ''; };
+      fst.textContent = stTxt + msTxt();
+      FV.overlay = function (gx) {
+        BD.edges(gx, up, half); BD.edges(gx, dn2, half);
+        BD.label(gx, 'in', 2, Y(off + yg) - half - 5, BD.C.white);
+        BD.label(gx, 'through ' + (100 * (1 - k)).toFixed(0) + ' %', fw - 4, Y(off + yg) - half - 5, BD.C.gold, 'right');
+        BD.label(gx, 'cross ' + (100 * k).toFixed(0) + ' %', fw - 4, Y(-off - yg) + half + 12, BD.C.blue, 'right');
+        BD.dim(gx, X(Lb), bot + 12, X(Lb + L), bot + 12, 'L = ' + L.toFixed(1) + ' µm', BD.C.gold, -6);
+        // cross-section to scale: beside the top view, or under it on a narrow panel
+        var cx0 = nar ? 8 : fw + 10, cw = W - cx0 - 8, ct = nar ? bot + 30 : top, cb = nar ? H - 8 : bot, cyc = (ct + cb) / 2;
+        var cs = Math.min(cw / (1.0 + g + 0.6), (cb - ct) / 1.0), ccx = cx0 + cw / 2, base = cyc + 0.15 * cs;
+        gx.fillStyle = BD.GEO.ox; gx.fillRect(cx0, ct, cw, cb - ct);
+        gx.fillStyle = BD.GEO.si; gx.fillRect(ccx - (g / 2 + 0.5) * cs, base - 0.22 * cs, 0.5 * cs, 0.22 * cs); gx.fillRect(ccx + g / 2 * cs, base - 0.22 * cs, 0.5 * cs, 0.22 * cs);
+        BD.dim(gx, ccx - g / 2 * cs, base - 0.32 * cs, ccx + g / 2 * cs, base - 0.32 * cs, (1000 * g).toFixed(0) + ' nm', BD.C.gold, -6);
+        BD.label(gx, 'cross-section', cx0 + 4, ct + 12, BD.C.dim);
+        BD.scalebar(gx, cx0 + 6, cb - 6, cs, cw * 0.4);
+        if (++nfr % 30 === 0) fst.textContent = stTxt + msTxt();
+      };
+      FV.render();
     })();
     // ---- readouts
     q('[data-o="dn"]').textContent = d.toFixed(4);
     q('[data-o="lx"]').textContent = lx.toFixed(1) + ' µm';
     q('[data-o="k"]').textContent = (100 * k).toFixed(0) + ' / ' + (100 * (1 - k)).toFixed(0) + ' %';
     var l50 = lx / 2 - LB; q('[data-o="l50"]').textContent = l50 > 0 ? l50.toFixed(1) + ' µm' : 'shorter than the bends';
+    BD.pill(q('[data-o="pill"]'), Math.abs(k - 0.5) < 0.05 ? '50/50' : '', 'ok');
     var slope = Math.abs(cross(L, g, lam + 0.01) - cross(L, g, lam - 0.01)) / 20;
     var c = 'The two supermodes travel with slightly different indices, so the power beats between the guides with period 2L<sub>x</sub>, where L<sub>x</sub> = λ/(2Δn). ';
     c += 'The coupling falls about exponentially with the gap, because it comes from the evanescent tails. ';
