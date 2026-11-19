@@ -52,7 +52,7 @@ if __name__ == "__main__":
         # narrow tips whose mode reaches the 14 um window: redo in a 24 um window and merge
         out = json.load(open(path))
         done = {(round(o["width"], 4), o["pol"]) for o in out if o.get("window", 14) > 20}
-        jobs = [(w, "TE") for w in (0.13, 0.135, 0.14, 0.15, 0.17)] + [(w, "TM") for w in (0.09, 0.10)]
+        jobs = [(w, "TE") for w in (0.13, 0.135, 0.14, 0.15, 0.16, 0.17)] + [(w, "TM") for w in (0.09, 0.10, 0.12)]
         jobs = [j for j in jobs if (round(j[0], 4), j[1]) not in done]
         half = 12.0
     else:

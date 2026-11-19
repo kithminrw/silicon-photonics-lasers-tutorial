@@ -25,7 +25,7 @@ Write a finite-difference mode solver in a dozen lines, use it with the effectiv
 
 - [Chapter 9]({% link chapters/09_couplers.md %}) (Sections 9.2 to 9.4) and [Chapter 10]({% link chapters/10_mmi.md %}) (Sections 10.2 to 10.4); [Lab 1]({% link labs/lab01_slab.md %}) helps.
 - Python 3.11 or newer with NumPy and Matplotlib: `pip install numpy matplotlib`.
-- The script <a href="{{ '/labs/lab03_couplers.py' | relative_url }}" download><code>lab03_couplers.py</code></a> (also in the repository's [`labs/` folder](https://github.com/kithminrw/silicon-photonics-lasers-tutorial/tree/main/labs)).
+- The script <a href="{{ '/labs/lab03_couplers.py' | relative_url }}" download><code>lab03_couplers.py</code></a>.
 - About two hours, including the exercises.
 
 Run it from a terminal in the folder where you saved it:

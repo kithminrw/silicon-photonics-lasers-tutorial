@@ -25,7 +25,7 @@ Add up the reference link block by block in a few lines of Python, derive the re
 
 - [Chapter 33]({% link chapters/33_links.md %}) (Sections 33.2, 33.5 and 33.7), with [Chapter 1]({% link chapters/01_why.md %}) (Worked Example 1.1, Table 1.3), [Chapter 21]({% link chapters/21_pd.md %}) (Section 21.6), [Chapter 14]({% link chapters/14_wdm.md %}) (Worked Example 14.1) and [Chapter 2]({% link chapters/02_em.md %}) (Worked Example 2.5).
 - Python 3.11 or newer with NumPy and Matplotlib: `pip install numpy matplotlib`. The error function is Python's own `math.erfc`, so SciPy is not needed.
-- The script <a href="{{ '/labs/lab12_link.py' | relative_url }}" download><code>lab12_link.py</code></a> (also in the repository's [`labs/` folder](https://github.com/kithminrw/silicon-photonics-lasers-tutorial/tree/main/labs)).
+- The script <a href="{{ '/labs/lab12_link.py' | relative_url }}" download><code>lab12_link.py</code></a>.
 - About two hours, including the exercises.
 
 Run it from a terminal in the folder where you saved it:

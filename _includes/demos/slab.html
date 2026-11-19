@@ -7,9 +7,9 @@
   <div class="bd-sliders">
     <label class="bd-sl"><span>core thickness d <b data-v="d"></b></span><input type="range" data-k="d" min="0.02" max="2" step="0.005" value="0.22" aria-label="thickness"></label>
     <label class="bd-sl"><span>wavelength λ <b data-v="lam"></b></span><input type="range" data-k="lam" min="0.4" max="2" step="0.005" value="1.55" aria-label="wavelength"></label>
-    <label class="bd-sl"><span>core index n<sub>1</sub> <b data-v="n1"></b></span><input type="range" data-k="n1" min="1.5" max="3.6" step="0.005" value="3.476" aria-label="core index"></label>
-    <label class="bd-sl"><span>substrate index n<sub>2</sub> <b data-v="n2"></b></span><input type="range" data-k="n2" min="1" max="3.4" step="0.005" value="1.444" aria-label="substrate index"></label>
-    <label class="bd-sl"><span>cover index n<sub>3</sub> <b data-v="n3"></b></span><input type="range" data-k="n3" min="1" max="3.4" step="0.005" value="1.444" aria-label="cover index"></label>
+    <label class="bd-sl"><span>core index n<sub>1</sub> <b data-v="n1"></b></span><input type="range" data-k="n1" min="1.5" max="3.6" step="0.001" value="3.476" aria-label="core index"></label>
+    <label class="bd-sl"><span>substrate index n<sub>2</sub> <b data-v="n2"></b></span><input type="range" data-k="n2" min="1" max="3.4" step="0.001" value="1.444" aria-label="substrate index"></label>
+    <label class="bd-sl"><span>cover index n<sub>3</sub> <b data-v="n3"></b></span><input type="range" data-k="n3" min="1" max="3.4" step="0.001" value="1.444" aria-label="cover index"></label>
   </div>
   <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag" data-o="tag">field (red +, blue −), rays, side view to scale</span></div>
   <div class="bd-status"><span data-o="fst"></span></div>
@@ -21,7 +21,7 @@
   <p class="bd-caption" data-o="cap"></p>
   <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
     <li><b>Find the single-mode limit.</b> With Si / SiO₂ at 1550 nm, thicken the film from 220 nm. At 250 nm TE1 appears (V = π at 245 nm, Worked Example 5.2): the pill turns to MULTIMODE and a second, steeper ray joins the side view.</li>
-    <li><b>Switch to TM.</b> At 220 nm, n<sub>eff</sub> falls from 2.847 to 2.053 (Worked Example 5.1). The crests, λ/n<sub>eff</sub> apart, spread out and the field reaches further into the oxide.</li>
+    <li><b>Switch to TM.</b> At 220 nm, n<sub>eff</sub> falls from 2.848 to 2.053 (Worked Example 5.1). The crests, λ/n<sub>eff</sub> apart, spread out and the field reaches further into the oxide.</li>
     <li><b>Put air on top.</b> Set n<sub>3</sub> = 1.00, stay on TM and thin the film: below about 105 nm the pill reads NOT GUIDED. An asymmetric slab cuts off even its fundamental mode.</li>
   </ol></div>
   <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>The 220 nm silicon film in oxide is single-mode at 1550 nm. Is it still single-mode at 1310 nm?</p>
@@ -74,6 +74,15 @@
       return ed * Math.exp(-g3 * (x - d));
     });
   }
+  // fraction of the power in the core, from the exact integrals of the cos/sin and exponential pieces above
+  // (|E_y|^2 for TE; |H_y|^2/n^2, the Poynting flux, for TM)
+  function confine(ne, n1, n2, n3, d, lam, tm) {
+    var k0 = 2 * Math.PI / lam, ka = k0 * Math.sqrt(n1 * n1 - ne * ne), g2 = k0 * Math.sqrt(ne * ne - n2 * n2), g3 = k0 * Math.sqrt(ne * ne - n3 * n3);
+    var A = (tm ? g2 * n1 * n1 / (n2 * n2) : g2) / ka, ed = Math.cos(ka * d) + A * Math.sin(ka * d), sd = Math.sin(ka * d);
+    var w1 = tm ? 1 / (n1 * n1) : 1, w2 = tm ? 1 / (n2 * n2) : 1, w3 = tm ? 1 / (n3 * n3) : 1;
+    var core = w1 * (d / 2 * (1 + A * A) + (1 - A * A) * Math.sin(2 * ka * d) / (4 * ka) + A * sd * sd / ka);
+    return core / (core + w2 / (2 * g2) + w3 * ed * ed / (2 * g3));
+  }
   var COL = [BD.C.gold, BD.C.blue, BD.C.green, BD.C.red, BD.C.teal, BD.C.white];
   var FV = BD.field(q('[data-c="g"]'), { button: q('.bd-status'), hz: 1 }), nfr = 0;
   function draw() {
@@ -92,12 +101,7 @@
     ms.slice(0, 6).forEach(function (ne, m) {
       var e = field(ne, n1, n2, n3, d, lam, tm, xs), mx = 0; e.forEach(function (v) { mx = Math.max(mx, Math.abs(v)); });
       BD.line(f, xs, e.map(function (v) { return v / mx; }), COL[m], m === 0 ? 2.2 : 1.4);
-      if (m === 0) {   // confinement from |field|^2 on a fine grid
-        var xx = [], N = 2000; for (var k = 0; k <= N; k++) xx.push(-6 * lam + (d + 12 * lam) * k / N);
-        var ee = field(ne, n1, n2, n3, d, lam, tm, xx), tot = 0, core = 0;
-        ee.forEach(function (v, k) { var x = xx[k], nn = x < 0 ? n2 : x <= d ? n1 : n3, w = tm ? v * v / (nn * nn) : v * v; tot += w; if (x >= 0 && x <= d) core += w; });
-        gam = core / tot; dcov = 1 / (2 * Math.PI / lam * Math.sqrt(ne * ne - n3 * n3));
-      }
+      if (m === 0) { gam = confine(ne, n1, n2, n3, d, lam, tm); dcov = 1 / (2 * Math.PI / lam * Math.sqrt(ne * ne - n3 * n3)); }
     });
     // ---- neff against thickness
     var dmax = Math.max(2 * d, 0.6), dn = BD.setup(q('[data-c="n"]')), nlo = Math.max(n2, n3), f2 = BD.frame(dn, { x: [0, dmax], y: [nlo, n1], pad: { l: 42, b: 22 },
@@ -106,8 +110,10 @@
     for (var k2 = 1; k2 <= 120; k2++) {
       var dd = dmax * k2 / 120, mm = modes(n1, n2, n3, dd, lam, tm);
       mm.forEach(function (ne, m) { (curves[m] = curves[m] || { x: [], y: [] }).x.push(dd); curves[m].y.push(ne); });
-      if (!isFinite(dsm) && mm.length >= 2) dsm = dd;
     }
+    // the second mode's cut-off, exactly: at n_eff = the higher cladding index, kappa d = pi + atan(p/kappa) for the other cladding
+    var nch = Math.max(n2, n3), ncl = Math.min(n2, n3), kc = 2 * Math.PI / lam * Math.sqrt(Math.max(n1 * n1 - nch * nch, 0)), gc = 2 * Math.PI / lam * Math.sqrt(nch * nch - ncl * ncl);
+    if (kc > 0) dsm = (Math.PI + Math.atan((tm ? gc * n1 * n1 / (ncl * ncl) : gc) / kc)) / kc;
     curves.slice(0, 6).forEach(function (c, m) { BD.line(f2, c.x, c.y, COL[m], m === 0 ? 2 : 1.3); });
     BD.vline(f2, d, BD.C.dim, [3, 3]);
     ms.slice(0, 6).forEach(function (ne, m) { BD.dot(f2, d, ne, COL[m], 3.5); });
@@ -162,13 +168,18 @@
     q('[data-o="ne"]').textContent = ms.length ? ms[0].toFixed(4) : 'none';
     q('[data-o="g"]').textContent = isFinite(gam) ? (100 * gam).toFixed(0) + ' %' : '–';
     q('[data-o="dc"]').textContent = isFinite(dcov) ? (1000 * dcov).toFixed(0) + ' nm' : '–';
-    q('[data-o="sm"]').textContent = isFinite(dsm) ? '≈ ' + (1000 * dsm).toFixed(0) + ' nm' : '> ' + (1000 * dmax).toFixed(0) + ' nm';
+    q('[data-o="sm"]').textContent = isFinite(dsm) ? (1000 * dsm).toFixed(0) + ' nm' : '–';
     BD.pill(q('[data-o="pill"]'), !ms.length ? 'not guided' : ms.length === 1 ? 'single-mode' : 'multimode', !ms.length ? 'bad' : ms.length === 1 ? 'ok' : 'warn');
     var c;
     if (!ms.length) c = '<b>No guided mode.</b> With an asymmetric slab (n₂ ≠ n₃) the fundamental mode has a cut-off: make the core thicker or the indices more symmetric.';
     else if (ms.length === 1) c = 'One guided mode: the slab is single-mode. ' + (gam < 0.6 ? 'Much of the power travels in the claddings, which suits evanescent sensing and coupling but makes the mode sensitive to roughness and to the substrate.' : 'Most of the power is in the core.');
     else c = ms.length + ' guided modes. Mode m has m nodes in the core and a lower effective index; each one cuts off as the core thins. Single-mode operation needs d below about ' + (isFinite(dsm) ? (1000 * dsm).toFixed(0) + ' nm' : '–') + ' at this wavelength.';
-    if (tm && ms.length) c += ' TM modes are less confined than TE in a high-contrast slab: the normal field jumps by (n₁/n₂)² at each interface.';
+    if (tm && ms.length) {   // compared with TE0 of the same film: TM is less confined only in thin films (below about 305 nm for Si in oxide at 1550 nm)
+      var te0 = modes(n1, n2, n3, d, lam, false)[0], gte = te0 ? confine(te0, n1, n2, n3, d, lam, false) : NaN;
+      if (gam < gte - 0.005) c += ' Here TM0 is less confined than TE0 (' + (100 * gam).toFixed(0) + ' % against ' + (100 * gte).toFixed(0) + ' % in the core): the normal field jumps by (n₁/n₂)² at each interface, which matters most in thin high-contrast films.';
+      else if (gam > gte + 0.005) c += ' Here TM0 keeps more of its power in the core than TE0 (' + (100 * gam).toFixed(0) + ' % against ' + (100 * gte).toFixed(0) + ' %), as in thicker high-contrast films, though its effective index stays lower.';
+      else if (isFinite(gte)) c += ' At this thickness TM0 and TE0 keep about the same share of their power in the core (' + (100 * gam).toFixed(0) + ' %), though the TM index stays lower.';
+    }
     q('[data-o="cap"]').innerHTML = c;
   }
   BD.observe(root, draw);

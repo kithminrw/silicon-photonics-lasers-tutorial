@@ -25,7 +25,7 @@ Model the two-ring filter of a silicon external-cavity laser, let the gain pick 
 
 - [Chapter 26]({% link chapters/26_tunable.md %}) (Sections 26.4 and 26.5), with the add-drop ring of [Chapter 12]({% link chapters/12_rings.md %}) (Sections 12.3 and 12.4) and the heaters of [Chapter 18]({% link chapters/18_thermal.md %}).
 - Python 3.11 or newer with NumPy and Matplotlib: `pip install numpy matplotlib`.
-- The script <a href="{{ '/labs/lab11_vernier.py' | relative_url }}" download><code>lab11_vernier.py</code></a> (also in the repository's [`labs/` folder](https://github.com/kithminrw/silicon-photonics-lasers-tutorial/tree/main/labs)).
+- The script <a href="{{ '/labs/lab11_vernier.py' | relative_url }}" download><code>lab11_vernier.py</code></a>.
 - About two hours, including the exercises.
 
 Run it from a terminal in the folder where you saved it:

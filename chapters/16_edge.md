@@ -52,8 +52,8 @@ The trouble is the size mismatch ([Figure 16.1](#fig-16-1)). A 500 × 220 nm sil
 The obvious converter widens the waveguide, but a wide silicon waveguide confines light more tightly and becomes multimode. The trick, which seems backwards at first, is to **narrow** it {% include cite.html keys="almeida2003" %}. As a silicon strip is tapered towards a tip of a hundred or two nanometres, it becomes too small to hold the mode. The effective index falls towards the cladding's (1.444), the evanescent decay constant $$\gamma = k_0\sqrt{n_\mathrm{eff}^2 - n_\mathrm{ox}^2}$$ shrinks, and the mode spreads out into the oxide cladding, which acts as a larger, weakly guiding waveguide. If the taper is long enough to be **adiabatic** ([Chapter 8]({% link chapters/08_bends.md %})), the light follows the fundamental mode from 0.4 µm to several micrometres with little loss ([Figure 16.2](#fig-16-2)).
 
 <figure id="fig-16-2">
-  <img src="{{ '/assets/figs/ch16_taper.svg' | relative_url }}" style="width:600px" alt="Top and side views along a 200 micrometre linear inverse taper from 500 to 160 nanometres, with the local mode size shaded: it stays below 1 micrometre for most of the length and grows to about 4.7 micrometres in the last few tens of micrometres, matching a 4 micrometre UHNA fibre beyond the facet; in the side view the mode reaches the silicon substrate below the 2 micrometre BOX at the tip">
-  <figcaption><span class="capnum">Figure 16.2.</span> <strong>An inverse taper from above and from the side.</strong> A linear taper from 500 to 160 nm over 200 µm (illustrative length), shaded with the 1/e² size of the local mode from the femwell sweep of Table 16.1, assuming the taper is slow enough to be adiabatic. The mode stays below 1 µm until the tip is about 250 nm wide, 150 µm along, then grows to 4.7 × 4.9 µm at the facet, matched to a UHNA fibre. In the side view it reaches the substrate below the 2 µm BOX, which would hold 4.2 % of its power (red). Transverse axes stretched × 6. Drawn by <code>figsrc/ch16_figs.py</code>.</figcaption>
+  <img src="{{ '/assets/figs/ch16_taper.svg' | relative_url }}" style="width:600px" alt="Top and side views along a 200 micrometre linear inverse taper from 500 to 160 nanometres, with the local mode size shaded: it stays below 1 micrometre for most of the length and grows to about 4.8 micrometres in the last few tens of micrometres, matching a 4 micrometre UHNA fibre beyond the facet; in the side view the mode reaches the silicon substrate below the 2 micrometre BOX at the tip">
+  <figcaption><span class="capnum">Figure 16.2.</span> <strong>An inverse taper from above and from the side.</strong> A linear taper from 500 to 160 nm over 200 µm (illustrative length), shaded with the 1/e² size of the local mode from the femwell sweep of Table 16.1, assuming the taper is slow enough to be adiabatic. The mode stays below 1 µm until the tip is about 250 nm wide, 150 µm along, then grows to 4.8 × 4.8 µm at the facet, matched to a UHNA fibre. In the side view it reaches the substrate below the 2 µm BOX, which would hold 4.2 % of its power (red). Transverse axes stretched × 6. Drawn by <code>figsrc/ch16_figs.py</code>.</figcaption>
 </figure>
 
 [Table 16.1](#tab-16-1) and [Figure 16.3](#fig-16-3) show how fast the mode grows, from full-vectorial femwell solutions of 220 nm silicon tips in oxide.
@@ -66,7 +66,7 @@ The obvious converter widens the waveguide, but a wide silicon waveguide confine
 | 130 nm | TE | 1.4445 | 11.8 × 14.3 ≈ | 33 % | 52 % | 90 % | 21.0 % |
 | 140 nm | TE | 1.4452 | 9.1 × 9.9 | 49 % | 70 % | 89 % | 13.8 % |
 | 150 nm | TE | 1.4466 | 6.6 × 6.7 | 66 % | 84 % | 77 % | 8.0 % |
-| 160 nm | TE | 1.4490 | 4.7 × 4.9 | 80 % | 91 % | 60 % | 4.2 % |
+| 160 nm | TE | 1.4490 | 4.8 × 4.8 | 80 % | 91 % | 60 % | 4.2 % |
 | 170 nm | TE | 1.4528 | 3.7 × 3.6 | 89 % | 89 % | 44 % | 2.0 % |
 | 180 nm | TE | 1.4586 | 2.9 × 2.8 | 92 % | 82 % | 32 % | 0.8 % |
 | 200 nm | TE | 1.4785 | 1.9 × 1.9 | 86 % | 62 % | 17 % | 0.1 % |
@@ -74,7 +74,7 @@ The obvious converter widens the waveguide, but a wide silicon waveguide confine
 | 500 nm | TE | 2.4459 | 0.4 × 0.4 | 12 % | 5 % | 1 % | 0.0 % |
 | 90 nm | TM | 1.4457 | 8.3 × 7.9 | 57 % | 77 % | 84 % | 10.8 % |
 | 100 nm | TM | 1.4470 | 6.2 × 6.1 | 70 % | 87 % | 73 % | 6.9 % |
-| 120 nm | TM | 1.4514 | 4.0 × 3.9 | 87 % | 90 % | 49 % | 2.5 % |
+| 120 nm | TM | 1.4514 | 3.9 × 4.0 | 87 % | 90 % | 48 % | 2.5 % |
 | 140 nm | TM | 1.4585 | 2.8 × 2.9 | 92 % | 82 % | 32 % | 0.8 % |
 | 160 nm | TM | 1.4685 | 2.2 × 2.2 | 90 % | 71 % | 22 % | 0.3 % |
 | 200 nm | TM | 1.4962 | 1.5 × 1.6 | 78 % | 51 % | 12 % | 0.0 % |
@@ -198,7 +198,7 @@ Edge couplers for the transceiver of the reference link: a two-stage Si-to-SiN c
 <div class="tbox-title">Key takeaways</div>
 
 - Butt-coupling a 500 × 220 nm strip to SMF-28 loses about 20 dB: the mode must be expanded first.
-- An inverse taper pushes the mode into the cladding. For TE, a 180 nm tip gives a 2.9 µm spot (92 % to a lensed fibre), 160 nm a 4.7 µm spot (UHNA fibre), and 140 nm about 10 µm.
+- An inverse taper pushes the mode into the cladding. For TE, a 180 nm tip gives a 2.9 µm spot (92 % to a lensed fibre), 160 nm a 4.8 µm spot (UHNA fibre), and 140 nm about 10 µm.
 - Large spots leak through a 2 µm BOX; SMF-sized spots need SiN or polymer stages, SWG or suspended couplers.
 - TE and TM expand at different tip widths, and the tip width is a critical, fabrication-sensitive dimension.
 - Facet reflections (3.3 % oxide–air) are cut by index matching, coatings and angled waveguides.

@@ -68,7 +68,7 @@ $$\kappa d = m\pi + \arctan\frac{p_2}{\kappa} + \arctan\frac{p_3}{\kappa}, \qqua
 
 </div>
 
-This is the transverse-resonance condition with $$\phi_i = \arctan(p_i/\kappa)$$. Because $$n_1^2/n_i^2 > 1$$, the TM reflection phases are larger, so a TM mode reaches resonance at a smaller $$\kappa$$, which means a lower effective index: TM modes are less confined than TE modes in the same film ([Figure 5.3](#fig-5-3)).
+This is the transverse-resonance condition with $$\phi_i = \arctan(p_i/\kappa)$$. Because $$n_1^2/n_i^2 > 1$$, the TM reflection phases are larger, so a TM mode reaches resonance at a larger $$\kappa$$, which means a lower effective index: in thin films such as 220 nm, TM modes are less confined than TE modes (above about 300 nm the TM mode holds the larger share of its power in the core, though its index stays lower) ([Figure 5.3](#fig-5-3)).
 
 The left-hand side falls and the right-hand side rises as $$n_\mathrm{eff}$$ increases, so each $$m$$ has at most one solution ([Figure 5.2](#fig-5-2)), found by bisection in a few lines of code. That is what the demo below does.
 
@@ -131,7 +131,7 @@ In an **asymmetric** slab ($$n_2 \neq n_3$$) even the fundamental mode has a cut
 <div class="tbox tbox-example" markdown="1">
 <div class="tbox-title">Worked Example 5.2 · Why 220 nm?</div>
 
-For silicon in oxide at 1550 nm, $$\sqrt{n_1^2 - n_2^2} = 3.163$$, so the slab is single-mode for $$d < 1.55/(2 \times 3.163) = 245$$ nm. A 220 nm film is just below that limit: as thick as it can be while guiding only one TE and one TM mode vertically, which gives the strongest confinement without higher-order modes. A 300 nm film already guides TE1 ($$n_\mathrm{eff} = 1.685$$) and TM1 ($$n_\mathrm{eff} = 1.458$$). At 1310 nm the same 220 nm film is slightly multimode vertically in principle, but the second mode is weak and is cut off in narrow strips ([Chapter 6]({% link chapters/06_soi.md %})). For silicon nitride in oxide ($$n_1 = 1.996$$) the limit is 562 nm, which is why SiN films are thicker.
+For silicon in oxide at 1550 nm, $$\sqrt{n_1^2 - n_2^2} = 3.162$$, so the slab is single-mode for $$d < 1.55/(2 \times 3.162) = 245$$ nm. A 220 nm film is just below that limit: as thick as it can be while guiding only one TE and one TM mode vertically, which gives the strongest confinement without higher-order modes. A 300 nm film already guides TE1 ($$n_\mathrm{eff} = 1.685$$) and TM1 ($$n_\mathrm{eff} = 1.457$$). At 1310 nm the same 220 nm film is slightly multimode vertically in principle, but the second mode is weak and is cut off in narrow strips ([Chapter 6]({% link chapters/06_soi.md %})). For silicon nitride in oxide ($$n_1 = 1.996$$) the limit is 562 nm, which is why SiN films are thicker.
 
 </div>
 
@@ -186,7 +186,7 @@ Free simulations by others that pair well with this chapter:
 <div class="tbox-title">Key takeaways</div>
 
 - A guided mode is a transverse resonance: $$2\kappa d - 2\phi_2 - 2\phi_3 = 2m\pi$$, with $$n_\mathrm{eff} = n_1\sin\theta$$ between the cladding and film indices.
-- The slab eigenvalue equation $$\kappa d = m\pi + \arctan(p_2/\kappa) + \arctan(p_3/\kappa)$$ covers TE and TM; TM modes are less confined.
+- The slab eigenvalue equation $$\kappa d = m\pi + \arctan(p_2/\kappa) + \arctan(p_3/\kappa)$$ covers TE and TM; in thin films TM modes are less confined.
 - A symmetric slab is single-mode for $$V < \pi$$; 220 nm of silicon in oxide is just below the 245 nm limit at 1550 nm.
 - The 220 nm film's TE0 mode has $$n_\mathrm{eff} = 2.85$$, $$n_g = 3.70$$, a 100 nm evanescent tail and 81 % of its power in the silicon.
 - Waveguide dispersion pushes the group index well above the effective index in high-contrast guides.

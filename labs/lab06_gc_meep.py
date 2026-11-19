@@ -348,8 +348,7 @@ def main(plot=True, res=30):
     est_slope = (phase_matched_wavelength(P0 + 0.02) - phase_matched_wavelength(P0 - 0.02)) / 0.04
     p1550 = (LAM0 - icept) / slope
     print(f"   d(lambda)/d(Lambda) = {slope:.2f} (FDTD) against {est_slope:.2f} (phase matching, the demo's indices)")
-    print(f"   period for a 1550 nm peak: {1000 * p1550:.1f} nm   (Chapter 15: 607 nm by the averaged index;"
-          " 'nearer 630 nm' by a full simulation)")
+    print(f"   period for a 1550 nm peak: {1000 * p1550:.1f} nm   (Chapter 15: 607 nm by the averaged index)")
     print(f"   {1000 * P0:.0f} nm peaks {1000 * (lam_pk - LAM0):+.1f} nm from 1550 nm: the grating index lambda/Lambda +"
           f" sin(theta) is {lam_pk / P0 + s:.3f}, against the averaged {n_avg:.3f}")
     print("   fibre angle, from the same simulation (fibre moved to its best position each time):")

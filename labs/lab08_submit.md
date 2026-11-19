@@ -25,7 +25,7 @@ Check the chip of Lab 7 the way openEBL's GitHub Actions will, first with a shor
 
 - [Chapter 30]({% link chapters/30_flow.md %}) (Sections 30.7 and 30.8) and [Chapter 17]({% link chapters/17_fiberarrays.md %}) (Section 17.7), and [Lab 7]({% link labs/lab07_layout.md %}): its rules table and its script.
 - Python 3.11 or newer with KLayout's Python module, which gdsfactory installs (or `pip install klayout`); gdsfactory and ubcpdk as in Lab 7 to make or break the chip; and, for Section L8.6, SiEPIC-Tools and the EBeam PDK as Python packages: `pip install SiEPIC siepic_ebeam_pdk`. Tested with Python 3.12, klayout 0.30.13, SiEPIC 0.5.31, siepic_ebeam_pdk 0.4.53, gdsfactory 9.51.0 and ubcpdk 3.3.5.
-- The script <a href="{{ '/labs/lab08_checks.py' | relative_url }}" download><code>lab08_checks.py</code></a>, saved beside <a href="{{ '/labs/lab07_layout.py' | relative_url }}" download><code>lab07_layout.py</code></a> (both also in the repository's [`labs/` folder](https://github.com/kithminrw/silicon-photonics-lasers-tutorial/tree/main/labs)).
+- The script <a href="{{ '/labs/lab08_checks.py' | relative_url }}" download><code>lab08_checks.py</code></a>, saved beside <a href="{{ '/labs/lab07_layout.py' | relative_url }}" download><code>lab07_layout.py</code></a>.
 - For the submission itself (Section L8.8): a GitHub account, and a place in an openEBL run (see below).
 - About two hours, including the exercises.
 

@@ -19,7 +19,7 @@
   <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
     <li><b>Tune the BOX.</b> Move it from 2 µm to 1.89 µm: the directionality rises from 62 % to 71 % as the substrate reflection returns in phase and the upward field brightens. At 2.16 µm it returns out of phase and only 29 % goes up.</li>
     <li><b>Weaken the grating.</b> Set α to 0.04 µm⁻¹ and the fibre to 8 µm. The emission now spreads past the fibre mode, 20 % of the light leaves the end of the grating unused, and the efficiency falls to 34 % (Table 15.1).</li>
-    <li><b>Apodise and add the mirror.</b> Choose apodised and bottom mirror, then set α to its maximum, the fibre to 8 µm and the BOX to 1.89 µm. The emitted field now follows the fibre’s Gaussian: 99 % overlap and 95 % (−0.2 dB) in all.</li>
+    <li><b>Apodise and add the mirror.</b> Choose apodised and bottom mirror, then set α to its maximum, the fibre to 8 µm and the BOX to 1.89 µm. The emitted field now follows the fibre’s Gaussian: 99 % overlap and 94 % (−0.3 dB) in all.</li>
   </ol></div>
   <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>Even with a perfect bottom mirror, a uniform grating couples at most about 80 % into the fibre. Why?</p>
     <div class="bd-check-opts" role="group" aria-label="Answers">
@@ -34,7 +34,7 @@
 (function () {
   var root = document.getElementById('bdGcEff'); if (!root || !window.BD) return;
   var q = function (s) { return root.querySelector(s); };
-  var prof = 'u', r = 0.413, L = 20, N = 400, w0 = 5.2, lam = 1.55, nox = 1.444, P = 0.63, aMin = 0.01;
+  var prof = 'u', r = 0.413, L = 20, N = 400, w0 = 5.2, lam = 1.55, nox = 1.444, P = 0.607, aMin = 0.01;
   var thOx = Math.asin(Math.sin(8 * Math.PI / 180) / nox);
   var S = BD.bind(root, {
     a: { fmt: function (x) { return x.toFixed(3) + ' µm⁻¹'; } },
@@ -48,7 +48,7 @@
     var up = 1 + r * r + 2 * r * Math.cos(ph); return up / (up + 1 - r * r);
   }
   function model() {
-    var dz = L / N, z = [], al = [], pw = [], f = [], g = [], rem = 1, ov = 0;
+    var dz = L / N, z = [], al = [], pw = [], rl = [], g = [], rem = 1, ov = 0;
     var tg = [], cum = 0, tot = 0, gn = Math.pow(2 / (Math.PI * w0 * w0), 0.25);
     if (prof === 'a') {   // target: Gaussian emitted power centred on the fibre, 98 % of it inside the grating
       for (var i = 0; i < N; i++) { var zz = (i + 0.5) * dz; tg.push(Math.exp(-2 * Math.pow(zz - S.zf, 2) / (w0 * w0))); tot += tg[i] * dz; }
@@ -58,13 +58,13 @@
       var zc = (i + 0.5) * dz, a;
       if (prof === 'u') a = S.a;
       else { a = tg[i] / (2 * Math.max(1e-6, 1 - cum)); cum += tg[i] * dz; a = Math.min(S.a, Math.max(aMin, a)); }
-      var p = 2 * a * rem;                       // emitted power per unit length
-      z.push(zc); al.push(a); pw.push(p);
+      var p = rem * (1 - Math.exp(-2 * a * dz)) / dz;   // emitted power per unit length: what the step loses, so the total is conserved
+      z.push(zc); al.push(a); pw.push(p); rl.push(rem);
       var gi = gn * Math.exp(-Math.pow(zc - S.zf, 2) / (w0 * w0)); g.push(gi * gi);
       ov += Math.sqrt(p) * gi * dz;
       rem *= Math.exp(-2 * a * dz);
     }
-    return { z: z, al: al, pw: pw, g: g, emitted: 1 - rem, overlap: ov * ov };
+    return { z: z, al: al, pw: pw, rl: rl, g: g, emitted: 1 - rem, overlap: ov * ov };
   }
   var FV = BD.field(q('[data-c="g"]'), { button: q('.bd-status'), hz: 1.0 }), nfr = 0;
   function draw() {
@@ -82,7 +82,7 @@
       var cr = BD.crests(lam / ngr * sc, 6), nn = cr.n, ag = 1 / Math.sqrt(0.22 + 2 / gam);   // guided field on the same power scale (1 / effective thickness)
       var dz = L / N, A = new Float32Array(Math.ceil(W) + 2), rem = function (x) {   // power left in the waveguide at canvas x
         var zz = (x - x0) / sc; if (zz <= 0) return 1; if (zz >= L) return 1 - m.emitted;
-        var i = Math.min(N - 1, Math.floor(zz / dz)); return m.pw[i] / (2 * m.al[i]);
+        var i = Math.min(N - 1, Math.floor(zz / dz)); return m.rl[i];
       };
       for (var ix = 0; ix < A.length; ix++) { var zx = (ix + 0.5 - x0) / sc; A[ix] = zx > 0 && zx < L ? Math.sqrt(m.pw[Math.min(N - 1, Math.floor(zx / dz))] / 2) : 0; }   // emitted field, each way
       var ph0 = (k0 * ngr - kx) * x0 / sc, cr2 = Math.cos(2 * ky * S.t), si2 = Math.sin(2 * ky * S.t), Mr = 1 - r * cr2, Mi = r * si2;   // above: (1 - r e^{-2j ky t})

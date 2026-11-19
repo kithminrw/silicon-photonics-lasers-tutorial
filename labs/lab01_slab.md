@@ -24,7 +24,7 @@ Write a slab mode solver in a few dozen lines of NumPy, check it against Chapter
 
 - [Chapter 5]({% link chapters/05_slab.md %}) (Sections 5.3 to 5.6) and [Chapter 6]({% link chapters/06_soi.md %}) (Section 6.2).
 - Python 3.11 or newer with NumPy and Matplotlib: `pip install numpy matplotlib`.
-- The script <a href="{{ '/labs/lab01_slab.py' | relative_url }}" download><code>lab01_slab.py</code></a> (also in the repository's [`labs/` folder](https://github.com/kithminrw/silicon-photonics-lasers-tutorial/tree/main/labs)).
+- The script <a href="{{ '/labs/lab01_slab.py' | relative_url }}" download><code>lab01_slab.py</code></a>.
 - About two hours, including the exercises.
 
 Run it from a terminal in the folder where you saved it:

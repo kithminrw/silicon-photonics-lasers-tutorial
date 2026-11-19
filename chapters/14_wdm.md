@@ -51,7 +51,7 @@ which fixes the trade between passband and crosstalk.
 
 **Free spectral range.** For a cyclic four-channel demultiplexer the rings' FSR should be four channel spacings, $$4 \times 3.2 = 12.8$$ nm, so that each ring's next resonance falls one full set of channels away. With $$n_g = 4.18$$, $$L = \lambda^2/(n_g\,\mathrm{FSR}) = 2.4025/(4.18 \times 0.0128) = 44.9$$ µm: a radius of 7.15 µm.
 
-**Bandwidth and crosstalk.** For −20 dB of rejection of the neighbouring channel 3.2 nm away, $$(2 \times 3.2/\Delta\lambda_\mathrm{FWHM})^2 = 99$$, so $$\Delta\lambda_\mathrm{FWHM} \le 0.64$$ nm, a loaded Q of about 2400. A 50 Gb/s NRZ signal occupies about 0.4 nm, so a 0.6 nm passband passes it, though not for free: the narrow drop ring slows the edges enough to close the eye by about 1 dB, which the driver's equalisation recovers ([Lab 12]({% link labs/lab12_link.md %})). Such a low Q means a strongly over-coupled ring with small gaps ([Chapter 9]({% link chapters/09_couplers.md %})), which also keeps the drop loss low.
+**Bandwidth and crosstalk.** For −20 dB of rejection of the neighbouring channel 3.2 nm away, $$(2 \times 3.2/\Delta\lambda_\mathrm{FWHM})^2 = 99$$, so $$\Delta\lambda_\mathrm{FWHM} \le 0.64$$ nm, a loaded Q of about 2400. A 50 Gb/s NRZ signal occupies about 0.4 nm, so a 0.6 nm passband passes it, though not for free: the narrow drop ring slows the edges enough to close the eye by about 1 dB, which the driver's equalisation recovers ([Lab 12]({% link labs/lab12_link.md %})). Such a low Q means a strongly over-coupled ring: 14.5 % of the power must cross each coupler, which a ring touching a straight bus would reach only with a gap of about 37 nm, so the couplers are racetracks or pulley couplers ([Chapter 9]({% link chapters/09_couplers.md %})). The strong coupling also keeps the drop loss low.
 
 </div>
 
@@ -78,7 +78,7 @@ For many channels, dispersive devices scale better. An **arrayed-waveguide grati
 
 ## <span class="secnum">14.4</span>Crosstalk, flat-top responses and tuning
 
-In practice a demultiplexer's crosstalk is set less by its ideal response than by imperfections: phase errors in AWGs, side lobes, backscatter in rings and the thermal drift of every resonant device. Ring-based WDM therefore depends on **control**: each ring needs a heater and a monitor (a photodiode tap or the drop signal itself) in a feedback loop that keeps it locked to its laser line ([Chapter 18]({% link chapters/18_thermal.md %})). Because silicon rings drift by 70–80 pm/K, a 50 K range moves them by more than one 3.2 nm channel; schemes that let each ring lock to whichever channel is nearest, then reassign channels in the electronics, save heater power.
+In practice a demultiplexer's crosstalk is set less by its ideal response than by imperfections: phase errors in AWGs, side lobes, backscatter in rings and the thermal drift of every resonant device. Ring-based WDM therefore depends on **control**: each ring needs a heater and a monitor (a photodiode tap or the drop signal itself) in a feedback loop that keeps it locked to its laser line ([Chapter 18]({% link chapters/18_thermal.md %})). Because silicon rings drift by about 75 pm/K, a 50 K range moves them by more than one 3.2 nm channel; schemes that let each ring lock to whichever channel is nearest, then reassign channels in the electronics, save heater power.
 
 ## <span class="secnum">14.5</span>Polarisation splitters and rotators
 
@@ -104,7 +104,7 @@ A **polarisation-diversity** receiver ([Figure 14.6](#fig-14-6)) splits the inco
 <div class="tbox tbox-specnote" markdown="1">
 <div class="tbox-title">Reference-link choice</div>
 
-Ring demultiplexer: four add-drop rings of about 7.15 µm radius (FSR 12.8 nm), over-coupled to a loaded Q of about 2400 (0.64 nm passband) for −20 dB adjacent-channel rejection, each with a heater and a locking loop. TE only; the receiver uses a TE grating coupler and polarisation-maintaining fibre in the lab.
+Ring demultiplexer: four add-drop rings of about 7.15 µm radius (FSR 12.8 nm), over-coupled to a loaded Q of about 2400 (0.64 nm passband) for about −20 dB adjacent-channel rejection (−19 dB once each ring's next order is counted; a slightly higher Q gains the last decibel), each with a heater and a locking loop. TE only; the receiver uses a TE grating coupler and polarisation-maintaining fibre in the lab.
 
 </div>
 
@@ -123,7 +123,7 @@ Ring demultiplexer: four add-drop rings of about 7.15 µm radius (FSR 12.8 nm), 
 <div class="tbox-title">Key takeaways</div>
 
 - WDM grids: CWDM (20 nm), LAN-WDM (800 GHz), DWDM (ITU grid, 400 GHz to 50 GHz and below).
-- A four-channel ring demultiplexer on a 3.2 nm grid needs rings of FSR 12.8 nm (R ≈ 7.15 µm) and a loaded Q of about 2400 for −20 dB crosstalk.
+- A four-channel ring demultiplexer on a 3.2 nm grid needs rings of FSR 12.8 nm (R ≈ 7.15 µm) and a loaded Q of about 2400 for about −20 dB crosstalk (−19 dB once the rings' next orders are counted).
 - Higher-order rings and MZI lattices flatten the passband and sharpen the skirts; AWGs and echelles scale to many channels.
 - Every resonant demultiplexer needs heaters and locking loops against thermal drift.
 - Polarisation splitter-rotators and 2D grating couplers make silicon circuits work with fibre's arbitrary polarisation.

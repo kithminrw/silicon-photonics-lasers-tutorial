@@ -25,7 +25,7 @@ Build a grating from its index steps, multiply 2 × 2 matrices along it, and che
 
 - [Chapter 13]({% link chapters/13_bragg.md %}) (Sections 13.1 to 13.5).
 - Python 3.11 or newer with NumPy and Matplotlib: `pip install numpy matplotlib`.
-- The script <a href="{{ '/labs/lab05_bragg.py' | relative_url }}" download><code>lab05_bragg.py</code></a> (also in the repository's [`labs/` folder](https://github.com/kithminrw/silicon-photonics-lasers-tutorial/tree/main/labs)).
+- The script <a href="{{ '/labs/lab05_bragg.py' | relative_url }}" download><code>lab05_bragg.py</code></a>.
 - About an hour and a half, including the exercises.
 
 Run it from a terminal in the folder where you saved it:

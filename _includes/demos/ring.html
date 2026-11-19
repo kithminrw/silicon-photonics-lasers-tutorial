@@ -6,7 +6,7 @@
   <div class="bd-sliders">
     <label class="bd-sl"><span>radius R <b data-v="R"></b></span><input type="range" data-k="R" min="3" max="60" step="0.1" value="10" aria-label="radius"></label>
     <label class="bd-sl"><span>coupling gap g (each coupler) <b data-v="g"></b></span><input type="range" data-k="g" min="0.08" max="0.6" step="0.005" value="0.25" aria-label="coupling gap"></label>
-    <label class="bd-sl"><span>propagation loss <b data-v="a"></b></span><input type="range" data-k="a" min="0" max="100" step="0.1" value="45" aria-label="loss"></label>
+    <label class="bd-sl"><span>propagation loss <b data-v="a"></b></span><input type="range" data-k="a" min="0" max="100" step="0.1" value="41.2" aria-label="loss"></label>
     <label class="bd-sl"><span>laser detuning <b data-v="det"></b></span><input type="range" data-k="det" min="-1" max="1" step="0.005" value="0" aria-label="laser detuning from the resonance"></label>
   </div>
   <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag" data-o="tag">field (red +, blue −), top view</span></div>
@@ -36,7 +36,8 @@
   var S = BD.bind(root, {
     R: { fmt: function (x) { return x.toFixed(1) + ' µm'; } },
     g: { fmt: function (x) { return (1000 * x).toFixed(0) + ' nm'; } },
-    a: { map: function (v) { return 0.3 * Math.pow(10, 2 * v / 100); }, fmt: function (x) { return x.toFixed(x < 10 ? 2 : 0) + ' dB/cm'; } },
+    a: { map: function (v) { var x = 0.3 * Math.pow(10, 2 * v / 100); return x < 10 ? Math.round(100 * x) / 100 : Math.round(x); },   // rounded as shown, so the default 41.2 is 2.00 dB/cm (Table 12.1)
+         fmt: function (x) { return x.toFixed(x < 10 ? 2 : 0) + ' dB/cm'; } },
     det: { fmt: function () { return ''; } }   // labelled in draw(): its scale is the resonance width, out to half an FSR at either end
   }, function () { draw(); });
   var FV = BD.field(q('[data-c="g"]'), { button: q('.bd-status'), hz: 1.1 });
@@ -48,12 +49,11 @@
   function draw() {
     var K = kappa2(S.R, S.g), L = 2 * Math.PI * S.R, alpha = S.a * 100 / 4.343, a = Math.exp(-alpha * L * 1e-6 / 2), t1 = Math.sqrt(1 - K), t2 = cfg === 'ad' ? t1 : 1;
     var fsr = lam0 * lam0 / (ng * L), m0 = Math.round(neff0 * L / lam0);
-    // resonance nearest 1550 nm, accounting for dispersion
-    var lres = (function () { var x = neff0 * L / m0; for (var i = 0; i < 20; i++) { var ne = neff0 - (ng - neff0) * (x - lam0) / lam0; x = ne * L / m0; } return x; })();
+    // resonance nearest 1550 nm, accounting for dispersion: n_eff is linear in wavelength, so n_eff(lres) L = m0 lres solves exactly
+    var lres = ng * L / (m0 + (ng - neff0) * L / lam0);
     var ra = t1 * t2 * a, fw = (1 - ra) * lres * lres / (Math.PI * ng * L * Math.sqrt(ra));
     // the laser: detuned from the resonance by a whole number of linewidths near the middle of the slider, half an FSR at its ends
-    var lasR = lres;   // the resonance itself, to well below a picometre (Newton on beta L = 2 pi m)
-    for (var it = 0; it < 4; it++) { var neR = neff0 - (ng - neff0) * (lasR - lam0) / lam0; lasR -= (neR * L / lasR - m0) / ((-(ng - neff0) / lam0 * lasR - neR) * L / (lasR * lasR)); }
+    var lasR = lres;   // the resonance itself
     var lasD = (S.det < 0 ? -1 : 1) * fw * (Math.pow(10, Math.abs(S.det) * Math.log10(fsr / (2 * fw) + 1)) - 1), lasL = lasR + lasD;
     q('[data-v="det"]').textContent = Math.abs(lasD) < 1e-12 ? 'on resonance' : (lasD > 0 ? '+' : '−') + (Math.abs(lasD) < 1e-3 ? (Math.abs(lasD) * 1e6).toFixed(Math.abs(lasD) < 1e-5 ? 1 : 0) + ' pm' : (Math.abs(lasD) * 1e3).toFixed(2) + ' nm') + ' (' + (Math.abs(lasD) / fw).toFixed(Math.abs(lasD) < 10 * fw ? 2 : 0) + ' FWHM)';
     var span = zoom ? Math.max(8 * fw, 0.02 * fsr) : 3.2 * fsr, l0 = lres - span / 2, l1 = lres + span / 2;

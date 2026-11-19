@@ -44,7 +44,7 @@ $$\mathrm{FSR} = \frac{\lambda^2}{n_gL}$$
 
 </div>
 
-A 10 µm radius silicon ring ($$L = 62.8$$ µm, $$n_g = 4.18$$) has FSR = $$1.55^2/(4.18 \times 62.8) = 9.15$$ nm. For the four channels of the reference link, spread over 9.6 nm, the FSR must exceed that span, which calls for rings of about 9 µm radius or less.
+A 10 µm radius silicon ring ($$L = 62.8$$ µm, $$n_g = 4.18$$) has FSR = $$1.55^2/(4.18 \times 62.8) = 9.15$$ nm. For the four channels of the reference link, spread over 9.6 nm, the FSR must exceed that span; [Chapter 14]({% link chapters/14_wdm.md %}) makes it four channel spacings (12.8 nm), so that each ring's next resonance lands on an empty slot, which calls for rings of 7.15 µm radius or less.
 
 
 <figure id="fig-12-1">

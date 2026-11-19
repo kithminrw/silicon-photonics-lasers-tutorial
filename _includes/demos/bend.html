@@ -13,14 +13,14 @@
   <div class="bd-read" aria-live="polite"><span>circular: radius <b data-o="rc">–</b>, length <b data-o="lc">–</b></span><span>Euler: minimum radius <b data-o="re">–</b>, length <b data-o="le">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
   <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
-    <li><b>Count the cost.</b> At the default R = 5 µm, the full Euler bend's tightest radius is 2.68 µm against 5.0 µm, and it is 8.41 µm long against 7.85 µm: 7 % longer for the same footprint.</li>
+    <li><b>Count the cost.</b> At the default R = 5 µm, the full Euler bend's tightest radius is 2.67 µm against 5.0 µm, and it is 8.40 µm long against 7.85 µm: 7 % longer for the same footprint.</li>
     <li><b>Make it circular.</b> Set R = 2 µm and p = 0: the curvature jumps from 0 to 1/R at both ends, and the mode steps 100 nm outward where the straight guide meets the bend.</li>
     <li><b>Go back to Euler.</b> At p = 1 the mode drifts out and back smoothly, leaning 140 nm out at the tightest radius of 1.07 µm. Below 2–3 µm a silicon strip starts to radiate, which this demo does not model.</li>
   </ol></div>
-  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>For a 5 µm footprint the full Euler bend reaches a tightest radius of only 2.68 µm. Why is it still usually the better choice in silicon strips?</p>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>For a 5 µm footprint the full Euler bend reaches a tightest radius of only 2.67 µm. Why is it still usually the better choice in silicon strips?</p>
     <div class="bd-check-opts" role="group" aria-label="Answers">
       <button type="button" data-correct data-why="Radiation is negligible above 2–3 µm in a silicon strip, so the mode mismatch at the two junctions of a circular bend dominates, and the Euler bend has no junctions where the curvature jumps.">Its curvature never jumps, so the mode shifts gradually instead of being mismatched at two junctions</button>
-      <button type="button" data-why="It is longer, not shorter: 8.41 µm against 7.85 µm for the circular bend with the same footprint.">It is shorter, so there is less length to scatter</button>
+      <button type="button" data-why="It is longer, not shorter: 8.40 µm against 7.85 µm for the circular bend with the same footprint.">It is shorter, so there is less length to scatter</button>
       <button type="button" data-why="Radiation loss grows as the radius shrinks, roughly as C₁e^(−C₂R); the Euler bend wins despite its tighter radius, not because of it.">A tighter radius radiates less</button>
     </div>
     <p class="bd-check-fb" aria-live="polite"></p>
@@ -34,11 +34,12 @@
   // a 90-degree bend whose curvature rises linearly (clothoid), stays constant, then falls; p = fraction of the angle in the clothoids
   function euler(p, R) {
     var th = Math.PI / 2, thc = p * th / 2, tha = th - 2 * thc, km = 1, s1 = 2 * thc / km, sa = tha / km, L = 2 * s1 + sa, n = 600;
-    var x = 0, y = 0, a = 0, pts = [[0, 0]], ks = [0], ss = [0], ds = L / n;
+    var x = 0, y = 0, pts = [[0, 0]], ks = [0], ss = [0], ds = L / n;
+    var ang = function (s) { return s1 === 0 ? km * s : s <= s1 ? km * s * s / (2 * s1) : s <= s1 + sa ? km * (s1 / 2 + s - s1) : th - km * (L - s) * (L - s) / (2 * s1); };   // exact heading
     for (var i = 1; i <= n; i++) {
-      var s = i * ds, k = s < s1 ? km * s / s1 : s < s1 + sa ? km : km * (L - s) / s1;
+      var s = i * ds, k = s < s1 ? km * s / s1 : s < s1 + sa ? km : km * (L - s) / s1, am = ang(s - ds / 2);
       if (s1 === 0) k = km;
-      a += k * ds; x += Math.cos(a - k * ds / 2) * ds; y += Math.sin(a - k * ds / 2) * ds; pts.push([x, y]); ks.push(k); ss.push(s);
+      x += Math.cos(am) * ds; y += Math.sin(am) * ds; pts.push([x, y]); ks.push(k); ss.push(s);   // midpoint rule: R_min and L exact to 1e-5
     }
     var scale = R / x;   // scale the unit-curvature path so its end point lands at (R, R)
     return { pts: pts.map(function (p2) { return [p2[0] * scale, p2[1] * scale]; }), ks: ks.map(function (k) { return k / scale; }), ss: ss.map(function (s) { return s * scale; }), L: L * scale, kmax: km / scale };

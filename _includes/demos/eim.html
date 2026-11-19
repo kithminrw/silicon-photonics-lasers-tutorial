@@ -17,9 +17,9 @@
   <div class="bd-read" aria-live="polite"><span>n<sub>eff</sub> (EIM) <b data-o="ne">–</b></span><span>n<sub>g</sub> <b data-o="ng">–</b></span><span>guided modes <b data-o="m">–</b></span><span>single-mode below W ≈ <b data-o="wc">–</b></span><span>step 1: n<sub>I</sub> / n<sub>II</sub> <b data-o="n12">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
   <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
-    <li><b>Check it against the full solver.</b> The default 500 × 220 nm strip gives n<sub>eff</sub> = 2.492 and single-mode below 322 nm; femwell gives 2.446 and about 450 nm. Narrow W to 300 nm and the pill reads SINGLE-MODE.</li>
-    <li><b>Etch a rib.</b> Press Si rib 220/90: n<sub>II</sub> rises from 1.444 to 2.104, the lateral contrast falls, and the single-mode width grows from 322 to 406 nm. n<sub>eff</sub> = 2.600, against 2.568 from femwell (Table 6.1).</li>
-    <li><b>Switch to TM-like.</b> On the strip, n<sub>eff</sub> falls to 1.847 (femwell: 1.771). Its vertical slab index n<sub>I</sub> is only 2.054, so the guide stays single-mode up to 533 nm.</li>
+    <li><b>Check it against the full solver.</b> The default 500 × 220 nm strip gives n<sub>eff</sub> = 2.492 and single-mode below 316 nm; femwell gives 2.446 and about 450 nm. Narrow W to 300 nm and the pill reads SINGLE-MODE.</li>
+    <li><b>Etch a rib.</b> Press Si rib 220/90: n<sub>II</sub> rises from 1.444 to 2.104, the lateral contrast falls, and the single-mode width grows from 316 to 404 nm. n<sub>eff</sub> = 2.600, against 2.568 from femwell (Table 6.1).</li>
+    <li><b>Switch to TM-like.</b> On the strip, n<sub>eff</sub> falls to 1.847 (femwell: 1.771). Its vertical slab index n<sub>I</sub> is only 2.054, so the guide stays single-mode up to 531 nm.</li>
   </ol></div>
   <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>In step 2 the EIM solves a lateral slab of width W. For the TE-like mode, which boundary conditions does that slab use?</p>
     <div class="bd-check-opts" role="group" aria-label="Answers">
@@ -70,6 +70,8 @@
   }
   function draw() {
     var W = S.w, t = S.t, s = S.s, lam = S.lam, r = eim(W, t, s, lam, 0);
+    // the lateral slab is symmetric, so its second mode cuts off exactly at k0 W sqrt(nI^2 - nII^2) = pi
+    var wc = r.nI > r.nII ? lam / (2 * Math.sqrt(r.nI * r.nI - r.nII * r.nII)) : NaN;
     var rp = eim(W, t, s, lam + 0.005, 0), rm = eim(W, t, s, lam - 0.005, 0), ng = r.ne - lam * (rp.ne - rm.ne) / 0.01;
     var nm = 0; while (nm < 8 && isFinite(eim(W, t, s, lam, nm).ne)) nm++;
     // ---- geometry: oxide, silicon (or nitride) ridge and slab, mode intensity
@@ -99,10 +101,10 @@
     // ---- n_eff against width for the first lateral modes
     var dn = BD.setup(q('[data-c="n"]')), wmax = 2, nlo = nox(lam), nhi = ncore(lam), f = BD.frame(dn, { x: [0.1, wmax], y: [nlo, Math.min(nhi, (r.nI || nhi) + 0.15)], pad: { l: 42, b: 22 },
       xt: [[0.5, '0.5'], [1, '1'], [1.5, '1.5'], [2, '2 µm']], yt: [[nlo, nlo.toFixed(2)], [r.nI || nhi, (r.nI || nhi).toFixed(2)]] });
-    var COL = [BD.C.gold, BD.C.blue, BD.C.green, BD.C.red], wc = NaN;
+    var COL = [BD.C.gold, BD.C.blue, BD.C.green, BD.C.red];
     for (var m = 0; m < 4; m++) {
       var xs = [], ys = [];
-      for (var k = 0; k <= 90; k++) { var ww = 0.1 + (wmax - 0.1) * k / 90, e = eim(ww, t, s, lam, m).ne; xs.push(ww); ys.push(e); if (m === 1 && !isFinite(wc) && isFinite(e)) wc = ww; }
+      for (var k = 0; k <= 90; k++) { var ww = 0.1 + (wmax - 0.1) * k / 90, e = eim(ww, t, s, lam, m).ne; xs.push(ww); ys.push(e); }
       BD.line(f, xs, ys, COL[m], m ? 1.3 : 2);
     }
     BD.vline(f, W, BD.C.dim, [3, 3]); if (isFinite(r.ne)) BD.dot(f, W, r.ne, BD.C.white, 4);
@@ -111,14 +113,14 @@
     q('[data-o="ne"]').textContent = isFinite(r.ne) ? r.ne.toFixed(4) : 'not guided';
     q('[data-o="ng"]').textContent = isFinite(ng) ? ng.toFixed(3) : '–';
     q('[data-o="m"]').textContent = nm + ' ' + pol + '-like';
-    q('[data-o="wc"]').textContent = isFinite(wc) ? um(wc - 0.0105) : '> 2 µm';
+    q('[data-o="wc"]').textContent = isFinite(wc) ? um(wc) : '–';
     q('[data-o="n12"]').textContent = (r.nI || NaN).toFixed(3) + ' / ' + r.nII.toFixed(3);
     BD.pill(q('[data-o="pill"]'), !isFinite(r.ne) ? 'not guided' : nm > 1 ? 'multimode' : 'single-mode', !isFinite(r.ne) ? 'bad' : nm > 1 ? 'warn' : 'ok');
     var c = 'Step 1 solves a vertical slab for the core region (n<sub>I</sub>) and for the region beside it (n<sub>II</sub>: the remaining slab, or the cladding); step 2 solves a lateral slab of width W between them, with the other polarisation\'s boundary conditions. ';
     if (mat === 'si' && s < 0.002 && Math.abs(W - 0.5) < 0.006 && Math.abs(t - 0.22) < 0.003 && pol === 'TE' && Math.abs(lam - 1.55) < 0.003)
       c += 'For 500 × 220 nm at 1550 nm a full-vectorial solver (femwell) gives n<sub>eff</sub> = 2.446 and n<sub>g</sub> = 4.18, and puts the TE1 cut-off near 450 nm: the EIM overestimates n<sub>eff</sub> and underestimates the single-mode width, as it does for small high-contrast strips, but it gets the trends right. ';
     if (s > 0.002) c += 'In a rib the lateral contrast is only n<sub>I</sub> − n<sub>II</sub>, so the mode spreads sideways and the waveguide stays single-mode to a larger width, at the cost of larger bends. ';
-    if (nm > 1) c += '<b>This width guides ' + nm + ' modes</b> in the EIM; single-mode routing needs W below about ' + (isFinite(wc) ? um(wc - 0.0105) : '–') + (s < 0.002 && mat === 'si' ? ' (for strips, check this with a full solver, which gives a larger width)' : '') + '.';
+    if (nm > 1) c += '<b>This width guides ' + nm + ' modes</b> in the EIM; single-mode routing needs W below about ' + (isFinite(wc) ? um(wc) : '–') + (s < 0.002 && mat === 'si' ? ' (for strips, check this with a full solver, which gives a larger width)' : '') + '.';
     q('[data-o="cap"]').innerHTML = c;
   }
   BD.observe(root, draw);

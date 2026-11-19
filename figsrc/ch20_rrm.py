@@ -195,11 +195,11 @@ def injection_ring_numbers():
     x, w = np.array(d["x"]), np.array(d["w"])
     gam_core = float(np.sum(w[np.abs(x) <= 0.25]) * (x[1] - x[0]))
     F = 0.8
-    def shift(N):        # blue shift (m) for equal electron and hole densities N (cm^-3) in the 500 nm core
+    def shift(N):        # blue shift (m) for equal electron and hole densities N (cm^-3) in the 500 nm core, along 80 % of the ring
         dn = 8.8e-22 * N + 8.5e-18 * N ** 0.8
         return LAM * F * gam_core * dn / NG
-    def dalpha(N):       # added loss in cm^-1 (core-weighted)
-        return gam_core * (8.5e-18 * N + 6.0e-18 * N)
+    def dalpha(N):       # added loss in cm^-1, core-weighted and averaged round the ring (carriers on the fraction F only)
+        return F * gam_core * (8.5e-18 * N + 6.0e-18 * N)
     return gam_core, F, shift, dalpha
 
 

@@ -14,12 +14,12 @@
   </div>
   <div class="bd-status"><span class="bd-seg" role="group" aria-label="Drive level shown in the field"><button type="button" data-lv="lo" aria-pressed="true">low bias</button><button type="button" data-lv="hi" aria-pressed="false">high bias</button></span><span data-o="fst"></span></div>
   <div class="bd-scope"><canvas data-c="o" aria-hidden="true"></canvas><span class="bd-tag">extinction (blue), loss (gold) against detuning</span></div>
-  <div class="bd-read" aria-live="polite"><span>extinction <b data-o="er">–</b></span><span>insertion loss <b data-o="il">–</b></span><span>optical bandwidth <b data-o="bw">–</b></span><span>reference target <b data-o="ok">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
+  <div class="bd-read" aria-live="polite"><span>extinction <b data-o="er">–</b></span><span>insertion loss <b data-o="il">–</b></span><span>linewidth <b data-o="lw">–</b></span><span>modulation bandwidth <b data-o="bw">–</b></span><span>reference target <b data-o="ok">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
   <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
-    <li><b>Meet the target.</b> Set the junction efficiency to 50 pm/V and the detuning to −109 pm: 4.3 dB of extinction at 3.0 dB of loss. The target is met, but slowly: c/(λQ) is only 24 GHz.</li>
+    <li><b>Meet the target.</b> Set the junction efficiency to 50 pm/V and the detuning to −109 pm: 4.3 dB of extinction at 3.0 dB of loss. The resonance is only 24 GHz wide, but with the laser on its side the response peaks, and the small-signal bandwidth reaches 38 GHz (Section 20.8): the target is met.</li>
     <li><b>Watch the ring fill.</b> At the defaults, flip the field between low and high bias. At low bias the resonance sits nearer the laser: the ring holds 15 times the bus power and only 28 % gets through; at high bias, 7 times and 68 %.</li>
-    <li><b>Trade Q for speed.</b> Lower the loaded Q to 5000: the bandwidth rises to 39 GHz, but the dip widens, and even at 50 pm/V and −109 pm the loss reaches 4.0 dB.</li>
+    <li><b>Trade Q for speed.</b> Lower the loaded Q to 5000: the linewidth rises to 39 GHz and the bandwidth to 59 GHz, but the dip widens, and even at 50 pm/V and −109 pm the loss reaches 4.0 dB.</li>
   </ol></div>
   <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>What extinction does the demo give with the laser exactly on the resonance (detuning 0)?</p>
     <div class="bd-check-opts" role="group" aria-label="Answers">
@@ -48,9 +48,24 @@
     var sh = S.eff * S.V / 2, t0 = r.T(det + sh), t1 = r.T(det - sh);   // detuning = laser - resonance(mid), pm
     return { a: t0, b: t1, hi: Math.max(t0, t1), lo: Math.min(t0, t1) };
   }
+  function mbw(Ql, det, fl) {   // small-signal 3 dB bandwidth (GHz) of the output power for a small shift of the resonance, from one-mode
+    // coupled-mode theory as in figsrc/ch20_rrm.py: frequencies in half-linewidths, x = (w_r - w_L), y = modulation frequency;
+    // with c1 = conj(s0) mu a0 / 2 = p + jq, the response is H(y) = 2 [p (1 + jy) - q x] / [(1 + jy)^2 + x^2]
+    var rc = 1 - Ql / S.Qi, x = 2 * det / (LAM / Ql * 1000);
+    if (Math.abs(x) < 1e-3) x = x < 0 ? -1e-3 : (x > 0 ? 1e-3 : -1e-3);
+    var dd = 1 + x * x, ar = 2 * rc * x / dd, ai = -2 * rc / dd, sr = 1 + ai, si = -ar, p = (sr * ar + si * ai) / 2, qq = (sr * ai - si * ar) / 2;
+    var h = function (y) { var nr = p - qq * x, ni = p * y, er = 1 - y * y + x * x, ei = 2 * y; return Math.sqrt((nr * nr + ni * ni) / (er * er + ei * ei)); };
+    var h0 = h(0), lim = h0 / Math.SQRT2, y = 0;
+    if (!(h0 > 1e-12)) return NaN;
+    while (y < 200 && h(y + 0.01) >= lim) y += 0.01;
+    if (y >= 200) return NaN;
+    var lo = y, hi = y + 0.01;
+    for (var k = 0; k < 30; k++) { var m = (lo + hi) / 2; if (h(m) < lim) hi = m; else lo = m; }
+    return (lo + hi) / 2 * fl / 2;
+  }
   function draw() {
     var Ql = Math.min(S.Q, S.Qi * 0.98), r = ring(Ql), L = levels(r, S.d), er = 10 * Math.log10(L.hi / Math.max(L.lo, 1e-6)), il = -10 * Math.log10((L.hi + L.lo) / 2);
-    var fopt = 3e8 / (LAM * 1e-9) / Ql / 1e9;   // GHz, photon-lifetime limit c/(lambda Q)
+    var fopt = 3e8 / (LAM * 1e-9) / Ql / 1e9, fbw = mbw(Ql, S.d, fopt);   // GHz: linewidth c/(lambda Q_L), and the small-signal bandwidth at this detuning
     // ---- top view to scale with the optical field, at one drive level (lvl), from the same Lorentzian all-pass model in
     // coupled-mode form: with x the laser's detuning in half-linewidths (frequency), r_i = Q_L/Q_i and r_c = 1 - r_i, the
     // through field is t = (jx + r_i - r_c)/(jx + 1), so |t|^2 = T above, and the ring field is -j sqrt(2 r_c F/pi)/(1 + jx)
@@ -115,15 +130,16 @@
     var ok = er >= 4 && il <= 3 && S.V <= 2.001;
     q('[data-o="er"]').textContent = er.toFixed(1) + ' dB';
     q('[data-o="il"]').textContent = il.toFixed(1) + ' dB';
-    q('[data-o="bw"]').textContent = fopt.toFixed(0) + ' GHz';
-    q('[data-o="ok"]').textContent = ok ? (fopt >= 30 ? 'met' : 'met, but slow') : 'not met';
-    BD.pill(q('[data-o="pill"]'), ok ? (fopt >= 30 ? 'target met' : 'met, but slow') : 'target missed', ok ? (fopt >= 30 ? 'ok' : 'warn') : 'bad');
+    q('[data-o="lw"]').textContent = fopt.toFixed(0) + ' GHz';
+    q('[data-o="bw"]').textContent = isFinite(fbw) ? fbw.toFixed(0) + ' GHz' : '–';
+    q('[data-o="ok"]').textContent = ok ? (fbw >= 30 ? 'met' : 'met, but slow') : 'not met';
+    BD.pill(q('[data-o="pill"]'), ok ? (fbw >= 30 ? 'target met' : 'met, but slow') : 'target missed', ok ? (fbw >= 30 ? 'ok' : 'warn') : 'bad');
     var c = 'Reverse bias depletes the junction and moves the resonance red by ' + (S.eff * S.V).toFixed(0) + ' pm; a laser parked on the side of the dip sees its power change. ';
-    c += 'A higher Q makes the dip narrower and steeper, so a small shift gives a large extinction, but light then lives longer in the ring: the photon lifetime limits the bandwidth to about c/(λQ) = ' + fopt.toFixed(0) + ' GHz. ';
+    c += 'A higher Q makes the dip narrower and steeper, so a small shift gives a large extinction, but light then lives longer in the ring. Its resonance is c/(λQ<sub>L</sub>) = ' + fopt.toFixed(0) + ' GHz wide, and with the laser on resonance the ring would respond roughly as a single pole at half that, ' + (fopt / 2).toFixed(0) + ' GHz. Moving the laser onto the side of the dip makes the response peak and widens it: the small-signal bandwidth at this detuning is ' + (isFinite(fbw) ? fbw.toFixed(0) : '–') + ' GHz (Section 20.8). ';
     if (S.Q > S.Qi * 0.98) c += 'The loaded Q cannot exceed the intrinsic Q: it is held just below it. ';
     if (r.tmin > 0.2) c += 'With Q<sub>L</sub> far below Q<sub>i</sub> the ring is strongly over-coupled, so the dip is only ' + (-10 * Math.log10(r.tmin)).toFixed(1) + ' dB deep: heavier doping lowers Q<sub>i</sub> and deepens it, but costs loss. ';
-    c += 'A lateral junction gives 10–20 pm/V (Chapter 19); L- and U-shaped or interleaved junctions reach 40 pm/V and more. The reference link asks for 4 dB at 2 Vpp with at most 3 dB loss and enough bandwidth for 50 Gb/s.';
-    c += ' <i>Lorentzian all-pass model; electrical bandwidth, the drop in loss with bias and self-heating are left out.</i>';
+    c += 'A lateral junction gives 10–20 pm/V (Chapter 19); L- and U-shaped or interleaved junctions reach 40 pm/V and more. The reference link asks for 4 dB at 2 Vpp with at most 3 dB loss and enough bandwidth for 50 Gb/s (taken here as 30 GHz of small-signal bandwidth).';
+    c += ' <i>Lorentzian all-pass model; small-signal bandwidth from one-mode coupled-mode theory, as in Section 20.8; electrical bandwidth, the drop in loss with bias and self-heating are left out.</i>';
     q('[data-o="cap"]').innerHTML = c;
   }
   BD.observe(root, draw);

@@ -91,7 +91,6 @@ _config.yml, _sass/, _includes/       site settings, "Wafer" colour theme, dark 
 
 Spotted a mistake, a broken demo or a missing credit? Please
 [open an issue](https://github.com/kithminrw/silicon-photonics-lasers-tutorial/issues) or a pull request.
-Every page has an *Edit this page on GitHub* link.
 
 When writing a page:
 

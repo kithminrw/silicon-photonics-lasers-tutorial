@@ -33,7 +33,7 @@ Y-branch or MMI, and how long must the MMI be?
 
 A Y-branch splits one waveguide into two by widening it gradually and separating it into two arms. If the transition is adiabatic ([Chapter 8]({% link chapters/08_bends.md %})), the fundamental mode of the input evolves into the even supermode of the two arms, which carries half the power in each: a 50/50 splitter, symmetric by construction and therefore broadband ([Figure 10.1a](#fig-10-1)).
 
-Run backwards, the same device is a combiner, and here it holds a surprise. Feed light into only one arm and it is the sum of an even and an odd supermode of the arms, in equal parts. Only the even supermode evolves into the output's fundamental mode; the odd one has nowhere to go in a single-mode output and radiates away ([Figure 10.1b](#fig-10-1)). **A symmetric Y-combiner fed from one arm passes exactly half the power**, and the same is true for two inputs out of phase. This is not a defect but the Y-junction's reciprocity, and it is why a Mach–Zehnder interferometer built from Y-branches loses its light into the substrate rather than into a second output port at its nulls ([Chapter 11]({% link chapters/11_mzi.md %})).
+Run backwards, the same device is a combiner, and here it holds a surprise. Feed light into only one arm and it is the sum of an even and an odd supermode of the arms, in equal parts. Only the even supermode evolves into the output's fundamental mode; the odd one has nowhere to go in a single-mode output and radiates away ([Figure 10.1b](#fig-10-1)). **A symmetric Y-combiner fed from one arm passes exactly half the power.** Fed from both arms, it passes all of it when the inputs are in phase, none when they are in antiphase, and half when they are 90° apart. This is not a defect but the Y-junction's reciprocity, and it is why a Mach–Zehnder interferometer built from Y-branches loses its light into the substrate rather than into a second output port at its nulls ([Chapter 11]({% link chapters/11_mzi.md %})).
 
 Practical Y-branches face a fabrication limit: the gap between the arms cannot close to zero, and the blunt tip scatters. The compact Y-junction of the SiEPIC EBeam PDK solved this by optimising the shape of a short taper with particle-swarm optimisation in 3D FDTD, reaching an insertion loss of about 0.28 dB {% include cite.html keys="zhang2013,ebeampdk" %}. You can turn it over in the [3D gallery]({% link devices-3d.md %}#dev-siepic-ybranch).
 
@@ -96,7 +96,7 @@ Take a 6 µm wide multimode section in 220 nm silicon at 1550 nm (TE), with $$n_
 
 $$L_\pi = \frac{4 \times 2.85 \times 6.052^2}{3 \times 1.55} = 89.8\ \mu\mathrm{m}.$$
 
-A centred input gives two images at $$3L_\pi/8 = 33.7$$ µm, at $$\pm W_e/4 = \pm1.51$$ µm from the centre, where the two output waveguides start. A 2 × 2 MMI by general interference needs $$3L_\pi/2 = 135$$ µm; by paired interference, with inputs at $$\pm W_e/6$$, $$L_\pi/2 = 45$$ µm ([Figure 10.4](#fig-10-4)). Taking $$\sigma = 0$$ by mistake would give $$W_e = 6.20$$ µm and a 1 × 2 MMI 35.4 µm long, 1.7 µm too long, which costs about 1 dB ([Lab 3]({% link labs/lab03_couplers.md %})).
+A centred input gives two images at $$3L_\pi/8 = 33.7$$ µm, at $$\pm W_e/4 = \pm1.51$$ µm from the centre, where the two output waveguides start. A 2 × 2 MMI by general interference needs $$3L_\pi/2 = 135$$ µm; by paired interference, with inputs at $$\pm W_e/6$$, $$L_\pi/2 = 45$$ µm ([Figure 10.4](#fig-10-4)). Taking $$\sigma = 0$$ by mistake would give $$W_e = 6.20$$ µm and a 1 × 2 MMI 35.4 µm long, 1.7 µm too long, which costs 0.85–1 dB ([Lab 3]({% link labs/lab03_couplers.md %})).
 
 </div>
 
@@ -108,7 +108,7 @@ A centred input gives two images at $$3L_\pi/8 = 33.7$$ µm, at $$\pm W_e/4 = \p
 Three practical points shape a real MMI:
 
 - **Tapered access waveguides.** Widening the input and output waveguides to 1–2 µm where they meet the multimode section makes the images sharper and the device less sensitive to the exact length, and reduces the loss from the higher-order modes that the ideal theory neglects.
-- **Tolerance.** $$L_\pi$$ grows with $$W_e^2$$, so a 1 % width error moves the images by 2 % of the length, about 0.7 µm in Example 10.1; the image region is roughly that long, so a few tens of nanometres of width error are tolerable.
+- **Tolerance.** $$L_\pi$$ grows with $$W_e^2$$, so a 1 % width error moves the images by 2 % of the length, about 0.7 µm in Example 10.1; the 1 × 2 stays within 0.1 dB of its best over about 1.7 µm of length, so a few tens of nanometres of width error are tolerable.
 - **Bandwidth.** $$L_\pi$$ is inversely proportional to wavelength, so the images drift as the wavelength changes; short MMIs (small $$W$$, symmetric interference) are the most broadband ([Figure 10.5](#fig-10-5)). Excess losses of a few tenths of a dB and imbalances of a few per cent over tens of nanometres are typical of good designs.
 
 <figure id="fig-10-5">
@@ -131,7 +131,7 @@ Three practical points shape a real MMI:
 <div class="tbox tbox-insight" markdown="1">
 <div class="tbox-title">What this means for your design</div>
 
-For a 1 × 2 split on your first chip, the PDK's Y-branch is the safe choice: small, broadband and measured. For a 2 × 2 coupler that must work across the four channels of the reference link, an MMI or an adiabatic coupler beats a directional coupler, whose split ratio drifts by a few per cent per nanometre ([Chapter 9]({% link chapters/09_couplers.md %})).
+For a 1 × 2 split on your first chip, the PDK's Y-branch is the safe choice: small, broadband and measured. For a 2 × 2 coupler that must work across the four channels of the reference link, an MMI or an adiabatic coupler beats a directional coupler, whose split ratio drifts by about 0.35 % per nanometre, a few per cent across the four channels ([Chapter 9]({% link chapters/09_couplers.md %})).
 
 </div>
 

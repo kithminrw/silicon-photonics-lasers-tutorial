@@ -40,11 +40,11 @@
            draw: function (g, X, Y) { rect(g, X, Y, -1.3, 0, 2.6, 0.2, '#ee9aaa'); g.fillStyle = '#ee9aaa'; g.beginPath(); g.moveTo(X(-0.62), Y(0.2)); g.lineTo(X(0.62), Y(0.2)); g.lineTo(X(0.5), Y(0.4)); g.lineTo(X(-0.5), Y(0.4)); g.fill(); } },
     bto: { name: 'BTO on Si', core: 2.3, clad: 1.44, loss: [1, 10], bend: [5, 30], col: '#b8a8e0', caps: [0, 1, 2, 1, 1],
            draw: function (g, X, Y) { rect(g, X, Y, -1.3, 0, 2.6, 0.1, '#b8a8e0'); rect(g, X, Y, -1.3, 0.1, 2.6, 0.05, '#9db3cc'); rect(g, X, Y, -0.3, 0.1, 0.6, 0.17, '#9db3cc'); } },
-    inp: { name: 'InP (generic)', core: 3.36, clad: 3.17, loss: [1, 3], bend: [10, 100], col: '#8e7f5a', caps: [2, 2, 2, 1, 2],
+    inp: { name: 'InP (generic)', core: 3.36, clad: 3.17, loss: [1, 3], bend: [10, 500], col: '#8e7f5a', caps: [2, 2, 2, 1, 2],
            draw: function (g, X, Y) { rect(g, X, Y, -1.4, -1.0, 2.8, 1.0, '#c9c2b0'); rect(g, X, Y, -1.0, 0, 2.0, 0.5, '#8e7f5a'); rect(g, X, Y, -1.0, 0.5, 2.0, 1.3, '#c9c2b0'); } }
   };
   var CAPS = ['gain / lasers', 'photodetectors', 'fast EO modulation', 'thermal tuning', 'CMOS-foundry process'];
-  P.si.caps = [1, 2, 2, 2, 2]; P.sin.caps = [1, 1, 0, 2, 2]; P.ln.caps = [1, 0, 2, 2, 0]; P.bto.caps = [1, 1, 2, 2, 1]; P.inp.caps = [2, 2, 2, 2, 0];
+  P.si.caps = [1, 2, 2, 2, 2]; P.sin.caps = [1, 1, 0, 2, 2]; P.ln.caps = [1, 1, 2, 2, 0]; P.bto.caps = [1, 1, 2, 2, 1]; P.inp.caps = [2, 2, 2, 2, 0];
   function rect(g, X, Y, x, y, w, h, c) { g.fillStyle = c; g.fillRect(X(x), Y(y + h), X(x + w) - X(x), Y(y) - Y(y + h)); }
   BD.seg(root, 'pa', function (v) { A = v; draw(); });
   BD.seg(root, 'pb', function (v) { B = v; draw(); });

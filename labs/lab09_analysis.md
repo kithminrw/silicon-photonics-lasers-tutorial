@@ -25,7 +25,7 @@ Take the raw sweeps of a test chip, divide out the grating couplers, read the gr
 
 - [Chapter 32]({% link chapters/32_analysis.md %}) (Sections 32.1 to 32.5), with [Chapter 31]({% link chapters/31_testing.md %}) (Section 31.3), [Chapter 7]({% link chapters/07_loss.md %}) (Section 7.7), [Chapter 11]({% link chapters/11_mzi.md %}) (Sections 11.3 and 11.6) and [Chapter 12]({% link chapters/12_rings.md %}) (Sections 12.2 to 12.5, Table 12.1).
 - Python 3.11 or newer with NumPy and Matplotlib: `pip install numpy matplotlib`. The fits are written out in the script, so SciPy is not needed.
-- The script <a href="{{ '/labs/lab09_analysis.py' | relative_url }}" download><code>lab09_analysis.py</code></a> and the data: either the ten CSV files listed below, saved in a folder `data/` beside the script, or the generator <a href="{{ '/labs/lab09_make_data.py' | relative_url }}" download><code>lab09_make_data.py</code></a>, which writes the same files there (all three are also in the repository's [`labs/` folder](https://github.com/kithminrw/silicon-photonics-lasers-tutorial/tree/main/labs)).
+- The script <a href="{{ '/labs/lab09_analysis.py' | relative_url }}" download><code>lab09_analysis.py</code></a> and the data: either the ten CSV files listed below, saved in a folder `data/` beside the script, or the generator <a href="{{ '/labs/lab09_make_data.py' | relative_url }}" download><code>lab09_make_data.py</code></a>, which writes the same files there.
 - About two hours, including the exercises.
 
 Run them from a terminal in the folder where you saved them:

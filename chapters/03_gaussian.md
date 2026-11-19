@@ -139,7 +139,7 @@ $$\frac{w}{a} \approx 0.65 + \frac{1.619}{V^{3/2}} + \frac{2.879}{V^6}.$$
 <div class="tbox tbox-example" markdown="1">
 <div class="tbox-title">Worked Example 3.3 · Standard single-mode fibre</div>
 
-Take a core radius of 4.1 µm and $$\Delta = 0.36\ \%$$, close to standard (G.652) fibre {% include cite.html keys="itug652" %}. With $$n_2 = 1.444$$, $$n_1 = 1.449$$ and NA = 0.123. The cut-off is $$\lambda_c = 2\pi\times4.1\times0.123/2.405 = 1.32$$ µm, so the fibre is single-mode through the O band and beyond. At 1550 nm, $$V = 2.04$$ and Marcuse gives $$w = 5.10$$ µm, an MFD of 10.2 µm; at 1310 nm, $$V = 2.42$$ and MFD = 9.0 µm. Data sheets quote about 10.4 and 9.2 µm, measured rather than modelled.
+Take a core radius of 4.1 µm and $$\Delta = 0.36\ \%$$, close to standard (G.652) fibre {% include cite.html keys="itug652" %}. With $$n_2 = 1.444$$, $$n_1 = 1.449$$ and NA = 0.123. The cut-off is $$\lambda_c = 2\pi\times4.1\times0.123/2.405 = 1.32$$ µm, so this model fibre is single-mode above about 1.32 µm. Real G.652 fibre is specified by its cabled cut-off, at most 1260 nm, so in practice it is single-mode across the whole O band. At 1550 nm, $$V = 2.04$$ and Marcuse gives $$w = 5.10$$ µm, an MFD of 10.2 µm; at 1310 nm, $$V = 2.42$$ and MFD = 9.0 µm. Data sheets quote about 10.4 and 9.2 µm, measured rather than modelled.
 
 </div>
 
@@ -152,7 +152,7 @@ Take a core radius of 4.1 µm and $$\Delta = 0.36\ \%$$, close to standard (G.65
 
 {% include demos/fiber.html %}
 
-Silica fibre is used in five telecom bands: O (1260–1360 nm), E (1360–1460), S (1460–1530), C (1530–1565) and L (1565–1625 nm). Loss is about 0.35 dB/km in the O band and about 0.2 dB/km in the C band, where it is lowest; the C and L bands are also where erbium-doped amplifiers work. Chromatic dispersion is close to zero near 1310 nm and about 17 ps/(nm·km) at 1550 nm ([Chapter 2]({% link chapters/02_em.md %}), [Figure 3.4](#fig-3-4)).
+Silica fibre is used in six telecom bands: O (1260–1360 nm), E (1360–1460), S (1460–1530), C (1530–1565), L (1565–1625) and U (1625–1675 nm), the last mostly for monitoring. Loss is about 0.35 dB/km in the O band and about 0.2 dB/km in the C band, where it is lowest; the C and L bands are also where erbium-doped amplifiers work. Chromatic dispersion is close to zero near 1310 nm and about 17 ps/(nm·km) at 1550 nm ([Chapter 2]({% link chapters/02_em.md %}), [Figure 3.4](#fig-3-4)).
 
 <figure id="fig-3-4">
   <img src="{{ '/assets/figs/ch03_bands.svg' | relative_url }}" style="width:640px" alt="(a) Fibre loss falling from 0.40 dB/km at 1260 nm to 0.17 dB/km at 1625 nm, through 0.35 dB/km at 1310 nm and 0.2 dB/km at 1550 nm, with the O, E, S, C and L bands shaded. (b) Chromatic dispersion of the step-index fibre model rising from about −3 to 21 ps/(nm·km), zero at 1296 nm and 17.1 at 1550 nm, with the dispersion of silica alone for comparison">
@@ -186,7 +186,7 @@ and two equal modes separated by an axial gap $$z$$ couple $$\eta = 1/\left[1 + 
 <div class="tbox tbox-example" markdown="1">
 <div class="tbox-title">Worked Example 3.4 · Mismatch and tolerance</div>
 
-Butt-coupling a standard fibre ($$w = 5.2$$ µm) to a 1.5 µm on-chip spot gives $$\eta = (2\times5.2\times1.5/29.29)^2 = 0.28$$, or −5.5 dB, before any misalignment; a 2.5 µm spot gives −2.2 dB. Between two standard fibres, the 1 dB tolerances are a lateral offset of $$d = \sqrt{0.115\times2\times5.2^2} = 2.5$$ µm and a tilt of 2.6° in air. Because the tolerances scale with the spot size, an edge coupler that expands its mode to match the fibre is both more efficient and easier to align.
+Butt-coupling a standard fibre ($$w = 5.2$$ µm) to a 1.5 µm on-chip spot gives $$\eta = (2\times5.2\times1.5/29.29)^2 = 0.28$$, or −5.5 dB, before any misalignment; a 2.5 µm spot gives −2.1 dB. Between two standard fibres, the 1 dB tolerances are a lateral offset of $$d = \sqrt{0.115\times2\times5.2^2} = 2.5$$ µm and a tilt of 2.6° in air. Because the tolerances scale with the spot size, an edge coupler that expands its mode to match the fibre is both more efficient and easier to align.
 
 </div>
 

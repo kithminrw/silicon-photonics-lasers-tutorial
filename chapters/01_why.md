@@ -32,7 +32,7 @@ When does light beat copper, and what does a photonic chip need to do it?
 
 ## <span class="secnum">1.1</span>Light versus charge
 
-A copper trace is a transmission line, and its loss grows with frequency: the current crowds into a skin a few micrometres thick at gigahertz frequencies, and the laminate around it absorbs more energy each cycle. A trace on a printed circuit board loses roughly a decibel per centimetre at tens of gigahertz, depending on the laminate, so a 100 Gb/s electrical lane can cross a board but not a room without equalisation, retimers and the power they burn.
+A copper trace is a transmission line, and its loss grows with frequency: the current crowds into a skin about 2 µm thick at 1 GHz and well under a micrometre at tens of gigahertz, and the laminate around it absorbs more energy each cycle. A trace on a printed circuit board loses roughly a decibel per centimetre at tens of gigahertz, depending on the laminate, so a 100 Gb/s electrical lane can cross a board but not a room without equalisation, retimers and the power they burn.
 
 An optical fibre has none of these problems. Its loss, about 0.2 dB per *kilometre* at 1550 nm, does not depend on how fast the light is modulated, because the modulation is a tiny fraction of the optical carrier frequency of about 193 THz. The C band alone, 1530–1565 nm, spans about 4.4 THz of spectrum ([Figure 1.5](#fig-1-5)), and wavelength-division multiplexing (WDM) puts many independent channels into it, on the same fibre, without interference between them.
 
@@ -96,7 +96,7 @@ Silicon has five weaknesses, and each one shapes the rest of this tutorial:
 1. **No efficient light emission.** Silicon has an indirect bandgap, so electrons and holes recombine through phonons and heat rather than light. The laser has to be brought in from another material (Chapters 22 and 27).
 2. **No linear electro-optic effect.** Silicon's crystal is centrosymmetric, so it has no Pockels effect. Its modulators move free carriers instead, which costs loss and limits linearity (Chapter 19).
 3. **Two-photon absorption.** At 1550 nm the photon energy is 0.80 eV, and two photons together exceed silicon's 1.12 eV bandgap, so high intensities are absorbed (Chapter 7).
-4. **Temperature sensitivity.** Silicon's index changes by about 1.8 × 10⁻⁴ per kelvin, so a silicon ring resonator drifts by about 80 pm/K and needs active control (Chapter 18).
+4. **Temperature sensitivity.** Silicon's index changes by about 1.8 × 10⁻⁴ per kelvin, so a silicon ring resonator drifts by about 75 pm/K and needs active control (Chapter 18).
 5. **Sensitivity to fabrication.** The strong confinement that makes devices small also makes them sensitive to nanometre changes in width and thickness (Chapter 29).
 
 These weaknesses are why other materials have joined silicon: silicon nitride for low loss and wide transparency, thin-film lithium niobate and barium titanate for fast, efficient modulation, and indium phosphide and other III–V semiconductors for gain. [Chapter 4]({% link chapters/04_platforms.md %}) compares them.
@@ -185,8 +185,8 @@ The fibre couplers usually dominate a short link's budget: two grating couplers 
 |---|---|---|
 | Channels | 4 wavelengths on the 400 GHz ITU grid: 1546.12, 1549.32, 1552.52, 1555.75 nm {% include cite.html keys="itug694" %} | Ch 12, 14 |
 | Modulation and rate | NRZ, 50 Gb/s per channel, 200 Gb/s in total | Ch 20, 21 |
-| Reach | 2 km of standard single-mode fibre, two connectors | Ch 3, 34 |
-| Bit-error ratio | below 10⁻¹² without forward error correction | Ch 21, 34 |
+| Reach | 2 km of standard single-mode fibre, two connectors | Ch 3, 33 |
+| Bit-error ratio | below 10⁻¹² without forward error correction | Ch 21, 33 |
 | Laser | ≥ +10 dBm per wavelength in the waveguide; side-mode suppression ≥ 35 dB | Ch 24–27 |
 | Ring modulator | extinction ≥ 4 dB with ≤ 2 V peak-to-peak drive; insertion loss ≤ 3 dB | Ch 12, 19, 20 |
 | Fibre couplers | ≤ 3 dB each, 1 dB bandwidth covering all four channels | Ch 15–17 |
@@ -196,7 +196,7 @@ The fibre couplers usually dominate a short link's budget: two grating couplers 
 | Link margin | ≥ 3 dB after all penalties | Ch 33 |
 | Energy | ≤ 5 pJ/bit for the whole link, including laser wall-plug power, drivers, receivers and heaters | Ch 33 |
 
-The 400 GHz spacing (about 3.2 nm) is wide enough that ring filters with a free spectral range above the 9.6 nm span of the four channels separate them cleanly, and it leaves room for the thermal drift that the heaters must correct. At 80 pm/K, a 50 K temperature change moves a silicon ring by 4 nm, more than one channel spacing: thermal control is not optional. [Figure 1.5](#fig-1-5) places the four channels in the C band.
+The 400 GHz spacing (about 3.2 nm) is wide enough that ring filters whose free spectral range spans four channel spacings (12.8 nm), more than the 9.6 nm from the first channel to the last, separate them cleanly, and it leaves room for the thermal drift that the heaters must correct. At about 75 pm/K, a 50 K temperature change moves a silicon ring by 3.7 nm, more than one channel spacing: thermal control is not optional. [Figure 1.5](#fig-1-5) places the four channels in the C band.
 
 <figure id="fig-1-5">
   <img src="{{ '/assets/figs/ch01_bands.svg' | relative_url }}" style="width:640px" alt="The O, E, S, C, L and U telecom bands from 1260 to 1675 nm, with a frequency axis from about 238 to 179 THz above, and a zoom on the C band showing the four reference-link channels at 193.9, 193.5, 193.1 and 192.7 THz, 3.2 nm or 400 GHz apart">

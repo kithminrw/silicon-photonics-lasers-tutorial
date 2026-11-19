@@ -25,7 +25,7 @@ Mesh the cross-section of a silicon strip, solve Maxwell's equations on it with 
 
 - [Chapter 6]({% link chapters/06_soi.md %}) (Sections 6.2 to 6.5) and [Chapter 7]({% link chapters/07_loss.md %}) (Section 7.4); [Lab 1]({% link labs/lab01_slab.md %}) helps.
 - Python 3.11 or newer with femwell, NumPy and Matplotlib: `pip install femwell matplotlib`. femwell brings the finite-element library scikit-fem, the mesher gmsh and shapely. On Linux, gmsh needs three system libraries: `sudo apt install libglu1-mesa libxft2 libxinerama1`, or in a conda environment `conda install -c conda-forge libglu xorg-libxft xorg-libxinerama`. Tested with Python 3.12, femwell 0.1.12, scikit-fem 12.0.2, gmsh 4.15.2, shapely 2.2.0, NumPy 2.4.6 and Matplotlib 3.11.2.
-- The script <a href="{{ '/labs/lab02_femwell.py' | relative_url }}" download><code>lab02_femwell.py</code></a> (also in the repository's [`labs/` folder](https://github.com/kithminrw/silicon-photonics-lasers-tutorial/tree/main/labs)).
+- The script <a href="{{ '/labs/lab02_femwell.py' | relative_url }}" download><code>lab02_femwell.py</code></a>.
 - About two hours, including the exercises.
 
 Run it from a terminal in the folder where you saved it:

@@ -16,7 +16,7 @@ Labs
 Learning by doing, with free tools only: simulate the devices, lay out and submit a chip, and analyse real measurements.
 {: .part-blurb }
 
-<p>The labs are designed and listed below. Each written lab has its own page and a script you can download from it, also in the repository's <a href="https://github.com/kithminrw/silicon-photonics-lasers-tutorial/tree/main/labs"><code>labs/</code></a> folder; the others follow.</p>
+<p>The labs are designed and listed below. Each lab has its own page and a script you can download from it.</p>
 
 The twelve labs follow three tracks. **Simulate** (Labs 1–6): mode solvers, coupled-mode and FDTD simulations, circuit models and grating couplers. **Make** (Labs 7–9): lay out a passive chip in the SiEPIC EBeam PDK, verify and submit it to an openEBL run, and analyse the measured data that comes back. **Lasers and links** (Labs 10–12): rate-equation models, a Vernier tunable laser and the budget of the reference link. Every tool is free and open source; the interactive demos in the chapters are a quick way to explore the same models before running a lab.
 

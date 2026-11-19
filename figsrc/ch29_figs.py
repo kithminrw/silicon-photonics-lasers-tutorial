@@ -282,13 +282,13 @@ def fig_etch():
             tick_dim(a, (-0.55, 0), (-0.55, T), "", lw=0.6)
             label(a, -0.62, T / 2, "220 nm", fs=FS_SMALL, ha="right")
         else:
-            LAMG, FF = 0.63, 0.5                   # grating period (Chapter 15, full simulation) and fill factor
+            LAMG, FF = 0.607, 0.5                  # grating period (Worked Example 15.1, Lab 6) and fill factor
             box(a, -1.3, 0, 2.6, slab, "si", z=2)
             x = -1.3 + 0.09
             while x + LAMG * FF < 1.3:
                 trapezoid(a, x + LAMG * FF / 2, slab, LAMG * FF + 2 * sl, LAMG * FF, etch, "si", z=2)
                 x += LAMG
-            dim(a, (-1.21, T + 0.07), (-1.21 + LAMG, T + 0.07), "Λ ≈ 630 nm", bg=None, text_off=(0.25, 0.1), ha="left")
+            dim(a, (-1.21, T + 0.07), (-1.21 + LAMG, T + 0.07), "Λ = 607 nm", bg=None, text_off=(0.25, 0.1), ha="left")
             tick_dim(a, (1.18, slab), (1.18, T), "", lw=0.6)
             label(a, 1.12, T + 0.08, "70 nm", fs=FS_SMALL, ha="right", va="bottom")
         a.text(0.5, 1.0, name, transform=a.transAxes, ha="center", va="top", fontsize=FS + 0.5, color=INK, fontweight="bold")
@@ -299,7 +299,7 @@ def fig_etch():
             label(a, -1.25, 0.38, "oxide cladding", fs=FS_SMALL, ha="left")
         if k == 2:
             scalebar(a, 0.45, -0.38, 0.5, "500 nm", above=True)
-    print("etch depths: full 220 nm, rib 130 nm (90 nm slab), shallow 70 nm (150 nm slab); GC period 630 nm drawn")
+    print("etch depths: full 220 nm, rib 130 nm (90 nm slab), shallow 70 nm (150 nm slab); GC period 607 nm drawn")
     save(fig, "ch29_etch")
 
 
@@ -332,8 +332,8 @@ def fig_stack():
     box(ax, xh - 0.25, 0, 0.5, T, "si", z=3)
     box(ax, xh - 1.0, 1.9, 2.0, 0.12, "tin", z=4)
     # --- grating coupler with an oxide window above it, x = 19.6 ... 23.4
-    for x in np.arange(19.7, 23.3, 0.63):
-        box(ax, x, 0.15, 0.315, 0.07, "si", z=3)
+    for x in np.arange(19.7, 23.3, 0.607):     # the 607 nm period of Chapter 15, fill 50 %
+        box(ax, x, 0.15, 0.3035, 0.07, "si", z=3)
     box(ax, 19.4, 0, 4.0, 0.15, "si", z=3)
     # --- contacts (W plugs) from Si/Ge to metal 1
     def plug(x, y0, y1, w=0.22):

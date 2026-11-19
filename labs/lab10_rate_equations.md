@@ -25,7 +25,7 @@ Solve the rate equations of the Chapter 24 laser with your own Runge–Kutta int
 
 - [Chapter 24]({% link chapters/24_fp.md %}) (Sections 24.1 to 24.6) and [Chapter 25]({% link chapters/25_dynamics.md %}) (Sections 25.1, 25.3 and 25.4).
 - Python 3.11 or newer with NumPy and Matplotlib: `pip install numpy matplotlib`. No ODE library: the script brings its own integrator.
-- The script <a href="{{ '/labs/lab10_rate_equations.py' | relative_url }}" download><code>lab10_rate_equations.py</code></a> (also in the repository's [`labs/` folder](https://github.com/kithminrw/silicon-photonics-lasers-tutorial/tree/main/labs)).
+- The script <a href="{{ '/labs/lab10_rate_equations.py' | relative_url }}" download><code>lab10_rate_equations.py</code></a>.
 - About two hours, including the exercises.
 
 Run it from a terminal in the folder where you saved it:

@@ -42,7 +42,7 @@ $$\frac{\mathrm{d}\lambda}{\mathrm{d}T} = \frac{\lambda}{n_g}\,\frac{\mathrm{d}n
 
 </div>
 
-which is 74 pm/K for the strip ($$n_g = 4.18$$) and 75 pm/K for the rib ($$n_g = 3.89$$): the "70–80 pm/K" quoted for silicon rings since [Chapter 1]({% link chapters/01_why.md %}). The same drift that forces every silicon ring to be controlled makes heating the cheapest way to tune.
+which is 74 pm/K for the strip ($$n_g = 4.18$$) and 75 pm/K for the rib ($$n_g = 3.89$$): the "about 75 pm/K" quoted for silicon rings since [Chapter 1]({% link chapters/01_why.md %}). The same drift that forces every silicon ring to be controlled makes heating the cheapest way to tune.
 
 ## <span class="secnum">18.2</span>Heater types
 
@@ -146,7 +146,7 @@ Two design rules follow from the physics. A heater can only heat, which moves a 
 <div class="tbox tbox-example" markdown="1">
 <div class="tbox-title">Worked Example 18.2 · The heater budget of the reference link</div>
 
-A 7.2 µm ring has an FSR of 13.7 nm (rib, $$n_g = 3.89$$). With $$2P_\pi = 52$$ mW for a full FSR, the tuning efficiency is $$13.7/52 \approx 0.26$$ nm/mW. To follow a 50 K range at 75 pm/K, 3.75 nm, plus up to ±1.6 nm of fabrication error (half a channel), a ring needs up to about 5.4 nm, or 20 mW. Eight rings (four modulators, four drop filters) then need up to 160 mW: at 200 Gb/s, 0.8 pJ/bit, a sixth of the link's 5 pJ/bit target ([Chapter 1]({% link chapters/01_why.md %})). Undercut heaters would cut it to about 0.15 pJ/bit; letting each ring lock to the nearest channel and reordering the channels electronically ([Chapter 14]({% link chapters/14_wdm.md %})) cuts the fabrication term.
+A 7.2 µm ring has an FSR of 13.7 nm (rib, $$n_g = 3.89$$). With $$2P_\pi = 52$$ mW for a full FSR, the tuning efficiency is $$13.7/52 \approx 0.26$$ nm/mW. To follow a 50 K range at 75 pm/K, 3.75 nm, plus up to ±1.6 nm of fabrication error (half a channel), a ring needs up to about 5.4 nm, or 20 mW. Eight rings (four modulators, four drop filters) then need up to 160 mW: at 200 Gb/s, 0.8 pJ/bit, a sixth of the link's 5 pJ/bit target ([Chapter 1]({% link chapters/01_why.md %})). Undercut heaters would cut it to about 0.14 pJ/bit; letting each ring lock to the nearest channel and reordering the channels electronically ([Chapter 14]({% link chapters/14_wdm.md %})) cuts the fabrication term.
 
 </div>
 
@@ -157,7 +157,7 @@ A 7.2 µm ring has an FSR of 13.7 nm (rib, $$n_g = 3.89$$). With $$2P_\pi = 52$$
 <div class="tbox tbox-specnote" markdown="1">
 <div class="tbox-title">Reference-link choice</div>
 
-TiN heaters with deep trenches over every ring, a monitor photodiode on each drop port, and a dither lock-in loop per ring. Rings are designed about 2 nm blue of their channel at the coolest operating temperature, and lock to the nearest channel to limit heater power.
+TiN heaters over every ring (the budget above assumes plain TiN; deep trenches would cut the heater power by about a third), a monitor photodiode on each drop port, and a dither lock-in loop per ring. Rings are designed about 2 nm blue of their channel at the coolest operating temperature, and lock to the nearest channel to limit heater power.
 
 </div>
 

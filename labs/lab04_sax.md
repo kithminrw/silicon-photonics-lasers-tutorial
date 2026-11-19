@@ -25,7 +25,7 @@ Write compact models for a waveguide, a coupler and a ring, connect them into ci
 
 - [Chapter 11]({% link chapters/11_mzi.md %}) (Sections 11.2, 11.3 and 11.6), [Chapter 12]({% link chapters/12_rings.md %}) (Sections 12.2 to 12.4) and [Chapter 30]({% link chapters/30_flow.md %}) (Section 30.6); [Lab 2]({% link labs/lab02_femwell.md %}) for where the waveguide's numbers come from.
 - Python 3.11 or newer with NumPy and Matplotlib: `pip install numpy matplotlib`. SAX is optional: `pip install sax` installs it with JAX. Without it, or with `--numpy`, the script solves every circuit with its own NumPy function and prints the same numbers. Tested with Python 3.12, SAX 0.18.2, JAX 0.9.2, NumPy 2.4.6 and Matplotlib 3.11.2.
-- The script <a href="{{ '/labs/lab04_sax.py' | relative_url }}" download><code>lab04_sax.py</code></a> (also in the repository's [`labs/` folder](https://github.com/kithminrw/silicon-photonics-lasers-tutorial/tree/main/labs)).
+- The script <a href="{{ '/labs/lab04_sax.py' | relative_url }}" download><code>lab04_sax.py</code></a>.
 - About two hours, including the exercises.
 
 Run it from a terminal in the folder where you saved it:

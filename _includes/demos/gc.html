@@ -18,7 +18,7 @@
   <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
     <li><b>Detune the period.</b> Set Λ to 630 nm. The centre moves to 1595 nm, and at 1550 nm the beam now leaves at 13.5° in air, well off the 8° fibre: the pill reads mismatched.</li>
     <li><b>Stand the fibre up.</b> Set θ to 0°: the peak jumps to 1615 nm. Bring it back with Λ = 576 nm. The beam now goes straight up, but that period also meets the second-order Bragg condition, so the grating reflects light back into the waveguide.</li>
-    <li><b>Take the oxide off.</b> Choose air clad. The centre wavelength stays at 1550 nm, because only the angle in air enters the phase matching, but the beam now leaves the grating at 8.0° instead of 5.5°, with its crests further apart.</li>
+    <li><b>Take the oxide off.</b> Choose air clad. With air above, the slab indices fall to 2.831 and 2.505, so the centre moves about 12 nm down, to 1539 nm; Λ = 613 nm brings it back. The beam now leaves straight into air at 8.0°, instead of at 5.5° in the oxide.</li>
   </ol></div>
   <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>Your coupler peaks at 1530 nm instead of 1550 nm. Which change moves the peak up to 1550 nm?</p>
     <div class="bd-check-opts" role="group" aria-label="Answers">
@@ -33,13 +33,15 @@
 (function () {
   var root = document.getElementById('bdGc'); if (!root || !window.BD) return;
   var q = function (s) { return root.querySelector(s); }, nc = 1.444;
-  // slab effective indices (TE, 1550 nm) of the unetched 220 nm and etched 150 nm silicon, and their group indices
-  var nHi = 2.848, nLo = 2.539, ngHi = 3.58, ngLo = 3.40, w0 = 5.2, lam0 = 1.55;   // from the slab solver of Chapter 5
+  // slab effective indices (TE, 1550 nm) of the unetched 220 nm and etched 150 nm silicon on oxide, and their group indices,
+  // with oxide or air above (from the slab solver of Chapter 5; air-clad values as in Lab 6, Exercise 2)
+  var SLAB = { '1.444': [2.848, 2.539, 3.58, 3.40], '1.0': [2.831, 2.505, 3.59, 3.43] };
+  var nHi = 2.848, nLo = 2.539, ngHi = 3.58, ngLo = 3.40, w0 = 5.2, lam0 = 1.55;
   var S = BD.bind(root, {
     P: { fmt: function (x) { return (1000 * x).toFixed(0) + ' nm'; } }, ff: { fmt: function (x) { return (100 * x).toFixed(0) + ' %'; } },
     th: { fmt: function (x) { return x.toFixed(1) + '°'; } }
   }, function () { draw(); });
-  BD.seg(root, 'clad', function (v) { nc = parseFloat(v); draw(); });
+  BD.seg(root, 'clad', function (v) { nc = parseFloat(v); var sl = SLAB[v] || SLAB['1.444']; nHi = sl[0]; nLo = sl[1]; ngHi = sl[2]; ngLo = sl[3]; draw(); });
   function neff(lam) {   // averaged index of the grating section with first-order dispersion
     var hi = nHi - (ngHi - nHi) * (lam - lam0) / lam0, lo = nLo - (ngLo - nLo) * (lam - lam0) / lam0;
     return S.ff * hi + (1 - S.ff) * lo;
@@ -172,7 +174,7 @@
     if (Math.abs(S.th) < 1) c += '<b>Near-vertical coupling</b> also satisfies the condition for the backward direction, so the second-order Bragg reflection sends light back into the waveguide; that is why fibres are tilted by about 8–12°. ';
     c += 'The bandwidth comes from the fibre\'s angular acceptance: as the wavelength changes, the diffracted beam swings away from the fibre axis. ';
     c += 'Part of the light always goes down into the BOX; the reflection from the silicon substrate decides whether it returns in phase, which is why the BOX thickness matters.';
-    c += ' <i>Averaged-index model: the grating index is taken as the fill-factor average of the 220 nm and 150 nm slab indices. A converged 2D FDTD simulation of the same grating (Lab 6) puts its peak within a nanometre of 1550 nm. Peak efficiency is not modelled here; see the efficiency-budget demo (Section 15.3).</i>';
+    c += ' <i>Averaged-index model: the grating index is taken as the fill-factor average of the 220 nm and 150 nm slab indices, for the chosen top cladding. A converged 2D FDTD simulation of the oxide-clad 607 nm grating (Lab 6) puts its peak within a nanometre of 1550 nm. Peak efficiency is not modelled here; see the efficiency-budget demo (Section 15.3).</i>';
     q('[data-o="cap"]').innerHTML = c;
   }
   BD.observe(root, draw);

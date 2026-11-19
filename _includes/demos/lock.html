@@ -1,6 +1,6 @@
 {% include demos/assets.html %}
 <div class="bd" id="bdLock" role="group" aria-label="Interactive demo: locking a ring resonator to a laser with a heater">
-  <div class="bd-head"><span>// try it · lock a drop ring to its laser (74 pm/K drift, heater 0.25 nm/mW, dither lock-in)</span>
+  <div class="bd-head"><span>// try it · lock a drop ring to its laser (75 pm/K drift, heater 0.26 nm/mW, dither lock-in)</span>
     <span class="bd-controls" style="margin:0"><button type="button" class="bd-toggle" data-act="loop" aria-pressed="true">loop on</button><button type="button" class="bd-btn" data-act="step">+10 K step</button><button type="button" class="bd-btn" data-act="reset">reset</button></span></div>
   <div class="bd-sliders">
     <label class="bd-sl"><span>ambient swing (peak) <b data-v="amb"></b></span><input type="range" data-k="amb" min="0" max="25" step="0.5" value="8" aria-label="ambient swing"></label>
@@ -16,8 +16,8 @@
   <p class="bd-caption" data-o="cap"></p>
   <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
     <li><b>Open the loop.</b> Turn the loop off: the heater stops, the ring falls back 1.5 nm blue of the laser and wanders ±0.6 nm with the ±8 K room, and the dropped power falls by 10 to 16 dB.</li>
-    <li><b>Overheat the room.</b> With the loop on, raise the ambient swing to 25 K, past the 20 K that a 1.5 nm offset covers at 74 pm/K: at each hot peak the ring sits red of the laser with the heater already off, and the lock is lost until the room cools.</li>
-    <li><b>Start too far blue.</b> Set the cold offset to −3 nm and press reset: so far from the peak the dither barely changes the photodiode signal, so the loop crawls, and once locked the heater would spend about 12 mW all the time.</li>
+    <li><b>Overheat the room.</b> With the loop on, raise the ambient swing to 25 K, past the 20 K that a 1.5 nm offset covers at 75 pm/K: at each hot peak the ring sits red of the laser with the heater already off, and the lock is lost until the room cools.</li>
+    <li><b>Start too far blue.</b> Set the cold offset to −3 nm and press reset: so far from the peak the dither barely changes the photodiode signal, so the loop crawls, and once locked the heater would spend about 11.5 mW all the time.</li>
   </ol></div>
   <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>Why is each ring made blue of its laser, rather than exactly on it?</p>
     <div class="bd-check-opts" role="group" aria-label="Answers">
@@ -32,7 +32,7 @@
 (function () {
   var root = document.getElementById('bdLock'); if (!root || !window.BD) return;
   var q = function (s) { return root.querySelector(s); };
-  var DRIFT = 0.074, ETA = 0.246, FW = 0.64, PMAX = 20, TAU = 8e-6, DT = 2e-6, FD = 2e4, AD = 0.15, TLP = 2e-4, PER = 0.25;
+  var DRIFT = 0.075, ETA = 0.262, FW = 0.64, PMAX = 20, TAU = 8e-6, DT = 2e-6, FD = 2e4, AD = 0.15, TLP = 2e-4, PER = 0.25;
   var loop = true, t = 0, Th = 0, Pb = 0, lp = 0, step = 0, hist = [], timer = 0, visible = false;
   var S = BD.bind(root, { amb: { fmt: function (x) { return '± ' + x.toFixed(1) + ' K'; } }, off: { fmt: function (x) { return (x * 1000).toFixed(0) + ' pm'; } },
     gain: { fmt: function (x) { return x.toFixed(2) + ' ×'; } } }, function () { draw(); });
@@ -100,7 +100,7 @@
     BD.pill(q('[data-o="pill"]'), { 'free-running': 'drifting', locked: 'locked', 'heater at maximum': 'out of range', 'heater off, ring too red': 'too red', acquiring: 'acquiring' }[state],
       locked ? 'ok' : state === 'acquiring' ? 'warn' : 'bad');
     var c;
-    if (!loop) c = 'Without control the ring follows the ambient temperature at 74 pm/K, and a few kelvin move its 0.64 nm passband off the laser. ';
+    if (!loop) c = 'Without control the ring follows the ambient temperature at 75 pm/K, and a few kelvin move its 0.64 nm passband off the laser. ';
     else if (locked) c = '<b>Locked.</b> A small 20 kHz dither on the heater makes the photodiode signal wobble; a lock-in reads which side of the peak the ring is on, and an integrator moves the heater power to the top. ';
     else if (state === 'heater off, ring too red') c = '<b>Lock lost:</b> the room got so hot that the ring sits red of the laser even with the heater off, and a heater can only push it redder. Design the cold ring far enough blue (the offset slider) for the hottest case. ';
     else if (state === 'heater at maximum') c = '<b>Out of range:</b> the heater would need more than ' + PMAX + ' mW. A ring set too far blue wastes heater power all the time. ';
