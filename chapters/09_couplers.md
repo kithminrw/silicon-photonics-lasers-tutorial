@@ -48,7 +48,7 @@ For identical guides ($$\delta = 0$$) the power transfers completely and back ag
 
 ## <span class="secnum">9.2</span>Supermodes
 
-There is a second, exact way to see the same physics. Two coupled identical waveguides form one structure whose own modes, the **supermodes**, are the even (symmetric) and odd (antisymmetric) combinations of the single-guide modes, with effective indices $$n_\mathrm{even} > n_\mathrm{odd}$$. Light launched into one guide is half even and half odd; the two supermodes travel at different speeds, and after the length over which they slip by π relative to each other, they add up in the other guide. This **cross-over length** is
+There is a second, exact way to see the same physics. Two coupled identical waveguides form one structure whose own modes, the **supermodes**, are the even (symmetric) and odd (antisymmetric) combinations of the single-guide modes, with effective indices $$n_\mathrm{even} > n_\mathrm{odd}$$. Light launched into one guide is half even and half odd; the two supermodes travel at different speeds, and after the length over which they slip by π relative to each other, they add up in the other guide ([Figure 9.2](#fig-9-2)). This **cross-over length** is
 
 <div class="tbox tbox-keyeq" markdown="1">
 <div class="tbox-title">Cross-over length</div>
@@ -74,16 +74,26 @@ where $$L_b$$ is the extra effective length contributed by the bends, which stil
   <figcaption><span class="capnum">Figure 9.1.</span> <strong>Directional couplers of 500 × 220 nm silicon strips (TE).</strong> (a) Cross-over length against gap at 1550 nm: femwell supermode solutions (points) and an exponential fit. (b) Cross-coupled power of 3 dB couplers designed at 1550 nm, assuming the bends add 2.5 µm of effective length: the split drifts by about 0.35 % per nanometre. Drawn by <code>figsrc/part3_figs.py</code> from <code>figsrc/ch09_supermodes.py</code>.</figcaption>
 </figure>
 
+<figure id="fig-9-2">
+  <img src="{{ '/assets/figs/ch09_supermode_fields.svg' | relative_url }}" style="width:600px" alt="Top: cross-sections of two 500 by 220 nm silicon strips 200 nm apart with the electric field of the even supermode, the same sign in both strips, and of the odd supermode, opposite signs. Bottom: the two fields along a line through the strips, and the intensity of light launched into the left strip at the start, after half the cross-over length, equal in both, and after the full cross-over length, in the right strip">
+  <figcaption><span class="capnum">Figure 9.2.</span> <strong>The supermodes of a directional coupler.</strong> (a, b) \(E_x\) of the even and odd TE supermodes of two 500 × 220 nm strips 200 nm apart at 1550 nm, femwell, cross-section to scale: the same sign in both strips, or opposite signs (red positive, blue negative). (c) The two fields along a line through the strips' mid-height, drawn as \(D_x = n^2E_x\), which is continuous across the side walls where \(E_x\) jumps. (d) Light launched into the left strip is the sum of the two; as they slip in phase, the light is shared equally after \(L_x/2\) = 18.9 µm and has moved to the right strip after \(L_x\) = 37.8 µm (99.9 % of \(\lvert D_x\rvert^2\) on that side). Effective indices as in Figure 9.1 and Worked Example 9.1. Drawn by <code>figsrc/ch09_figs.py</code> from <code>figsrc/ch09_fields.py</code> (femwell).</figcaption>
+</figure>
+
 <div class="tbox tbox-example" markdown="1">
 <div class="tbox-title">Worked Example 9.1 · A 3 dB coupler in silicon</div>
 
-At a 200 nm gap femwell gives $$n_\mathrm{even} = 2.4573$$ and $$n_\mathrm{odd} = 2.4368$$, so $$L_x = 1.55/(2 \times 0.0205) = 37.8$$ µm. With the bends adding about 2.5 µm, a 50/50 coupler needs a straight section of $$37.8/2 - 2.5 = 16.4$$ µm. At a 300 nm gap, $$L_x = 91$$ µm and the straight section grows to 43 µm. A 100 nm gap would need only about 5 µm, but small gaps are hard to fabricate reproducibly, and a 10 nm error in a 100 nm gap changes $$L_x$$ by about 10 %.
+At a 200 nm gap femwell gives $$n_\mathrm{even} = 2.4573$$ and $$n_\mathrm{odd} = 2.4368$$, so $$L_x = 1.55/(2 \times 0.0205) = 37.8$$ µm. With the bends adding about 2.5 µm, a 50/50 coupler needs a straight section of $$37.8/2 - 2.5 = 16.4$$ µm ([Figure 9.3](#fig-9-3)). At a 300 nm gap, $$L_x = 91$$ µm and the straight section grows to 43 µm. A 100 nm gap would need only about 5 µm, but small gaps are hard to fabricate reproducibly, and a 10 nm error in a 100 nm gap changes $$L_x$$ by about 10 %.
 
 </div>
 
 **Try it.** Set the gap, length and wavelength; the top view shows the light moving between the guides, and the cross-section the gap to scale.
 
 {% include demos/dc.html %}
+
+<figure id="fig-9-3">
+  <img src="{{ '/assets/figs/ch09_dc_topview.svg' | relative_url }}" style="width:640px" alt="Top view to scale of a silicon directional coupler: two 500 nm wide waveguides brought together by S-bends 13 micrometres long with a 2 micrometre offset, running 16.4 micrometres in parallel 200 nm apart, then separating. Below, the local coupling strength along the device: 1 in the straight section and falling quickly to zero along each bend">
+  <figcaption><span class="capnum">Figure 9.3.</span> <strong>The 3 dB coupler of Worked Example 9.1, to scale.</strong> (a) Two 500 × 220 nm strips run 16.4 µm in parallel with a 200 nm gap, between raised-cosine S-bends 13.0 µm long that move each guide 2 µm sideways (smallest bend radius 17 µm). (b) Local coupling along the device, \(\Delta n\) relative to its value at 200 nm, from the gap dependence of Figure 9.1a: the bends still couple while the gap is small, and the areas under their tails add 1.25 µm each, the 2.5 µm of \(L_b\) assumed in the text. S-bend shape chosen to give that value. Drawn by <code>figsrc/ch09_figs.py</code>.</figcaption>
+</figure>
 
 ## <span class="secnum">9.4</span>Wavelength, polarisation and fabrication sensitivity
 
@@ -101,8 +111,13 @@ A directional coupler is the right choice when you need a specific, possibly sma
 Three tricks flatten a coupler's response:
 
 - **Asymmetric phase control.** Using waveguides of slightly different widths in part of the coupler adds a wavelength-dependent phase that compensates the wavelength dependence of $$\kappa$$. The broadband directional coupler of the SiEPIC EBeam PDK works this way {% include cite.html keys="lu2015bdc" %}; see it in the [3D gallery]({% link devices-3d.md %}#dev-siepic-bdc).
-- **Adiabatic couplers.** If one waveguide is tapered so that the input mode evolves slowly into the even or odd supermode of the symmetric section, the split ratio is set by symmetry, not by an interference length, and is nearly wavelength-independent, at the price of a device hundreds of micrometres long {% include cite.html keys="yun2013adiabatic" %}.
+- **Adiabatic couplers.** If one waveguide is tapered so that the input mode evolves slowly into the even or odd supermode of the symmetric section, the split ratio is set by symmetry, not by an interference length, and is nearly wavelength-independent ([Figure 9.4](#fig-9-4)), at the price of a device hundreds of micrometres long {% include cite.html keys="yun2013adiabatic" %}.
 - **Bent couplers.** Curving the coupling region changes how the phase mismatch varies with wavelength and can cancel the dependence of $$\kappa$$ over a band.
+
+<figure id="fig-9-4">
+  <img src="{{ '/assets/figs/ch09_adiabatic.svg' | relative_url }}" style="width:600px" alt="Top: schematic top view of an adiabatic 3 dB coupler in which a wide and a narrow waveguide come together 200 nm apart and taper slowly to equal widths before separating, with four numbered stations. Bottom: at each station the field profiles of the two supermodes, which start each confined to one guide and end as the even and odd supermodes shared equally between the guides">
+  <figcaption><span class="capnum">Figure 9.4.</span> <strong>An adiabatic 3 dB coupler.</strong> (a) A wide (600 nm) and a narrow (400 nm) strip meet 200 nm apart, taper slowly to 500 nm each and separate again; schematic, transverse scale × 10, length compressed. (b) The two TE supermodes at stations 1–4 (femwell, \(D_x\) through mid-height; \(n_\mathrm{eff}\) 2.568 and 2.232 at station 1, 2.457 and 2.437 at station 4). At the start each supermode lives in one guide, mode 1 (blue) in the wide one; at the end they are the even and odd supermodes. Light launched into the wide guide follows mode 1 and leaves split 50/50 in phase; launched into the narrow guide it follows mode 2 and leaves 50/50 in antiphase. The split is set by symmetry, not by a coupling length, provided the taper is slow enough for the light to stay in its supermode. Drawn by <code>figsrc/ch09_figs.py</code> from <code>figsrc/ch09_fields.py</code> (femwell).</figcaption>
+</figure>
 
 MMIs ([Chapter 10]({% link chapters/10_mmi.md %})) are the other broadband option.
 
@@ -112,7 +127,12 @@ Whatever happens inside, a lossless, reciprocal 2 × 2 coupler connects its inpu
 
 $$\begin{pmatrix}b_1\\ b_2\end{pmatrix} = \begin{pmatrix} t & -j\kappa \\ -j\kappa & t\end{pmatrix}\begin{pmatrix}a_1\\ a_2\end{pmatrix}.$$
 
-The −j is not a convention to memorise but a consequence of energy conservation: unitarity requires the cross-coupled fields to be 90° out of phase with the through fields, so that $$\lvert b_1\rvert^2 + \lvert b_2\rvert^2 = \lvert a_1\rvert^2 + \lvert a_2\rvert^2$$ for every input. That quadrature phase is what makes the Mach–Zehnder interferometer and the ring resonator of the next chapters work, and it is the same matrix used in their demos.
+The −j is not a convention to memorise but a consequence of energy conservation: unitarity requires the cross-coupled fields to be 90° out of phase with the through fields, so that $$\lvert b_1\rvert^2 + \lvert b_2\rvert^2 = \lvert a_1\rvert^2 + \lvert a_2\rvert^2$$ for every input ([Figure 9.5](#fig-9-5)). That quadrature phase is what makes the Mach–Zehnder interferometer and the ring resonator of the next chapters work, and it is the same matrix used in their demos.
+
+<figure id="fig-9-5">
+  <img src="{{ '/assets/figs/ch09_smatrix.svg' | relative_url }}" style="width:600px" alt="Left: a directional coupler with input amplitudes a1 and a2 and output amplitudes b1 and b2, the through path labelled t and the cross path labelled minus j kappa, and the two output equations. Right: total output power against the relative phase of two equal inputs, constant at 1 with the minus j cross term and swinging between 0 and 2 with a real cross term">
+  <figcaption><span class="capnum">Figure 9.5.</span> <strong>Why the cross term carries −j.</strong> (a) The ports and the matrix of a 2 × 2 coupler: each output is the through field \(t\) of one input plus the cross field \(-j\kappa\) of the other. (b) Two equal inputs with a relative phase, into a 50/50 coupler: with \(-j\kappa\) the total output power is 1 for every phase; with a real cross term \(+\kappa\) it would swing between 0 and 2, creating and destroying power. Only the quadrature phase conserves energy. Drawn by <code>figsrc/ch09_figs.py</code>.</figcaption>
+</figure>
 
 <div class="tbox tbox-tryit" markdown="1">
 <div class="tbox-title">Explore further</div>
