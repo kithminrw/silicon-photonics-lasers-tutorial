@@ -71,6 +71,10 @@ defaults:
     values:
       layout: "default"
   - scope:
+      path: "demos.md"
+    values:
+      layout: "default"
+  - scope:
       path: "labs"
       type: "pages"
     values:

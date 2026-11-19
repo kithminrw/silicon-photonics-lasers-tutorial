@@ -38,7 +38,7 @@ The key equations of the tutorial on one page, in the notation used throughout, 
 | Single-mode slab (symmetric) | $$d < \lambda/(2\sqrt{n_1^2 - n_2^2})$$ | [5]({% link chapters/05_slab.md %}) |
 | Evanescent decay | $$\gamma = k_0\sqrt{n_\mathrm{eff}^2 - n_2^2}$$ | [5]({% link chapters/05_slab.md %}) |
 | Group index | $$n_g = n_\mathrm{eff} - \lambda\,\mathrm{d}n_\mathrm{eff}/\mathrm{d}\lambda$$ | [6]({% link chapters/06_soi.md %}) |
-| Resonance shift from fabrication | $$\Delta\lambda = (\lambda/n_g)(\partial_W n_\mathrm{eff}\,\Delta W + \partial_t n_\mathrm{eff}\,\Delta t)$$ | [6]({% link chapters/06_soi.md %}), [29]({% link chapters/29_fab.md %}) |
+| Resonance shift from fabrication | $$\Delta\lambda = (\lambda/n_g)(\partial_W n_\mathrm{eff}\,\Delta W + \partial_t n_\mathrm{eff}\,\Delta t)$$ | [6]({% link chapters/06_soi.md %}), [35]({% link chapters/35_fab.md %}) |
 | Two-photon absorption | $$\alpha_\mathrm{TPA} = \beta_\mathrm{TPA}I$$ | [7]({% link chapters/07_loss.md %}) |
 
 ## Couplers, interferometers, rings and gratings
@@ -109,7 +109,7 @@ The key equations of the tutorial on one page, in the notation used throughout, 
 
 | Quantity | Formula | Chapter |
 |---|---|---|
-| Link margin | $$P_\mathrm{launch} - \sum L_i - \sum \mathrm{penalties} - P_\mathrm{sens}$$ | [33]({% link chapters/33_links.md %}) |
-| Ring sensor | $$S = (\lambda/n_g)\,\partial n_\mathrm{eff}/\partial n_c, \quad \mathrm{LOD} = 3\sigma_\lambda/S$$ | [34]({% link chapters/34_apps.md %}) |
-| Phased-array steering | $$\sin\theta = \Delta\phi\,\lambda/(2\pi d)$$ | [34]({% link chapters/34_apps.md %}) |
-| FMCW ranging | $$f_b = 2RB/(cT), \quad \Delta R = c/(2B)$$ | [34]({% link chapters/34_apps.md %}) |
+| Link margin | $$P_\mathrm{launch} - \sum L_i - \sum \mathrm{penalties} - P_\mathrm{sens}$$ | [38]({% link chapters/38_links.md %}) |
+| Ring sensor | $$S = (\lambda/n_g)\,\partial n_\mathrm{eff}/\partial n_c, \quad \mathrm{LOD} = 3\sigma_\lambda/S$$ | [39]({% link chapters/39_apps.md %}) |
+| Phased-array steering | $$\sin\theta = \Delta\phi\,\lambda/(2\pi d)$$ | [39]({% link chapters/39_apps.md %}) |
+| FMCW ranging | $$f_b = 2RB/(cT), \quad \Delta R = c/(2B)$$ | [39]({% link chapters/39_apps.md %}) |

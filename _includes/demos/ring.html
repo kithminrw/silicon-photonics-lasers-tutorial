@@ -194,7 +194,7 @@
       if (Math.abs(t1 - a) / (1 - a + 1e-9) < 0.15) c = '<b>Near critical coupling</b> (t ≈ a): the light coupled out of the ring cancels the light passing by, and the through port drops to almost nothing.';
       else if (t1 > a) c = '<b>Under-coupled</b> (t > a): the ring loses more per round trip than it couples out. The resonance is narrow but shallow; Q is close to the intrinsic Q.';
       else c = '<b>Over-coupled</b> (t < a): the coupler dominates, the resonance broadens and the dip shallows again.';
-      c += ' From the through port alone, under- and over-coupling with swapped t and a give the same spectrum, which is why Chapter 32 needs more than one measurement to separate them.';
+      c += ' From the through port alone, under- and over-coupling with swapped t and a give the same spectrum, which is why Chapter 37 needs more than one measurement to separate them.';
     } else c = 'In the add-drop ring the drop port peaks where the through port dips; with equal couplers and no loss the drop would take all the power on resonance. Loss lowers the drop peak and leaves a residual dip at the through port.';
     c += ' A narrower gap couples more (κ² is computed from the illustrative coupler model of the Chapter 9 demo). The FSR falls as 1/R, while the intrinsic Q depends only on the loss: about ' + BD.eng(Qi).replace(' ', '') + ' at ' + S.a.toFixed(1) + ' dB/cm.';
     q('[data-o="cap"]').innerHTML = c;

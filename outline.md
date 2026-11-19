@@ -7,7 +7,7 @@ permalink: /outline/
 
 # Tutorial Outline
 
-The whole tutorial on one page: every part, chapter and section, and the interactive demos.
+The whole tutorial on one page: every part, chapter and section, and the interactive demos (also listed on their own on the [demos page]({% link demos.md %})).
 {: .chapterlead }
 
 ## Part I · Foundations
@@ -258,17 +258,13 @@ Demos: III–V/Si supermodes
 
 Demos: SOA gain and noise figure
 
-## Part VII · Fabrication, Testing and Data Analysis
+## Part VII · Design, Simulation and Layout
 
-How photonic chips are made and verified: fabrication and its variations, the design flow and open PDKs, test setups and data analysis.
+From a specification to a verified layout: design principles, how the simulators work, how to use them, layout in KLayout and GDSII, and the checks before tape-out.
 
-### [29. Fabrication]({% link chapters/29_fab.md %})
+### [29. Design Principles and Simulation Workflows]({% link chapters/29_design.md %})
 
-*How do nanometre variations turn into nanometre wavelength shifts?*
-
-29.1 SOI wafers · 29.2 Lithography · 29.3 Etching and cladding · 29.4 Doping, metals and germanium · 29.5 Other platforms · 29.6 Process variation · 29.7 Design for manufacturing · 29.8 Access
-
-Demos: Wafer-map Monte Carlo
+*Being written.*
 
 ### [30. Design Flow and Open PDKs]({% link chapters/30_flow.md %})
 
@@ -278,39 +274,69 @@ Demos: Wafer-map Monte Carlo
 
 Demos: Circuit simulator
 
-### [31. Testing Photonic Chips]({% link chapters/31_testing.md %})
+### [31. How Photonic Simulators Work]({% link chapters/31_simulators.md %})
+
+*Being written.*
+
+### [32. Simulation Tools in Practice]({% link chapters/32_simtools.md %})
+
+*Being written.*
+
+### [33. Layout with KLayout and GDSII]({% link chapters/33_layout.md %})
+
+*Being written.*
+
+### [34. Verification and Tape-Out]({% link chapters/34_verification.md %})
+
+*How do you know, before the chips come back, that the file you send is the chip you meant?*
+
+34.1 What can go wrong · 34.2 Design rules · 34.3 How a DRC engine works · 34.4 Running DRC in KLayout · 34.5 Curved geometry, grids and waivers · 34.6 Connectivity and layout versus schematic · 34.7 Design-for-test rules · 34.8 Foundry sign-off · 34.9 A pre-fabrication checklist
+
+## Part VIII · Fabrication, Testing and Data Analysis
+
+How photonic chips are made and measured: fabrication and its variations, test setups and data analysis.
+
+### [35. Fabrication]({% link chapters/35_fab.md %})
+
+*How do nanometre variations turn into nanometre wavelength shifts?*
+
+35.1 SOI wafers · 35.2 Lithography · 35.3 Etching and cladding · 35.4 Doping, metals and germanium · 35.5 Other platforms · 35.6 Process variation · 35.7 Design for manufacturing · 35.8 Access
+
+Demos: Wafer-map Monte Carlo
+
+### [36. Testing Photonic Chips]({% link chapters/36_testing.md %})
 
 *How do you trust a measured spectrum?*
 
-31.1 The passive test setup · 31.2 Automated testing and design for test · 31.3 Calibration and de-embedding · 31.4 Testing active devices · 31.5 Testing lasers · 31.6 High-speed testing · 31.7 Wafer-scale testing
+36.1 The passive test setup · 36.2 Automated testing and design for test · 36.3 Calibration and de-embedding · 36.4 Testing active devices · 36.5 Testing lasers · 36.6 High-speed testing · 36.7 Wafer-scale testing
 
 Demos: Virtual test bench
 
-### [32. Data Analysis]({% link chapters/32_analysis.md %})
+### [37. Data Analysis]({% link chapters/37_analysis.md %})
 
 *How do you extract physical parameters, with error bars, from measured spectra?*
 
-32.1 Data formats and open datasets · 32.2 Calibrating out the grating couplers · 32.3 Propagation loss by cutback · 32.4 Group index from interferometers and rings · 32.5 Fitting ring resonances · 32.6 Bragg-grating parameters · 32.7 Statistics across a wafer · 32.8 Back to compact models
+37.1 Data formats and open datasets · 37.2 Calibrating out the grating couplers · 37.3 Propagation loss by cutback · 37.4 Group index from interferometers and rings · 37.5 Fitting ring resonances · 37.6 Bragg-grating parameters · 37.7 Statistics across a wafer · 37.8 Back to compact models
 
 Demos: Ring-fit playground
 
-## Part VIII · Systems and Applications
+## Part IX · Systems and Applications
 
 Everything together: optical links and transceivers, and the sensing, LiDAR, quantum and computing systems built from the same blocks.
 
-### [33. Optical Links and Transceivers]({% link chapters/33_links.md %})
+### [38. Optical Links and Transceivers]({% link chapters/38_links.md %})
 
 *Does the reference link close, and what does each block contribute?*
 
-33.1 Link architectures · 33.2 Power budget and penalties · 33.3 WDM transceivers · 33.4 Coherent transceivers · 33.5 Energy per bit · 33.6 Co-packaged optics · 33.7 The reference link, block by block · 33.8 NRZ or PAM4 · 33.9 Drivers and equalisation · 33.10 Clocking, jitter and the timing budget · 33.11 Optimising for energy
+38.1 Link architectures · 38.2 Power budget and penalties · 38.3 WDM transceivers · 38.4 Coherent transceivers · 38.5 Energy per bit · 38.6 Co-packaged optics · 38.7 The reference link, block by block · 38.8 NRZ or PAM4 · 38.9 Drivers and equalisation · 38.10 Clocking, jitter and the timing budget · 38.11 Optimising for energy
 
 Demos: Link budget
 
-### [34. Beyond Datacom: Sensing, LiDAR, Quantum and Computing]({% link chapters/34_apps.md %})
+### [39. Beyond Datacom: Sensing, LiDAR, Quantum and Computing]({% link chapters/39_apps.md %})
 
 *What changes when the chip is a sensor, a beam steerer or a processor instead of a transceiver?*
 
-34.1 Biosensing with evanescent fields · 34.2 LiDAR and optical phased arrays · 34.3 Quantum photonics · 34.4 Photonic computing · 34.5 Microwave photonics and frequency combs · 34.6 Visible and mid-infrared photonics
+39.1 Biosensing with evanescent fields · 39.2 LiDAR and optical phased arrays · 39.3 Quantum photonics · 39.4 Photonic computing · 39.5 Microwave photonics and frequency combs · 39.6 Visible and mid-infrared photonics
 
 Demos: Ring biosensor · Optical phased array
 

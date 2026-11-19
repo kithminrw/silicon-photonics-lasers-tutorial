@@ -107,7 +107,7 @@ The EIM always overestimates here, for the two reasons given in Section 6.2: the
 
 1. **Silicon nitride.** Repeat Checkpoint A for 400 nm of silicon nitride ($$n = 1.996$$) in oxide. How many modes, and what is its single-mode thickness?
 2. **The O band.** Use `n_si(1.31)` and `n_ox(1.31)` to solve the 220 nm film at 1310 nm. Is it still single-mode?
-3. **Thin and thick films.** Find $$\Gamma$$ and $$1/\gamma$$ for 150, 300 and 500 nm films. Which would you choose for an evanescent sensor ([Chapter 34]({% link chapters/34_apps.md %})), and which for low leakage through a thin buried oxide ([Section 7.4]({% link chapters/07_loss.md %}))?
+3. **Thin and thick films.** Find $$\Gamma$$ and $$1/\gamma$$ for 150, 300 and 500 nm films. Which would you choose for an evanescent sensor ([Chapter 39]({% link chapters/39_apps.md %})), and which for low leakage through a thin buried oxide ([Section 7.4]({% link chapters/07_loss.md %}))?
 4. **Air cover.** For the air-clad film of Checkpoint A, how far does the field reach into the air, and into the oxide below?
 5. **Ribs.** Compare `eim(w, 0.22, 0.09)` with the strip for widths of 400, 500 and 800 nm, and find the rib's TE1 cut-off with `first_width_with`. Why does the rib stay single-mode to a wider width?
 

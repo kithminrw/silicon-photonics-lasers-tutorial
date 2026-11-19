@@ -1,14 +1,14 @@
-"""Figures of Chapter 32 (data analysis). All data are synthetic: generated here from the chapter's models and numbers,
+"""Figures of Chapter 37 (data analysis). All data are synthetic: generated here from the chapter's models and numbers,
 with illustrative noise and fabrication offsets, never measured data.
 
-    python -I -X utf8 figsrc/ch32_figs.py
+    python -I -X utf8 figsrc/ch37_figs.py
 
-ch32_calib     a raw MZI spectrum, the loopback, the polynomial envelope and the calibrated response
-ch32_ng        troughs found automatically and the group index from their spacing, against femwell
-ch32_cutback   cutback spectra of four spirals and the loss spectrum from per-wavelength fits (two length sets)
-ch32_ringgap   Worked Example 32.1: three ring gaps, their two mirror solutions for loss and coupling
-ch32_bragg     a Bragg grating's reflection spectrum, kappa and n_eff from it, and when the simple formula fails
-ch32_wafer     wafer statistics: wafer-scale bowl and die-to-die scatter of ring resonances
+ch37_calib     a raw MZI spectrum, the loopback, the polynomial envelope and the calibrated response
+ch37_ng        troughs found automatically and the group index from their spacing, against femwell
+ch37_cutback   cutback spectra of four spirals and the loss spectrum from per-wavelength fits (two length sets)
+ch37_ringgap   Worked Example 37.1: three ring gaps, their two mirror solutions for loss and coupling
+ch37_bragg     a Bragg grating's reflection spectrum, kappa and n_eff from it, and when the simple formula fails
+ch37_wafer     wafer statistics: wafer-scale bowl and die-to-die scatter of ring resonances
 """
 import os, sys, json
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -22,8 +22,8 @@ DL = 100.0                          # MZI arm-length difference (um), as in Chap
 
 
 def disp():
-    """n_eff(lambda) and n_g(lambda) of the 500 x 220 nm strip from femwell (ch32_disp.json); returns callables in nm."""
-    d = json.load(open(os.path.join(HERE, "ch32_disp.json")))
+    """n_eff(lambda) and n_g(lambda) of the 500 x 220 nm strip from femwell (ch37_disp.json); returns callables in nm."""
+    d = json.load(open(os.path.join(HERE, "ch37_disp.json")))
     l = np.array(d["lam_um"]) * 1000; n = np.array(d["neff"]); g = np.array(d["ng"])
     pn = np.polyfit(l - LAM0, n, 3); pg = np.polyfit(l - LAM0, g, 2)
     return (lambda x: np.polyval(pn, x - LAM0)), (lambda x: np.polyval(pg, x - LAM0)), (l, n, g)
@@ -39,7 +39,7 @@ def to_dbm(p_mw):
     return 10 * np.log10(p_mw)
 
 
-# ------------------------------------------------------------------ Figure 32.1 and 32.2 data
+# ------------------------------------------------------------------ Figure 37.1 and 37.2 data
 def mzi_measurement(rng):
     neff, ng, _ = disp()
     lam = np.arange(1500.0, 1600.0001, 0.01)
@@ -91,11 +91,11 @@ def fig_calib():
     b.set_xlim(1500, 1600); b.set_ylim(-35, 3)
     finish(b, xlabel="wavelength (nm)", ylabel="device response (dB)")
     tag(b, "b")
-    save(fig, "ch32_calib")
+    save(fig, "ch37_calib")
     return lam, cal, win, m
 
 
-# ------------------------------------------------------------------ Figure 32.3
+# ------------------------------------------------------------------ Figure 37.3
 def fig_ng():
     rng = np.random.default_rng(321)
     lam, dev, lb, m = mzi_measurement(rng)
@@ -137,10 +137,10 @@ def fig_ng():
     finish(b, xlabel="wavelength (nm)", ylabel="group index $n_g$")
     b.legend(loc="lower right", fontsize=6.5)
     tag(b, "b")
-    save(fig, "ch32_ng")
+    save(fig, "ch37_ng")
 
 
-# ------------------------------------------------------------------ Figure 32.2
+# ------------------------------------------------------------------ Figure 37.2
 def fig_cutback():
     rng = np.random.default_rng(7)
     lam = np.arange(1520.0, 1580.0001, 0.05)
@@ -190,16 +190,16 @@ def fig_cutback():
     b.legend(loc="upper right", fontsize=6.3)
     b.text(1522, ALPHA - 0.25, "true 2.0 dB/cm", fontsize=6.2, color=INK, va="top")
     tag(b, "b")
-    save(fig, "ch32_cutback")
+    save(fig, "ch37_cutback")
 
 
-# ------------------------------------------------------------------ Figure 32.4
+# ------------------------------------------------------------------ Figure 37.4
 def fig_ringgap():
     R, NG = 10.0, 4.18
     Lcm = 2 * np.pi * R * 1e-4
     FSR = LAM0 ** 2 / (NG * 2 * np.pi * R * 1000)
     gaps = np.array([200, 250, 300])
-    loss_phys = np.array([2.1, 1.9, 2.0])          # Worked Example 32.1 (illustrative)
+    loss_phys = np.array([2.1, 1.9, 2.0])          # Worked Example 37.1 (illustrative)
     loss_mirr = np.array([8.6, 3.6, 1.5])
     a_of = lambda dbcm: 10 ** (-dbcm * Lcm / 20)    # round-trip field transmission
     a = a_of(loss_phys); t = a_of(loss_mirr)       # the mirror solution's "a" is the physical t
@@ -238,10 +238,10 @@ def fig_ringgap():
     c.set_xticks(gaps); c.set_ylim(0, 1.4)
     finish(c, xlabel="gap (nm)", ylabel="fitted coupling κ² (%)")
     tag(c, "c")
-    save(fig, "ch32_ringgap")
+    save(fig, "ch37_ringgap")
 
 
-# ------------------------------------------------------------------ Figure 32.5
+# ------------------------------------------------------------------ Figure 37.5
 def bragg_r(lam_nm, kappa_um, L_um, Lam_um, neff, alpha_um=0.0):
     """Coupled-mode reflection of a uniform grating; neff is a callable in nm."""
     beta = 2 * np.pi * neff(lam_nm) / (lam_nm / 1000)
@@ -302,15 +302,15 @@ def fig_bragg():
     b.set_ylim(0.8, 3.6); b.set_xlim(0.5, 30)
     finish(b, xlabel="κL", ylabel="simple κ / true κ")
     tag(b, "b")
-    save(fig, "ch32_bragg")
+    save(fig, "ch37_bragg")
 
 
-# ------------------------------------------------------------------ Figure 32.6
+# ------------------------------------------------------------------ Figure 37.6
 def fig_wafer():
-    """Synthetic wafer: the thickness and width variations of Worked Example 29.1 (6 nm each, centre to edge) and a
+    """Synthetic wafer: the thickness and width variations of Worked Example 35.1 (6 nm each, centre to edge) and a
     random die-to-die width of sigma 1.5 nm, turned into ring-resonance shifts with 0.6 and 1.4 nm per nm. The analysis
     fits a radial bowl (wafer-scale part) and looks at what is left (die-to-die part)."""
-    DWS, DTS = 0.6, 1.4                                  # nm per nm (Chapters 6 and 29)
+    DWS, DTS = 0.6, 1.4                                  # nm per nm (Chapters 6 and 35)
     rng = np.random.default_rng(29)
     R, P = 100.0, 15.0                                   # wafer radius and die pitch, mm
     g = np.arange(-R, R + 0.1, P) + P / 2
@@ -343,7 +343,7 @@ def fig_wafer():
     b.legend(loc="upper left", fontsize=6.3, bbox_to_anchor=(0.0, 1.02))
     b.set_ylim(0, b.get_ylim()[1] * 1.35)
     tag(b, "b")
-    save(fig, "ch32_wafer")
+    save(fig, "ch37_wafer")
 
 
 if __name__ == "__main__":

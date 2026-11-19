@@ -97,7 +97,7 @@ In 500 × 220 nm silicon strips at 1550 nm ($$n_g = 4.18$$, [Chapter 6]({% link 
 
 ## <span class="secnum">11.4</span>Tuning and switching
 
-A phase shifter on one arm slides the fringes without changing their spacing. With a balanced MZI ($$\Delta L = 0$$), a phase shift of π switches the light from one output to the other: the **MZI switch**, the building block of switch fabrics and of the interferometer meshes used for photonic computing ([Figure 11.3](#fig-11-3), [Chapter 34]({% link chapters/34_apps.md %})). The phase shifter can be a heater (slow, efficient, [Chapter 18]({% link chapters/18_thermal.md %})) or an electro-optic section (fast, [Chapters 19–20]({% link chapters/19_eo.md %})); driven with data, the same MZI is a modulator.
+A phase shifter on one arm slides the fringes without changing their spacing. With a balanced MZI ($$\Delta L = 0$$), a phase shift of π switches the light from one output to the other: the **MZI switch**, the building block of switch fabrics and of the interferometer meshes used for photonic computing ([Figure 11.3](#fig-11-3), [Chapter 39]({% link chapters/39_apps.md %})). The phase shifter can be a heater (slow, efficient, [Chapter 18]({% link chapters/18_thermal.md %})) or an electro-optic section (fast, [Chapters 19–20]({% link chapters/19_eo.md %})); driven with data, the same MZI is a modulator.
 
 <figure id="fig-11-3">
   <img src="{{ '/assets/figs/ch11_switch.svg' | relative_url }}" style="width:600px" alt="Left: a balanced MZI switch with the heater off sending light to the cross port, and with the heater on sending it to the bar port. Right: a four by four Beneš network of six two by two switches in three stages routing four coloured inputs to four outputs">
@@ -119,7 +119,7 @@ Because the FSR depends only on $$n_g$$ and the drawn $$\Delta L$$, an unbalance
 
 $$n_g = \frac{\lambda^2}{\mathrm{FSR}\,\Delta L}.$$
 
-A set of MZIs with different $$\Delta L$$ gives several estimates and an error bar ([Figure 11.5](#fig-11-5)); the depth of the fringes measures how well the couplers are balanced. This is one of the first things you put on a test chip and one of the first analyses of [Chapter 32]({% link chapters/32_analysis.md %}).
+A set of MZIs with different $$\Delta L$$ gives several estimates and an error bar ([Figure 11.5](#fig-11-5)); the depth of the fringes measures how well the couplers are balanced. This is one of the first things you put on a test chip and one of the first analyses of [Chapter 37]({% link chapters/37_analysis.md %}).
 
 <figure id="fig-11-5">
   <img src="{{ '/assets/figs/ch11_ng.svg' | relative_url }}" style="width:600px" alt="Left: bar-port spectra from 1540 to 1560 nm of unbalanced MZIs with arm-length differences of 50, 100 and 300 micrometres, with free spectral ranges of 11.5, 5.75 and 1.92 nm marked. Right: free spectral range against arm-length difference on log axes, with the group-index line through the three designs and a dashed effective-index line above it">

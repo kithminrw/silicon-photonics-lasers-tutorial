@@ -1,12 +1,12 @@
-"""Figures and numbers for Chapter 33 (optical links and transceivers).
+"""Figures and numbers for Chapter 38 (optical links and transceivers).
 
-Run from the repository root:   python -I -X utf8 figsrc/ch33_links.py
-Writes assets/figs/ch33_*.svg and prints every number the chapter quotes from these models.
+Run from the repository root:   python -I -X utf8 figsrc/ch38_links.py
+Writes assets/figs/ch38_*.svg and prints every number the chapter quotes from these models.
 
 The receiver model is the one of the Chapter 21 demo (_includes/demos/rx.html): Ge PIN with R = 0.9 A/W,
 0.1 µA dark current, TIA noise 20 pA/√Hz over a noise bandwidth of 0.7 × the symbol rate, Gaussian noise,
 level-dependent shot noise. Everything else (jitter budget, front-end poles, energy split) is an
-illustrative choice anchored to Table 33.1, and the chapter says so.
+illustrative choice anchored to Table 38.1, and the chapter says so.
 """
 import math
 import os
@@ -20,8 +20,8 @@ from matplotlib.colors import LinearSegmentedColormap  # noqa: E402
 QE = 1.602e-19
 RESP, IDARK, IN_TIA = 0.9, 1e-7, 20e-12       # A/W, A, A/√Hz (Chapter 21)
 ER_REF = 10 ** 0.4                            # 4 dB extinction (Chapter 20)
-P_RX = -2.7                                   # received power per lane, dBm (Table 33.1)
-LOSS, PEN = 12.7, 3.0                         # link loss and penalty allowances, dB (Table 33.1)
+P_RX = -2.7                                   # received power per lane, dBm (Table 38.1)
+LOSS, PEN = 12.7, 3.0                         # link loss and penalty allowances, dB (Table 38.1)
 BER_T, BER_KP4 = 1e-12, 2.4e-4
 UI = 20.0                                     # ps at 50 Gb/s
 
@@ -82,7 +82,7 @@ def sensitivity(fn, target=BER_T, lo=-40.0, hi=30.0):
 S_REF = sensitivity(lambda p: nrz_ber(p))            # -11.6 dBm, as in Chapter 21
 
 
-# ------------------------------------------------------------------ Figure 33.1: one lane of the reference transceiver
+# ------------------------------------------------------------------ Figure 38.1: one lane of the reference transceiver
 def fig_architecture():
     fig, ax = plt.subplots(figsize=(6.3, 3.75))
     ax.set_xlim(0, 100); ax.set_ylim(-3, 60); ax.set_aspect("equal"); ax.axis("off")
@@ -163,12 +163,12 @@ def fig_architecture():
     box(43, 13.0, 12, 5.0, "lock loop", ec=CTL, fc="#FBF1DF")
     ax.plot([43, 25], [14.0, y_rx - 3.0], color=CTL, lw=0.9, ls="--")
     note(66, 0.4, "UI = 20 ps", fs=5.8)
-    savefig(fig, "ch33_architecture")
-    print("Fig 33.1 power levels: fibre in %.1f dBm, after fibre %.1f, after RX GC %.1f, at PD %.1f dBm" %
+    savefig(fig, "ch38_architecture")
+    print("Fig 38.1 power levels: fibre in %.1f dBm, after fibre %.1f, after RX GC %.1f, at PD %.1f dBm" %
           (10 - 3.0 - 0.8 - 3.0, 10 - 3.0 - 0.8 - 3.0 - 1.4, 10 - 3.0 - 0.8 - 3.0 - 1.4 - 3.0, 10 - 12.7))
 
 
-# ------------------------------------------------------------------ Figure 33.2: BER against Q and received power
+# ------------------------------------------------------------------ Figure 38.2: BER against Q and received power
 def fig_ber():
     fig, (a, b) = plt.subplots(1, 2, figsize=FULL, gridspec_kw=dict(width_ratios=[1, 1.45]))
     q = np.linspace(0, 9, 400)
@@ -203,8 +203,8 @@ def fig_ber():
     finish(b, "Average received power (dBm)", "Bit-error ratio")
     b.legend(loc="lower right", fontsize=6.6)
     tag(b, "b")
-    savefig(fig, "ch33_ber")
-    print("Fig 33.2: Q(1e-12) %.3f, Q(1e-15) %.3f, Q(KP4) %.3f" % (q_of_ber(1e-12), q_of_ber(1e-15), q_of_ber(BER_KP4)))
+    savefig(fig, "ch38_ber")
+    print("Fig 38.2: Q(1e-12) %.3f, Q(1e-15) %.3f, Q(KP4) %.3f" % (q_of_ber(1e-12), q_of_ber(1e-15), q_of_ber(BER_KP4)))
     for k, v in sens.items(): print("   sensitivity %-24s %.2f dBm" % (k, v))
     print("   ER penalty (sim) %.2f dB; (r+1)/(r-1) = %.2f dB; RIN -135 %.2f dB; RIN -130 %.2f dB" %
           (s1 - s0, 10 * math.log10((ER_REF + 1) / (ER_REF - 1)), s2 - s1, sens["+ RIN −130 dB/Hz"] - s1))
@@ -213,7 +213,7 @@ def fig_ber():
 
 
 def penalty_numbers():
-    """Penalties quoted in Section 33.2 and Worked Example 33.1."""
+    """Penalties quoted in Section 38.2 and Worked Example 38.1."""
     print("Penalties relative to %.2f dBm:" % S_REF)
     for erdb in (4, 6, 10):
         r = 10 ** (erdb / 10)
@@ -234,7 +234,7 @@ def penalty_numbers():
     print("   OMA at sensitivity: %.1f uW (%.2f dBm); thermal sigma %.2f uA" % (2 * p * (ER_REF - 1) / (ER_REF + 1) * 1e6, dbm(2 * p * (ER_REF - 1) / (ER_REF + 1)), sth * 1e6))
 
 
-# ------------------------------------------------------------------ front-end model (Figures 33.3 and the ISI numbers)
+# ------------------------------------------------------------------ front-end model (Figures 38.3 and the ISI numbers)
 F_RING, F_RX = 24e9, 32e9          # transmitter as one pole at the ring's 24 GHz optical bandwidth (Ch 20); RX 2nd-order Butterworth
 
 
@@ -294,7 +294,7 @@ def front_end_numbers():
     print("   Ch 21 noise bandwidth 0.7 B corresponds to f3 = %.2f B for this response" % (0.7 / 1.1107))
 
 
-# ------------------------------------------------------------------ Figure 33.3: NRZ and PAM4 eyes
+# ------------------------------------------------------------------ Figure 38.3: NRZ and PAM4 eyes
 def fig_eyes():
     rng = np.random.default_rng(7)
     n, nsym = 32, 2600
@@ -325,8 +325,8 @@ def fig_eyes():
         ax.set_xlabel("Time (symbol periods)")
     axs[0].set_ylabel("Photocurrent (µA)")
     fig.set_dpi(220)
-    savefig(fig, "ch33_eyes")
-    print("Fig 33.3: received %.1f dBm, levels %.1f / %.1f uA, noise %.2f uA rms" % (p_rx, i0 * 1e6, i1 * 1e6, sth * 1e6))
+    savefig(fig, "ch38_eyes")
+    print("Fig 38.3: received %.1f dBm, levels %.1f / %.1f uA, noise %.2f uA rms" % (p_rx, i0 * 1e6, i1 * 1e6, sth * 1e6))
 
 
 def format_numbers():
@@ -365,7 +365,7 @@ def ffe_numbers():
         print("   ISI jitter %s FFE: %.2f ps peak to peak" % (label, (tc.max() - tc.min()) * UI))
 
 
-# ------------------------------------------------------------------ Figure 33.4: bathtub
+# ------------------------------------------------------------------ Figure 38.4: bathtub
 JITTER = [("Transmitter: serialiser, driver, ring", 2.0, 0.30), ("Modulator and fibre ISI (after FFE)", 2.0, 0.0),
           ("Receiver front end: TIA, CTLE", 1.0, 0.25), ("Clock: PLL and CDR", 1.0, 0.35)]
 
@@ -391,8 +391,8 @@ def fig_bathtub():
     ax.set_xlim(0, UI); ax.set_ylim(1e-16, 1)
     finish(ax, "Sampling time within the 20 ps bit (ps)", "Bit-error ratio", legend=True, loc="upper center")
     ax.legend(loc="upper center", fontsize=6.6, ncol=1, bbox_to_anchor=(0.5, 1.0))
-    savefig(fig, "ch33_bathtub")
-    print("Fig 33.4 / Table 33.2: DJ %.2f ps, RJ %.3f ps rms; 2Q(1e-12) %.3f, 2Q(KP4) %.3f" % (dj, rj, 2 * q12, 2 * qk))
+    savefig(fig, "ch38_bathtub")
+    print("Fig 38.4 / Table 38.2: DJ %.2f ps, RJ %.3f ps rms; 2Q(1e-12) %.3f, 2Q(KP4) %.3f" % (dj, rj, 2 * q12, 2 * qk))
     for r, lab in ((rj, "budget"), (2 * rj, "RJ x2")):
         tj12, tjk = dj + 2 * q12 * r, dj + 2 * qk * r
         print("   %s: TJ(1e-12) %.2f ps, open %.2f ps (%.2f UI); TJ(KP4) %.2f ps, open %.2f ps (%.2f UI)" %
@@ -401,8 +401,8 @@ def fig_bathtub():
     print("   lane skew over 2 km across 1546.12-1555.75 nm: %.0f ps = %.1f UI" % (34 * (1555.75 - 1546.12), 34 * (1555.75 - 1546.12) / UI))
 
 
-# ------------------------------------------------------------------ Figure 33.5: energy per bit
-E_HEAT, E_TIA, E_DRV, E_MOD = 0.80, 1.0, 0.5, 0.02     # pJ/bit at 50 Gb/s (Table 33.1)
+# ------------------------------------------------------------------ Figure 38.5: energy per bit
+E_HEAT, E_TIA, E_DRV, E_MOD = 0.80, 1.0, 0.5, 0.02     # pJ/bit at 50 Gb/s (Table 38.1)
 
 
 def e_laser(p_dbm, rate, eta=0.15):
@@ -424,7 +424,7 @@ def fig_energy():
     a.axhline(5, color=RED, lw=0.8, ls=":")
     a.text(39.5, 4.85, "5 pJ/bit target", fontsize=6.6, color=RED, ha="right", va="top")
     a.plot([15], [other + e_laser(10, 50e9, 0.15)], "o", color=INK, ms=3.5)
-    a.annotate("Table 33.1", (15, other + e_laser(10, 50e9, 0.15)), xytext=(6, 6), textcoords="offset points", fontsize=6.6)
+    a.annotate("Table 38.1", (15, other + e_laser(10, 50e9, 0.15)), xytext=(6, 6), textcoords="offset points", fontsize=6.6)
     a.set_xlim(5, 40); a.set_ylim(0, 8)
     h, l = a.get_legend_handles_labels()
     a.legend(h[::-1], l[::-1], fontsize=6.2, loc="upper right", bbox_to_anchor=(1.0, 1.02))
@@ -454,8 +454,8 @@ def fig_energy():
     b.legend(h[::-1], l[::-1], fontsize=6.2, loc="upper right", bbox_to_anchor=(1.0, 1.02))
     finish(b, "Lane rate (Gb/s, NRZ)", "Energy per bit (pJ/bit)")
     tag(b, "b")
-    savefig(fig, "ch33_energy")
-    print("Fig 33.5a: total at 15 %% and +10 dBm %.2f pJ/bit; laser +7.13 dBm %.2f; 5 pJ/bit reached at eta = %.1f %%; at 30 %% %.2f" %
+    savefig(fig, "ch38_energy")
+    print("Fig 38.5a: total at 15 %% and +10 dBm %.2f pJ/bit; laser +7.13 dBm %.2f; 5 pJ/bit reached at eta = %.1f %%; at 30 %% %.2f" %
           (other + e_laser(10, 50e9), other + e_laser(7.13, 50e9), 100 * mw(10) / ((5 - other) * 1e-12 * 50e9), other + e_laser(10, 50e9, 0.30)))
     for r in (10e9, 25e9, 50e9, 100e9):
         s = sensitivity(lambda x: nrz_ber(x, rate=r))

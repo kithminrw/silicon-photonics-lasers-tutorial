@@ -23,7 +23,7 @@ Take the raw sweeps of a test chip, divide out the grating couplers, read the gr
 
 ## What you need
 
-- [Chapter 32]({% link chapters/32_analysis.md %}) (Sections 32.1 to 32.5), with [Chapter 31]({% link chapters/31_testing.md %}) (Section 31.3), [Chapter 7]({% link chapters/07_loss.md %}) (Section 7.7), [Chapter 11]({% link chapters/11_mzi.md %}) (Sections 11.3 and 11.6) and [Chapter 12]({% link chapters/12_rings.md %}) (Sections 12.2 to 12.5, Table 12.1).
+- [Chapter 37]({% link chapters/37_analysis.md %}) (Sections 37.1 to 37.5), with [Chapter 36]({% link chapters/36_testing.md %}) (Section 36.3), [Chapter 7]({% link chapters/07_loss.md %}) (Section 7.7), [Chapter 11]({% link chapters/11_mzi.md %}) (Sections 11.3 and 11.6) and [Chapter 12]({% link chapters/12_rings.md %}) (Sections 12.2 to 12.5, Table 12.1).
 - Python 3.11 or newer with NumPy and Matplotlib: `pip install numpy matplotlib`. The fits are written out in the script, so SciPy is not needed.
 - The script <a href="{{ '/labs/lab09_analysis.py' | relative_url }}" download><code>lab09_analysis.py</code></a> and the data: either the ten CSV files listed below, saved in a folder `data/` beside the script, or the generator <a href="{{ '/labs/lab09_make_data.py' | relative_url }}" download><code>lab09_make_data.py</code></a>, which writes the same files there.
 - About two hours, including the exercises.
@@ -42,11 +42,11 @@ The analysis prints a checkpoint for each part below, with the true value and th
 <div class="tbox tbox-insight" markdown="1">
 <div class="tbox-title">These measurements are simulated</div>
 
-The files are not measurements. `lab09_make_data.py` writes them with NumPy from a known chip, so that every number you extract can be checked against the truth; the last section of this page shows where to get real openEBL data and how to run the same analysis on it. The files copy the layout of a real openEBL sweep file's header (Section 32.1) and every imperfection of [Section 31.3]({% link chapters/31_testing.md %}).
+The files are not measurements. `lab09_make_data.py` writes them with NumPy from a known chip, so that every number you extract can be checked against the truth; the last section of this page shows where to get real openEBL data and how to run the same analysis on it. The files copy the layout of a real openEBL sweep file's header (Section 37.1) and every imperfection of [Section 36.3]({% link chapters/36_testing.md %}).
 
 </div>
 
-The chip is "your first chip" of Chapters 30–32: 500 × 220 nm silicon strips with $$n_g = 4.1836$$ at 1550 nm (femwell, [Chapter 6]({% link chapters/06_soi.md %})), rising by $$1.12\times10^{-4}$$ per nm, and 2.00 dB/cm of loss. Every device sits between two grating couplers, and the generator adds what a real bench adds:
+The chip is "your first chip" of Chapters 30–37: 500 × 220 nm silicon strips with $$n_g = 4.1836$$ at 1550 nm (femwell, [Chapter 6]({% link chapters/06_soi.md %})), rising by $$1.12\times10^{-4}$$ per nm, and 2.00 dB/cm of loss. Every device sits between two grating couplers, and the generator adds what a real bench adds:
 
 - **coupler envelope:** 6.0 dB per coupler at 1548 nm, 1 dB down 16 nm either side (a 32 nm 1 dB bandwidth), with each structure's pair of couplers off by a random 0.25 dB rms in loss and 0.5 nm in centre;
 - **fringes:** each coupler reflects −18 dB in amplitude (1.6 % in power) back into the chip, so the waveguide between them is a weak Fabry–Pérot cavity;
@@ -84,7 +84,7 @@ wavelength,channel_1
 
 `load_spectrum` returns the wavelengths, the powers and a dictionary of the header. It reads both layouts: these files store the data in columns, while real openEBL files store each variable as a row (`wavelength,1475,1475.008,…`, then `channel_1,…`). A real file holds one row per detector channel, and without a `channel` argument the function returns the strongest, the detector that saw the device.
 
-The loopback is the couplers alone. A Gaussian passband is a parabola in decibels, and the loopback holds two couplers, so it falls by 2 dB where each coupler falls by 1 dB. `coupler_envelope` fits that parabola to the top 6 dB, as Section 32.2 recommends:
+The loopback is the couplers alone. A Gaussian passband is a parabola in decibels, and the loopback holds two couplers, so it falls by 2 dB where each coupler falls by 1 dB. `coupler_envelope` fits that parabola to the top 6 dB, as Section 37.2 recommends:
 
 ```python
 def coupler_envelope(wl, p, within_db=6.0):
@@ -100,13 +100,13 @@ What the parabola leaves is the ripple. Reflections a distance $$L$$ apart make 
 <div class="tbox tbox-specnote" markdown="1">
 <div class="tbox-title">Checkpoint A</div>
 
-The loopback peaks at −11.86 dBm at 1548.1 nm: 5.90 dB per coupler (true: 6.0 dB plus half of this pair's offset of −0.20 dB, so 5.90 dB, at 1548.1 nm). One coupler's 1 dB bandwidth is 32.0 nm (true 32 nm; [Chapter 31]({% link chapters/31_testing.md %}): "a 30–40 nm wide passband"). The ripple is 0.27 dB peak to peak and repeats every 0.96 nm: reflections 300 µm apart, the length of the loopback's waveguide (true: 0.27 dB, 300 µm).
+The loopback peaks at −11.86 dBm at 1548.1 nm: 5.90 dB per coupler (true: 6.0 dB plus half of this pair's offset of −0.20 dB, so 5.90 dB, at 1548.1 nm). One coupler's 1 dB bandwidth is 32.0 nm (true 32 nm; [Chapter 36]({% link chapters/36_testing.md %}): "a 30–40 nm wide passband"). The ripple is 0.27 dB peak to peak and repeats every 0.96 nm: reflections 300 µm apart, the length of the loopback's waveguide (true: 0.27 dB, 300 µm).
 
 </div>
 
 ## <span class="secnum">L9.2</span>Group index from the MZI
 
-`calibrate` subtracts the loopback, in decibels, from the MZI: the couplers' envelope cancels and the MZI's own response remains (Section 32.2). Only the band where the loopback is within 10 dB of its peak is kept; outside it the signal sinks towards the floor. An MZI's output is a sinusoid in its phase, and its troughs are sharp, so `fringe_troughs` takes the lowest point of each fringe and fits $$A + B\cos(2\pi x/\mathrm{FSR}) + C\sin(2\pi x/\mathrm{FSR})$$ to the points within a quarter of an FSR around it. The fit's minimum falls between the samples:
+`calibrate` subtracts the loopback, in decibels, from the MZI: the couplers' envelope cancels and the MZI's own response remains (Section 37.2). Only the band where the loopback is within 10 dB of its peak is kept; outside it the signal sinks towards the floor. An MZI's output is a sinusoid in its phase, and its troughs are sharp, so `fringe_troughs` takes the lowest point of each fringe and fits $$A + B\cos(2\pi x/\mathrm{FSR}) + C\sin(2\pi x/\mathrm{FSR})$$ to the points within a quarter of an FSR around it. The fit's minimum falls between the samples:
 
 ```python
         sel = np.abs(wl - wl[i]) <= fsr_guess / 4
@@ -115,20 +115,20 @@ The loopback peaks at −11.86 dBm at 1548.1 nm: 5.90 dB per coupler (true: 6.0 
         out.append(wl[i] + np.arctan2(-C, -B) * fsr_guess / (2 * np.pi))   # B cos + C sin is lowest at phase atan2(-C, -B)
 ```
 
-Each pair of neighbouring troughs gives an FSR, and the key equation of Section 32.4 turns it into a group index at their midpoint, $$n_g = \lambda^2/(\mathrm{FSR}\cdot\Delta L)$$. A straight line through those values (`line_fit`, the least-squares line with the standard errors of Section 32.3) gives $$n_g$$ at 1550 nm and its slope. The same fits give each fringe's highest and lowest transmission, and the ratio measures the splitters' balance: with power fractions $$s$$ and $$1 - s$$, the extinction is $$20\log_{10}[1/(2s - 1)]$$ (Section 11.6).
+Each pair of neighbouring troughs gives an FSR, and the key equation of Section 37.4 turns it into a group index at their midpoint, $$n_g = \lambda^2/(\mathrm{FSR}\cdot\Delta L)$$. A straight line through those values (`line_fit`, the least-squares line with the standard errors of Section 37.3) gives $$n_g$$ at 1550 nm and its slope. The same fits give each fringe's highest and lowest transmission, and the ratio measures the splitters' balance: with power fractions $$s$$ and $$1 - s$$, the extinction is $$20\log_{10}[1/(2s - 1)]$$ (Section 11.6).
 
 <div class="tbox tbox-specnote" markdown="1">
 <div class="tbox-title">Checkpoint B</div>
 
-Twelve troughs from 1517.9 to 1581.0 nm. The FSR at 1550 nm is 5.742 nm (true 5.743 nm; Chapter 11: 5.75 nm with $$n_g = 4.18$$). $$n_g = 4.1840 \pm 0.0004$$ at 1550 nm (true 4.1836; Chapters 6 and 32: 4.18), rising by $$(1.12 \pm 0.23)\times10^{-4}$$ per nm (true $$1.12\times10^{-4}$$). The fringes are 24.1 dB deep, so the Y-branches split 0.531/0.469 (true 24.3 dB and 0.530/0.470).
+Twelve troughs from 1517.9 to 1581.0 nm. The FSR at 1550 nm is 5.742 nm (true 5.743 nm; Chapter 11: 5.75 nm with $$n_g = 4.18$$). $$n_g = 4.1840 \pm 0.0004$$ at 1550 nm (true 4.1836; Chapters 6 and 37: 4.18), rising by $$(1.12 \pm 0.23)\times10^{-4}$$ per nm (true $$1.12\times10^{-4}$$). The fringes are 24.1 dB deep, so the Y-branches split 0.531/0.469 (true 24.3 dB and 0.530/0.470).
 
 </div>
 
-The error of $$n_g$$ is a ten-thousandth: an FSR measured over twelve fringes is far more precise than any one fringe. An imbalance in the arms, or a $$\Delta L$$ that differs from the drawing, would bias it instead; two MZIs with different $$\Delta L$$ separate the two (Section 32.4).
+The error of $$n_g$$ is a ten-thousandth: an FSR measured over twelve fringes is far more precise than any one fringe. An imbalance in the arms, or a $$\Delta L$$ that differs from the drawing, would bias it instead; two MZIs with different $$\Delta L$$ separate the two (Section 37.4).
 
 ## <span class="secnum">L9.3</span>Fitting a resonance: Lorentzian
 
-Near a resonance the all-pass ring is a Lorentzian dip on a slowly varying baseline: the couplers' envelope and a piece of a fringe. `fit_ring` fits both at once, with the baseline a parabola in decibels (the "smooth envelope fitted to the device's own spectrum" of Section 32.2) and the dip of depth $$D$$ and full width $$w$$:
+Near a resonance the all-pass ring is a Lorentzian dip on a slowly varying baseline: the couplers' envelope and a piece of a fringe. `fit_ring` fits both at once, with the baseline a parabola in decibels (the "smooth envelope fitted to the device's own spectrum" of Section 37.2) and the dip of depth $$D$$ and full width $$w$$:
 
 ```python
 def lorentz_db(x, p):
@@ -169,12 +169,12 @@ The all-pass formula of Section 12.2 gives the same spectrum for $$(a, t)$$ and 
 
 The FSR uses the group index that the MZI measured, which is why the MZI comes first: the fit measures the resonance's width in units of the FSR (Exercise 3). Each solution gives a loss, $$-20\log_{10}(a)/L$$ in dB per unit length with $$L = 2\pi R$$, and a coupling $$\kappa^2 = 1 - t^2$$.
 
-The two solutions fit equally well, so the spectrum alone cannot choose. The gap series can (Worked Example 32.1): the gap changes the coupling, but not the loss of the ring. `resolve_gap_series` tries all $$2^3 = 8$$ ways of picking one solution per ring and keeps the one whose three losses agree best, measured by their $$\chi^2$$ about the weighted mean.
+The two solutions fit equally well, so the spectrum alone cannot choose. The gap series can (Worked Example 37.1): the gap changes the coupling, but not the loss of the ring. `resolve_gap_series` tries all $$2^3 = 8$$ ways of picking one solution per ring and keeps the one whose three losses agree best, measured by their $$\chi^2$$ about the weighted mean.
 
 <div class="tbox tbox-specnote" markdown="1">
 <div class="tbox-title">Checkpoint D</div>
 
-Both solutions of every ring fit equally well (the ratio of their $$\chi^2$$ is 1.0000). The gap series picks over-, over- and under-coupled, with losses of 2.02 ± 0.01, 2.00 ± 0.02 and 2.05 ± 0.05 dB/cm ($$\chi^2 = 1.4$$ for 2 degrees of freedom), and couplings of 1.250, 0.520 and 0.214 %, which fall 5.83 times per 100 nm (true: 1.235, 0.516 and 0.215 %, over, over and under, as in Table 12.1; the Chapter 9 model falls 5.75 times). The other set has "losses" of 8.7, 3.6 and 1.5 dB/cm and "couplings" of 0.291, 0.289 and 0.296 % (Worked Example 32.1: 8.6, 3.6 and 1.5 dB/cm, couplings that barely change). The rings' weighted mean loss is 2.01 ± 0.01 dB/cm (true 2.00; Table 12.1: 2 dB/cm).
+Both solutions of every ring fit equally well (the ratio of their $$\chi^2$$ is 1.0000). The gap series picks over-, over- and under-coupled, with losses of 2.02 ± 0.01, 2.00 ± 0.02 and 2.05 ± 0.05 dB/cm ($$\chi^2 = 1.4$$ for 2 degrees of freedom), and couplings of 1.250, 0.520 and 0.214 %, which fall 5.83 times per 100 nm (true: 1.235, 0.516 and 0.215 %, over, over and under, as in Table 12.1; the Chapter 9 model falls 5.75 times). The other set has "losses" of 8.7, 3.6 and 1.5 dB/cm and "couplings" of 0.291, 0.289 and 0.296 % (Worked Example 37.1: 8.6, 3.6 and 1.5 dB/cm, couplings that barely change). The rings' weighted mean loss is 2.01 ± 0.01 dB/cm (true 2.00; Table 12.1: 2 dB/cm).
 
 </div>
 
@@ -182,7 +182,7 @@ The wrong set has a clear signature: its "couplings" are all $$1 - a^2 = 0.29$$ 
 
 ## <span class="secnum">L9.5</span>Propagation loss by cutback
 
-`insertion_loss` averages each cutback spectrum, in milliwatts, over ±1 nm around 1550 nm and subtracts it from the laser's power. `line_fit` then fits loss against length (Section 32.3):
+`insertion_loss` averages each cutback spectrum, in milliwatts, over ±1 nm around 1550 nm and subtracts it from the laser's power. `line_fit` then fits loss against length (Section 37.3):
 
 ```python
 def line_fit(x, y):
@@ -194,7 +194,7 @@ def line_fit(x, y):
     return c0, c1, sy * np.sqrt(1 / n + xm ** 2 / sxx), sy / np.sqrt(sxx), sy
 ```
 
-The slope is the loss and its error is $$\sigma_y/\sqrt{\sum_i(L_i - \bar L)^2}$$, as in Section 32.3. Here $$\sigma_y$$ is almost all coupler-to-coupler variation, which no averaging over wavelength removes. Half the intercept is one coupler's loss. Repeating the fit at every wavelength from 1500 to 1595 nm gives the loss spectrum in the inset of plot (f).
+The slope is the loss and its error is $$\sigma_y/\sqrt{\sum_i(L_i - \bar L)^2}$$, as in Section 37.3. Here $$\sigma_y$$ is almost all coupler-to-coupler variation, which no averaging over wavelength removes. Half the intercept is one coupler's loss. Repeating the fit at every wavelength from 1500 to 1595 nm gives the loss spectrum in the inset of plot (f).
 
 <div class="tbox tbox-specnote" markdown="1">
 <div class="tbox-title">Checkpoint E</div>
@@ -203,7 +203,7 @@ The loss is 1.98 ± 0.06 dB/cm, with 0.18 dB of scatter about the line (true 2.0
 
 </div>
 
-The cutback and the rings agree, by two independent routes: one uses centimetres of waveguide and the couplers' scatter, the other 63 µm of ring and the shape of a resonance. The loopback's couplers differ from the cutback's by 0.14 dB, as Section 31.3 warns: absolute losses carry a few tenths of a decibel of coupler variation, and slopes, widths and wavelengths do not.
+The cutback and the rings agree, by two independent routes: one uses centimetres of waveguide and the couplers' scatter, the other 63 µm of ring and the shape of a resonance. The loopback's couplers differ from the cutback's by 0.14 dB, as Section 36.3 warns: absolute losses carry a few tenths of a decibel of coupler variation, and slopes, widths and wavelengths do not.
 
 <figure id="fig-l9-1">
   <img src="{{ '/assets/figs/lab09_expected.png' | relative_url }}" style="width:760px" alt="Six plots from the lab script: the raw loopback, MZI and 4 cm cutback sweeps with the coupler envelope fit; the MZI divided by the loopback with its troughs; group index against wavelength; the three ring resonances with all-pass fits; propagation loss against coupling for both solutions of each ring; and insertion loss against length for the cutback, with the loss spectrum as an inset">
@@ -249,7 +249,7 @@ print(ring["Q"], ring["ext"], ring["sols"]["under"]["loss"], ring["sols"]["over"
 <summary>Answers</summary>
 
 1. With every eighth point the 300 nm ring's 7.4 pm resonance falls between one or two samples: Q drops to 174 000 ± 17 000 and the extinction to 7.4 ± 1.8 dB (true 210 900 and 16.7 dB), and its under-coupled solution gives 3.0 ± 0.5 dB/cm. The 200 nm ring gives Q = 62 700 ± 2000 and 2.18 dB/cm. The gap series still picks the right set, but the mean loss is 2.16 ± 0.04 dB/cm, against 2.00. From the other starting points the 300 nm ring's Q ranges from 174 000 to 197 000 and its extinction from 7.4 to 14.7 dB: under-sampled fits depend on where the samples fall. Sweep high-Q rings at a step of a fifth of their width or finer, here 1–2 pm.
-2. 1.49 ± 0.28 dB/cm (true 2.00), with 0.15 dB of scatter. The spread of lengths, $$\sqrt{\sum_i(L_i - \bar L)^2}$$, is 0.54 cm instead of 3.05 cm, so the same coupler scatter gives an error bar more than five times larger (Section 32.3). Adding the 2 cm waveguide gives 1.87 ± 0.14 dB/cm; the 4 cm spiral does most of the work.
+2. 1.49 ± 0.28 dB/cm (true 2.00), with 0.15 dB of scatter. The spread of lengths, $$\sqrt{\sum_i(L_i - \bar L)^2}$$, is 0.54 cm instead of 3.05 cm, so the same coupler scatter gives an error bar more than five times larger (Section 37.3). Adding the 2 cm waveguide gives 1.87 ± 0.14 dB/cm; the 4 cm spiral does most of the work.
 3. The over-coupled solution gives 1.77 dB/cm and κ² = 0.460 %, against 2.00 dB/cm and 0.520 % with the MZI's 4.184: both fall in proportion to $$n_g$$ (3.70/4.184 = 0.884). Q stays at 131 256. The fit measures the resonance's width in units of the FSR, and $$1 - at$$ is proportional to it, so an error in $$n_g$$ passes straight into the loss and the coupling, but not into Q.
 4. The couplings fall 5.83 times per 100 nm. At 2.01 dB/cm, $$a = 0.998546$$, and critical coupling needs $$\kappa^2 = 1 - a^2 = 0.291$$ %, at a gap of 283 nm (the Chapter 9 model gives 283.2 nm). A ring at that gap would give the deepest notch; Worked Example 12.1 notes that at 250 nm it would need 3.6 dB/cm.
 5. For the 200 nm ring, $$Q_i = 84\,600$$ (8.69 dB/cm, under) or 364 600 (2.02 dB/cm, over). For the 250 nm ring, 204 000 (3.61 dB/cm) or 368 000 (2.00 dB/cm). For the 300 nm ring, 359 300 (2.05 dB/cm) or 496 300 (1.48 dB/cm). They are the all-pass fits' two solutions again: a Lorentzian contains the same information, and the same ambiguity. The true $$Q_i$$ is $$3.68\times10^5$$ (Chapter 12: $$3.7\times10^5$$).
@@ -259,6 +259,6 @@ print(ring["Q"], ring["ext"], ring["sols"]["under"]["loss"], ring["sols"]["over"
 ## Going further
 
 - Run the analysis on a real openEBL chip, as described above, and compare its loss, group index and couplings with these.
-- The ring-fitting demo of [Chapter 32]({% link chapters/32_analysis.md %}) draws the misfit map behind Checkpoint D, and the test-bench demo of [Chapter 31]({% link chapters/31_testing.md %}) makes spectra like these in your browser.
+- The ring-fitting demo of [Chapter 37]({% link chapters/37_analysis.md %}) draws the misfit map behind Checkpoint D, and the test-bench demo of [Chapter 36]({% link chapters/36_testing.md %}) makes spectra like these in your browser.
 - Add a drop port. An add-drop ring's drop port breaks the symmetry between loss and coupling ([Sections 12.3 and 12.5]({% link chapters/12_rings.md %})), so one device resolves the ambiguity. Add one to `lab09_make_data.py` and fit both ports together.
-- Extract a Bragg grating's κ from its stop band (Section 32.6), with the transfer matrices of [Lab 5]({% link labs/lab05_bragg.md %}).
+- Extract a Bragg grating's κ from its stop band (Section 37.6), with the transfer matrices of [Lab 5]({% link labs/lab05_bragg.md %}).

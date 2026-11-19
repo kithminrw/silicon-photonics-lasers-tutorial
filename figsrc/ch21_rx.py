@@ -322,7 +322,7 @@ def numbers():
     p_fe = p_tia + p_la + p_dc
     print(f"TIA inverter: g_m {GM*1e3:.0f} mS from NMOS + PMOS at g_m/I_D = {GM_ID:.0f}/V each -> {i_tia*1e3:.2f} mA, {p_tia*1e3:.2f} mW at {VDD} V")
     print(f"post-amp: {i_la*1e3:.1f} mA per stage -> {p_la*1e3:.2f} mW; DC loop and bias {p_dc*1e3:.1f} mW; front end {p_fe*1e3:.2f} mW = {p_fe/BR*1e12:.2f} pJ/bit")
-    print(f"Table 33.1 allows 1.0 pJ/bit = {1.0e-12*BR*1e3:.0f} mW per lane; left for decision, clock recovery, deserialiser: {(1.0e-12*BR-p_fe)*1e3:.0f} mW")
+    print(f"Table 38.1 allows 1.0 pJ/bit = {1.0e-12*BR*1e3:.0f} mW per lane; left for decision, clock recovery, deserialiser: {(1.0e-12*BR-p_fe)*1e3:.0f} mW")
 
     print("\n== Section 21.9: noise against TIA bandwidth")
     sweep = []

@@ -1,8 +1,8 @@
-"""Block diagrams for Chapter 33 (optical links and transceivers): a coherent transceiver, and where the electrical
+"""Block diagrams for Chapter 38 (optical links and transceivers): a coherent transceiver, and where the electrical
 path runs in pluggable, linear-drive and co-packaged optics.
 
-Run from the repository root:   python -I -X utf8 figsrc/ch33_figs.py
-Writes assets/figs/ch33_coherent.svg and ch33_cpo.svg. Both are schematics without numbers.
+Run from the repository root:   python -I -X utf8 figsrc/ch38_figs.py
+Writes assets/figs/ch38_coherent.svg and ch38_cpo.svg. Both are schematics without numbers.
 """
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -90,7 +90,7 @@ def fig_coherent():
     ax.plot([50, 54], [1.2, 1.2], color=OPT_C, lw=1.3); label(ax, 54.7, 1.2, "optical", fs=6.3, ha="left", col=OPT_C)
     ax.plot([63, 67], [1.2, 1.2], color=ELE_C, lw=0.9); label(ax, 67.7, 1.2, "electrical", fs=6.3, ha="left", col=ELE_C)
     note(ax, "schematic", loc="lower left")
-    save(fig, "ch33_coherent")
+    save(fig, "ch38_coherent")
 
 
 # ------------------------------------------------------------------ Figure: pluggable, linear-drive and co-packaged optics
@@ -135,7 +135,7 @@ def fig_cpo():
     owire(ax, [(79.0, yc - 3.0), (62.0, yc - 3.0), (50.2, yc + 0.6)], arrow_end=True)
     label(ax, 70.0, yc - 4.8, "CW light in by fibre", fs=6.0, col=OPT_C)
     note(ax, "schematic", loc="lower right")
-    save(fig, "ch33_cpo")
+    save(fig, "ch38_cpo")
 
 
 if __name__ == "__main__":

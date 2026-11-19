@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MIT
 # Copyright (c) 2026 the Open-Photonics authors
-"""Lab 9: analyse measured openEBL data (Open-Photonics, Chapter 32), here simulated files that imitate it.
+"""Lab 9: analyse measured openEBL data (Open-Photonics, Chapter 37), here simulated files that imitate it.
 
 Run it from a terminal, with the data files in a folder data/ beside this script:
     python lab09_make_data.py           # once: writes data/lab09_*.csv (or download them from the lab page)
@@ -25,7 +25,7 @@ NG_GUESS = 4.18        # only to start the fringe search; the MZI measures the r
 
 
 # ---------------------------------------------------------------------------------------------------------
-# Part A. Reading a sweep file, and the grating couplers' envelope (Chapter 32, Sections 32.1 and 32.2)
+# Part A. Reading a sweep file, and the grating couplers' envelope (Chapter 37, Sections 37.1 and 37.2)
 # ---------------------------------------------------------------------------------------------------------
 def load_spectrum(path, channel=None):
     """Wavelength (nm), power (dBm) and the header of one sweep file.
@@ -103,10 +103,10 @@ def fringe_cavity(wl, residual_db, ng=NG_GUESS, lengths=np.arange(20.0, 2000.0, 
 
 
 # ---------------------------------------------------------------------------------------------------------
-# Part B. Group index from an unbalanced MZI (Section 32.4, Chapter 11)
+# Part B. Group index from an unbalanced MZI (Section 37.4, Chapter 11)
 # ---------------------------------------------------------------------------------------------------------
 def calibrate(wl, p, wl_ref, p_ref):
-    """Device minus loopback, in dB: the couplers' envelope cancels (Section 32.2)."""
+    """Device minus loopback, in dB: the couplers' envelope cancels (Section 37.2)."""
     return p - np.interp(wl, wl_ref, p_ref)
 
 
@@ -132,7 +132,7 @@ def fringe_troughs(wl, t_lin, fsr_guess):
 
 
 def line_fit(x, y):
-    """Least-squares line y = c0 + c1 x with the standard errors of both (Section 32.3)."""
+    """Least-squares line y = c0 + c1 x with the standard errors of both (Section 37.3)."""
     n, xm = x.size, x.mean()
     sxx = ((x - xm) ** 2).sum()
     c1 = ((x - xm) * (y - y.mean())).sum() / sxx
@@ -156,7 +156,7 @@ def mzi_group_index(wl, cal_db, dl_um, ng_guess=NG_GUESS):
 
 
 # ---------------------------------------------------------------------------------------------------------
-# Part C. Fitting a ring resonance: Lorentzian and all-pass models (Section 32.5, Chapter 12)
+# Part C. Fitting a ring resonance: Lorentzian and all-pass models (Section 37.5, Chapter 12)
 # ---------------------------------------------------------------------------------------------------------
 def levenberg_marquardt(resid, p0, h, ok=lambda p: True, iters=200):
     """Minimise sum(resid(p)^2). h: the finite-difference step of each parameter; ok(p): a constraint.
@@ -210,7 +210,7 @@ def fit_ring(wl, p, ng, radius_um=RING_R, centre=None, span=12):
     """Fit one through-port resonance. Returns the Lorentzian results and both all-pass solutions.
 
     The window is +-span FWHM around the dip (centre, or the lowest point). The baseline (couplers' envelope,
-    fringes) is a parabola in dB fitted with the dip: the local envelope of Section 32.2.
+    fringes) is a parabola in dB fitted with the dip: the local envelope of Section 37.2.
     """
     sm = np.convolve(p, np.ones(5) / 5, mode="same")                  # a 5-point moving average
     sm[:2] = sm[-2:] = np.inf
@@ -262,7 +262,7 @@ def fit_ring(wl, p, ng, radius_um=RING_R, centre=None, span=12):
 
 
 # ---------------------------------------------------------------------------------------------------------
-# Part D. Under or over? Resolve the ambiguity with the gap series (Worked Example 32.1)
+# Part D. Under or over? Resolve the ambiguity with the gap series (Worked Example 37.1)
 # ---------------------------------------------------------------------------------------------------------
 def resolve_gap_series(fits):
     """Choose one solution per ring so that the loss is the same for all gaps.
@@ -283,7 +283,7 @@ def resolve_gap_series(fits):
 
 
 # ---------------------------------------------------------------------------------------------------------
-# Part E. Propagation loss by cutback (Section 32.3, Chapter 7)
+# Part E. Propagation loss by cutback (Section 37.3, Chapter 7)
 # ---------------------------------------------------------------------------------------------------------
 def insertion_loss(wl, p, p_laser, lam=1550.0, half=1.0):
     """Insertion loss at lam: the laser power minus the received power averaged (in mW) over +-half nm."""
@@ -313,7 +313,7 @@ def main(plot=True):
     print(f"   peak {env['peak']:.2f} dBm at {env['centre']:.1f} nm: {gc_peak:.2f} dB per coupler"
           f"   (true {6.0 + off / 2:.2f} dB: 6.0 dB plus half this pair's offset of {off:+.2f} dB; centre"
           f" {1548 + true_value(m_lb, 'coupler centre offset'):.1f} nm)")
-    print(f"   1 dB bandwidth of one coupler {env['bw1']:.1f} nm   (true 32 nm; Chapter 31: a 30-40 nm wide passband)")
+    print(f"   1 dB bandwidth of one coupler {env['bw1']:.1f} nm   (true 32 nm; Chapter 36: a 30-40 nm wide passband)")
     print(f"   ripple {ripple:.2f} dB peak to peak, repeating every {1550**2 / (2 * NG_GUESS * L_fp * 1e3):.2f} nm:"
           f" reflections {L_fp:.0f} um apart   (true: 300 um, R = 1.6 %, 0.27 dB p-p)\n")
 
@@ -327,7 +327,7 @@ def main(plot=True):
     print("B. Unbalanced MZI, dL = 100 um, divided by the loopback")
     print(f"   {mzi['troughs'].size} troughs from {mzi['troughs'][0]:.1f} to {mzi['troughs'][-1]:.1f} nm;"
           f" FSR at 1550 nm {fsr1550:.3f} nm   (true {true_value(m_m, 'FSR at 1550 nm'):.3f}; Chapter 11: 5.75 nm)")
-    print(f"   n_g(1550) = {mzi['ng1550']:.4f} +- {mzi['s_ng']:.4f}   (true {ng_true:.4f}; Chapters 6 and 32: 4.18)")
+    print(f"   n_g(1550) = {mzi['ng1550']:.4f} +- {mzi['s_ng']:.4f}   (true {ng_true:.4f}; Chapters 6 and 37: 4.18)")
     print(f"   dn_g/dlambda = {1e4 * mzi['slope']:.2f} +- {1e4 * mzi['s_slope']:.2f} x 1e-4 per nm   (true {1e4 * slope_true:.2f})")
     split = (1 + 10 ** (-mzi["er"] / 20)) / 2                         # (s - (1 - s)) / (s + (1 - s)) = 2 s - 1
     er_true = true_value({"True x": m_m["True Y-branch split and loss"].split("extinction")[1]}, "x")
@@ -376,7 +376,7 @@ def main(plot=True):
           "   (Table 12.1: 1.23, 0.52, 0.22 %; Chapter 9 model: 5.75x)")
     losses = ", ".join("%.1f" % s["loss"] for s in mirror)
     couplings = ", ".join("%.3f" % (100 * s["k2"]) for s in mirror)
-    print(f"   the other set: losses {losses} dB/cm, couplings {couplings} %   (Worked Example 32.1: 8.6, 3.6, 1.5 dB/cm)")
+    print(f"   the other set: losses {losses} dB/cm, couplings {couplings} %   (Worked Example 37.1: 8.6, 3.6, 1.5 dB/cm)")
     print(f"   ring loss, weighted mean: {mean:.2f} +- {s_mean:.2f} dB/cm   (true 2.00; Table 12.1: 2 dB/cm)\n")
 
     # ---- Part E

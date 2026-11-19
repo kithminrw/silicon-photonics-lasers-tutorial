@@ -146,5 +146,5 @@ The peak sits 4 pm short of 1550 nm because the central layer has the lower inde
 
 - The contra-directional coupler of Section 13.6 couples four waves, forward and backward in two waveguides: extend the matrices to 4 × 4.
 - Give the effective index an imaginary part to add gain or loss; with gain, the λ/4-shifted grating becomes the DFB laser of [Chapter 26]({% link chapters/26_tunable.md %}), and its transmission peak grows without limit as it approaches threshold.
-- Section 32.6 reads κ back from a measured stop-band; [Lab 9]({% link labs/lab09_analysis.md %}) analyses real openEBL measurements.
+- Section 37.6 reads κ back from a measured stop-band; [Lab 9]({% link labs/lab09_analysis.md %}) analyses real openEBL measurements.
 - The Chapter 13 demo uses coupled-mode matrices section by section; run this script at its defaults (Λ = 317 nm) and compare the two.

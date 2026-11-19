@@ -38,7 +38,7 @@ python lab07_layout.py
 
 It prints a checkpoint for each part below, writes the layout `EBeam_YourName_firstchip.gds` and saves the figure `lab07_layout.png`, in a minute or two. Read each part, then the matching function in the script; change things and run it again. All lengths are in micrometres. Before you submit anything, set `USER` at the top of the script to your own name (letters and digits only): it goes into the file name, the top cell and every label.
 
-The chip is the "your first chip" of Chapters 6–32: a passive 220 nm SOI chip at 1550 nm, measured through grating couplers. [Lab 8]({% link labs/lab08_submit.md %}) checks it and walks through the submission, and [Lab 9]({% link labs/lab09_analysis.md %}) analyses the kind of data it returns.
+The chip is the "your first chip" of Chapters 6–37: a passive 220 nm SOI chip at 1550 nm, measured through grating couplers. [Lab 8]({% link labs/lab08_submit.md %}) checks it and walks through the submission, and [Lab 9]({% link labs/lab09_analysis.md %}) analyses the kind of data it returns.
 
 ## <span class="secnum">L7.1</span>The openEBL rules
 
@@ -183,7 +183,7 @@ def label_text(name, user=USER):
             chip.add_label(label_text(name), position=(in_xy[0] + lx, in_xy[1] + ly), layer=LAYER_TEXT)
 ```
 
-The label tells the automated prober what to do: align to this coupler (the "laser" fibre, [Chapter 31]({% link chapters/31_testing.md %})), sweep the TE laser around 1550 nm, and record the couplers of the same circuit as detectors. ubcpdk's own `add_fiber_array` writes labels with hyphens, `…device_<user>-<name>`; this lab uses the underscores of SiEPIC's examples. The extra arguments `move_label` and `move_device` exist to break the chip on purpose in Lab 8.
+The label tells the automated prober what to do: align to this coupler (the "laser" fibre, [Chapter 36]({% link chapters/36_testing.md %})), sweep the TE laser around 1550 nm, and record the couplers of the same circuit as detectors. ubcpdk's own `add_fiber_array` writes labels with hyphens, `…device_<user>-<name>`; this lab uses the underscores of SiEPIC's examples. The extra arguments `move_label` and `move_device` exist to break the chip on purpose in Lab 8.
 
 <div class="tbox tbox-specnote" markdown="1">
 <div class="tbox-title">Checkpoint E</div>

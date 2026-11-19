@@ -143,7 +143,7 @@ A 1 mm SOA gives about 13 dB of small-signal gain, a −3 dB output power near 9
 <div class="tbox tbox-specnote" markdown="1">
 <div class="tbox-title">Reference-link choice</div>
 
-No SOA: the budget of [Chapter 1]({% link chapters/01_why.md %}) closes with about 9 dB of margin before penalties ([Chapter 21]({% link chapters/21_pd.md %})) and 5.9 dB after them ([Chapter 33]({% link chapters/33_links.md %}))). An SOA would be the first upgrade for a longer reach or more channels.
+No SOA: the budget of [Chapter 1]({% link chapters/01_why.md %}) closes with about 9 dB of margin before penalties ([Chapter 21]({% link chapters/21_pd.md %})) and 5.9 dB after them ([Chapter 38]({% link chapters/38_links.md %}))). An SOA would be the first upgrade for a longer reach or more channels.
 
 </div>
 

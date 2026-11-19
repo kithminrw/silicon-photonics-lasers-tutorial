@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: MIT
 # Copyright (c) 2026 the Open-Photonics authors
-"""Lab 9: make the simulated openEBL-style measurement files (Open-Photonics, Chapters 31 and 32).
+"""Lab 9: make the simulated openEBL-style measurement files (Open-Photonics, Chapters 36 and 37).
 
-The files imitate the sweep files an openEBL chip returns (Chapter 32, Section 32.1), with the imperfections
-of Chapter 31: the grating couplers' envelope, Fabry-Perot fringes between the couplers, 1 % power noise, a
+The files imitate the sweep files an openEBL chip returns (Chapter 37, Section 37.1), with the imperfections
+of Chapter 36: the grating couplers' envelope, Fabry-Perot fringes between the couplers, 1 % power noise, a
 detector floor and a little wavelength jitter. The devices are those of "your first chip": a loopback, an
 unbalanced MZI, three all-pass rings with the gaps of Table 12.1, and a cutback set.
 

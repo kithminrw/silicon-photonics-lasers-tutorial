@@ -1,12 +1,12 @@
-"""Figures of Chapter 31 (testing photonic chips).
+"""Figures of Chapter 36 (testing photonic chips).
 
-    python -I -X utf8 figsrc/ch31_figs.py
+    python -I -X utf8 figsrc/ch36_figs.py
 
-ch31_setup     the passive test setup (block diagram with the chip in side view)
-ch31_dft       a design-for-test coupler row with the fibre array's footprint: loopback, device, cutback spiral
-ch31_probe     DC needles and a GSG probe on an active device, with the instruments
-ch31_liv       laser test: setup, L-I-V with the extracted parameters, threshold against temperature (synthetic)
-ch31_rf        high-speed tests: frequency domain (lightwave component analyser) and time domain (eye, BER)
+ch36_setup     the passive test setup (block diagram with the chip in side view)
+ch36_dft       a design-for-test coupler row with the fibre array's footprint: loopback, device, cutback spiral
+ch36_probe     DC needles and a GSG probe on an active device, with the instruments
+ch36_liv       laser test: setup, L-I-V with the extracted parameters, threshold against temperature (synthetic)
+ch36_rf        high-speed tests: frequency domain (lightwave component analyser) and time domain (eye, BER)
 """
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -38,7 +38,7 @@ def ewire(ax, pts, arrow_end=True, ls="-"):
     wire(ax, pts, col=ELEC, lw=0.9, arrow_end=arrow_end, ms=6, ls=ls)
 
 
-# ------------------------------------------------------------------ Figure 31.1
+# ------------------------------------------------------------------ Figure 36.1
 def fig_setup():
     fig, ax = geom_axes(figsize=(6.3, 3.1), xlim=(0, 10.6), ylim=(0, 5.2), equal=False)
     yo = 4.15
@@ -84,10 +84,10 @@ def fig_setup():
     label(ax, 4.7, 5.02, "trigger: the detectors sample in step with the wavelength sweep", fs=6.2, col=ELEC, va="bottom")
     legend_paths(ax, loc="lower left", bbox=(0.0, 0.17), extra=[Line2D([], [], color=ELEC, lw=0.8, ls=(0, (3, 2)), label="trigger")])
     note(ax, "not to scale")
-    save(fig, "ch31_setup")
+    save(fig, "ch36_setup")
 
 
-# ------------------------------------------------------------------ Figure 31.2
+# ------------------------------------------------------------------ Figure 36.2
 def fig_dft():
     P, CLAD, MFD = 127.0, 125.0, 10.4          # array pitch, fibre cladding diameter, SMF-28 mode field diameter at 1550 nm (um)
     R_RING, GAP, ENL = 10.0, 0.25, 3.0          # ring of Table 12.1, drawn enlarged ENL times
@@ -137,10 +137,10 @@ def fig_dft():
     scalebar(ax, -80, 225, 100, "100 µm")
     note(ax, "to scale except the ring (×3); waveguides drawn as lines", loc="upper right")
     print(f"DFT: pitch {P} um, cladding {CLAD} um ({P - CLAD:.0f} um between fibres), MFD {MFD} um; spiral outer radius {re:.0f} um")
-    save(fig, "ch31_dft")
+    save(fig, "ch36_dft")
 
 
-# ------------------------------------------------------------------ Figure 31.3
+# ------------------------------------------------------------------ Figure 36.3
 def fig_probe():
     fig, ax = geom_axes(figsize=(6.3, 3.0), xlim=(0, 10.6), ylim=(0, 5.0), equal=False)
     # chip
@@ -205,10 +205,10 @@ def fig_probe():
     label(ax, 10.38, 2.45, "RF", fs=6.0, ha="left", col=ELEC)
     label(ax, 6.0, 0.25, "heater: IV and tuning against power   ·   junction: IV, shift against bias, and S$_{21}$ through the GSG probe", fs=6.2, col=INK)
     note(ax, "not to scale", loc="upper left")
-    save(fig, "ch31_probe")
+    save(fig, "ch36_probe")
 
 
-# ------------------------------------------------------------------ Figure 31.4
+# ------------------------------------------------------------------ Figure 36.4
 ITH25, ETA, V0, RS, T0 = 19.0, 0.21, 0.85, 5.0, 60.0     # Chapter 24 FP laser: mA, W/A per facet, V, ohm, K
 
 
@@ -289,10 +289,10 @@ def fig_liv():
     ins.tick_params(labelsize=5.5, length=2, pad=1); ins.grid(False)
     ins.set_xlabel("T (°C)", fontsize=5.5, labelpad=0); ins.set_ylabel("$I_\\mathrm{th}$ (mA)", fontsize=5.5, labelpad=0)
     ins.set_title(f"$T_0$ = {1/slope:.0f} K", fontsize=6, pad=2, color=INK)
-    save(fig, "ch31_liv")
+    save(fig, "ch36_liv")
 
 
-# ------------------------------------------------------------------ Figure 31.5
+# ------------------------------------------------------------------ Figure 36.5
 def fig_rf():
     fig, ax = geom_axes(figsize=(6.3, 3.6), xlim=(0, 10.6), ylim=(0, 6.2), equal=False)
     # (a) frequency domain
@@ -341,7 +341,7 @@ def fig_rf():
     label(ax, 5.2, 0.43, "clock and pattern reference", fs=6.0, col=ELEC, va="bottom")
     legend_paths(ax, loc="lower left", bbox=(0.0, 0.44), ncol=2)
     note(ax, "not to scale")
-    save(fig, "ch31_rf")
+    save(fig, "ch36_rf")
 
 
 if __name__ == "__main__":

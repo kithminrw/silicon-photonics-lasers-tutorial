@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MIT
 # Copyright (c) 2026 the Open-Photonics authors
-"""Lab 12: close the reference link budget (Open-Photonics, Chapters 1, 2, 14, 21 and 33).
+"""Lab 12: close the reference link budget (Open-Photonics, Chapters 1, 2, 14, 21 and 38).
 
 Run it from a terminal:
     python lab12_link.py              # prints every checkpoint and saves lab12_link.png
@@ -29,14 +29,14 @@ TARGET_ENERGY = 5.0         # pJ/bit, whole link
 
 
 # ---------------------------------------------------------------------------------------------------------
-# Part A. The budget, block by block (Chapter 1, Example 1.1; Chapter 33, Table 33.1)
+# Part A. The budget, block by block (Chapter 1, Example 1.1; Chapter 38, Table 38.1)
 # ---------------------------------------------------------------------------------------------------------
 P_LASER = 10.0              # dBm per lane in the transmitter waveguide
 FIBRE_DB_PER_KM = 0.2       # standard single-mode fibre in the C band (Chapter 3)
 
 
 def link_blocks(km=FIBRE_KM, gc=3.0, fibre_db_per_km=FIBRE_DB_PER_KM):
-    """Each block's loss in dB for one wavelength, in the order the light meets them (Table 33.1)."""
+    """Each block's loss in dB for one wavelength, in the order the light meets them (Table 38.1)."""
     return [("ring modulator", 3.0),
             ("other rings, routing", 0.8),
             ("TX grating coupler", gc),
@@ -46,7 +46,7 @@ def link_blocks(km=FIBRE_KM, gc=3.0, fibre_db_per_km=FIBRE_DB_PER_KM):
             ("demux ring, routing", 1.5)]
 
 
-# Allowances of Table 33.1, in dB. The extinction-ratio penalty is not here: it is inside the sensitivity.
+# Allowances of Table 38.1, in dB. The extinction-ratio penalty is not here: it is inside the sensitivity.
 PENALTIES = {"crosstalk": 0.5, "dispersion": 0.5, "drift and locking": 1.0, "ageing": 1.0}
 
 
@@ -56,7 +56,7 @@ def power_levels(p_laser, blocks):
 
 
 def margin(p_rx, sens, penalties):
-    """margin = P_launch - sum(losses) - sum(penalties) - P_sens (the key equation of Section 33.2)."""
+    """margin = P_launch - sum(losses) - sum(penalties) - P_sens (the key equation of Section 38.2)."""
     return p_rx - sum(penalties.values()) - sens
 
 
@@ -249,7 +249,7 @@ def dispersion_for_penalty(pen_db, lo=0.0, hi=100.0, **kw):
 
 
 # ---------------------------------------------------------------------------------------------------------
-# Part E. Energy per bit, and margin traded for laser power (Chapter 33, Section 33.5)
+# Part E. Energy per bit, and margin traded for laser power (Chapter 38, Section 38.5)
 # ---------------------------------------------------------------------------------------------------------
 WALL_PLUG = 0.15            # laser wall-plug efficiency
 HEATER_MW = 20.0            # per ring, at the worst case (Chapter 18, Worked Example 18.2)
@@ -272,19 +272,19 @@ def main(plot=True):
     blocks = link_blocks()
     lv = power_levels(P_LASER, blocks)
     p_rx = lv[-1]
-    sens_table = -11.6                               # Table 33.1, from Chapter 21; Part B derives it
-    print("A. The budget, block by block (Table 33.1)")
+    sens_table = -11.6                               # Table 38.1, from Chapter 21; Part B derives it
+    print("A. The budget, block by block (Table 38.1)")
     print(f"   {'laser':<22}{P_LASER:+6.1f} dBm")
     for (name, loss), p in zip(blocks, lv):
         print(f"   {name:<22}{-loss:+6.1f} dB  ->  {p:+5.1f} dBm")
     print(f"   total loss {sum(l for _, l in blocks):.1f} dB, received {p_rx:.1f} dBm = {10 ** (p_rx / 10):.2f} mW"
-          "   (Chapter 33: 12.7 dB, -2.7 dBm)")
+          "   (Chapter 38: 12.7 dB, -2.7 dBm)")
     print(f"   margin against -12 dBm before penalties = {p_rx + 12:.1f} dB   (Example 1.1: 9.3 dB)")
     print(f"   penalties {' + '.join(f'{v:.1f}' for v in PENALTIES.values())} = {sum(PENALTIES.values()):.1f} dB;"
-          f" margin = {margin(p_rx, sens_table, PENALTIES):.1f} dB   (Chapter 33: 3.0 dB and 5.9 dB)")
+          f" margin = {margin(p_rx, sens_table, PENALTIES):.1f} dB   (Chapter 38: 3.0 dB and 5.9 dB)")
     print(f"   with the measured -4 dB grating couplers: received {power_levels(P_LASER, link_blocks(gc=4.0))[-1]:.1f} dBm,"
           f" margin {margin(power_levels(P_LASER, link_blocks(gc=4.0))[-1], sens_table, PENALTIES):.1f} dB"
-          "   (Chapter 33: 3.9 dB)\n")
+          "   (Chapter 38: 3.9 dB)\n")
 
     # ---- Part B
     q12 = q_for_ber(TARGET_BER)
@@ -300,7 +300,7 @@ def main(plot=True):
     print(f"   sigma = {1e6 * sigma:.2f} uA, I1 - I0 = 2 Q sigma = {2e6 * q12 * sigma:.1f} uA, OMA = {1e6 * oma:.1f} uW,"
           f" OMA/average = {2 * (r - 1) / (r + 1):.3f}   (Chapter 21: 3.7 uA, 52 uA, 58 uW, 0.86)")
     print(f"   sensitivity, TIA noise only: {1e6 * p_avg:.1f} uW = {s_th:.2f} dBm   (Chapter 21: 68 uW, -11.7 dBm)")
-    print(f"   with shot and dark-current noise:        {s_full:.2f} dBm   (Chapters 21 and 33: -11.6 dBm)")
+    print(f"   with shot and dark-current noise:        {s_full:.2f} dBm   (Chapters 21 and 38: -11.6 dBm)")
     print(f"   extinction-ratio penalty at 4 dB: {er_penalty(ER_DB):.2f} dB (inside the sensitivity);"
           f" a perfect '0' gives {sensitivity(er_db=math.inf):.1f} dBm, 15 dB ER {sensitivity(er_db=15.0):.1f} dBm"
           "   (Chapter 21: -15.0 dBm)")
@@ -320,7 +320,7 @@ def main(plot=True):
     print(f"   leak from the neighbours at 400 GHz: {100 * float(drop(SPACING_GHZ, fwhm)):.2f} % each;"
           f" from the channel 800 GHz away: {100 * float(drop(2 * SPACING_GHZ, fwhm)):.2f} %")
     print(f"   total crosstalk {100 * x:.2f} % ({10 * math.log10(x):.1f} dB): penalty {crosstalk_penalty(x):.2f} dB"
-          "   (Chapter 33: about 2 %, roughly 0.1 dB; allowance 0.5 dB)")
+          "   (Chapter 38: about 2 %, roughly 0.1 dB; allowance 0.5 dB)")
     eo_ring = eye_opening(received_waveform(0.0, ring_fwhm=fwhm))
     print(f"   the drop ring also filters its own channel: eye-closure penalty"
           f" {10 * math.log10(eye_opening(received_waveform(0.0)) / eo_ring):.2f} dB   (Chapter 14: 'little filtering penalty')\n")
@@ -334,7 +334,7 @@ def main(plot=True):
           "   (Example 2.5: 34 ps/nm, about 14 ps)")
     print(f"   eye opening back-to-back {eye_opening(received_waveform(0.0)):.3f}, after 2 km"
           f" {eye_opening(received_waveform(disp)):.3f} (OMA = {2 * (r - 1) / (r + 1):.3f}, average 1)")
-    print(f"   eye-closure penalty at 34 ps/nm: {pen_d:.2f} dB   (Chapter 33: 'a few tenths of a decibel', allowance 0.5 dB)")
+    print(f"   eye-closure penalty at 34 ps/nm: {pen_d:.2f} dB   (Chapter 38: 'a few tenths of a decibel', allowance 0.5 dB)")
     print(f"   with a perfect extinction ratio: {dispersion_penalty(disp, er_db=math.inf):.2f} dB;"
           f" without the transmitter filter: {dispersion_penalty(disp, f_tx=1e15):.2f} dB")
     print(f"   penalty reaches 1 dB at {d1:.0f} ps/nm and 2 dB at {d2:.0f} ps/nm   (Example 2.5: tolerance 40-60 ps/nm)")
@@ -350,12 +350,12 @@ def main(plot=True):
     e_cut = energy_per_bit(P_LASER - cut)
     print("E. Energy per bit, and margin traded for laser power")
     print(f"   {' + '.join(f'{v:.2f}' for v in e.values())} = {etot:.2f} pJ/bit"
-          f" ({', '.join(e)})   (Chapter 33: 1.33 + 0.80 + 1.0 + 0.5 + 0.02 = 3.65)")
+          f" ({', '.join(e)})   (Chapter 38: 1.33 + 0.80 + 1.0 + 0.5 + 0.02 = 3.65)")
     print(f"   one laser: {10 ** (P_LASER / 10):.0f} mW of light draws {10 ** (P_LASER / 10) / WALL_PLUG:.0f} mW;"
           f" laser share {100 * e['lasers'] / etot:.0f} %   (Chapter 1: about 67 mW, 1.3 pJ/bit)")
     print(f"   cut the laser by {cut:.1f} dB to {P_LASER - cut:.1f} dBm: margin {TARGET_MARGIN:.1f} dB,"
           f" saves {etot - sum(e_cut.values()):.2f} pJ/bit, total {sum(e_cut.values()):.2f} pJ/bit"
-          "   (Chapter 33: 2.9 dB, 0.65 pJ/bit)")
+          "   (Chapter 38: 2.9 dB, 0.65 pJ/bit)")
     print(f"   targets: margin {m0:.1f} >= {TARGET_MARGIN:.0f} dB, energy {etot:.2f} <= {TARGET_ENERGY:.0f} pJ/bit:"
           f" {'the link closes' if m0 >= TARGET_MARGIN and etot <= TARGET_ENERGY else 'the link does not close'}\n")
 

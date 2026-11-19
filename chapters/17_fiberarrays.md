@@ -73,7 +73,7 @@ A fibre over a grating coupler: $$w_1 = 5.2$$ µm (SMF-28) and $$w_2 \approx 4.6
 
 {% include demos/couple.html %}
 
-**Finding the peak.** Far from a coupler the power meter reads only noise, so there is no gradient to follow. Alignment therefore runs in two phases. **First light** comes from a blind search, typically a spiral whose pitch is smaller than the mode diameter. Then **optimisation** climbs the gradient: hill-climbing in steps that halve as the peak approaches, or gradient and model-fitting methods that fit a Gaussian to a few measured points and jump to its centre. Automated test stations add the angles, the gap and the rotation of the array, and align input and output together through a loopback. With a calibrated stage and a known chip position, the first-light search can be skipped altogether, which is what makes wafer-scale testing fast ([Chapter 31]({% link chapters/31_testing.md %})).
+**Finding the peak.** Far from a coupler the power meter reads only noise, so there is no gradient to follow. Alignment therefore runs in two phases. **First light** comes from a blind search, typically a spiral whose pitch is smaller than the mode diameter. Then **optimisation** climbs the gradient: hill-climbing in steps that halve as the peak approaches, or gradient and model-fitting methods that fit a Gaussian to a few measured points and jump to its centre. Automated test stations add the angles, the gap and the rotation of the array, and align input and output together through a loopback. With a calibrated stage and a known chip position, the first-light search can be skipped altogether, which is what makes wafer-scale testing fast ([Chapter 36]({% link chapters/36_testing.md %})).
 
 **Try it.** Find the peak with as few moves as possible, then let the automatic spiral and hill-climb do it.
 
@@ -101,7 +101,7 @@ Active alignment with sub-micrometre precision is slow and expensive. **Photonic
 A silicon chip needs a light source, an electrical connection and, often, temperature control:
 
 - **Laser attach.** A III-V laser die can be **flip-chip** bonded face down onto the silicon chip, its height set by lithographically defined pedestals and its position by alignment marks, so that its facet butts against an edge coupler ([Figure 17.4](#fig-17-4)). Alternatively a micro-optical bench of ball lenses and an isolator couples a packaged laser, or the laser is integrated on the wafer ([Chapter 27]({% link chapters/27_lasersonsi.md %})).
-- **Electrical.** Wire bonds or flip-chip bumps connect modulators and photodiodes to their drivers and amplifiers. At tens of gigabits per second the length of every connection matters, which is why driver chips sit next to, or on top of, the photonic chip ([Chapter 33]({% link chapters/33_links.md %})).
+- **Electrical.** Wire bonds or flip-chip bumps connect modulators and photodiodes to their drivers and amplifiers. At tens of gigabits per second the length of every connection matters, which is why driver chips sit next to, or on top of, the photonic chip ([Chapter 38]({% link chapters/38_links.md %})).
 - **Thermal.** Rings and lasers drift with temperature ([Chapter 18]({% link chapters/18_thermal.md %})), so packages include heaters, thermistors and sometimes thermo-electric coolers.
 
 <figure id="fig-17-4">

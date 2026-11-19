@@ -65,7 +65,7 @@ Instead of a GDS file you may submit a Python script that builds it, in `submiss
 | `aggregation.yml` | after verification, merges the submissions into the run's layout (`merge/EBeam_merge.py`) |
 {: .lab-table }
 
-After the deadline the merged layout is written by 100 keV electron-beam lithography at Applied Nanotools, and the chips are measured on SiEPIC's automated probe station ([Chapter 31]({% link chapters/31_testing.md %})). The openEBL page gives results "typically 4-6 weeks after tape-out date", and a link to the measurements on the homepage of the submission repository; the README says the results "will be posted in this repository", and the repository of the October 2025 run also holds SEM images in a `SEMs/` folder. We found no published time between the submission deadline and tape-out. [Lab 9]({% link labs/lab09_analysis.md %}) analyses the kind of data that comes back.
+After the deadline the merged layout is written by 100 keV electron-beam lithography at Applied Nanotools, and the chips are measured on SiEPIC's automated probe station ([Chapter 36]({% link chapters/36_testing.md %})). The openEBL page gives results "typically 4-6 weeks after tape-out date", and a link to the measurements on the homepage of the submission repository; the README says the results "will be posted in this repository", and the repository of the October 2025 run also holds SEM images in a `SEMs/` folder. We found no published time between the submission deadline and tape-out. [Lab 9]({% link labs/lab09_analysis.md %}) analyses the kind of data that comes back.
 
 ## <span class="secnum">L8.2</span>Top cell, floorplan and layers
 
@@ -215,7 +215,7 @@ Use the run that is open when you submit, and the file-name prefix your course g
 2. **Four couplers.** An add-drop ring ([Section 12.3]({% link chapters/12_rings.md %})) needs four couplers in its column: input, through, drop and add. Using the rules of `DFT.xml`, which coupler must carry the label, and where must the other three be?
 3. **Size, not position.** Shift every device 20 µm to the right, and leave the floorplan box where it is. Which check would `run_submission_checks.py` make, and would it pass? Which of this lab's checks fails?
 4. **Your own check.** openEBL's prober can only measure what its label names, and a label with someone else's name in it is easy to copy from an example. Add a check that every label's device ID equals your `USER`, and run it on a copy of the chip with one label changed.
-5. **Why these rules?** Explain each of these design-for-test rules from the prober's point of view ([Chapters 17]({% link chapters/17_fiberarrays.md %}) and [31]({% link chapters/31_testing.md %})): the couplers are never rotated; at most one coupler above and two below the labelled one; couplers at least 60 µm apart; the label within 10 µm of the coupler's origin.
+5. **Why these rules?** Explain each of these design-for-test rules from the prober's point of view ([Chapters 17]({% link chapters/17_fiberarrays.md %}) and [36]({% link chapters/36_testing.md %})): the couplers are never rotated; at most one coupler above and two below the labelled one; couplers at least 60 µm apart; the label within 10 µm of the coupler's origin.
 
 <details markdown="1">
 <summary>Answers</summary>

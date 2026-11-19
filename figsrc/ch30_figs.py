@@ -36,9 +36,9 @@ def fig_flow():
            ("layout", "PDK cells + routing\n(KLayout, gdsfactory)")]
     bot = [("verification", "DRC, connectivity,\ndesign for test"),
            ("tape-out", "GDS file to the\nfoundry or openEBL"),
-           ("fabrication", "foundry process\n(Chapter 29)"),
-           ("test", "probe station,\nspectra (Chapter 31)"),
-           ("analysis", "fits and statistics\n(Chapter 32)")]
+           ("fabrication", "foundry process\n(Chapter 35)"),
+           ("test", "probe station,\nspectra (Chapter 36)"),
+           ("analysis", "fits and statistics\n(Chapter 37)")]
     for i, (t, sub) in enumerate(top):
         block(ax, xs[i], yt, bw, bh, t, fc=DESIGN_FC, fs=7.2, bold=True)
         label(ax, xs[i], yt + bh / 2 + 0.3, sub, fs=6.0, col=MUTED)

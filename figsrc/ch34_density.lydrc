@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>Chapter 34 example deck: silicon density in windows</description>
+ <version/>
+ <category>drc</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name>drc_scripts</group-name>
+ <menu-path>tools_menu.drc.end</menu-path>
+ <interpreter>dsl</interpreter>
+ <dsl-interpreter-name>drc-dsl-xml</dsl-interpreter-name>
+ <text># Chapter 34: density rule of the toy SOI process (illustrative): Si density 20-80 % in every 100 um window,
+# windows stepped by 50 um over a 1 mm die. With a step smaller than the window, each window is centred on
+# its step cell, so the origin is that of the first 50 um step cell (25, 25): the first window is 0..100 um.
+# klayout -b -r ch34_density.lydrc -rd input=ch34_die_fill.oas -rd report=ch34_die_fill.lyrdb
+
+source($input)
+report("Chapter 34 density", $report)
+si = input(1, 0)
+win = [tile_size(100.um), tile_step(50.um), tile_origin(25.0, 25.0), tile_count(19, 19)]
+si.with_density(0.0 .. 0.2, *win).output("SI.D.1", "Si density below 20 % in a 100 um window")
+si.with_density(0.8 .. 1.0, *win).output("SI.D.2", "Si density above 80 % in a 100 um window")
+</text>
+</klayout-macro>

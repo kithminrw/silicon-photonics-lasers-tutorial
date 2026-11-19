@@ -27,7 +27,7 @@ These are typical values for orientation. Film properties depend on how the mate
 | Indium phosphide (InP) | 3.17 | 1.34 eV, direct | substrate for 1310 and 1550 nm lasers |
 | Gallium arsenide (GaAs) | 3.37 | 1.42 eV, direct | substrate for quantum-dot lasers |
 | Germanium (Ge) | ≈ 4.3 | 0.66 eV indirect, 0.80 eV direct | absorbs through the C band: photodetectors |
-| Water | 1.318 | | the analyte medium of [Chapter 34]({% link chapters/34_apps.md %}) |
+| Water | 1.318 | | the analyte medium of [Chapter 39]({% link chapters/39_apps.md %}) |
 
 ## Dispersion models
 

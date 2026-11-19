@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description>Chapter 34 example deck (toy SOI process)</description>
+ <version/>
+ <category>drc</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name>drc_scripts</group-name>
+ <menu-path>tools_menu.drc.end</menu-path>
+ <interpreter>dsl</interpreter>
+ <dsl-interpreter-name>drc-dsl-xml</dsl-interpreter-name>
+ <text># Chapter 34: a small DRC deck for a toy SOI process (illustrative rule values, not a foundry's).
+# Batch run:  klayout -b -r ch34_deck.lydrc -rd input=ch34_test.gds -rd report=ch34_test.lyrdb
+# (-rd name=value defines the Ruby global $name.)
+
+source($input)                      # the layout to check (-rd input=...)
+report("Chapter 34 toy SOI deck", $report)
+
+si   = input(1, 0)     # silicon core (full etch)
+slab = input(2, 0)     # slab kept by the partial etch (rib waveguides)
+htr  = input(11, 0)    # heater
+mtl  = input(12, 0)    # metal routing and pads
+fp   = input(99, 0)    # floorplan: the design area
+
+# dimension rules: a value is an error when it is LESS than the rule
+si.width(150.nm).output("SI.W.1", "Si width &gt;= 150 nm")
+si.isolated(200.nm).output("SI.S.1", "Si space between shapes &gt;= 200 nm")
+si.notch(200.nm).output("SI.N.1", "Si space within one shape (notch) &gt;= 200 nm")
+
+# shape rules
+si.with_area(nil, 0.1).output("SI.A.1", "Si shape area &gt;= 0.1 um2")
+si.corners(-180.0 .. -150.0).output("SI.ANG.1", "No convex Si corner sharper than 30 deg")
+si.ongrid(5.nm).output("SI.GRID.1", "Si vertices on the 5 nm manufacturing grid")
+si.odd_polygons.output("SI.ODD.1", "No self-intersecting Si polygons")
+
+# placement and two-layer rules
+(si - fp).output("SI.FP.1", "Si inside the floorplan")
+slab.enclosing(si, 1.um).output("SLAB.EN.1", "Slab encloses Si by &gt;= 1 um")
+mtl.overlap(htr, 1.um).output("M.OV.1", "Metal overlaps heater by &gt;= 1 um")
+</text>
+</klayout-macro>

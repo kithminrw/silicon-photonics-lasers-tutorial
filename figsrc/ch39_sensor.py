@@ -1,7 +1,7 @@
-"""Bulk sensitivity of a 500 x 220 nm silicon strip in water (Chapter 34), with femwell.
+"""Bulk sensitivity of a 500 x 220 nm silicon strip in water (Chapter 39), with femwell.
 Oxide below (BOX), water above and at the sides. For TE0 and TM0: n_eff, group index, d n_eff / d n_water, and the
 ring-resonance bulk sensitivity S = (lambda / n_g) d n_eff / d n_water in nm per refractive-index unit.
-Run: .venv/bin/python figsrc/ch34_sensor.py
+Run: .venv/bin/python figsrc/ch39_sensor.py
 """
 from collections import OrderedDict
 import numpy as np

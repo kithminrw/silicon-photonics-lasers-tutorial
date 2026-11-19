@@ -162,7 +162,7 @@
 - key: liu2005
   text: "Jifeng Liu, Jurgen Michel et al. “High-performance, tensile-strained Ge p-i-n photodetectors on a Si platform.” *Applied Physics Letters*, 87:103501, 2005."
 
-# ---- Chapters 21 and 33 (18 Nov 2026): optical-link circuits; Sam Palermo's Texas A&M course slides (cite only, never copy)
+# ---- Chapters 21 and 38 (18 Nov 2026): optical-link circuits; Sam Palermo's Texas A&M course slides (cite only, never copy)
 - key: sackinger2005
   text: "Eduard Säckinger. *Broadband Circuits for Optical Fiber Communication*. Wiley-Interscience, 2005."
 - key: palermo721
@@ -285,3 +285,81 @@
   text: "Yang-Hang Fan, Di Liang, Ashkan Roshan-Zamir, Chong Zhang, Binhao Wang, Marco Fiorentino, Raymond Beausoleil and Samuel Palermo. “A directly modulated quantum dot microring laser transmitter with integrated CMOS driver.” *Optical Fiber Communication Conference (OFC)*, paper W3E.5, 2019. doi:10.1364/OFC.2019.W3E.5"
 - key: fan2020
   text: "Yang-Hang Fan, Sudharsanan Srinivasan, Yingtao Hu, Di Liang, Ruida Liu, Ankur Kumar, Erwen Li, Zhihong Huang, Raymond Beausoleil and Samuel Palermo. “A 22 Gb/s directly modulated optical injection-locked quantum-dot microring laser transmitter with integrated CMOS driver.” *2020 IEEE International Symposium on Circuits and Systems (ISCAS)*, 2020. doi:10.1109/ISCAS45731.2020.9180484"
+- key: bogaerts2018
+  text: "Wim Bogaerts and Lukas Chrostowski. “Silicon photonics circuit design: methods, tools and challenges.” *Laser & Photonics Reviews*, 12(4):1700237, 2018. doi:10.1002/lpor.201700237"
+- key: lu2017variability
+  text: "Zeqin Lu, Jaspreet Jhoja, Jackson Klein, Xu Wang, Amy Liu, Jonas Flueckiger, James Pond and Lukas Chrostowski. “Performance prediction for silicon photonics integrated circuits with layout-dependent correlated manufacturing variability.” *Optics Express*, 25(9):9712–9733, 2017. doi:10.1364/OE.25.009712. Open access."
+- key: mikkelsen2014
+  text: "Jared C. Mikkelsen, Wesley D. Sacher and Joyce K. S. Poon. “Dimensional variation tolerant silicon-on-insulator directional couplers.” *Optics Express*, 22(3):3145–3150, 2014. doi:10.1364/OE.22.003145. Open access."
+- key: lalaukeraly2013
+  text: "Christopher M. Lalau-Keraly, Samarth Bhargava, Owen D. Miller and Eli Yablonovitch. “Adjoint shape optimization applied to electromagnetic design.” *Optics Express*, 21(18):21693–21701, 2013. doi:10.1364/OE.21.021693. Open access."
+- key: piggott2015
+  text: "Alexander Y. Piggott, Jesse Lu, Konstantinos G. Lagoudakis, Jan Petykiewicz, Thomas M. Babinec and Jelena Vučković. “Inverse design and demonstration of a compact and broadband on-chip wavelength demultiplexer.” *Nature Photonics*, 9(6):374–377, 2015. doi:10.1038/nphoton.2015.69"
+- key: molesky2018
+  text: "Sean Molesky, Zin Lin, Alexander Y. Piggott, Weiliang Jin, Jelena Vučković and Alejandro W. Rodriguez. “Inverse design in nanophotonics.” *Nature Photonics*, 12(11):659–670, 2018. doi:10.1038/s41566-018-0246-9"
+- key: wilson2014
+  text: "Greg Wilson, D. A. Aruliah, C. Titus Brown, Neil P. Chue Hong, Matt Davis, Richard T. Guy, Steven H. D. Haddock, Kathryn D. Huff, Ian M. Mitchell, Mark D. Plumbley, Ben Waugh, Ethan P. White and Paul Wilson. “Best practices for scientific computing.” *PLoS Biology*, 12(1):e1001745, 2014. doi:10.1371/journal.pbio.1001745. Open access."
+# ---- Chapter 33: layout data formats and layout practice
+- key: calma1987
+  text: "Calma Company. *GDSII Stream Format Manual*, Release 6.0, Documentation No. B97E060, February 1987. <http://www.bitsavers.org/pdf/calma/GDS_II_Stream_Format_Manual_6.0_Feb87.pdf>"
+- key: semip39
+  text: "SEMI. *SEMI P39-0416: Specification for OASIS® – Open Artwork System Interchange Standard*. SEMI, 2016. <https://www.semi.org>"
+- key: reich2003
+  text: "Alfred J. Reich, Kent H. Nakagawa and Robert E. Boone. “OASIS vs. GDSII stream format efficiency.” *Proc. SPIE 5256, 23rd Annual BACUS Symposium on Photomask Technology*, p. 163, 2003. doi:10.1117/12.518271"
+- key: klayoutapi
+  text: "Matthias Köfferlein. *KLayout documentation: Python API reference (classes Layout, Cell, SaveLayoutOptions, LoadLayoutOptions)*, and the standalone `klayout` Python package, version 0.30. <https://www.klayout.de/doc/code/index.html>; <https://pypi.org/project/klayout/>"
+- key: cherchi2013
+  text: "Matteo Cherchi, Sami Ylinen, Mikko Harjanne, Markku Kapulainen and Timo Aalto. “Dramatic size reduction of waveguide bends on a micron-scale silicon photonic platform.” *Optics Express*, 21(15):17814, 2013. doi:10.1364/OE.21.017814. Open access."
+- key: orcutt2010
+  text: "Jason S. Orcutt and Rajeev J. Ram. “Photonic device layout within the foundry CMOS design environment.” *IEEE Photonics Technology Letters*, 22(8):544–546, 2010. doi:10.1109/LPT.2010.2041445"
+# ---- Chapter 34: verification and tape-out
+- key: klayoutdrc
+  text: "Matthias Köfferlein. *KLayout documentation: Design Rule Check (DRC)*, user manual and DRC reference (layer and global functions), version 0.30. <https://www.klayout.de/doc-qt5/manual/drc_basic.html>; <https://www.klayout.de/doc-qt5/about/drc_ref.html>"
+- key: klayoutlvs
+  text: "Matthias Köfferlein. *KLayout documentation: Layout vs. Schematic (LVS)*, overview and device extractors, version 0.30. <https://www.klayout.de/doc-qt5/manual/lvs_overview.html>"
+- key: cao2014drc
+  text: "Ruping Cao, John Ferguson, Fabien Gays, Youssef Drissi, Alexandre Arriordaz and Ian O’Connor. “Silicon photonics design rule checking: application of a programmable modeling engine for non-Manhattan geometry verification.” *22nd International Conference on Very Large Scale Integration (VLSI-SoC)*, Playa del Carmen, pp. 1–6, 2014. doi:10.1109/VLSI-SoC.2014.7004173"
+- key: cao2015lvs
+  text: "Ruping Cao, Julien Billoudet, John Ferguson, Lionel Couder, John Cayo, Alexandre Arriordaz and Ian O’Connor. “LVS check for photonic integrated circuits: curvilinear feature extraction and validation.” *Design, Automation & Test in Europe Conference & Exhibition (DATE)*, pp. 1253–1256, 2015. doi:10.7873/DATE.2015.0993"
+- key: pond2014flow
+  text: "James Pond, Chris Cone, Lukas Chrostowski, Jackson Klein, Jonas Flueckiger, Amy Liu, Dylan McGuire and Xu Wang. “A complete design flow for silicon photonics.” *Proc. SPIE 9133, Silicon Photonics and Photonic Integrated Circuits IV*, 913310, 2014. doi:10.1117/12.2052050"
+- key: lauther1981
+  text: "U. Lauther. “An O(N log N) algorithm for Boolean mask operations.” *18th Design Automation Conference*, Nashville, pp. 555–562, 1981. doi:10.1109/DAC.1981.1585410"
+- key: kahng1999fill
+  text: "Andrew B. Kahng, Gabriel Robins, Anish Singh and Alexander Zelikovsky. “Filling algorithms and analyses for layout density control.” *IEEE Transactions on Computer-Aided Design of Integrated Circuits and Systems*, 18(4):445–462, 1999. doi:10.1109/43.752928"
+- key: xing2020density
+  text: "Yufei Xing, Jiaxing Dong, Umar Khan and Wim Bogaerts. “Correlation between pattern density and linewidth variation in silicon photonics waveguides.” *Optics Express*, 28(6):7961–7968, 2020. doi:10.1364/OE.388149. Open access."
+
+# ---- Chapter 31: how photonic simulators work
+- key: yee1966
+  text: "Kane S. Yee. “Numerical solution of initial boundary value problems involving Maxwell's equations in isotropic media.” *IEEE Transactions on Antennas and Propagation*, 14(3):302–307, 1966. doi:10.1109/TAP.1966.1138693"
+- key: taflove2005
+  text: "Allen Taflove and Susan C. Hagness. *Computational Electrodynamics: The Finite-Difference Time-Domain Method*, 3rd edition. Artech House, 2005. ISBN 978-1-58053-832-9."
+- key: berenger1994
+  text: "Jean-Pierre Bérenger. “A perfectly matched layer for the absorption of electromagnetic waves.” *Journal of Computational Physics*, 114(2):185–200, 1994. doi:10.1006/jcph.1994.1159"
+- key: chew1994
+  text: "Weng Cho Chew and William H. Weedon. “A 3D perfectly matched medium from modified Maxwell's equations with stretched coordinates.” *Microwave and Optical Technology Letters*, 7(13):599–604, 1994. doi:10.1002/mop.4650071304"
+- key: johnson2021pml
+  text: "Steven G. Johnson. “Notes on perfectly matched layers (PMLs).” arXiv:2108.05348, 2021. <https://arxiv.org/abs/2108.05348>. Open access."
+- key: oskooi2008
+  text: "Ardavan F. Oskooi, Lei Zhang, Yehuda Avniel and Steven G. Johnson. “The failure of perfectly matched layers, and towards their redemption by adiabatic absorbers.” *Optics Express*, 16(15):11376–11392, 2008. doi:10.1364/OE.16.011376. Open access."
+- key: farjadpour2006
+  text: "A. Farjadpour, David Roundy, Alejandro Rodriguez, M. Ibanescu, Peter Bermel, J. D. Joannopoulos, Steven G. Johnson and G. W. Burr. “Improving accuracy by subpixel smoothing in the finite-difference time domain.” *Optics Letters*, 31(20):2972–2974, 2006. doi:10.1364/OL.31.002972"
+- key: zhu2002
+  text: "Zhaoming Zhu and Thomas G. Brown. “Full-vectorial finite-difference analysis of microstructured optical fibers.” *Optics Express*, 10(17):853–864, 2002. doi:10.1364/OE.10.000853. Open access."
+- key: fallahkhair2008
+  text: "Arman B. Fallahkhair, Kai S. Li and Thomas E. Murphy. “Vector finite difference modesolver for anisotropic dielectric waveguides.” *Journal of Lightwave Technology*, 26(11):1423–1431, 2008. doi:10.1109/JLT.2008.923643"
+- key: femwell
+  text: "Helge Gehring et al. *femwell: an open-source finite-element solver for photonic waveguide modes, heat and electrostatics* (GPL-3.0). <https://github.com/HelgeGehring/femwell>"
+- key: bienstman2001
+  text: "Peter Bienstman and Roel Baets. “Optical modelling of photonic crystals and VCSELs using eigenmode expansion and perfectly matched layers.” *Optical and Quantum Electronics*, 33(4–5):327–341, 2001. doi:10.1023/A:1010882531238"
+- key: gallagher2003
+  text: "Dominic F. G. Gallagher and Thomas P. Felici. “Eigenmode expansion methods for simulation of optical propagation in photonics: pros and cons.” *Proc. SPIE 4987, Integrated Optics: Devices, Materials, and Technologies VII*, p. 69, 2003. doi:10.1117/12.473173"
+- key: feit1978
+  text: "M. D. Feit and J. A. Fleck. “Light propagation in graded-index optical fibers.” *Applied Optics*, 17(24):3990–3998, 1978. doi:10.1364/AO.17.003990"
+- key: kawano2001
+  text: "Kenji Kawano and Tsutomu Kitoh. *Introduction to Optical Waveguide Analysis: Solving Maxwell's Equations and the Schrödinger Equation*. Wiley, 2001. ISBN 978-0-471-40634-1."
+- key: hammer2009
+  text: "Manfred Hammer and Olena V. Ivanova. “Effective index approximations of photonic crystal slabs: a 2-to-1-D assessment.” *Optical and Quantum Electronics*, 41:267–283, 2009. doi:10.1007/s11082-009-9349-3. Open access."
+- key: shin2012
+  text: "Wonseok Shin and Shanhui Fan. “Choice of the perfectly matched layer boundary condition for frequency-domain Maxwell's equations solvers.” *Journal of Computational Physics*, 231(8):3406–3431, 2012. doi:10.1016/j.jcp.2012.01.013"

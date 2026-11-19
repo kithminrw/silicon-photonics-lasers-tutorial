@@ -1,6 +1,6 @@
 ---
 title: "30. Design Flow and Open PDKs"
-parent: "Part VII · Fabrication, Testing and Data Analysis"
+parent: "Part VII · Design, Simulation and Layout"
 nav_order: 30
 permalink: /part-7/ch30/
 chapter: 30
@@ -39,7 +39,7 @@ A photonic design moves through the same stages as an electronic one, with diffe
 4. **Circuit simulation**: the devices connected, and the circuit's response computed from the compact models (Section 30.6).
 5. **Layout**: the geometry drawn on the foundry's layers, from PDK cells and routed waveguides (Sections 30.3–30.4).
 6. **Verification**: design-rule checks, connectivity checks and design-for-test rules (Section 30.7).
-7. **Tape-out**: the GDS file sent to the foundry (Section 30.8), then testing ([Chapter 31]({% link chapters/31_testing.md %})) and analysis ([Chapter 32]({% link chapters/32_analysis.md %})), whose results update the compact models.
+7. **Tape-out**: the GDS file sent to the foundry (Section 30.8), then testing ([Chapter 36]({% link chapters/36_testing.md %})) and analysis ([Chapter 37]({% link chapters/37_analysis.md %})), whose results update the compact models.
 
 <figure id="fig-30-1">
   <img src="{{ '/assets/figs/ch30_flow.svg' | relative_url }}" style="width:600px" alt="Block diagram of the design flow as a loop. Top row, left to right: concept and specification, component simulation, compact models, circuit simulation, layout, each with its tools. Down to the bottom row, right to left: verification, tape-out, fabrication, test, analysis. A red arrow returns from analysis to compact models, labelled measured effective and group index, loss and coupling update the models; a dashed arrow from circuit simulation back to component simulation is labelled iterate until the circuit meets the spec.">
@@ -113,7 +113,7 @@ Before tape-out, a design is checked:
 
 ## <span class="secnum">30.8</span>Tape-out through openEBL
 
-The openEBL runs accept designs through GitHub: a designer adds a GDS file to the run's repository by pull request, automated checks run DRC and the design-for-test rules on it, and the merged designs are combined and fabricated. The chips are measured on an automated probe station and the data come back through a link in the same repository {% include cite.html keys="openebl" %}. The open designs and data of past runs are a rich source for learning, and for [Chapter 32]({% link chapters/32_analysis.md %}).
+The openEBL runs accept designs through GitHub: a designer adds a GDS file to the run's repository by pull request, automated checks run DRC and the design-for-test rules on it, and the merged designs are combined and fabricated. The chips are measured on an automated probe station and the data come back through a link in the same repository {% include cite.html keys="openebl" %}. The open designs and data of past runs are a rich source for learning, and for [Chapter 37]({% link chapters/37_analysis.md %}).
 
 <div class="tbox tbox-specnote" markdown="1">
 <div class="tbox-title">Your first chip</div>

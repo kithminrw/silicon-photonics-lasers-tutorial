@@ -1,13 +1,13 @@
-"""Figures of Chapter 29 (fabrication).
+"""Figures of Chapter 35 (fabrication).
 
-    python -I -X utf8 figsrc/ch29_figs.py
+    python -I -X utf8 figsrc/ch35_figs.py
 
-ch29_soi       SOI wafer to scale (handle shortened) and the Smart Cut steps
-ch29_litho     lithography and etch as a strip of cross-sections (schematic)
-ch29_opc       blur of a projected image: drawn layout, printed shape, and optical proximity correction (simple model)
-ch29_etch      full, rib and shallow etch to scale
-ch29_stack     front-end and back-end stack of an active SOI process (to scale; back-end thicknesses illustrative)
-ch29_sens      resonance shift over the width-thickness plane; sensitivity against width (femwell, Chapter 6 sweep), slab limit for thickness
+ch35_soi       SOI wafer to scale (handle shortened) and the Smart Cut steps
+ch35_litho     lithography and etch as a strip of cross-sections (schematic)
+ch35_opc       blur of a projected image: drawn layout, printed shape, and optical proximity correction (simple model)
+ch35_etch      full, rib and shallow etch to scale
+ch35_stack     front-end and back-end stack of an active SOI process (to scale; back-end thicknesses illustrative)
+ch35_sens      resonance shift over the width-thickness plane; sensitivity against width (femwell, Chapter 6 sweep), slab limit for thickness
 """
 import os, sys, json
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -32,7 +32,7 @@ def oxbox(ax, x, y, w, h, z=1, mat="ox"):
     return box(ax, x, y, w, h, mat, ec=OXE, lw=0.5, z=z)
 
 
-# ------------------------------------------------------------------ Figure 29.1
+# ------------------------------------------------------------------ Figure 35.1
 def fig_soi():
     T_SI, T_BOX, T_HANDLE = 0.22, 2.0, 725.0
     print(f"SOI: film {T_SI*1000:.0f} nm, BOX {T_BOX:.1f} um, handle {T_HANDLE:.0f} um; film/wafer = 1/{(T_HANDLE + T_BOX + T_SI)/T_SI:.0f}")
@@ -120,10 +120,10 @@ def fig_soi():
         fig.text(cols[k % 3 + 1] - 0.012, rows[k // 3] + 0.17, "›", fontsize=13, color=MUTED, ha="center", va="center")
     fig.text(cols[0] - 0.005, 0.93, "b", fontweight="bold", fontsize=9.5, color=INK, ha="left", va="center")
     fig.text(0.98, 0.012, "b: not to scale", fontsize=6, color=MUTED, style="italic", ha="right", va="bottom")
-    save(fig, "ch29_soi")
+    save(fig, "ch35_soi")
 
 
-# ------------------------------------------------------------------ Figure 29.2
+# ------------------------------------------------------------------ Figure 35.2
 def fig_litho():
     fig = plt.figure(figsize=(6.3, 2.75))
     W = 2.6; TSI, TBOX, TRES = 0.22, 0.45, 0.42; XW, WW = 1.3, 0.5   # schematic proportions
@@ -168,10 +168,10 @@ def fig_litho():
     for k in (0, 1, 3, 4):
         fig.text(cols[k % 3 + 1] - 0.015, rows[k // 3] + 0.2, "›", fontsize=13, color=MUTED, ha="center", va="center")
     fig.text(0.995, 0.0, "not to scale", fontsize=6, color=MUTED, style="italic", ha="right", va="bottom")
-    save(fig, "ch29_litho")
+    save(fig, "ch35_litho")
 
 
-# ------------------------------------------------------------------ Figure 29.3 (OPC)
+# ------------------------------------------------------------------ Figure 35.3 (OPC)
 def fig_opc():
     """Blur-and-threshold model of projection lithography: the mask is convolved with a Gaussian and printed where the
     image exceeds half its open-field value. The blur is set so that the narrowest isolated line that still prints is
@@ -251,14 +251,14 @@ def fig_opc():
     scalebar(ax1, 2.85, 1.62, 0.5, "500 nm", above=True)
     fig.text(0.01, 0.995, "a", fontweight="bold", fontsize=9.5, color=INK, va="top")
     fig.text(0.515, 0.995, "b", fontweight="bold", fontsize=9.5, color=INK, va="top")
-    save(fig, "ch29_opc")
+    save(fig, "ch35_opc")
 
 
 def sigma_nm(s):
     return f"{s*1000:.0f}"
 
 
-# ------------------------------------------------------------------ Figure 29.4 (etch depths)
+# ------------------------------------------------------------------ Figure 35.4 (etch depths)
 def fig_etch():
     T, W, ANG = 0.22, 0.50, 4.0                   # film, ridge width, sidewall angle off vertical (degrees, drawn)
     cases = [("full etch", 0.22, "strip: routing, bends,\nrings, couplers"),
@@ -300,10 +300,10 @@ def fig_etch():
         if k == 2:
             scalebar(a, 0.45, -0.38, 0.5, "500 nm", above=True)
     print("etch depths: full 220 nm, rib 130 nm (90 nm slab), shallow 70 nm (150 nm slab); GC period 607 nm drawn")
-    save(fig, "ch29_etch")
+    save(fig, "ch35_etch")
 
 
-# ------------------------------------------------------------------ Figure 29.4
+# ------------------------------------------------------------------ Figure 35.4
 def fig_stack():
     """Cross-section of an active SOI process, true scale in both directions. Front end from the earlier chapters
     (220 nm film, 90 nm slab, 2 um BOX, contacts 1.2 um from the rib, Ge 4 um wide and 0.5 um thick, TiN heater
@@ -382,10 +382,10 @@ def fig_stack():
     scalebar(ax, 17.6, 6.45, 2.0, "2 µm", above=True)
     note(ax, "true scale in both directions; back-end thicknesses illustrative", loc="upper left")
     print("stack: film 220 nm, slab 90 nm, BOX 2 um, Ge 4 x 0.5 um, TiN 2 x 0.12 um at 1.9 um; M1 %.1f-%.1f, M2 %.1f-%.1f, top %.1f um (illustrative)" % (M1 + M2 + (PAS,)))
-    save(fig, "ch29_stack")
+    save(fig, "ch35_stack")
 
 
-# ------------------------------------------------------------------ Figure 29.6 (sensitivity)
+# ------------------------------------------------------------------ Figure 35.6 (sensitivity)
 def n_si(l):        # silicon, wavelength in um (same Sellmeier as femwell_modes.py)
     l1 = 1.1071
     return np.sqrt(11.6858 + 0.939816 / l ** 2 + 0.00810461 * l1 ** 2 / (l ** 2 - l1 ** 2))
@@ -457,7 +457,7 @@ def fig_sens():
     finish(ax2, xlabel="waveguide width (nm)", ylabel="resonance shift (nm per nm)")
     ax2.legend(loc="center right", fontsize=6.6, bbox_to_anchor=(1.0, 0.55))
     tag(ax2, "b")
-    save(fig, "ch29_sens")
+    save(fig, "ch35_sens")
 
 
 

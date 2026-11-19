@@ -128,7 +128,7 @@ For a 10 µm radius silicon ring with 2 dB/cm of loss ($$a = 0.99855$$, $$Q_i = 
 
 ## <span class="secnum">12.5</span>Extracting parameters from measurements
 
-Fitting a measured through-port resonance with the all-pass formula gives $$a$$ and $$t$$, and so the propagation loss and the coupling, in a device a fraction of a millimetre long {% include cite.html keys="shi2012" %}. There is a catch: $$T(\phi)$$ is symmetric in $$a$$ and $$t$$, so an under-coupled ring with $$(a, t)$$ and an over-coupled one with $$(t, a)$$ give identical spectra. The ambiguity is resolved by measuring more than one spectrum: a series of rings with different gaps (the coupling changes, the loss does not), an add-drop ring (whose drop port breaks the symmetry), or the phase response ([Figure 12.2b](#fig-12-2)). [Chapter 32]({% link chapters/32_analysis.md %}) fits real data this way.
+Fitting a measured through-port resonance with the all-pass formula gives $$a$$ and $$t$$, and so the propagation loss and the coupling, in a device a fraction of a millimetre long {% include cite.html keys="shi2012" %}. There is a catch: $$T(\phi)$$ is symmetric in $$a$$ and $$t$$, so an under-coupled ring with $$(a, t)$$ and an over-coupled one with $$(t, a)$$ give identical spectra. The ambiguity is resolved by measuring more than one spectrum: a series of rings with different gaps (the coupling changes, the loss does not), an add-drop ring (whose drop port breaks the symmetry), or the phase response ([Figure 12.2b](#fig-12-2)). [Chapter 37]({% link chapters/37_analysis.md %}) fits real data this way.
 
 ## <span class="secnum">12.6</span>Non-idealities
 
@@ -144,7 +144,7 @@ Fitting a measured through-port resonance with the all-pass formula gives $$a$$ 
 
 ## <span class="secnum">12.7</span>Applications
 
-Rings are the most versatile passive device in silicon photonics: WDM filters and multiplexers ([Chapter 14]({% link chapters/14_wdm.md %})), compact modulators that shift their resonance with carriers ([Chapter 20]({% link chapters/20_modulators.md %})), evanescent-field sensors that track a resonance as molecules bind ([Chapter 34]({% link chapters/34_apps.md %})), the wavelength-selective mirrors of tunable lasers, where two rings of slightly different radius form a Vernier filter ([Chapter 26]({% link chapters/26_tunable.md %})), and high-Q resonators for frequency combs and narrow-linewidth lasers.
+Rings are the most versatile passive device in silicon photonics: WDM filters and multiplexers ([Chapter 14]({% link chapters/14_wdm.md %})), compact modulators that shift their resonance with carriers ([Chapter 20]({% link chapters/20_modulators.md %})), evanescent-field sensors that track a resonance as molecules bind ([Chapter 39]({% link chapters/39_apps.md %})), the wavelength-selective mirrors of tunable lasers, where two rings of slightly different radius form a Vernier filter ([Chapter 26]({% link chapters/26_tunable.md %})), and high-Q resonators for frequency combs and narrow-linewidth lasers.
 
 <div class="tbox tbox-specnote" markdown="1">
 <div class="tbox-title">Your first chip</div>

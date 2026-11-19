@@ -7,8 +7,8 @@ across the **Si, SiN, thin-film LiNbO₃ (TFLN), BaTiO₃ (BTO) and InP** platfo
 
 **Read it online:** <https://www.kithminrw.com/silicon-photonics-lasers-tutorial/>
 
-> **Status: draft v0.1 (November 2026).** All eight parts are written; the other parts are detailed outlines that
-> are being filled in. Corrections are very welcome (see [Contributing](#contributing)).
+> **Status: draft v0.1 (November 2026).** All nine parts and twelve labs are written. Corrections are very welcome
+> (see [Contributing](#contributing)).
 
 ## What makes it different
 
@@ -43,8 +43,9 @@ across the **Si, SiN, thin-film LiNbO₃ (TFLN), BaTiO₃ (BTO) and InP** platfo
 | IV. Coupling and packaging | 15 Grating couplers · 16 Edge couplers · 17 Fibre arrays and packaging | **written** |
 | V. Active devices | 18 Thermo-optic tuning · 19 Electro-optic effects · 20 Modulators · 21 Photodetectors | **written** |
 | VI. Lasers and amplifiers | 22 Absorption, emission, gain · 23 Semiconductor gain · 24 Fabry–Pérot laser · 25 Dynamics and noise · 26 Tunable lasers · 27 Lasers on silicon · 28 SOAs | **written** |
-| VII. Fabrication, testing, data | 29 Fabrication · 30 Design flow and open PDKs · 31 Testing · 32 Data analysis | **written** |
-| VIII. Systems | 33 Links and transceivers · 34 Sensing, LiDAR, quantum, computing | **written** |
+| VII. Design, simulation, layout | 29 Design principles and workflows · 30 Design flow and open PDKs · 31 How simulators work · 32 Simulation tools in practice · 33 KLayout and GDSII · 34 Verification and tape-out | **written** |
+| VIII. Fabrication, testing, data | 35 Fabrication · 36 Testing · 37 Data analysis | **written** |
+| IX. Systems | 38 Links and transceivers · 39 Sensing, LiDAR, quantum, computing | **written** |
 | Hands-on labs | 12 labs: simulate, make (openEBL), lasers and links | planned |
 | PDK devices in 3D | 13 devices from three open PDKs | working |
 | Appendices | A formulas · B materials · C glossary · D open tools, PDKs, data · E reading and free simulations | in progress |

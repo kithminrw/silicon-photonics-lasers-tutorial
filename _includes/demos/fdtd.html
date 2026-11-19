@@ -1,0 +1,482 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdFdtd" role="group" aria-label="Interactive demo: a live 2D FDTD simulation on a Yee grid">
+  <div class="bd-head"><span>// try it · 2D FDTD on a Yee grid (E<sub>x</sub>, E<sub>y</sub>, H<sub>z</sub>)</span>
+    <span class="bd-seg" role="group" aria-label="Structure"><button type="button" data-st="straight" aria-pressed="true">straight</button><button type="button" data-st="bend" aria-pressed="false">bend</button><button type="button" data-st="ring" aria-pressed="false">ring</button></span></div>
+  <div class="bd-scope"><canvas data-c="f" aria-hidden="true"></canvas><span class="bd-tag" data-o="tag">H<sub>z</sub> (red +, blue −), one square per cell</span></div>
+  <div class="bd-status"><span data-o="fst"></span></div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="e" aria-hidden="true"></canvas><span class="bd-tag">field energy in the grid</span></div>
+    <div class="bd-scope tall"><canvas data-c="d" aria-hidden="true"></canvas><span class="bd-tag" data-o="dtag">index error of the grid against resolution</span></div>
+  </div>
+  <div class="bd-read"><span>grid (with PML) <b data-o="grid">–</b></span><span>Δx · Δt <b data-o="dxdt">–</b></span><span>steps per period <b data-o="spp">–</b></span><span>time simulated <b data-o="tsim">–</b></span><span>fields in memory: 2D · 3D, 2 µm tall <b data-o="mem">–</b></span><span><span data-o="m1l">n<sub>eff</sub> in the run</span> <b data-o="m1">–</b></span><span><span data-o="m2l">reflection from the far end</span> <b data-o="m2">–</b></span><span class="bd-pill" data-o="pS" hidden></span><span class="bd-pill" data-o="pM" hidden></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>wavelength λ <b data-v="lam"></b></span><input type="range" data-k="lam" min="1.5" max="1.6" step="0.0005" value="1.55" aria-label="wavelength"></label>
+    <label class="bd-sl"><span>cells per λ in Si, N · Δx <b data-v="N"></b></span><input type="range" data-k="N" min="6" max="30" step="1" value="12" aria-label="cells per wavelength in silicon"></label>
+    <label class="bd-sl"><span>Courant number S = c<sub>ox</sub>Δt/Δx <b data-v="S"></b></span><input type="range" data-k="S" min="0.3" max="0.8" step="0.01" value="0.5" aria-label="Courant number"></label>
+    <label class="bd-sl"><span>PML thickness <b data-v="P"></b></span><input type="range" data-k="P" min="4" max="24" step="1" value="12" aria-label="PML thickness in cells"></label>
+    <label class="bd-sl" data-o="rsl"><span>bend radius R <b data-v="R"></b></span><input type="range" data-k="R" min="0.75" max="3" step="0.25" value="1.5" aria-label="bend radius"></label>
+  </div>
+  <div class="bd-controls">
+    <span class="bd-seg" role="group" aria-label="Source" style="font-family:'IBM Plex Mono',monospace;font-size:10.5px"><button type="button" data-src="cw" aria-pressed="true">CW source</button><button type="button" data-src="pulse" aria-pressed="false">pulse</button></span>
+    <button type="button" class="bd-toggle" data-t="pml" aria-pressed="true">PML</button>
+    <button type="button" class="bd-toggle" data-t="ff" aria-pressed="false">fast-forward</button>
+    <button type="button" class="bd-btn" data-b="step">one step</button>
+    <button type="button" class="bd-btn" data-b="reset">reset</button>
+  </div>
+  <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Break the Courant limit.</b> Set S to 0.71, just above 1/√2 = 0.707: the pill turns red and within about 300 steps a checkerboard, the finest pattern the grid can hold, grows out of round-off in the oxide and swamps the picture. The energy plot shows it growing ×1.42 per step (×1.44 on an unbounded grid). At 0.70 the run stays stable however long it goes.</li>
+    <li><b>Turn off the PML.</b> The grid now ends in a metal wall: the wave comes back from the far end, the energy keeps climbing and the readings never settle. Turn it back on and vary its thickness: the guided wave’s far-end reflection is −49 dB with 4 cells, −74 dB with 6 and −90 dB with the default 12.</li>
+    <li><b>Coarsen the grid.</b> In the straight guide, go from N = 12 to 6: n<sub>eff</sub> rises from 2.5115 to 2.5844, 3.7 % above the exact 2.492, so the wavelength in the guide shrinks from 617 to 600 nm (622 nm exact). In the bend at R = 1 µm the transmission moves from 88.4 % to 90.2 % (MEEP: 88.3 %). A ring resonance moves further: a pulse run puts it at 1585.8 nm with N = 12 and 1596.8 nm with N = 8.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>You halve Δx (double N) to cut the grid error by four. For the same simulated time, how much more work is the 2D run?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-why="Only if Δt stayed the same, but the Courant limit ties Δt to Δx: halving Δx halves Δt, so the run also needs twice as many steps.">Four times: there are four times as many cells</button>
+      <button type="button" data-correct data-why="Four times the cells and twice the steps, because the Courant limit halves Δt with Δx: N = 12 to 24 takes the grid inside the PML from 154 × 110 to 309 × 220 cells and the steps per period from 47.3 to 94.7. In 3D it is 2 × 2 × 2 × 2 = 16 times.">Eight times: four times the cells and twice the steps</button>
+      <button type="button" data-why="That would be 3D: eight times the cells and twice the steps. In 2D the cells grow by four.">Sixteen times</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdFdtd'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  // 2D effective-index model of the 500 x 220 nm strip, TE-like (H_z polarisation: E in the plane of the chip):
+  // core 2.848 (the 220 nm slab's TE index, Chapter 5) in oxide 1.444, no material dispersion. Units inside the solver:
+  // cell size 1, c0 = 1, so dt = S n_ox (S is the Courant number of the fastest light on the grid, in the oxide).
+  var NC = 2.848, NL = 1.444, EC = NC * NC, EL = NL * NL, WG = 0.5, LX = 7, LY = 5, RING = 1.5, GAP = 0.08, KF = 20, CUM = 0.299792458;
+  // converged MEEP 1.35 runs of the same 2D bends, same monitors (80 px/um; 60 px/um agrees to 0.03 %)
+  var MEEP = { '0.75': 0.766, '1.00': 0.883, '1.25': 0.941, '1.50': 0.966, '1.75': 0.976, '2.00': 0.983, '2.25': 0.988, '2.50': 0.990, '2.75': 0.992, '3.00': 0.994 };
+  var RM = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  var st = 'straight', srcT = 'cw', pmlOn = true, fast = false, G = null, playing = !(RM && RM.matches), visible = true, raf = 0;
+  var S = BD.bind(root, {
+    lam: { fmt: function (x) { return (1000 * x).toFixed(1) + ' nm'; } },
+    N: { fmt: function (x) { return x + ' · ' + (1550 / (NC * x)).toFixed(1) + ' nm'; } },
+    S: { fmt: function (x) { return x.toFixed(2) + (x > Math.SQRT1_2 ? ' > 0.707' : ''); } },
+    P: { fmt: function (x) { return x + ' cells'; } },
+    R: { fmt: function (x) { return x.toFixed(2) + ' µm'; } }
+  }, function () { rebuild(); });
+  BD.seg(root, 'st', function (v) { st = v; rebuild(); });
+  BD.seg(root, 'src', function (v) { srcT = v; rebuild(); });
+  BD.toggle(q('[data-t="pml"]'), function (on) { pmlOn = on; rebuild(); });
+  BD.toggle(q('[data-t="ff"]'), function (on) { fast = on; });
+  q('[data-b="step"]').addEventListener('click', function () { setPlay(false); if (G && !G.blown) { stepN(1); measure(true); } draw(); });
+  q('[data-b="reset"]').addEventListener('click', function () { rebuild(); });
+  // ---- geometry: is (x, y) (um, interior coordinates, origin at the lower-left corner inside the PML) in the core?
+  function shape(s, R) {
+    var h = WG / 2;
+    if (s === 'bend') { var y0 = 1, xo = 5.8, xc = xo - R, cy = y0 + R;
+      return function (x, y) { if (x <= xc) return Math.abs(y - y0) < h; if (y >= cy) return Math.abs(x - xo) < h; return Math.abs(Math.sqrt((x - xc) * (x - xc) + (y - cy) * (y - cy)) - R) < h; }; }
+    if (s === 'ring') { var yb = 0.9, cx = LX / 2, cr = yb + WG + GAP + RING;
+      return function (x, y) { return Math.abs(y - yb) < h || Math.abs(Math.sqrt((x - cx) * (x - cx) + (y - cr) * (y - cr)) - RING) < h; }; }
+    return function (x, y) { return Math.abs(y - LY / 2) < h; };
+  }
+  // 1/eps at a grid point (gx, gy in cell units), averaged over the cell around it: a 5 x 5 test; a mixed cell gets 20 x 20
+  // subsamples, and the component (comp 0: x, 1: y) sees <1/eps> along the interface normal and 1/<eps> along it
+  function epsInv(IN, gx, gy, comp, d, P) {
+    var a, b, c = 0;
+    for (a = 0; a < 5; a++) for (b = 0; b < 5; b++) if (IN((gx - 0.5 + a / 4 - P) * d, (gy - 0.5 + b / 4 - P) * d)) c++;
+    if (c === 0) return 1 / EL; if (c === 25) return 1 / EC;
+    var f = 0, mx = 0, my = 0;
+    for (a = 0; a < KF; a++) { var ox = (a + 0.5) / KF - 0.5;
+      for (b = 0; b < KF; b++) { var oy = (b + 0.5) / KF - 0.5; if (IN((gx + ox - P) * d, (gy + oy - P) * d)) { f++; mx += ox; my += oy; } } }
+    f /= KF * KF; if (f <= 0) return 1 / EL; if (f >= 1) return 1 / EC;
+    var ea = f * EC + (1 - f) * EL, ia = f / EC + (1 - f) / EL, mm = mx * mx + my * my, nu = mm > 1e-12 ? (comp ? my * my : mx * mx) / mm : 0.5;
+    return nu * ia + (1 - nu) / ea;
+  }
+  // fundamental mode of a column of the grid (discrete in x, y and t): beta~^2 Hz = eps_y (L + w~^2) Hz, symmetrised; the
+  // largest eigenvalue by Sturm bisection, the vector by inverse iteration. ex: 1/eps at Ex (rows 0..n), ey: 1/eps at Ey.
+  function colMode(ex, ey, n, wt2, wantVec) {
+    var dg = new Float64Array(n), of = new Float64Array(n), j, lo = 1e30, hi = -1e30;
+    for (j = 0; j < n; j++) { var e0 = j > 0 ? ex[j] : 0, e1 = j < n - 1 ? ex[j + 1] : 0;
+      dg[j] = (wt2 - e0 - e1) / ey[j]; of[j] = j < n - 1 ? ex[j + 1] / Math.sqrt(ey[j] * ey[j + 1]) : 0; }
+    for (j = 0; j < n; j++) { var r = (j ? Math.abs(of[j - 1]) : 0) + Math.abs(of[j]); lo = Math.min(lo, dg[j] - r); hi = Math.max(hi, dg[j] + r); }
+    var below = function (x) { var c = 0, qq = 1; for (var m = 0; m < n; m++) { qq = dg[m] - x - (m ? of[m - 1] * of[m - 1] / qq : 0); if (qq === 0) qq = -1e-300; if (qq < 0) c++; } return c; };
+    for (var it = 0; it < 70; it++) { var mid = (lo + hi) / 2; if (below(mid) === n) hi = mid; else lo = mid; }
+    var lam = (lo + hi) / 2, out = { b2: lam };
+    if (!wantVec) return out;
+    var sg = lam + 1e-9 * Math.abs(lam) + 1e-12, y = new Float64Array(n).fill(1), cp = new Float64Array(n), dp = new Float64Array(n);
+    for (it = 0; it < 4; it++) {
+      for (j = 0; j < n; j++) { var mm = dg[j] - sg - (j ? of[j - 1] * cp[j - 1] : 0); cp[j] = of[j] / mm; dp[j] = (y[j] - (j ? of[j - 1] * dp[j - 1] : 0)) / mm; }
+      y[n - 1] = dp[n - 1]; for (j = n - 2; j >= 0; j--) y[j] = dp[j] - cp[j] * y[j + 1];
+      var nr = 0; for (j = 0; j < n; j++) nr += y[j] * y[j]; nr = Math.sqrt(nr); for (j = 0; j < n; j++) y[j] /= nr;
+    }
+    out.u = y; return out;
+  }
+  // exact TM slab (E normal to the walls) for the 2D guide: tan(k w/2) = (n1/n2)^2 g/k
+  function slabN(lam) {
+    var k0 = 2 * Math.PI / lam, lo = Math.sqrt(Math.max(EL, EC - Math.pow(Math.PI / (k0 * WG), 2))) + 1e-12, hi = NC - 1e-12;
+    for (var it = 0; it < 80; it++) { var n = (lo + hi) / 2, ka = k0 * Math.sqrt(EC - n * n), ga = k0 * Math.sqrt(n * n - EL);
+      if (Math.tan(ka * WG / 2) - EC / EL * ga / ka > 0) lo = n; else hi = n; }
+    return (lo + hi) / 2;
+  }
+  // ---- build the grid from the settings
+  function rebuild() {
+    var N = S.N, d = 1.55 / (NC * N), P = pmlOn ? Math.round(S.P) : 0, i, j, p;
+    var nxi = Math.round(LX / d), nyi = Math.round(LY / d), nx = nxi + 2 * P, ny = nyi + 2 * P, W = nx + 1, n = W * (ny + 1);
+    var dt = S.S * NL, om = 2 * Math.PI * d / S.lam, R = S.R, IN = shape(st, R);
+    var g = { N: N, d: d, P: P, nx: nx, ny: ny, nxi: nxi, nyi: nyi, W: W, dt: dt, om: om, per: 2 * Math.PI / (om * dt), st: st, src: srcT, R: R, n: 0, blown: false,
+      Ex: new Float32Array(n), Ey: new Float32Array(n), Hz: new Float32Array(n), Hzx: new Float32Array(n), Hzy: new Float32Array(n),
+      eix: new Float32Array(n), eiy: new Float32Array(n), cex: new Float32Array(n), cey: new Float32Array(n), IN: IN };
+    for (j = 0; j <= ny; j++) for (i = 0; i <= nx; i++) { p = j * W + i;
+      g.eix[p] = i < nx ? epsInv(IN, i + 0.5, j, 0, d, P) : 1 / EL; g.eiy[p] = j < ny ? epsInv(IN, i, j + 0.5, 1, d, P) : 1 / EL; }
+    // split-field PML: the same damping rate s(depth) = smax (depth/P)^3 for E and H, matched for any eps
+    var smax = 0.8 * 4 / NL, sg = function (pos, m) { if (!P) return 0; var u = Math.max(P - pos, pos - (m - P), 0) / P; return smax * u * u * u; };
+    var co = function (s) { var a = Math.exp(-s * dt); return [a, s > 0 ? (1 - a) / (s * dt) : 1]; };
+    g.axh = new Float32Array(W); g.dbxh = new Float32Array(W); g.axe = new Float32Array(W); var bxe = new Float32Array(W);
+    g.ayh = new Float32Array(ny + 1); g.dbyh = new Float32Array(ny + 1); g.aye = new Float32Array(ny + 1); var bye = new Float32Array(ny + 1);
+    for (i = 0; i <= nx; i++) { var c1 = co(sg(i + 0.5, nx)), c2 = co(sg(i, nx)); g.axh[i] = c1[0]; g.dbxh[i] = c1[1] * dt; g.axe[i] = c2[0]; bxe[i] = c2[1]; }
+    for (j = 0; j <= ny; j++) { var c3 = co(sg(j + 0.5, ny)), c4 = co(sg(j, ny)); g.ayh[j] = c3[0]; g.dbyh[j] = c3[1] * dt; g.aye[j] = c4[0]; bye[j] = c4[1]; }
+    for (j = 0; j <= ny; j++) for (i = 0; i <= nx; i++) { p = j * W + i; g.cex[p] = bye[j] * dt * g.eix[p]; g.cey[p] = bxe[i] * dt * g.eiy[p]; }
+    // the source: a soft line of magnetic current at x = 0.6 um across the input guide, shaped as the grid's own mode / eps
+    g.is = Math.round(0.6 / d) + P;
+    var ex = new Float64Array(ny + 1), ey = new Float64Array(ny);
+    for (j = 0; j <= ny; j++) ex[j] = g.eix[j * W + g.is]; for (j = 0; j < ny; j++) ey[j] = g.eiy[j * W + g.is];
+    var wt = 2 / dt * Math.sin(om * dt / 2), md = colMode(ex, ey, ny, wt * wt, true), pk = 0;
+    g.bgrid = 2 * Math.asin(Math.min(1, Math.sqrt(Math.max(0, md.b2)) / 2)); g.ngrid = g.bgrid / om;
+    g.prof = new Float32Array(ny);
+    for (j = 0; j < ny; j++) { g.prof[j] = md.u[j] * Math.sqrt(ey[j]); if (Math.abs(g.prof[j]) > Math.abs(pk)) pk = g.prof[j]; }
+    for (j = 0; j < ny; j++) g.prof[j] /= pk;
+    g.tr = 4 * g.per * dt; g.tau = 1.5 * g.per * dt; g.t0 = 5 * g.tau;
+    // monitors (DFT at the source frequency): [vertical?, x or y (um), centre, half-span, sign]
+    var mons = st === 'bend' ? [['in', 1, 1.2, 1, 0.9, 1], ['out', 0, 4.4, 5.8, 0.9, 1]] :
+      st === 'ring' ? [['in', 1, 1.2, 0.9, 0.8, 1], ['through', 1, 6.4, 0.9, 0.8, 1], ['ring', 1, LX / 2, 0.9 + WG + GAP + 2 * RING, 0.6, -1]] :
+      [['in', 1, 1.2, LY / 2, 0.9, 1], ['out', 1, 6.4, LY / 2, 0.9, 1]];
+    g.mon = mons.map(function (m) {
+      var o = { name: m[0], v: m[1], sign: m[5], pos: m[2], c: m[3], h: m[4] };
+      o.k = Math.round(m[2] / d) + P; o.a = Math.round((m[3] - m[4]) / d) + P; o.b = Math.round((m[3] + m[4]) / d) + P;   // E nodes: column (or row) k, rows (or columns) a..b-1
+      var L = o.b - o.a; o.er = new Float64Array(L); o.ei = new Float64Array(L); o.hr = new Float64Array(L); o.hi = new Float64Array(L);
+      return o;
+    });
+    if (st === 'straight') { g.jc = Math.round(LY / 2 / d - 0.5) + P; g.f0 = Math.round(1.2 / d) + P; g.f1 = Math.round(6 / d) + P;
+      g.pr = new Float64Array(g.f1 - g.f0); g.pi = new Float64Array(g.f1 - g.f0); }
+    // CW: Hann-windowed DFT blocks of k periods, k = 3..6 chosen to make the block closest to a whole number of steps
+    var best = 1, kb = 4; for (var k = 3; k <= 6; k++) { var fr = Math.abs(k * g.per - Math.round(k * g.per)); if (fr < best) { best = fr; kb = k; } }
+    g.M = Math.max(16, Math.round(kb * g.per)); g.mb = 0; g.res = null; g.prev = null; g.rh = []; g.settled = false; g.done = false;
+    g.eHist = []; g.eMax = 0; g.amp = 0; g.ampPk = 0; g.tStep = 0.05; g.sps = 0; g.growth = 0;
+    g.geo = null; G = g;
+    // ring: the through port is measured as the bus's fundamental mode, H_z projected on the grid mode / eps (orthogonal
+    // to every other mode of the grid), so light the ring radiates across the monitor is not counted
+    if (st === 'ring') { g.wm = new Float64Array(ny); for (j = 0; j < ny; j++) if (Math.abs((j + 0.5 - P) * d - 0.9) <= 0.9) g.wm[j] = g.prof[j];
+      g.mc = [Math.round(1.2 / d) + P, Math.round(6.4 / d) + P]; g.ma = new Float64Array(4); }
+    // ring + pulse: DFT at 401 wavelengths (1500-1600 nm) of the bus-mode projections (in, through) and of H_z summed across
+    // the ring's top (its shape only), for the spectrum panel
+    var wr = function (yc) { var w = new Float64Array(ny); for (j = 0; j < ny; j++) if (Math.abs((j + 0.5 - P) * d - yc) <= 0.4) w[j] = 1; return w; };
+    if (st === 'ring' && srcT === 'pulse') { var nf = 401, sp = { nf: nf, lam: new Float64Array(nf), ph: new Float64Array(2 * nf), rot: new Float64Array(2 * nf), acc: new Float64Array(6 * nf), cols: [] };
+      for (k = 0; k < nf; k++) { sp.lam[k] = 1.5 + 0.1 * k / (nf - 1); var wk = 2 * Math.PI * d / sp.lam[k]; sp.ph[2 * k] = 1; sp.rot[2 * k] = Math.cos(wk * dt); sp.rot[2 * k + 1] = Math.sin(wk * dt); }
+      sp.cols = [[g.mc[0], g.wm], [g.mc[1], g.wm], [Math.round(LX / 2 / d) + P, wr(0.9 + WG + GAP + 2 * RING)]];
+      g.sp = sp; }
+    var rs = q('[data-o="rsl"]'); rs.style.opacity = st === 'bend' ? '' : '0.45'; rs.querySelector('input').disabled = st !== 'bend';
+    curve(); measureReset(); draw(); kick();
+  }
+  function measureReset() { G.mon.forEach(function (o) { o.er.fill(0); o.ei.fill(0); o.hr.fill(0); o.hi.fill(0); }); if (G.pr) { G.pr.fill(0); G.pi.fill(0); } if (G.ma) G.ma.fill(0); G.mb = 0; }
+  function srcAmp(t) {
+    var g = G;
+    if (g.src === 'cw') { var r = t >= g.tr ? 1 : 0.5 * (1 - Math.cos(Math.PI * t / g.tr)); return r * Math.sin(g.om * t); }
+    var u = (t - g.t0) / g.tau; return Math.abs(u) > 7 ? 0 : Math.exp(-0.5 * u * u) * Math.sin(g.om * (t - g.t0));
+  }
+  // ---- the Yee leapfrog: H to t + dt/2 (split in the PML, direct inside), the source, then E to t + dt
+  function stepN(k) {
+    var g = G, nx = g.nx, ny = g.ny, W = g.W, P = g.P, dt = g.dt, Ex = g.Ex, Ey = g.Ey, Hz = g.Hz, Hx = g.Hzx, Hy = g.Hzy;
+    var axh = g.axh, dbxh = g.dbxh, ayh = g.ayh, dbyh = g.dbyh, aye = g.aye, axe = g.axe, cex = g.cex, cey = g.cey, pr = g.prof, is = g.is;
+    var i, j, p, row, hx, hy, ay, by;
+    for (var s = 0; s < k; s++) {
+      for (j = 0; j < ny; j++) {
+        row = j * W; ay = ayh[j]; by = dbyh[j];
+        if (j < P || j >= ny - P) {
+          for (i = 0; i < nx; i++) { p = row + i; hx = axh[i] * Hx[p] - dbxh[i] * (Ey[p + 1] - Ey[p]); hy = ay * Hy[p] + by * (Ex[p + W] - Ex[p]); Hx[p] = hx; Hy[p] = hy; Hz[p] = hx + hy; }
+        } else {
+          for (i = 0; i < P; i++) { p = row + i; hx = axh[i] * Hx[p] - dbxh[i] * (Ey[p + 1] - Ey[p]); hy = Hy[p] + by * (Ex[p + W] - Ex[p]); Hx[p] = hx; Hy[p] = hy; Hz[p] = hx + hy; }
+          for (i = P; i < nx - P; i++) { p = row + i; Hz[p] += dt * (Ex[p + W] - Ex[p] - Ey[p + 1] + Ey[p]); }
+          for (i = nx - P; i < nx; i++) { p = row + i; hx = axh[i] * Hx[p] - dbxh[i] * (Ey[p + 1] - Ey[p]); hy = Hy[p] + by * (Ex[p + W] - Ex[p]); Hx[p] = hx; Hy[p] = hy; Hz[p] = hx + hy; }
+        }
+      }
+      var a = dt * srcAmp((g.n + 0.5) * dt);
+      if (a !== 0) for (j = 0; j < ny; j++) Hz[j * W + is] += a * pr[j];
+      for (j = 1; j < ny; j++) { row = j * W; var ae = aye[j];
+        if (ae === 1) { for (i = 0; i < nx; i++) { p = row + i; Ex[p] += cex[p] * (Hz[p] - Hz[p - W]); } }
+        else { for (i = 0; i < nx; i++) { p = row + i; Ex[p] = ae * Ex[p] + cex[p] * (Hz[p] - Hz[p - W]); } } }
+      for (j = 0; j < ny; j++) { row = j * W; for (i = 1; i < nx; i++) { p = row + i; Ey[p] = axe[i] * Ey[p] - cey[p] * (Hz[p] - Hz[p - 1]); } }
+      g.n++;
+      dft();
+    }
+  }
+  // running DFT at the source frequency on the monitors (E at n dt, H at (n - 1/2) dt); CW: Hann window over each block
+  function dft() {
+    var g = G, W = g.W, Ex = g.Ex, Ey = g.Ey, Hz = g.Hz, w = 1;
+    if (g.src === 'cw') { var sn = Math.sin(Math.PI * (g.mb + 0.5) / g.M); w = sn * sn; }
+    var tE = g.n * g.dt, tH = tE - 0.5 * g.dt, cE = w * Math.cos(g.om * tE), sE = w * Math.sin(g.om * tE), cH = w * Math.cos(g.om * tH), sH = w * Math.sin(g.om * tH);
+    for (var m = 0; m < g.mon.length; m++) { var o = g.mon[m], L = o.b - o.a, k, p, e, h;
+      if (o.v) for (k = 0; k < L; k++) { p = (o.a + k) * W + o.k; e = Ey[p]; h = 0.5 * (Hz[p - 1] + Hz[p]); o.er[k] += e * cE; o.ei[k] -= e * sE; o.hr[k] += h * cH; o.hi[k] -= h * sH; }
+      else for (k = 0; k < L; k++) { p = o.k * W + o.a + k; e = Ex[p]; h = 0.5 * (Hz[p - W] + Hz[p]); o.er[k] += e * cE; o.ei[k] -= e * sE; o.hr[k] += h * cH; o.hi[k] -= h * sH; } }
+    if (g.ma) { var a0 = 0, a1 = 0, wm = g.wm, c0 = g.mc[0], c1 = g.mc[1]; for (var j2 = 0; j2 < g.ny; j2++) if (wm[j2]) { a0 += Hz[j2 * W + c0] * wm[j2]; a1 += Hz[j2 * W + c1] * wm[j2]; }
+      g.ma[0] += a0 * cH; g.ma[1] -= a0 * sH; g.ma[2] += a1 * cH; g.ma[3] -= a1 * sH; }
+    if (g.pr) { var r0 = g.jc * W; for (var i = g.f0; i < g.f1; i++) { var hz = Hz[r0 + i]; g.pr[i - g.f0] += hz * cH; g.pi[i - g.f0] -= hz * sH; } }
+    if (g.src === 'cw' && ++g.mb >= g.M) { G.res = results(); measureReset(); }
+    if (g.sp) { var sp = g.sp, nf = sp.nf, ph = sp.ph, rt = sp.rot, ac = sp.acc, sv = [0, 0, 0];
+      for (m = 0; m < 3; m++) { var cc = sp.cols[m], wv = cc[1], su = 0; for (var jj = 0; jj < g.ny; jj++) if (wv[jj]) su += Hz[jj * W + cc[0]] * wv[jj]; sv[m] = su; }
+      for (var f = 0; f < nf; f++) { var pr2 = ph[2 * f], pi2 = ph[2 * f + 1], o6 = 6 * f;
+        ac[o6] += sv[0] * pr2; ac[o6 + 1] += sv[0] * pi2; ac[o6 + 2] += sv[1] * pr2; ac[o6 + 3] += sv[1] * pi2; ac[o6 + 4] += sv[2] * pr2; ac[o6 + 5] += sv[2] * pi2;
+        ph[2 * f] = pr2 * rt[2 * f] + pi2 * rt[2 * f + 1]; ph[2 * f + 1] = pi2 * rt[2 * f] - pr2 * rt[2 * f + 1]; }
+      if (g.n % 512 === 0) for (f = 0; f < nf; f++) { var nn = Math.sqrt(ph[2 * f] * ph[2 * f] + ph[2 * f + 1] * ph[2 * f + 1]); ph[2 * f] /= nn; ph[2 * f + 1] /= nn; } }
+  }
+  function flux(o) { var s = 0; for (var k = 0; k < o.er.length; k++) s += o.er[k] * o.hr[k] + o.ei[k] * o.hi[k]; return 0.5 * s * o.sign * (o.v ? 1 : -1); }
+  // fit the phasor along the core to a e^(-jbx) + c e^(jbx): the run's own beta and the far-end reflection |c/a|^2
+  function fitBeta(b0) {
+    var g = G, n = g.f1 - g.f0, pr = g.pr, pi = g.pi, PP = 0, k;
+    for (k = 0; k < n; k++) PP += pr[k] * pr[k] + pi[k] * pi[k];
+    var ev = function (b) {
+      var sr = 0, si = 0, ar = 0, ai = 0, cr = 0, ci = 0;
+      for (var m = 0; m < n; m++) { var x = g.f0 + m + 0.5, c = Math.cos(b * x), s = Math.sin(b * x), c2 = c * c - s * s, s2 = 2 * s * c;
+        sr += c2; si += s2; ar += c * pr[m] - s * pi[m]; ai += c * pi[m] + s * pr[m]; cr += c * pr[m] + s * pi[m]; ci += c * pi[m] - s * pr[m]; }
+      var det = n * n - (sr * sr + si * si);
+      var Ar = (n * ar - (sr * cr - si * ci)) / det, Ai = (n * ai - (sr * ci + si * cr)) / det;
+      var Cr = (n * cr - (sr * ar + si * ai)) / det, Ci = (n * ci - (sr * ai - si * ar)) / det;
+      var fit = Ar * ar + Ai * ai + Cr * cr + Ci * ci;
+      return { r: Math.max(0, PP - fit) / PP, a2: Ar * Ar + Ai * Ai, c2: Cr * Cr + Ci * Ci };
+    };
+    var bb = b0, rb = 1e9;
+    for (k = -30; k <= 30; k++) { var b = b0 * (1 + 0.001 * k), r = ev(b).r; if (r < rb) { rb = r; bb = b; } }
+    var lo = bb - 0.001 * b0, hi = bb + 0.001 * b0;
+    for (k = 0; k < 40; k++) { var m1 = lo + 0.382 * (hi - lo), m2 = lo + 0.618 * (hi - lo); if (ev(m1).r < ev(m2).r) hi = m2; else lo = m1; }
+    var bf = (lo + hi) / 2, e = ev(bf);
+    return { b: bf, refl: e.c2 / e.a2, resid: e.r };
+  }
+  function results() {
+    var g = G, out = {}, fl = {};
+    g.mon.forEach(function (o) { fl[o.name] = flux(o); });
+    if (g.st === 'straight') { var f = fitBeta(g.bgrid); out.n = f.b / g.om; out.refl = f.refl; out.resid = f.resid; out.T = fl.out / fl['in']; }
+    else if (g.st === 'bend') out.T = fl.out / fl['in'];
+    else { var ma = g.ma; out.T = (ma[2] * ma[2] + ma[3] * ma[3]) / (ma[0] * ma[0] + ma[1] * ma[1]); out.B = fl.ring / fl['in']; }
+    return out;
+  }
+  // ---- after each frame: energy history, settling, blow-up, the end of a pulse run
+  function energy() {
+    var g = G, W = g.W, s = 0;
+    for (var j = g.P; j < g.ny - g.P; j++) for (var i = g.P; i < g.nx - g.P; i++) { var p = j * W + i, ex = g.Ex[p], ey = g.Ey[p], hz = g.Hz[p];
+      s += ex * ex / g.eix[p] + ey * ey / g.eiy[p] + hz * hz; }
+    return 0.5 * s;
+  }
+  function measure(force) {
+    var g = G, e = energy(), t = g.n / g.per;
+    if (!(e < 1e30)) { g.blown = true; setPlay(false); }
+    else { g.eMax = Math.max(g.eMax, e); var h = g.eHist;
+      if (!h.length || t - h[h.length - 1][0] >= Math.max(0.05, h.length > 1500 ? t / 1500 : 0) || force) h.push([t, e]);
+      if (h.length > 3) { var a = h[h.length - 1], b2 = h[Math.max(0, h.length - 6)], ds = (a[0] - b2[0]) * g.per; if (ds > 0 && a[1] > 0 && b2[1] > 0) g.growth = Math.pow(a[1] / b2[1], 1 / ds); } }
+    // CW: settled when every block result of the last 40 um of light travel (and at least three blocks) agrees with the latest
+    if (g.src === 'cw' && g.res && g.res !== g.prev) {
+      var r = g.res, hs = g.rh, ok = true, span = 40 / (g.d * g.dt);
+      hs.push([g.n, r]); while (hs.length > 3 && g.n - hs[1][0] > span) hs.shift();
+      hs.forEach(function (x) { var pv = x[1]; if (!(Math.abs(r.T - pv.T) < 1e-3 * Math.max(1e-3, Math.abs(r.T)) && (r.n === undefined || (Math.abs(r.n - pv.n) < 2e-5 && ((r.refl < 1e-8 && pv.refl < 1e-8) || Math.abs(Math.log(r.refl / pv.refl)) < 0.12))) && (r.B === undefined || Math.abs(r.B - pv.B) < 2e-3 * r.B))) ok = false; });
+      g.settled = ok && hs.length >= 3 && !g.blown && g.n * g.dt * g.d > 60 + g.tr * g.d && (r.resid === undefined || r.resid < 1e-3); g.prev = r;
+    }
+    if (g.src === 'pulse' && !g.done && g.n * g.dt > g.t0 + 6 * g.tau && e < 1e-6 * g.eMax) { g.done = true; g.res = results(); g.settled = true; setPlay(false); }
+  }
+  // ---- index error of the grid against N: plane waves in silicon (analytic Yee relation) and the straight guide's mode
+  var CV = null;
+  function curve() {
+    var key = [S.S, S.lam, pmlOn ? S.P : 0].join(); if (CV && CV.key === key) return;
+    var ns = [], pa = [], pd = [], pg = [], nex = slabN(S.lam), IN = shape('straight');
+    for (var N = 5; N <= 40; N++) {
+      var d = 1.55 / (NC * N), dt = S.S * NL, om = 2 * Math.PI * d / S.lam, v = 1 / NC, x = Math.sin(om * dt / 2) / (v * dt), k0 = om / v;
+      ns.push(N); pa.push(100 * (2 * Math.asin(Math.min(1, x)) / k0 - 1)); pd.push(100 * (2 * Math.SQRT2 * Math.asin(Math.min(1, x / Math.SQRT2)) / k0 - 1));
+      var P = pmlOn ? Math.round(S.P) : 0, ny = Math.round(LY / d) + 2 * P, ex = new Float64Array(ny + 1), ey = new Float64Array(ny), j;
+      for (j = 0; j <= ny; j++) ex[j] = epsInv(IN, 0.5, j, 0, d, P); for (j = 0; j < ny; j++) ey[j] = epsInv(IN, 0, j + 0.5, 1, d, P);
+      var wt = 2 / dt * Math.sin(om * dt / 2), b2 = colMode(ex, ey, ny, wt * wt, false).b2;
+      pg.push(100 * (2 * Math.asin(Math.min(1, Math.sqrt(Math.max(0, b2)) / 2)) / om / nex - 1));
+    }
+    CV = { key: key, ns: ns, pa: pa, pd: pd, pg: pg, nex: nex };
+  }
+  // ---- animation: only while playing, on screen and the page visible; paused at first under reduced motion
+  var pbtn = document.createElement('button'); pbtn.type = 'button'; pbtn.className = 'bd-play';
+  pbtn.appendChild(document.createElement('span')); pbtn.lastChild.className = 'w';
+  pbtn.addEventListener('click', function () { if (G && (G.blown || G.done)) rebuild(); setPlay(!playing); });   // after a blow-up or a finished pulse, start again
+  q('.bd-status').insertBefore(pbtn, q('.bd-status').firstChild);
+  function setPlay(on) { playing = !!on; pbtn.setAttribute('data-on', playing ? '1' : '0'); pbtn.setAttribute('aria-label', (playing ? 'Pause' : 'Run') + ' the simulation'); pbtn.lastChild.textContent = playing ? 'pause' : 'run'; if (playing) kick(); }
+  function live() { return playing && visible && !document.hidden && G && !G.blown; }
+  function kick() { if (live() && !raf) raf = requestAnimationFrame(frame); }
+  var nfr = 0, spsT = 0, spsN = 0;
+  function frame(ts) {
+    raf = 0; if (!live()) return;
+    var g = G, t0 = performance.now(), k;
+    k = Math.max(1, Math.min(Math.round(g.per / 6), Math.floor(20 / g.tStep)));   // about 1/6 period per frame
+    if (fast) k = Math.max(k, Math.floor(30 / g.tStep));   // fast-forward: about 30 ms of stepping per frame
+    stepN(k);
+    var el = performance.now() - t0; g.tStep = 0.8 * g.tStep + 0.2 * Math.max(0.002, el / k);
+    if (!spsT) spsT = ts; spsN += k; if (ts - spsT > 700) { g.sps = spsN * 1000 / (ts - spsT); spsT = ts; spsN = 0; }
+    measure(false); draw(); nfr++;
+    raf = live() ? requestAnimationFrame(frame) : 0;
+  }
+  if (window.IntersectionObserver) new IntersectionObserver(function (es) { visible = es[es.length - 1].isIntersecting; kick(); }).observe(q('[data-c="f"]'));
+  document.addEventListener('visibilitychange', function () { kick(); });
+  if (RM) { var onRM = function () { if (RM.matches) setPlay(false); }; if (RM.addEventListener) RM.addEventListener('change', onRM); else if (RM.addListener) RM.addListener(onRM); }
+  // ---- drawing
+  var LUT = (function () {
+    var lut = new Uint32Array(511), le = new Uint8Array(new Uint32Array([1]).buffer)[0] === 1;
+    for (var i = 0; i < 511; i++) { var v = (i - 255) / 255, a = Math.pow(Math.abs(v), 0.8), c = v >= 0 ? [255, 84, 62] : [72, 160, 255], wt = Math.max(0, a - 0.7) / 0.3 * 0.55;
+      var r = Math.round(c[0] + (255 - c[0]) * wt), gg = Math.round(c[1] + (255 - c[1]) * wt), b = Math.round(c[2] + (255 - c[2]) * wt), A = Math.round(255 * a);
+      lut[i] = le ? ((A << 24) | (b << 16) | (gg << 8) | r) >>> 0 : ((r << 24) | (gg << 16) | (b << 8) | A) >>> 0; }
+    return lut;
+  })();
+  var ofc = document.createElement('canvas'), ofx = ofc.getContext('2d'), img = null, u32 = null, gec = document.createElement('canvas');
+  function fmtB(b) { var f = function (v, u) { return (v >= 10 ? v.toFixed(0) : v.toFixed(1)) + u; }; return b >= 1e9 ? f(b / 1e9, ' GB') : b >= 1e6 ? f(b / 1e6, ' MB') : f(b / 1e3, ' kB'); }
+  function pm(v, dg) { return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(dg); }
+  function grp(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+  function draw() {
+    if (!G) return;
+    var g = G, nx = g.nx, ny = g.ny, W = g.W, P = g.P, d = g.d, i, j;
+    // ---- the field
+    var cv = q('[data-c="f"]'), Wc = cv.clientWidth, nar = Wc < 480, top = 22, a = nx / ny, bw = Wc - 12, bh = bw / a;
+    if (bh > 430) { bh = 430; bw = bh * a; }
+    var Hc = Math.round(top + bh + 8); if (cv.style.height !== Hc + 'px') cv.style.height = Hc + 'px';
+    var dv = BD.setup(cv), gx = dv.g, x0 = Math.round((Wc - bw) / 2), y0 = top, sc = bw / nx, su = sc / d;
+    var X = function (xu) { return x0 + (xu / d + P) * sc; }, Y = function (yu) { return y0 + bh - (yu / d + P) * sc; };
+    if (!g.geo) { gec.width = nx; gec.height = ny; var gctx = gec.getContext('2d'), gi = gctx.createImageData(nx, ny);
+      for (j = 0; j < ny; j++) for (i = 0; i < nx; i++) { var fe = (1 / g.eiy[j * W + i] - EL) / (EC - EL), o4 = 4 * ((ny - 1 - j) * nx + i);
+        gi.data[o4] = 157; gi.data[o4 + 1] = 179; gi.data[o4 + 2] = 204; gi.data[o4 + 3] = Math.round(70 * Math.max(0, Math.min(1, fe))); }
+      gctx.putImageData(gi, 0, 0); g.geo = true; }
+    gx.imageSmoothingEnabled = false; gx.drawImage(gec, x0, y0, bw, bh);
+    if (ofc.width !== nx || ofc.height !== ny || !img) { ofc.width = nx; ofc.height = ny; img = ofx.createImageData(nx, ny); u32 = new Uint32Array(img.data.buffer); }
+    var mx = 0, Hz = g.Hz; for (j = P; j < ny - P; j++) for (i = P; i < nx - P; i++) { var vv = Math.abs(Hz[j * W + i]); if (vv > mx) mx = vv; }
+    if (!(mx < 1e300)) mx = 1e300;
+    g.ampPk = Math.max(g.ampPk, mx); g.amp = Math.max(mx, 0.99 * g.amp, 0.05 * g.ampPk);
+    var kk = g.amp > 0 ? 255 / g.amp : 0;
+    for (j = 0; j < ny; j++) { var rw = (ny - 1 - j) * nx, rs = j * W; for (i = 0; i < nx; i++) { var vi = Hz[rs + i] * kk; vi = vi > 255 ? 255 : vi < -255 ? -255 : vi; u32[rw + i] = LUT[(vi + 255.5) | 0]; } }
+    ofx.putImageData(img, 0, 0); gx.drawImage(ofc, x0, y0, bw, bh); gx.imageSmoothingEnabled = true;
+    // PML band or the metal wall
+    if (P) { gx.fillStyle = 'rgba(5,16,32,.42)'; var pw = P * sc;
+      gx.fillRect(x0, y0, bw, pw); gx.fillRect(x0, y0 + bh - pw, bw, pw); gx.fillRect(x0, y0 + pw, pw, bh - 2 * pw); gx.fillRect(x0 + bw - pw, y0 + pw, pw, bh - 2 * pw);
+      gx.strokeStyle = 'rgba(170,205,240,.45)'; gx.setLineDash([3, 3]); gx.strokeRect(x0 + pw, y0 + pw, bw - 2 * pw, bh - 2 * pw); gx.setLineDash([]); }
+    else { gx.strokeStyle = BD.C.white; gx.lineWidth = 2; gx.strokeRect(x0 + 1, y0 + 1, bw - 2, bh - 2); gx.lineWidth = 1; }
+    BD.label(gx, P ? 'PML' : 'metal wall', x0 + (P ? Math.max(3, P * sc + 3) : 5), y0 + (P ? Math.max(10, P * sc + 11) : 13), P ? BD.C.dim : BD.C.white);
+    // the true outline of the structure
+    gx.strokeStyle = 'rgba(215,230,247,.55)'; gx.lineWidth = 1; var h = WG / 2;
+    var hl = function (yu, xa, xb) { gx.beginPath(); gx.moveTo(xa, Y(yu)); gx.lineTo(xb, Y(yu)); gx.stroke(); };
+    if (g.st === 'straight') { hl(LY / 2 - h, x0, x0 + bw); hl(LY / 2 + h, x0, x0 + bw); }
+    else if (g.st === 'bend') { var xc = 5.8 - g.R, cy = 1 + g.R;
+      hl(1 - h, x0, X(xc)); hl(1 + h, x0, X(xc));
+      [g.R - h, g.R + h].forEach(function (rr) { gx.beginPath(); gx.arc(X(xc), Y(cy), rr * su, Math.PI / 2, 0, true); gx.stroke(); });
+      [5.8 - h, 5.8 + h].forEach(function (xx) { gx.beginPath(); gx.moveTo(X(xx), Y(cy)); gx.lineTo(X(xx), y0); gx.stroke(); }); }
+    else { hl(0.9 - h, x0, x0 + bw); hl(0.9 + h, x0, x0 + bw); var cr = 0.9 + WG + GAP + RING;
+      [RING - h, RING + h].forEach(function (rr) { gx.beginPath(); gx.arc(X(LX / 2), Y(cr), rr * su, 0, 2 * Math.PI); gx.stroke(); }); }
+    // source and monitors
+    var yS = g.st === 'bend' ? 1 : g.st === 'ring' ? 0.9 : LY / 2;
+    gx.strokeStyle = BD.C.gold; gx.lineWidth = 2; gx.beginPath(); gx.moveTo(X(0.6), Y(yS - 0.55)); gx.lineTo(X(0.6), Y(yS + 0.55)); gx.stroke(); gx.lineWidth = 1;
+    BD.label(gx, 'source', X(0.6), Y(yS - 0.55) + 11, BD.C.gold, 'center');
+    gx.strokeStyle = 'rgba(255,255,255,.75)'; gx.setLineDash([3, 2]);
+    g.mon.forEach(function (o) {
+      gx.beginPath();
+      if (o.v) { gx.moveTo(X(o.pos), Y(o.c - o.h)); gx.lineTo(X(o.pos), Y(o.c + o.h)); } else { gx.moveTo(X(o.c - o.h), Y(o.pos)); gx.lineTo(X(o.c + o.h), Y(o.pos)); }
+      gx.stroke();
+    });
+    gx.setLineDash([]);
+    g.mon.forEach(function (o) {
+      if (o.v) BD.label(gx, o.name, X(o.pos), Y(o.c + o.h) - 4, BD.C.white, o.name === 'ring' ? 'center' : o.pos > LX / 2 ? 'right' : 'left');
+      else BD.label(gx, o.name, X(o.c - o.h) - 4, Y(o.pos) + 3, BD.C.white, 'right');
+    });
+    BD.scalebar(gx, x0 + bw - (P + 4) * sc - Math.min(60, bw * 0.2), y0 + bh - (P + 3) * sc, su, Math.min(60, bw * 0.2));
+    // ---- energy against time
+    var de = BD.setup(q('[data-c="e"]')), hh = g.eHist, tm = Math.max(10, hh.length ? hh[hh.length - 1][0] * 1.08 : 10), em = g.eMax || 1;
+    var fe2 = BD.frame(de, { x: [0, tm], y: [-100, 8], pad: { l: 52, b: 22 }, xt: [[0, '0'], [tm / 2, (tm / 2).toFixed(0)], [tm, tm.toFixed(0) + ' periods']], yt: [[0, '0 dB'], [-50, '−50 dB'], [-100, '−100 dB']] });
+    if (hh.length) BD.line(fe2, hh.map(function (p2) { return p2[0]; }), hh.map(function (p2) { return p2[1] > 0 ? 10 * Math.log10(p2[1] / em) : -1e9; }), g.blown || S.S > Math.SQRT1_2 ? BD.C.red : BD.C.gold, 2);
+    var ge = Math.exp(4 * Math.acosh(Math.max(1, Math.SQRT2 * S.S))), tx, un = S.S > Math.SQRT1_2;
+    g.qE = 0;
+    if (g.st === 'ring' && g.src === 'pulse' && hh.length > 20 && hh[hh.length - 1][0] > 2 * (g.t0 + 6 * g.tau) / (g.per * g.dt) + 100) {
+      var t1 = hh[hh.length - 1][0], sx = 0, sy = 0, sxx = 0, sxy = 0, nn = 0;   // Q from the slope of the ring-down: energy ~ exp(-2 pi t / Q), t in periods
+      hh.forEach(function (p2) { if (p2[0] > 0.5 * t1 && p2[1] > 0) { var yy = Math.log(p2[1]); sx += p2[0]; sy += yy; sxx += p2[0] * p2[0]; sxy += p2[0] * yy; nn++; } });
+      var sl = (nn * sxy - sx * sy) / (nn * sxx - sx * sx); if (sl < 0) g.qE = -2 * Math.PI / sl;
+    }
+    if (un) tx = 'energy ×' + (g.growth > 1.0001 ? g.growth.toFixed(2) : '–') + ' per step (theory ×' + ge.toFixed(2) + ')';
+    else if (!P) tx = g.src === 'pulse' ? 'no exit: the pulse bounces forever' : 'no exit: energy keeps piling up';
+    else if (g.qE) tx = 'rings down: Q ≈ ' + Math.round(g.qE / 10) * 10 + ' from the slope';
+    else tx = g.src === 'pulse' ? (g.st === 'ring' ? 'pulse in, then the ring rings down' : 'pulse in, then out through the PML') : 'rises to a steady state';
+    BD.label(de.g, tx, un ? fe2.p.l + 6 : de.w - fe2.p.r - 4, un ? fe2.p.t + 12 : de.h - fe2.p.b - 20, un ? BD.C.red : BD.C.axis, un ? 'left' : 'right');
+    BD.label(de.g, 'dB below the peak so far', un ? fe2.p.l + 6 : de.w - fe2.p.r - 4, un ? fe2.p.t + 24 : de.h - fe2.p.b - 8, BD.C.dim, un ? 'left' : 'right');
+    var dd = BD.setup(q('[data-c="d"]')), dg = dd.g, k;
+    if (g.st === 'ring') {
+      // ---- ring: the spectrum from one pulse run (through port, and the ring's power relative to its peak)
+      var dt1 = q('[data-o="dtag"]'); if (dt1.textContent !== 'through port and ring power against λ') dt1.textContent = 'through port and ring power against λ';
+      var fs = BD.frame(dd, { x: [1500, 1600], y: [0, 1.12], pad: { l: 36, b: 22 }, xt: [[1500, '1500'], [1550, '1550'], [1600, '1600 nm']], yt: [[0, '0'], [0.5, '0.5'], [1, '1']] });
+      BD.vline(fs, 1000 * S.lam, BD.C.dim, [2, 3]);
+      g.peaks = [];
+      if (g.sp && g.n * g.dt > g.t0 + 4 * g.tau + 30 / g.d && !g.blown) {
+        var sp = g.sp, ac = sp.acc, xs = [], tt = [], bb = [], bm = 0;
+        for (k = 0; k < sp.nf; k++) { var o6 = 6 * k, pin = ac[o6] * ac[o6] + ac[o6 + 1] * ac[o6 + 1];
+          xs.push(1000 * sp.lam[k]); tt.push((ac[o6 + 2] * ac[o6 + 2] + ac[o6 + 3] * ac[o6 + 3]) / pin); bb.push((ac[o6 + 4] * ac[o6 + 4] + ac[o6 + 5] * ac[o6 + 5]) / pin); bm = Math.max(bm, bb[k]); }
+        BD.line(fs, xs, bb.map(function (v) { return v / bm; }), BD.C.blue, 1.4); BD.line(fs, xs, tt, BD.C.gold, 2);
+        for (k = 1; k < sp.nf - 1; k++) if (bb[k] > 0.5 * bm && bb[k] >= bb[k - 1] && bb[k] > bb[k + 1]) {
+          var lo = k, hi = k, hm = bb[k] / 2; while (lo > 0 && bb[lo] > hm) lo--; while (hi < sp.nf - 1 && bb[hi] > hm) hi++;
+          var xl = xs[lo] + (xs[lo + 1] - xs[lo]) * (hm - bb[lo]) / (bb[lo + 1] - bb[lo]), xh = xs[hi - 1] + (xs[hi] - xs[hi - 1]) * (bb[hi - 1] - hm) / (bb[hi - 1] - bb[hi]);
+          g.peaks.push([xs[k], lo > 0 && hi < sp.nf - 1 ? xs[k] / (xh - xl) : 0]);
+          var px = fs.X(xs[k]), lt = xs[k].toFixed(1), hw = dg.measureText(lt).width / 2 + 2;
+          BD.label(dg, lt, Math.max(hw, Math.min(dd.w - hw, px)), fs.p.t - 4, BD.C.blue, 'center'); }
+      } else BD.label(dg, g.src === 'pulse' ? 'spectrum appears once the pulse is in' : (nar ? 'pulse source: whole spectrum in one run' : 'switch to the pulse: one run gives the whole spectrum'), fs.p.l + 6, fs.Y(0.7), BD.C.axis);
+      if (g.res && (g.settled || g.done) && !g.blown) BD.dot(fs, 1000 * S.lam, g.res.T, BD.C.gold, 4);
+      if (g.sp) { BD.label(dg, 'through port', fs.X(1514), fs.Y(0.42), BD.C.gold, 'left'); BD.label(dg, 'ring power (relative)', fs.X(1514), fs.Y(0.42) + 12, BD.C.blue, 'left'); }
+    } else {
+      // ---- index error of the grid against N
+      var dt2 = q('[data-o="dtag"]'); if (dt2.textContent !== 'index error of the grid against resolution') dt2.textContent = 'index error of the grid against resolution';
+      curve();
+      var fd = BD.frame(dd, { x: [5, 40], y: [0.03, 12], xlog: true, ylog: true, pad: { l: 44, b: 22 },
+        xt: [[6, '6'], [10, '10'], [20, '20'], [40, '40 cells/λ']], yt: [[0.1, '0.1 %'], [1, '1 %'], [10, '10 %']] });
+      BD.line(fd, CV.ns, CV.pa, BD.C.blue, 1.6); BD.line(fd, CV.ns, CV.pd, BD.C.blue, 1.4, [4, 3]); BD.line(fd, CV.ns, CV.pg, 'rgba(224,184,90,.45)', 1);
+      CV.ns.forEach(function (nn, ii) { if (CV.pg[ii] > 0) BD.dot(fd, nn, CV.pg[ii], BD.C.gold, 1.8); });
+      BD.vline(fd, g.N, BD.C.dim, [2, 3]);
+      var gi2 = CV.ns.indexOf(g.N); if (gi2 >= 0 && CV.pg[gi2] > 0) BD.dot(fd, g.N, CV.pg[gi2], BD.C.gold, 4);
+      var lx = dd.w - fd.p.r - 4, ly = fd.p.t + 12;
+      BD.label(dg, nar ? 'plane wave in Si: x / diagonal' : 'plane wave in silicon: along x / diagonal', lx, ly, BD.C.blue, 'right');
+      BD.label(dg, 'guided mode on this grid', lx, ly + 12, BD.C.gold, 'right');
+      var R0 = g.res, haveN = g.st === 'straight' && R0 && R0.n && (g.settled || g.done) && S.S <= Math.SQRT1_2;
+      if (haveN) { var em2 = 100 * (R0.n / CV.nex - 1); if (em2 > 0) BD.dot(fd, g.N, em2, BD.C.green, 3); BD.label(dg, 'measured in the run', lx, ly + 24, BD.C.green, 'right'); }
+    }
+    readouts();
+  }
+  function readouts() {
+    var g = G, d = g.d, P = g.P, tfs = g.dt * d / CUM, o = function (k, v) { var el = q('[data-o="' + k + '"]'); if (el.textContent !== v) el.textContent = v; };
+    o('grid', g.nx + ' × ' + g.ny);
+    o('dxdt', (1000 * d).toFixed(1) + ' nm · ' + tfs.toFixed(3) + ' fs');
+    o('spp', g.per.toFixed(1));
+    var ts = g.n * tfs; o('tsim', (ts < 1000 ? ts.toFixed(0) + ' fs' : (ts / 1000).toFixed(2) + ' ps') + ' · ' + grp(g.n) + ' steps');
+    var nz = Math.round(2 / d) + 2 * P; o('mem', fmtB(g.nx * g.ny * 3 * 4) + ' · ' + fmtB(g.nx * g.ny * nz * 6 * 4));
+    var r = g.res, ok = r && (g.settled || g.done) && !g.blown, l1 = q('[data-o="m1l"]');
+    if (g.st === 'straight') {
+      var l1h = 'n<sub>eff</sub> in the run (exact ' + CV.nex.toFixed(3) + ')'; if (l1.innerHTML !== l1h) l1.innerHTML = l1h; o('m2l', 'reflection from the far end');
+      o('m1', r && !g.blown ? r.n.toFixed(4) + ' (' + pm(100 * (r.n / CV.nex - 1), 2) + ' %)' : '–');
+      o('m2', r && !g.blown ? (P ? (r.refl > 0 ? (10 * Math.log10(r.refl)).toFixed(0).replace('-', '−') + ' dB' : '–') : 'no steady state') : '–');
+    } else if (g.st === 'bend') {
+      var key = g.R.toFixed(2), mp = MEEP[key];
+      o('m1l', 'transmission through the bend'); o('m2l', 'converged MEEP 2D run, same bend');
+      o('m1', r && !g.blown ? (100 * r.T).toFixed(1) + ' % (' + (10 * Math.log10(Math.max(1e-6, r.T))).toFixed(2).replace('-', '−') + ' dB)' : '–');
+      o('m2', mp ? (100 * mp).toFixed(1) + ' %' : '–');
+    } else {
+      o('m1l', 'power in the ring ÷ power in'); o('m2l', 'through port (bus mode)');
+      o('m1', r && !g.blown ? r.B.toFixed(2) + '×' : '–'); o('m2', r && !g.blown ? (100 * r.T).toFixed(1) + ' %' : '–');
+    }
+    BD.pill(q('[data-o="pS"]'), g.blown ? 'blew up' : S.S > Math.SQRT1_2 ? 'unstable' : 'stable', g.blown || S.S > Math.SQRT1_2 ? 'bad' : 'ok');
+    BD.pill(q('[data-o="pM"]'), !P ? 'walls reflect' : g.blown ? '' : ok ? (g.src === 'pulse' ? 'pulse done' : 'steady state') : g.n ? (g.src === 'pulse' ? 'pulse in flight' : 'settling') : 'press run', !P ? 'warn' : ok ? 'ok' : 'warn');
+    if (nfr % 20 === 0 || !playing) {
+      var fst = q('[data-o="fst"]'), stx = [g.nx + ' × ' + g.ny + ' Yee cells (' + grp(g.nx * g.ny) + ')'];
+      if (g.sps && playing) stx.push(grp(g.sps) + ' steps/s'); if (!playing) stx.push(g.blown ? 'stopped: the fields overflowed' : 'paused');
+      stx.push('live FDTD of this 2D model, not a stored movie'); fst.textContent = stx.join(' · ');
+    }
+    caption(ok);
+  }
+  function caption(ok) {
+    var g = G, r = g.res, c = 'A finite-difference time-domain simulation running in your browser: Faraday’s and Ampère’s laws stepped on a 2D Yee grid, H half a step after E, ' + g.per.toFixed(1) + ' steps per optical period. ';
+    c += 'The picture is H<sub>z</sub> (normal to the chip) for the TE-like mode of a 500 nm silicon strip, flattened to 2D by the effective-index method (core 2.848, oxide 1.444, Chapter 6). ';
+    if (g.blown || S.S > Math.SQRT1_2) c += 'S = ' + S.S.toFixed(2) + ' is above the 2D Courant limit 1/√2 = 0.707 for the fastest light on the grid (in the oxide): the update outruns what the grid can pass between neighbours, and the shortest pattern the grid can hold, a checkerboard, grows from round-off in the oxide (in silicon, where light is slower, the step is still stable) by up to e<sup>4 arccosh(√2 S)</sup> = ' + Math.exp(4 * Math.acosh(Math.SQRT2 * S.S)).toFixed(2) + '× in energy per step until the numbers overflow. ';
+    else if (!g.P) c += 'With the PML off the grid ends in a perfect conductor: everything that reaches the edge comes back, the energy has no way out, and the monitors never settle. ';
+    else if (g.st === 'straight') c += ok ? 'The phase of the field along the core gives n<sub>eff</sub> = ' + r.n.toFixed(4) + ' in this run; the grid’s own eigenmode predicts ' + g.ngrid.toFixed(4) + ' and the exact slab ' + CV.nex.toFixed(4) + ': on this grid light travels ' + Math.abs(100 * (r.n / CV.nex - 1)).toFixed(2) + (r.n > CV.nex ? ' % too slowly' : ' % too fast') + ', so the guided wavelength comes out ' + (1000 * S.lam / r.n).toFixed(0) + ' nm instead of ' + (1000 * S.lam / CV.nex).toFixed(0) + ' nm. ' : 'Once the field settles, its phase along the core gives the run’s own n<sub>eff</sub>. ';
+    else if (g.st === 'bend') c += ok ? 'DFT flux monitors give ' + (100 * r.T).toFixed(1) + ' % through the bend' + (MEEP[g.R.toFixed(2)] ? ', against ' + (100 * MEEP[g.R.toFixed(2)]).toFixed(1) + ' % from a converged MEEP run of the same 2D bend' : '') + '; the rest is radiated where the straight guide meets the arc, and part of what arrives is in the second (odd) mode, which the 2D guide also supports. ' : 'Once the field settles, DFT flux monitors give the power through the bend. ';
+    else if (g.sp) c += g.peaks && g.peaks.length ? 'One pulse run gives the whole spectrum: on this grid the ring resonates at ' + g.peaks.map(function (pk) { return pk[0].toFixed(1) + ' nm' + (pk[1] ? ' (Q ≈ ' + Math.round(pk[1] / 10) * 10 + ')' : ''); }).join(' and ') + ', with Q from the width of each peak. The peaks sharpen while the ring rings down, which takes hundreds of periods: FDTD time grows with Q. ' + (ok ? 'At λ = ' + (1000 * S.lam).toFixed(1) + ' nm the ring holds ' + g.res.B.toFixed(2) + ' times the bus power and the through port passes ' + (100 * g.res.T).toFixed(1) + ' %. ' : '') : 'One pulse run gives the whole spectrum of the ring once the pulse has passed. '
+    else c += ok ? 'At this wavelength the ring holds ' + r.B.toFixed(2) + ' times the bus power and the through port passes ' + (100 * r.T).toFixed(1) + ' %; ' + (r.B > 2 ? 'on resonance the light circulates many times, so the field needs hundreds of periods to build up: FDTD time grows with Q. ' : 'off resonance the light passes by. ') : 'A ring stores light for many round trips, so it takes hundreds of periods to settle (fast-forward helps). ';
+    c += '<i>Approximate: 2D model without material dispersion; ε averaged over each cell, as MEEP does; the soft source sends light both ways; split-field (Bérenger) PML.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+  rebuild();
+  setPlay(playing);
+  root.__fdtd = { G: function () { return G; }, S: S, step: stepN, measure: measure, results: results, rebuild: rebuild, draw: draw, CV: function () { return CV; } };
+})();
+</script>

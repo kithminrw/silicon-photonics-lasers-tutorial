@@ -98,7 +98,7 @@ with $$\Gamma g_\mathrm{th} = \alpha_i + \alpha_m$$ the modal gain at threshold,
 
 {% include demos/dyn.html %}
 
-For the Chapter 24 laser at 6.5 mW per facet, $$n_{sp} = 1.8$$ and $$\alpha = 4$$, the linewidth is 2.1 MHz. Without the α-factor it would be 0.12 MHz, seventeen times narrower ([Figure 25.4](#fig-25-4)). Megahertz linewidths are fine for intensity-modulated links. Coherent links with high-order formats need about 100 kHz or less, FMCW LiDAR needs coherence over its ranging distance ([Chapter 34]({% link chapters/34_apps.md %})), and atomic and quantum applications need hertz.
+For the Chapter 24 laser at 6.5 mW per facet, $$n_{sp} = 1.8$$ and $$\alpha = 4$$, the linewidth is 2.1 MHz. Without the α-factor it would be 0.12 MHz, seventeen times narrower ([Figure 25.4](#fig-25-4)). Megahertz linewidths are fine for intensity-modulated links. Coherent links with high-order formats need about 100 kHz or less, FMCW LiDAR needs coherence over its ranging distance ([Chapter 39]({% link chapters/39_apps.md %})), and atomic and quantum applications need hertz.
 
 <figure id="fig-25-4">
   <img src="{{ '/assets/figs/ch25_linewidth.svg' | relative_url }}" style="width:620px" alt="Lorentzian field spectra 2.1 megahertz and 0.12 megahertz wide, and simulated random walks of the optical phase over one microsecond for the two linewidths, the broader line's phase wandering much faster">

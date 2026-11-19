@@ -78,18 +78,18 @@ Photonic integrated circuits (PICs) are now in several markets, each pulling the
 
 - **Data-centre transceivers and AI clusters.** Pluggable modules convert electrical lanes to light over hundreds of metres to a few kilometres of fibre at 400 Gb/s, 800 Gb/s and beyond. Clusters of AI accelerators need far more bandwidth between chips than copper can deliver at acceptable power, which is driving optics into the package (co-packaged optics, Chapter 17).
 - **Coherent telecom.** Long-haul and metro links encode data in the amplitude and phase of light in two polarisations and recover it with a local oscillator and digital signal processing. They need low-loss IQ modulators and narrow-linewidth tunable lasers (Chapters 20 and 26).
-- **LiDAR and free-space beam steering.** Frequency-modulated continuous-wave (FMCW) LiDAR measures distance and velocity from the beat between transmitted and received light; optical phased arrays steer the beam without moving parts (Chapter 34).
+- **LiDAR and free-space beam steering.** Frequency-modulated continuous-wave (FMCW) LiDAR measures distance and velocity from the beat between transmitted and received light; optical phased arrays steer the beam without moving parts (Chapter 39).
 - **Sensing.** The evanescent field of a waveguide resonator responds to molecules binding at its surface, giving label-free biosensors; the same idea detects gases and measures rotation and strain.
 - **Quantum photonics.** Photon-pair sources, large interferometer meshes and single-photon detectors on a chip are a route to quantum communication and computing.
 - **Photonic computing.** Meshes of interferometers perform matrix multiplication at the speed of light, with the electronics around them as the bottleneck.
 
-The roadmap by Shekhar and co-authors reviews where silicon photonics stands in each of these {% include cite.html keys="shekhar2024" %}. In all of them the same few building blocks recur: waveguides, couplers, interferometers, resonators, modulators, detectors and lasers. That is why this tutorial is organised by building block, and only returns to systems in Part VIII.
+The roadmap by Shekhar and co-authors reviews where silicon photonics stands in each of these {% include cite.html keys="shekhar2024" %}. In all of them the same few building blocks recur: waveguides, couplers, interferometers, resonators, modulators, detectors and lasers. That is why this tutorial is organised by building block, and only returns to systems in Part IX.
 
 ## <span class="secnum">1.3</span>Why silicon, and why not only silicon
 
 Silicon photonics started from a simple observation: the silicon-on-insulator (SOI) wafers used for some CMOS processes also make excellent optical waveguides {% include cite.html keys="reedbook,hochberg2013" %}. A thin silicon film (most often 220 nm) sits on a buried oxide (BOX) 2–3 µm thick. Silicon is transparent at the telecom wavelengths, above about 1.1 µm, and its index of 3.48 against 1.44 for silica gives a very strong index contrast. Light can then be confined in a strip of silicon only 500 nm wide and turned around bends a few micrometres in radius, so complex circuits fit on a few square millimetres.
 
-The decisive advantage is manufacturing. Silicon photonics uses the lithography, etching, implantation and metallisation tools of the CMOS industry, on 200 mm and 300 mm wafers, with the yield and statistics of that industry. Germanium, already used in CMOS for strain engineering, makes photodetectors; doped junctions make modulators; metal heaters make tuners ([Figure 1.2](#fig-1-2)). Foundries offer this as a multi-project wafer (MPW) service with a process design kit, so a designer without a fab can tape out a chip (Chapters 29 and 30).
+The decisive advantage is manufacturing. Silicon photonics uses the lithography, etching, implantation and metallisation tools of the CMOS industry, on 200 mm and 300 mm wafers, with the yield and statistics of that industry. Germanium, already used in CMOS for strain engineering, makes photodetectors; doped junctions make modulators; metal heaters make tuners ([Figure 1.2](#fig-1-2)). Foundries offer this as a multi-project wafer (MPW) service with a process design kit, so a designer without a fab can tape out a chip (Chapters 35 and 30).
 
 Silicon has five weaknesses, and each one shapes the rest of this tutorial:
 
@@ -97,7 +97,7 @@ Silicon has five weaknesses, and each one shapes the rest of this tutorial:
 2. **No linear electro-optic effect.** Silicon's crystal is centrosymmetric, so it has no Pockels effect. Its modulators move free carriers instead, which costs loss and limits linearity (Chapter 19).
 3. **Two-photon absorption.** At 1550 nm the photon energy is 0.80 eV, and two photons together exceed silicon's 1.12 eV bandgap, so high intensities are absorbed (Chapter 7).
 4. **Temperature sensitivity.** Silicon's index changes by about 1.8 × 10⁻⁴ per kelvin, so a silicon ring resonator drifts by about 75 pm/K and needs active control (Chapter 18).
-5. **Sensitivity to fabrication.** The strong confinement that makes devices small also makes them sensitive to nanometre changes in width and thickness (Chapter 29).
+5. **Sensitivity to fabrication.** The strong confinement that makes devices small also makes them sensitive to nanometre changes in width and thickness (Chapter 35).
 
 These weaknesses are why other materials have joined silicon: silicon nitride for low loss and wide transparency, thin-film lithium niobate and barium titanate for fast, efficient modulation, and indium phosphide and other III–V semiconductors for gain. [Chapter 4]({% link chapters/04_platforms.md %}) compares them.
 
@@ -169,7 +169,7 @@ The fibre couplers usually dominate a short link's budget: two grating couplers 
 
 ## <span class="secnum">1.6</span>The two running examples
 
-**Your first chip.** The labs build a passive chip in 220 nm SOI at 1550 nm, with grating couplers on a 127 µm pitch for a fibre array, of the kind fabricated in the SiEPIC openEBL runs {% include cite.html keys="openebl" %}. It carries the classic test structures: waveguide cut-backs to measure loss, Mach–Zehnder interferometers to measure the group index, ring resonators and Bragg gratings. You lay it out with open tools ([Chapter 30]({% link chapters/30_flow.md %})), and [Chapter 32]({% link chapters/32_analysis.md %}) analyses measured data from chips like it, so that the tutorial covers a whole design–fabrication–test cycle.
+**Your first chip.** The labs build a passive chip in 220 nm SOI at 1550 nm, with grating couplers on a 127 µm pitch for a fibre array, of the kind fabricated in the SiEPIC openEBL runs {% include cite.html keys="openebl" %}. It carries the classic test structures: waveguide cut-backs to measure loss, Mach–Zehnder interferometers to measure the group index, ring resonators and Bragg gratings. You lay it out with open tools ([Chapter 30]({% link chapters/30_flow.md %})), and [Chapter 37]({% link chapters/37_analysis.md %}) analyses measured data from chips like it, so that the tutorial covers a whole design–fabrication–test cycle.
 
 **The reference link.** The system thread of the tutorial is a four-wavelength WDM link ([Figure 1.4](#fig-1-4)): four lasers, four ring modulators on one bus, a grating coupler into 2 km of single-mode fibre, and on the receiving chip four drop rings that separate the wavelengths onto germanium photodiodes. Ring modulators double as the multiplexer, which keeps the transmitter compact; the price is that every ring must be held on its wavelength by a heater and a control loop. [Table 1.3](#tab-1-3) lists its draft targets, and the chapter that sets or meets each.
 
@@ -178,23 +178,23 @@ The fibre couplers usually dominate a short link's budget: two grating couplers 
   <figcaption><span class="capnum">Figure 1.4.</span> <strong>The reference link.</strong> Four wavelengths on the 400 GHz ITU grid near 1550 nm, each carrying 50 Gb/s NRZ, share one waveguide and one fibre. On the receiver, four drop rings demultiplex the channels onto germanium photodiodes and transimpedance amplifiers.</figcaption>
 </figure>
 
-**Table 1.3. Draft targets of the reference link.** Set here, checked block by block, and closed in Chapter 33.
+**Table 1.3. Draft targets of the reference link.** Set here, checked block by block, and closed in Chapter 38.
 {: .tabcaption #tab-1-3 }
 
 | Quantity | Draft target | Set or met in |
 |---|---|---|
 | Channels | 4 wavelengths on the 400 GHz ITU grid: 1546.12, 1549.32, 1552.52, 1555.75 nm {% include cite.html keys="itug694" %} | Ch 12, 14 |
 | Modulation and rate | NRZ, 50 Gb/s per channel, 200 Gb/s in total | Ch 20, 21 |
-| Reach | 2 km of standard single-mode fibre, two connectors | Ch 3, 33 |
-| Bit-error ratio | below 10⁻¹² without forward error correction | Ch 21, 33 |
+| Reach | 2 km of standard single-mode fibre, two connectors | Ch 3, 38 |
+| Bit-error ratio | below 10⁻¹² without forward error correction | Ch 21, 38 |
 | Laser | ≥ +10 dBm per wavelength in the waveguide; side-mode suppression ≥ 35 dB | Ch 24–27 |
 | Ring modulator | extinction ≥ 4 dB with ≤ 2 V peak-to-peak drive; insertion loss ≤ 3 dB | Ch 12, 19, 20 |
 | Fibre couplers | ≤ 3 dB each, 1 dB bandwidth covering all four channels | Ch 15–17 |
 | Demultiplexer | crosstalk from neighbouring channels ≤ −20 dB; drop loss ≤ 1 dB | Ch 12, 14 |
 | Receiver | sensitivity ≤ −12 dBm average power at 50 Gb/s | Ch 21 |
 | Temperature | rings held on their channels from 20 to 70 °C | Ch 18 |
-| Link margin | ≥ 3 dB after all penalties | Ch 33 |
-| Energy | ≤ 5 pJ/bit for the whole link, including laser wall-plug power, drivers, receivers and heaters | Ch 33 |
+| Link margin | ≥ 3 dB after all penalties | Ch 38 |
+| Energy | ≤ 5 pJ/bit for the whole link, including laser wall-plug power, drivers, receivers and heaters | Ch 38 |
 
 The 400 GHz spacing (about 3.2 nm) is wide enough that ring filters whose free spectral range spans four channel spacings (12.8 nm), more than the 9.6 nm from the first channel to the last, separate them cleanly, and it leaves room for the thermal drift that the heaters must correct. At about 75 pm/K, a 50 K temperature change moves a silicon ring by 3.7 nm, more than one channel spacing: thermal control is not optional. [Figure 1.5](#fig-1-5) places the four channels in the C band.
 

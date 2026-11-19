@@ -33,7 +33,7 @@
 (function () {
   var root = document.getElementById('bdBio'); if (!root || !window.BD) return;
   var q = function (s) { return root.querySelector(s); };
-  // figsrc/ch34_sensor.py: 500 x 220 nm strip, oxide below, water (1.318) above, 1550 nm
+  // figsrc/ch39_sensor.py: 500 x 220 nm strip, oxide below, water (1.318) above, 1550 nm
   var P = { TE: { S: 54, neff: 2.4263, ng: 4.235 }, TM: { S: 206, neff: 1.7031, ng: 3.740 } }, NW = 1.318, K0 = 2 * Math.PI / 1.55;
   var pl = 'TE', FZ = BD.field(q('[data-c="z"]'), { button: q('.bd-status'), hz: 1 }), nfr = 0;
   var S = BD.bind(root, { dn: { fmt: function (x) { return x.toFixed(1) + ' × 10⁻⁴ RIU'; } }, Q: { fmt: function (x) { return Math.round(Math.pow(10, x)).toLocaleString('en'); } }, s: { fmt: function (x) { return x.toFixed(1) + ' pm'; } } }, function () { draw(); });
@@ -108,7 +108,7 @@
     var c = 'Molecules or a change in the fluid alter the index the evanescent field sees, and the resonance moves by S × Δn. ';
     c += pl === 'TE' ? 'TE light is tightly confined in the silicon: only 0.15 of a change in the water\'s index appears in its effective index, so S = 54 nm/RIU. ' : 'TM light reaches much further into the water above the strip: half of a change in the water\'s index (0.50) appears in its effective index, giving S = 206 nm/RIU, about four times TE. ';
     c += 'What matters is not the shift alone but the shift against the noise in tracking the resonance: the limit of detection is 3σ/S. A higher Q gives a narrower dip, which can be tracked more precisely, so σ falls with Q and with the signal-to-noise ratio. ';
-    if (sh < fw / 2) c += 'Here the shift is smaller than half the linewidth: it is still measurable, by fitting the resonance (Chapter 32). ';
+    if (sh < fw / 2) c += 'Here the shift is smaller than half the linewidth: it is still measurable, by fitting the resonance (Chapter 37). ';
     c += ' <i>Bulk sensitivities computed with femwell; the glow in the cross-section is a sketch of the exponential tails, while the side view uses the femwell decay lengths.</i>';
     q('[data-o="cap"]').innerHTML = c;
   }

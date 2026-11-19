@@ -1,9 +1,9 @@
-"""Mode fields of the Chapter 34 biosensor waveguide (500 x 220 nm Si strip, oxide below, water above), with femwell.
-Same structure as figsrc/ch34_sensor.py (which gives the sensitivities), on a smaller domain and a coarser mesh: one
+"""Mode fields of the Chapter 39 biosensor waveguide (500 x 220 nm Si strip, oxide below, water above), with femwell.
+Same structure as figsrc/ch39_sensor.py (which gives the sensitivities), on a smaller domain and a coarser mesh: one
 solve at 1550 nm for TE0 and TM0, giving n_eff, the confinement in the core and in the water, and the power density
-(Poynting z) on a grid for Figure 34.1.
+(Poynting z) on a grid for Figure 39.1.
 Runs in the photonics-labs container (femwell), with few threads:
-    OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 MKL_NUM_THREADS=2 python ch34_fields.py   ->  ch34_fields.json
+    OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 MKL_NUM_THREADS=2 python ch39_fields.py   ->  ch39_fields.json
 """
 import json, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -42,5 +42,5 @@ if __name__ == "__main__":
                                   conf_water=g_water, map=[int(round(999 * float(x))) for x in v])
         print(f"{name}: n_eff {float(np.real(m.n_eff)):.4f}, TE fraction {float(m.te_fraction):.3f}, "
               f"confinement core {g_core:.3f}, water {g_water:.3f}", flush=True)
-    json.dump(out, open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "ch34_fields.json"), "w"))
+    json.dump(out, open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "ch39_fields.json"), "w"))
     print("done", flush=True)

@@ -23,7 +23,7 @@ Add up the reference link block by block in a few lines of Python, derive the re
 
 ## What you need
 
-- [Chapter 33]({% link chapters/33_links.md %}) (Sections 33.2, 33.5 and 33.7), with [Chapter 1]({% link chapters/01_why.md %}) (Worked Example 1.1, Table 1.3), [Chapter 21]({% link chapters/21_pd.md %}) (Section 21.6), [Chapter 14]({% link chapters/14_wdm.md %}) (Worked Example 14.1) and [Chapter 2]({% link chapters/02_em.md %}) (Worked Example 2.5).
+- [Chapter 38]({% link chapters/38_links.md %}) (Sections 38.2, 38.5 and 38.7), with [Chapter 1]({% link chapters/01_why.md %}) (Worked Example 1.1, Table 1.3), [Chapter 21]({% link chapters/21_pd.md %}) (Section 21.6), [Chapter 14]({% link chapters/14_wdm.md %}) (Worked Example 14.1) and [Chapter 2]({% link chapters/02_em.md %}) (Worked Example 2.5).
 - Python 3.11 or newer with NumPy and Matplotlib: `pip install numpy matplotlib`. The error function is Python's own `math.erfc`, so SciPy is not needed.
 - The script <a href="{{ '/labs/lab12_link.py' | relative_url }}" download><code>lab12_link.py</code></a>.
 - About two hours, including the exercises.
@@ -38,7 +38,7 @@ It prints a checkpoint for each part below, with the value from the chapter besi
 
 ## <span class="secnum">L12.1</span>The budget as a table of blocks
 
-Losses multiply, so in decibels a link budget is a subtraction ([Section 1.5]({% link chapters/01_why.md %})). The script keeps the reference link as a list of blocks, each with its loss for one wavelength, in the order the light meets them, and the penalties of Table 33.1 as a dictionary:
+Losses multiply, so in decibels a link budget is a subtraction ([Section 1.5]({% link chapters/01_why.md %})). The script keeps the reference link as a list of blocks, each with its loss for one wavelength, in the order the light meets them, and the penalties of Table 38.1 as a dictionary:
 
 ```python
 def link_blocks(km=FIBRE_KM, gc=3.0, fibre_db_per_km=FIBRE_DB_PER_KM):
@@ -56,12 +56,12 @@ def power_levels(p_laser, blocks):
     return p_laser - np.cumsum([loss for _, loss in blocks])
 ```
 
-`power_levels` is the power after every block, a running subtraction from the laser's +10 dBm; its last value is the received power. The margin is the key equation of Section 33.2, $$\text{margin} = P_\mathrm{launch} - \sum_i L_i - \sum_j \mathrm{penalty}_j - P_\mathrm{sens}$$, with the sensitivity of −11.6 dBm that the next part derives. The extinction-ratio penalty is not in the dictionary: it is already inside that sensitivity. Writing the budget this way makes every "what if" a change of one argument: `link_blocks(gc=4.0)` for the measured couplers, `link_blocks(km=10)` for a longer fibre.
+`power_levels` is the power after every block, a running subtraction from the laser's +10 dBm; its last value is the received power. The margin is the key equation of Section 38.2, $$\text{margin} = P_\mathrm{launch} - \sum_i L_i - \sum_j \mathrm{penalty}_j - P_\mathrm{sens}$$, with the sensitivity of −11.6 dBm that the next part derives. The extinction-ratio penalty is not in the dictionary: it is already inside that sensitivity. Writing the budget this way makes every "what if" a change of one argument: `link_blocks(gc=4.0)` for the measured couplers, `link_blocks(km=10)` for a longer fibre.
 
 <div class="tbox tbox-specnote" markdown="1">
 <div class="tbox-title">Checkpoint A</div>
 
-The losses add up to 12.7 dB, so the receiver gets −2.7 dBm (0.54 mW), 9.3 dB above the −12 dBm of Worked Example 1.1. After 3.0 dB of penalties the margin against −11.6 dBm is 5.9 dB. With the measured −4 dB grating couplers the receiver gets −4.7 dBm and the margin is 3.9 dB. All as in Table 33.1 and the text below it.
+The losses add up to 12.7 dB, so the receiver gets −2.7 dBm (0.54 mW), 9.3 dB above the −12 dBm of Worked Example 1.1. After 3.0 dB of penalties the margin against −11.6 dBm is 5.9 dB. With the measured −4 dB grating couplers the receiver gets −4.7 dBm and the margin is 3.9 dB. All as in Table 38.1 and the text below it.
 
 </div>
 
@@ -83,12 +83,12 @@ def q_factor(p_dbm, er_db=ER_DB, i_n=I_N, bit_rate=BIT_RATE, shot=True):
     return (i1 - i0) / (s1 + s0)
 ```
 
-`sensitivity` then finds, by bisection again, the lowest average power whose Q meets the target. With the TIA's noise alone, the eye must be $$2Q\sigma$$ tall, so the sensitivity follows in closed form; the shot noise of the "1" level adds a little. A finite extinction ratio wastes power on the "0": against a perfect one it costs $$10\log_{10}[(r+1)/(r-1)]$$ in a receiver dominated by its TIA, which is the extinction-ratio penalty of Section 33.2.
+`sensitivity` then finds, by bisection again, the lowest average power whose Q meets the target. With the TIA's noise alone, the eye must be $$2Q\sigma$$ tall, so the sensitivity follows in closed form; the shot noise of the "1" level adds a little. A finite extinction ratio wastes power on the "0": against a perfect one it costs $$10\log_{10}[(r+1)/(r-1)]$$ in a receiver dominated by its TIA, which is the extinction-ratio penalty of Section 38.2.
 
 <div class="tbox tbox-specnote" markdown="1">
 <div class="tbox-title">Checkpoint B</div>
 
-Q = 7.034 for 10⁻¹² and 3.49 for the KP4 threshold of 2.4 × 10⁻⁴ (Chapter 21: 7.03 and 3.49). The TIA's noise is σ = 3.74 µA, so the eye needs $$I_1 - I_0 = 2Q\sigma = 52.6$$ µA, an OMA of 58.5 µW, which at 4 dB of extinction (OMA/average = 0.861) is 67.9 µW, or −11.68 dBm (Worked Example 21.2: 68 µW, −11.7 dBm). Shot and dark-current noise move it to −11.57 dBm, the −11.6 dBm of Chapters 21 and 33. The 4 dB extinction ratio costs 3.66 dB: a perfect "0" gives −15.3 dBm, and 15 dB of extinction, the top of the Chapter 21 demo's range, −15.0 dBm. KP4 FEC gives −14.7 dBm and a 10 pA/√Hz TIA −14.5 dBm (Chapter 21: −14.7 and −14.5 dBm). Against −11.57 dBm the link has 8.9 dB before penalties (Chapter 21: 8.9 dB).
+Q = 7.034 for 10⁻¹² and 3.49 for the KP4 threshold of 2.4 × 10⁻⁴ (Chapter 21: 7.03 and 3.49). The TIA's noise is σ = 3.74 µA, so the eye needs $$I_1 - I_0 = 2Q\sigma = 52.6$$ µA, an OMA of 58.5 µW, which at 4 dB of extinction (OMA/average = 0.861) is 67.9 µW, or −11.68 dBm (Worked Example 21.2: 68 µW, −11.7 dBm). Shot and dark-current noise move it to −11.57 dBm, the −11.6 dBm of Chapters 21 and 38. The 4 dB extinction ratio costs 3.66 dB: a perfect "0" gives −15.3 dBm, and 15 dB of extinction, the top of the Chapter 21 demo's range, −15.0 dBm. KP4 FEC gives −14.7 dBm and a 10 pA/√Hz TIA −14.5 dBm (Chapter 21: −14.7 and −14.5 dBm). Against −11.57 dBm the link has 8.9 dB before penalties (Chapter 21: 8.9 dB).
 
 </div>
 
@@ -110,11 +110,11 @@ The leaked channels are at other wavelengths, so they beat with the signal at 40
 <div class="tbox tbox-specnote" markdown="1">
 <div class="tbox-title">Checkpoint C</div>
 
-The channels are 1546.12, 1549.32, 1552.52 and 1555.75 nm (Table 1.3). −20 dB at 400 GHz needs a FWHM of 80.4 GHz (0.64 nm), a loaded Q of 2406, with an FSR of 1600 GHz (12.8 nm) (Worked Example 14.1: 0.64 nm, about 2400, 12.8 nm). Each neighbour leaks 1.00 % and the far channel 0.25 %: 2.25 % in all, a penalty of 0.10 dB (Chapter 33: about 2 %, roughly 0.1 dB, against an allowance of 0.5 dB). Filtering its own channel, the ring closes the eye by another 1.13 dB.
+The channels are 1546.12, 1549.32, 1552.52 and 1555.75 nm (Table 1.3). −20 dB at 400 GHz needs a FWHM of 80.4 GHz (0.64 nm), a loaded Q of 2406, with an FSR of 1600 GHz (12.8 nm) (Worked Example 14.1: 0.64 nm, about 2400, 12.8 nm). Each neighbour leaks 1.00 % and the far channel 0.25 %: 2.25 % in all, a penalty of 0.10 dB (Chapter 38: about 2 %, roughly 0.1 dB, against an allowance of 0.5 dB). Filtering its own channel, the ring closes the eye by another 1.13 dB.
 
 </div>
 
-The last line runs the eye simulation of the next part with the ring in the signal's path (the `ring_fwhm` argument). For the detected intensity, a Lorentzian of 80 GHz FWHM acts as a single-pole low-pass at 40 GHz, and in series with the transmitter and receiver it costs about a decibel (0.96 dB even with a perfect transmitter). Worked Example 14.1 calls this a small filtering penalty, and against 5.9 dB of margin it is; but Table 33.1 has no line for it. In practice it falls to the driver's equalisation ([Chapter 20]({% link chapters/20_modulators.md %})), which the ring modulator's 24 GHz optical bandwidth needs anyway.
+The last line runs the eye simulation of the next part with the ring in the signal's path (the `ring_fwhm` argument). For the detected intensity, a Lorentzian of 80 GHz FWHM acts as a single-pole low-pass at 40 GHz, and in series with the transmitter and receiver it costs about a decibel (0.96 dB even with a perfect transmitter). Worked Example 14.1 calls this a small filtering penalty, and against 5.9 dB of margin it is; but Table 38.1 has no line for it. In practice it falls to the driver's equalisation ([Chapter 20]({% link chapters/20_modulators.md %})), which the ring modulator's 24 GHz optical bandwidth needs anyway.
 
 ## <span class="secnum">L12.4</span>Dispersion: a 50 Gb/s eye through 2 km
 
@@ -141,15 +141,15 @@ Why does the weakly modulated signal suffer more than a fully modulated one? At 
 <div class="tbox tbox-specnote" markdown="1">
 <div class="tbox-title">Checkpoint D</div>
 
-34 ps/nm spread a 0.4 nm wide signal by 13.6 ps, most of a 20 ps bit (Worked Example 2.5: about 14 ps). The eye opening falls from 0.779 back-to-back to 0.683 after 2 km: a penalty of 0.57 dB, the "few tenths of a decibel" of Section 33.2, a little above its 0.5 dB allowance. With a perfect extinction ratio it is 0.37 dB, and without the transmitter's filter 0.38 dB. The penalty reaches 1 dB at 41 ps/nm and 2 dB at 53 ps/nm, inside the 40–60 ps/nm tolerance of Worked Example 2.5. With this lab's crosstalk (0.10 dB) and dispersion (0.57 dB) penalties in place of the allowances, the margin is 6.2 dB.
+34 ps/nm spread a 0.4 nm wide signal by 13.6 ps, most of a 20 ps bit (Worked Example 2.5: about 14 ps). The eye opening falls from 0.779 back-to-back to 0.683 after 2 km: a penalty of 0.57 dB, the "few tenths of a decibel" of Section 38.2, a little above its 0.5 dB allowance. With a perfect extinction ratio it is 0.37 dB, and without the transmitter's filter 0.38 dB. The penalty reaches 1 dB at 41 ps/nm and 2 dB at 53 ps/nm, inside the 40–60 ps/nm tolerance of Worked Example 2.5. With this lab's crosstalk (0.10 dB) and dispersion (0.57 dB) penalties in place of the allowances, the margin is 6.2 dB.
 
 </div>
 
-The two allowances together (1.0 dB) cover the two computed penalties (0.67 dB): the generous crosstalk allowance pays for the dispersion's small overshoot. Drift, locking and ageing (2.0 dB) remain allowances, as in Table 33.1.
+The two allowances together (1.0 dB) cover the two computed penalties (0.67 dB): the generous crosstalk allowance pays for the dispersion's small overshoot. Drift, locking and ageing (2.0 dB) remain allowances, as in Table 38.1.
 
 ## <span class="secnum">L12.5</span>Energy per bit, and margin traded for laser power
 
-The energy per bit of Section 33.5 adds the lasers' wall-plug power, the heaters, the receivers, the drivers and the modulators, and divides by the total bit rate of 200 Gb/s. Eight rings at up to 20 mW each come from Worked Example 18.2; the TIA and driver energies are typical values.
+The energy per bit of Section 38.5 adds the lasers' wall-plug power, the heaters, the receivers, the drivers and the modulators, and divides by the total bit rate of 200 Gb/s. Eight rings at up to 20 mW each come from Worked Example 18.2; the TIA and driver energies are typical values.
 
 ```python
 def energy_per_bit(p_laser=P_LASER, wall_plug=WALL_PLUG, heater_mw=HEATER_MW):
@@ -164,7 +164,7 @@ The laser term is the only one that scales with the margin. Any margin above the
 <div class="tbox tbox-specnote" markdown="1">
 <div class="tbox-title">Checkpoint E</div>
 
-1.33 + 0.80 + 1.00 + 0.50 + 0.02 = 3.65 pJ/bit (lasers, heaters, TIAs, drivers, modulators), as in Table 33.1. Each laser's 10 mW of light draws 67 mW (Section 1.5), and the lasers are 36 % of the total. Cutting them by 2.9 dB to 7.1 dBm leaves exactly 3.0 dB of margin and saves 0.65 pJ/bit, for 3.00 pJ/bit in all (Chapter 33: 2.9 dB and 0.65 pJ/bit). Both targets are met: 5.9 dB of margin against 3 dB, and 3.65 pJ/bit against 5.
+1.33 + 0.80 + 1.00 + 0.50 + 0.02 = 3.65 pJ/bit (lasers, heaters, TIAs, drivers, modulators), as in Table 38.1. Each laser's 10 mW of light draws 67 mW (Section 1.5), and the lasers are 36 % of the total. Cutting them by 2.9 dB to 7.1 dBm leaves exactly 3.0 dB of margin and saves 0.65 pJ/bit, for 3.00 pJ/bit in all (Chapter 38: 2.9 dB and 0.65 pJ/bit). Both targets are met: 5.9 dB of margin against 3 dB, and 3.65 pJ/bit against 5.
 
 </div>
 
@@ -175,7 +175,7 @@ The laser term is the only one that scales with the margin. Any margin above the
 
 ## Exercises
 
-1. **PAM4.** Send the same 50 Gb/s as PAM4 at 25 GBd: four equally spaced levels between the same "1" and "0" powers (4 dB, same average), three eyes each a third of the OMA, and a noise bandwidth of 0.7 × 25 GHz. With Gray coding and equal eyes, $$\mathrm{BER} \approx \tfrac{3}{8}\,\mathrm{erfc}(Q/\sqrt{2})$$, with $$Q$$ for one eye. Write a PAM4 version of `q_factor` and find the sensitivity and the margin with Table 33.1's penalties. Why is the cost smaller than the 4.8 dB of [Chapter 20]({% link chapters/20_modulators.md %})?
+1. **PAM4.** Send the same 50 Gb/s as PAM4 at 25 GBd: four equally spaced levels between the same "1" and "0" powers (4 dB, same average), three eyes each a third of the OMA, and a noise bandwidth of 0.7 × 25 GHz. With Gray coding and equal eyes, $$\mathrm{BER} \approx \tfrac{3}{8}\,\mathrm{erfc}(Q/\sqrt{2})$$, with $$Q$$ for one eye. Write a PAM4 version of `q_factor` and find the sensitivity and the margin with Table 38.1's penalties. Why is the cost smaller than the 4.8 dB of [Chapter 20]({% link chapters/20_modulators.md %})?
 2. **The measured couplers.** With `link_blocks(gc=4.0)`, what laser power restores 5.9 dB of margin, and what does it cost in energy? What is the lowest laser power that still keeps 3 dB?
 3. **Ten kilometres.** Stretch the fibre to 10 km at 1550 nm (`link_blocks(km=10)`, `dispersion_penalty(170)`). Does the power budget close? Does the eye? How far can the link reach within the 0.5 dB dispersion allowance, and where does the eye close completely? Repeat in the O band, with 0.35 dB/km (`fibre_db_per_km=0.35`) and almost no dispersion.
 4. **A quieter TIA.** Halve the TIA's noise to 10 pA/√Hz (`sensitivity(i_n=10e-12)`). What are the sensitivity and the margin, and how much laser power and energy can you save while keeping 3 dB?
@@ -194,7 +194,7 @@ The laser term is the only one that scales with the margin. Any margin above the
 
 ## Going further
 
-- The link-budget demo of Chapter 33 and the receiver demo of Chapter 21 run the same models in your browser.
+- The link-budget demo of Chapter 38 and the receiver demo of Chapter 21 run the same models in your browser.
 - Add chirp. A directly modulated laser's phase follows its power, $$\phi = (\alpha/2)\ln P$$ with $$\alpha \approx 4$$ ([Chapter 25]({% link chapters/25_dynamics.md %})): multiply the field by $$e^{i\phi}$$ before the fibre and watch the penalty grow. [Lab 10]({% link labs/lab10_rate_equations.md %}) models such a laser with its rate equations.
 - Replace the Lorentzian with the full drop response of an add-drop ring ([Section 12.3]({% link chapters/12_rings.md %})), which repeats smoothly every FSR. With the same FWHM it rejects the neighbours by only 19.1 dB, so the loaded Q must rise to meet −20 dB.
 - Add the ring modulator's own response (Q<sub>L</sub> ≈ 8000, about 24 GHz) to the transmitter, and see why its driver needs equalisation.

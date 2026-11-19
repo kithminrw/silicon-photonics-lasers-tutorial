@@ -7,7 +7,7 @@
 
    Use: serve the site (bundle exec jekyll serve), open any page of it, paste this file into the browser console,
    then run for example
-       await demoAudit([375, 900, 1280], ['part-6/ch22', 'part-7/ch31'])
+       await demoAudit([375, 900, 1280], ['part-6/ch22', 'part-8/ch36'])
    Window widths are iframe widths, so desktop scrollbars apply: 375 gives 298 px panels, as on a 360 px phone. */
 (function () {
   function install() {   // runs inside each page: wraps fillText/clearRect to log where every label is drawn

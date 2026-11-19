@@ -153,7 +153,7 @@ Loss is small per millimetre and the fibre couplers are large and variable, so m
 <div class="tbox tbox-insight" markdown="1">
 <div class="tbox-title">What this means for your design</div>
 
-On your first chip, the cutback set is the reference everything else is measured against: put at least four lengths spanning a centimetre or more between identical couplers, and add a ring or two as an independent check. [Chapter 32]({% link chapters/32_analysis.md %}) fits real openEBL data this way.
+On your first chip, the cutback set is the reference everything else is measured against: put at least four lengths spanning a centimetre or more between identical couplers, and add a ring or two as an independent check. [Chapter 37]({% link chapters/37_analysis.md %}) fits real openEBL data this way.
 
 </div>
 

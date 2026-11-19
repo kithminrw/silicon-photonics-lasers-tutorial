@@ -17,7 +17,7 @@ def fig_soi_stack():
     T_SI, T_SLAB, T_BOX, T_GE = 0.22, 0.09, 2.0, 0.5     # Ch 1, 4, 6, 21
     H_HEAT, T_HEAT, W_HEAT = 1.90, 0.12, 2.0               # TiN heater of Ch 18: bottom 1.9 µm above the BOX, 2 µm wide
     M1, T_M1, M2, T_M2, TOP = 2.6, 0.5, 3.6, 0.7, 4.7      # interconnect (representative)
-    GC_P, GC_E = 0.63, 0.07                                # grating period and etch depth (Ch 15, 29)
+    GC_P, GC_E = 0.63, 0.07                                # grating period and etch depth (Ch 15, 35)
     print("SOI stack: Si %.0f nm, slab %.0f nm, BOX %.1f µm, Ge %.1f µm, heater %.2f µm above the Si top" %
           (1e3 * T_SI, 1e3 * T_SLAB, T_BOX, T_GE, H_HEAT - T_SI))
 

@@ -37,14 +37,15 @@ The **[PDK devices in 3D]({% link devices-3d.md %})** page shows real devices fr
 
 **Your first chip** is a passive chip in 220 nm SOI at 1550 nm with grating couplers on a 127 µm pitch, of the kind made in the SiEPIC openEBL runs {% include cite.html keys="openebl" %}. The labs lay it out, verify it and analyse the measurements, so that you go through a whole design–fabrication–test cycle with free tools.
 
-**The reference link** is a four-wavelength WDM transmitter and receiver: lasers, modulators, a multiplexer, a fibre, a demultiplexer and photodetectors. Chapter 1 sets its draft targets, Parts V and VI design its active blocks, and Chapter 33 closes its power budget.
+**The reference link** is a four-wavelength WDM transmitter and receiver: lasers, modulators, a multiplexer, a fibre, a demultiplexer and photodetectors. Chapter 1 sets its draft targets, Parts V and VI design its active blocks, and Chapter 38 closes its power budget.
 
 ## Reading paths
 
 - **Physics first:** Parts I and II, then the passive devices of Part III and the lasers of Part VI.
-- **Chip designer:** Chapters 1, 4, 5 and 6, then Parts III and IV, Chapter 30 (design flow) and Chapter 32 (data analysis), with the labs.
+- **Chip designer:** Chapters 1, 4, 5 and 6, then Parts III and IV, Part VII (design, simulation and layout) and Chapter 37 (data analysis), with the labs.
+- **Simulation and layout:** Chapters 5 and 6 for the physics, then Part VII from Chapter 29, with Labs 2, 6, 7 and 8.
 - **Lasers:** Chapters 1–4, then Part VI from Chapter 22, with Chapters 12–13 (rings and gratings) for the tunable lasers of Chapter 26.
-- **Test and measurement:** Chapters 7, 12, 15 and 17, then Chapters 31 and 32.
+- **Test and measurement:** Chapters 7, 12, 15 and 17, then Chapters 36 and 37.
 
 ## Open material only
 

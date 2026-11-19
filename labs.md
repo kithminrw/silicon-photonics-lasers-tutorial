@@ -31,17 +31,17 @@ The twelve labs follow three tracks. **Simulate** (Labs 1–6): mode solvers, co
 | 4 | [MZI and ring circuits with S-parameters]({% link labs/lab04_sax.md %}) | 11–12 | SAX (with a NumPy fallback): compact models, MZI, all-pass and add-drop rings, a lattice filter |
 | 5 | [Bragg gratings with transfer matrices]({% link labs/lab05_bragg.md %}) | 13 | NumPy: transfer matrices, apodisation, phase-shifted cavities |
 | 6 | [A grating coupler in 2D FDTD]({% link labs/lab06_gc_meep.md %}) | 15 | MEEP: efficiency, bandwidth and directionality, phase matching against period and angle, BOX thickness |
-| 7 | [Lay out your first chip]({% link labs/lab07_layout.md %}) | 30 | gdsfactory with ubcpdk (the SiEPIC EBeam PDK); view in KLayout |
-| 8 | [Verify and submit to openEBL]({% link labs/lab08_submit.md %}) | 30 | Pre-flight checks in Python and SiEPIC-Tools verification; the GitHub submission |
-| 9 | [Analyse measured openEBL data]({% link labs/lab09_analysis.md %}) | 32 | NumPy: coupler envelope, group index, ring fits and the coupling ambiguity, cutback loss |
+| 7 | [Lay out your first chip]({% link labs/lab07_layout.md %}) | 30, 33 | gdsfactory with ubcpdk (the SiEPIC EBeam PDK); view in KLayout |
+| 8 | [Verify and submit to openEBL]({% link labs/lab08_submit.md %}) | 30, 34 | Pre-flight checks in Python and SiEPIC-Tools verification; the GitHub submission |
+| 9 | [Analyse measured openEBL data]({% link labs/lab09_analysis.md %}) | 37 | NumPy: coupler envelope, group index, ring fits and the coupling ambiguity, cutback loss |
 | 10 | [Laser rate equations]({% link labs/lab10_rate_equations.md %}) | 24–25 | NumPy: L–I, turn-on transients, modulation response, temperature, linewidth |
 | 11 | [Design a Vernier tunable laser]({% link labs/lab11_vernier.md %}) | 26 | NumPy: two ring filters, gain, mode selection and the tuning map |
-| 12 | [Close the reference link budget]({% link labs/lab12_link.md %}) | 33 | NumPy: power budget, sensitivity and BER, crosstalk and dispersion penalties, energy per bit |
+| 12 | [Close the reference link budget]({% link labs/lab12_link.md %}) | 38 | NumPy: power budget, sensitivity and BER, crosstalk and dispersion penalties, energy per bit |
 {: .lab-table }
 
 ## The openEBL cycle
 
-Labs 7–9 follow the SiEPIC openEBL workflow {% include cite.html keys="openebl" %}: designs in the SiEPIC EBeam PDK are submitted through a GitHub repository, checked automatically, fabricated by electron-beam lithography, measured on an automated probe station, and the data are shared through a link in the run's repository. The edX course *Silicon Photonics Design, Fabrication and Data Analysis* follows the same cycle {% include cite.html keys="phot1x" %}. [Chapter 30]({% link chapters/30_flow.md %}) covers the design flow and [Chapter 32]({% link chapters/32_analysis.md %}) the analysis.
+Labs 7–9 follow the SiEPIC openEBL workflow {% include cite.html keys="openebl" %}: designs in the SiEPIC EBeam PDK are submitted through a GitHub repository, checked automatically, fabricated by electron-beam lithography, measured on an automated probe station, and the data are shared through a link in the run's repository. The edX course *Silicon Photonics Design, Fabrication and Data Analysis* follows the same cycle {% include cite.html keys="phot1x" %}. [Chapter 30]({% link chapters/30_flow.md %}) covers the design flow and [Chapter 37]({% link chapters/37_analysis.md %}) the analysis.
 
 ## What you need
 
