@@ -56,7 +56,7 @@ $$w(z) = w_0\sqrt{1 + (z/z_R)^2},\qquad R(z) = z\left[1 + (z_R/z)^2\right],\qqua
 
 Here $$r$$ is the distance from the axis, $$w(z)$$ the **beam radius** (where the intensity has fallen to $$1/e^2$$ of its peak; twice it is the mode-field diameter, MFD), $$w_0$$ the radius at the **waist**, $$R(z)$$ the radius of curvature of the wavefronts, and $$\zeta(z)$$ the **Gouy phase**, an extra phase of π/2 that the beam slips through on each side of its focus.
 
-The **Rayleigh range** $$z_R$$ is the distance over which the beam stays nearly collimated: there its area has doubled. Far from the waist the beam spreads as a cone with half-angle
+The **Rayleigh range** $$z_R$$ is the distance over which the beam stays nearly collimated: there its area has doubled ([Figure 3.1](#fig-3-1)). Far from the waist the beam spreads as a cone with half-angle
 
 $$\theta_0 \approx \frac{\lambda_0}{\pi n w_0}.$$
 
@@ -68,6 +68,11 @@ A small spot diverges fast and a large one slowly, a direct consequence of diffr
 The output of a semiconductor laser or a silicon edge coupler might have $$w_0 = 1.5$$ µm. At 1550 nm in air its Rayleigh range is $$\pi(1.5)^2/1.55 = 4.6$$ µm and it diverges at $$\theta_0 = 1.55/(\pi\times1.5) = 0.33$$ rad, or 19°. The mode of a standard single-mode fibre has $$w_0 \approx 5.2$$ µm: $$z_R = 55$$ µm and $$\theta_0 = 5.4°$$. Butt-coupling the small spot straight into the fibre therefore needs a gap well below 5 µm, and even then the spot sizes do not match (Section 3.5). A lens, or a mode converter on the chip, is needed.
 
 </div>
+
+<figure id="fig-3-1">
+  <img src="{{ '/assets/figs/ch03_beam.svg' | relative_url }}" style="width:640px" alt="(a) Field of a Gaussian beam with a 1.5 µm waist at 1550 nm, drawn to scale over 32 µm, with the beam radius, the 19 degree asymptotes, the Rayleigh range of 4.6 µm on each side, and a curved wavefront of radius 9.1 µm at the Rayleigh range. (b) Beam radius against distance for waists of 1.5 and 5.2 µm. (c) Normalised beam radius, wavefront radius and Gouy phase against z over z_R">
+  <figcaption><span class="capnum">Figure 3.1.</span> <strong>Anatomy of a Gaussian beam.</strong> (a) The field of the 1.5 µm spot of Worked Example 3.1 at 1550 nm in air, to scale: the beam radius w(z) (dashed) grows from \(w_0\) to \(\sqrt{2}\,w_0\) at \(\pm z_R\) = ±4.6 µm and then follows the asymptotes at θ<sub>0</sub> = 19° (dotted). The wavefronts are flat at the waist and most curved at \(z_R\), where \(R = 2z_R\). (b) The two spots of Worked Example 3.1: the 1.5 µm spot is wider than the 5.2 µm fibre mode beyond only 16 µm. (c) Beam radius, wavefront radius and Gouy phase against \(z/z_R\), the same for every Gaussian beam. Drawn by <code>figsrc/ch03_figs.py</code>.</figcaption>
+</figure>
 
 ## <span class="secnum">3.3</span>Beam transformation with q and ABCD
 
@@ -88,7 +93,7 @@ Chaining matrices for a sequence of elements and applying the law once gives the
 
 $$M = \frac{f}{\sqrt{(d_1 - f)^2 + z_R^2}}, \qquad d_2 = f + \frac{(d_1 - f)f^2}{(d_1 - f)^2 + z_R^2}.$$
 
-When $$z_R \ll \lvert d_1 - f\rvert $$ these reduce to the familiar ray-optics magnification and imaging condition.
+When $$z_R \ll \lvert d_1 - f\rvert $$ these reduce to the familiar ray-optics magnification and imaging condition ([Figure 3.2](#fig-3-2)).
 
 <div class="tbox tbox-example" markdown="1">
 <div class="tbox-title">Worked Example 3.2 · Imaging a laser spot onto a fibre</div>
@@ -100,6 +105,11 @@ $$M = \frac{100}{\sqrt{30^2 + 4.6^2}} = 3.30, \qquad w_0' = 4.94\ \mu\mathrm{m},
 A fibre with $$w = 5.2$$ µm placed 426 µm behind the lens collects 99.7 % of the light (Section 3.5). Micro-lenses and ball lenses in laser packages do exactly this.
 
 </div>
+
+<figure id="fig-3-2">
+  <img src="{{ '/assets/figs/ch03_lens.svg' | relative_url }}" style="width:640px" alt="(a) Schematic of a source waist imaged by a thin lens to a new waist, with the distances d1 and d2 and the ray-transfer matrices of free space, the lens and free space. (b) Lens-to-waist distance and (c) magnification against the source-to-lens distance for a 1.5 µm spot and a 100 µm lens, for Gaussian beams and ray optics, with Worked Example 3.2 marked at d1 = 130 µm">
+  <figcaption><span class="capnum">Figure 3.2.</span> <strong>Imaging a waist with a lens.</strong> (a) The source waist, the thin lens and the image waist, with the ray-transfer matrix of each section (schematic). (b) Where the image waist forms and (c) its magnification, against the source-to-lens distance, for the 1.5 µm spot (\(z_R\) = 4.6 µm) and \(f\) = 100 µm. Gaussian beams (solid) follow ray optics (dashed) except within a few \(z_R\) of \(d_1 = f\): there ray optics sends the image to infinity, while a Gaussian waist forms at most \(f + f^2/2z_R\) ≈ 1.2 mm behind the lens and its magnification peaks at \(f/z_R\) ≈ 22. Worked Example 3.2 (dot) is in the ray-optics regime: M = 3.30 and \(d_2\) = 426 µm, against 433 µm from ray optics. Drawn by <code>figsrc/ch03_figs.py</code>.</figcaption>
+</figure>
 
 **Try it.** Focus the source with the lens, move the fibre, and watch the coupling and its tolerance.
 
@@ -122,7 +132,7 @@ $$u\,\frac{J_{l-1}(u)}{J_l(u)} = -w\,\frac{K_{l-1}(w)}{K_l(w)}, \qquad u^2 + w^2
 
 where $$u$$ and $$w$$ are the transverse wavenumbers in the core and cladding scaled by $$a$$. The fundamental mode LP$$_{01}$$ is always guided; the next, LP$$_{11}$$, appears at $$V = 2.405$$, the first zero of $$J_0$$. The **cut-off wavelength** $$\lambda_c = 2\pi a\,\mathrm{NA}/2.405$$ is the shortest wavelength at which the fibre is single-mode.
 
-Near cut-off the LP$$_{01}$$ field is close to a Gaussian, and its radius is well approximated by **Marcuse's formula** {% include cite.html keys="marcuse1977" %}:
+Near cut-off the LP$$_{01}$$ field is close to a Gaussian ([Figure 3.3](#fig-3-3)), and its radius is well approximated by **Marcuse's formula** {% include cite.html keys="marcuse1977" %}:
 
 $$\frac{w}{a} \approx 0.65 + \frac{1.619}{V^{3/2}} + \frac{2.879}{V^6}.$$
 
@@ -133,11 +143,21 @@ Take a core radius of 4.1 µm and $$\Delta = 0.36\ \%$$, close to standard (G.65
 
 </div>
 
+<figure id="fig-3-3">
+  <img src="{{ '/assets/figs/ch03_fibre.svg' | relative_url }}" style="width:640px" alt="(a) End face of a standard single-mode fibre to scale: a 250 µm coating, 125 µm cladding and 8.2 µm core, and a zoom on the core showing the mode intensity, mode-field diameters of 10.2 µm at 1550 nm and 9.0 µm at 1310 nm, and a 500 by 220 nm silicon wire at the same scale. (b) LP01 field against radius at 1310 and 1550 nm with the Gaussian approximations, the core shaded">
+  <figcaption><span class="capnum">Figure 3.3.</span> <strong>Standard single-mode fibre.</strong> (a) An end face to scale: an 8.2 µm core in 125 µm of cladding {% include cite.html keys="itug652" %}, inside a typical 250 µm coating; the zoom shows the mode intensity at 1550 nm, the mode-field diameters at 1550 nm (10.2 µm) and 1310 nm (9.0 µm), and a 500 × 220 nm silicon wire at the same scale. (b) The exact LP<sub>01</sub> field of the step-index model of Worked Example 3.3 at both wavelengths, with Marcuse's Gaussians (dashed). At the longer wavelength the field reaches further into the cladding; the Gaussians still overlap the exact fields by 99.2 % (1550 nm) and 99.7 % (1310 nm). Drawn by <code>figsrc/ch03_figs.py</code>.</figcaption>
+</figure>
+
 **Try it.** Change the core radius, NA and wavelength, and see which LP modes are guided and how well LP01 matches a Gaussian.
 
 {% include demos/fiber.html %}
 
-Silica fibre is used in five telecom bands: O (1260–1360 nm), E (1360–1460), S (1460–1530), C (1530–1565) and L (1565–1625 nm). Loss is about 0.35 dB/km in the O band and about 0.2 dB/km in the C band, where it is lowest; the C and L bands are also where erbium-doped amplifiers work. Chromatic dispersion is close to zero near 1310 nm and about 17 ps/(nm·km) at 1550 nm ([Chapter 2]({% link chapters/02_em.md %})).
+Silica fibre is used in five telecom bands: O (1260–1360 nm), E (1360–1460), S (1460–1530), C (1530–1565) and L (1565–1625 nm). Loss is about 0.35 dB/km in the O band and about 0.2 dB/km in the C band, where it is lowest; the C and L bands are also where erbium-doped amplifiers work. Chromatic dispersion is close to zero near 1310 nm and about 17 ps/(nm·km) at 1550 nm ([Chapter 2]({% link chapters/02_em.md %}), [Figure 3.4](#fig-3-4)).
+
+<figure id="fig-3-4">
+  <img src="{{ '/assets/figs/ch03_bands.svg' | relative_url }}" style="width:640px" alt="(a) Fibre loss falling from 0.40 dB/km at 1260 nm to 0.17 dB/km at 1625 nm, through 0.35 dB/km at 1310 nm and 0.2 dB/km at 1550 nm, with the O, E, S, C and L bands shaded. (b) Chromatic dispersion of the step-index fibre model rising from about −3 to 21 ps/(nm·km), zero at 1296 nm and 17.1 at 1550 nm, with the dispersion of silica alone for comparison">
+  <figcaption><span class="capnum">Figure 3.4.</span> <strong>Loss and dispersion across the bands.</strong> (a) Loss modelled as Rayleigh scattering (∝ λ<sup>−4</sup>) plus a constant, set to the typical 0.35 dB/km at 1310 nm and 0.2 dB/km at 1550 nm; real fibre also absorbs in the infrared beyond about 1.6 µm, and near 1383 nm unless it is of the low-water-peak kind. (b) Chromatic dispersion of the step-index model of Worked Example 3.3, from the exact LP<sub>01</sub> effective index with Malitson's silica in core and cladding {% include cite.html keys="malitson1965" %}: 17.1 ps/(nm·km) at 1550 nm and zero at 1296 nm. The waveguide's own dispersion moves the zero from silica's 1272 nm (dashed) to longer wavelengths. Drawn by <code>figsrc/ch03_figs.py</code>.</figcaption>
+</figure>
 
 Three special fibres appear in photonic-chip work. **Polarisation-maintaining (PM)** fibres have stress rods that make them strongly birefringent, so light launched along one axis stays there; fibre arrays for testing grating couplers usually use them ([Chapter 17]({% link chapters/17_fiberarrays.md %})). **High-NA** fibres have small cores and spots of about 3–4 µm, closer to on-chip modes. **Lensed fibres** have a shaped tip that focuses the mode to a spot of about 2–3 µm for edge coupling ([Chapter 16]({% link chapters/16_edge.md %})).
 
@@ -156,11 +176,11 @@ $$\eta = \underbrace{\left(\frac{2w_1w_2}{w_1^2 + w_2^2}\right)^2}_{\text{size m
 
 </div>
 
-and two equal modes separated by an axial gap $$z$$ couple $$\eta = 1/\left[1 + (z/2z_R)^2\right]$$. [Figure 3.1](#fig-3-1) plots the first two factors.
+and two equal modes separated by an axial gap $$z$$ couple $$\eta = 1/\left[1 + (z/2z_R)^2\right]$$. [Figure 3.5](#fig-3-5) plots the first two factors.
 
-<figure id="fig-3-1">
+<figure id="fig-3-5">
   <img src="{{ '/assets/figs/ch03_overlap.svg' | relative_url }}" style="width:720px" alt="Coupling efficiency against lateral offset for three spot sizes, and against waist ratio">
-  <figcaption><span class="capnum">Figure 3.1.</span> <strong>Coupling between Gaussian modes.</strong> (a) Against lateral offset, from a standard fibre mode (w = 5.2 µm) into modes of 5.2, 2.5 and 1.5 µm; the dashed line is 1 dB below a perfect match. (b) Against the ratio of the waists, at zero offset: a factor of two either way costs 1.9 dB. Drawn by <code>figsrc/part1_figs.py</code>.</figcaption>
+  <figcaption><span class="capnum">Figure 3.5.</span> <strong>Coupling between Gaussian modes.</strong> (a) Against lateral offset, from a standard fibre mode (w = 5.2 µm) into modes of 5.2, 2.5 and 1.5 µm; the dashed line is 1 dB below a perfect match. (b) Against the ratio of the waists, at zero offset: a factor of two either way costs 1.9 dB. Drawn by <code>figsrc/part1_figs.py</code>.</figcaption>
 </figure>
 
 <div class="tbox tbox-example" markdown="1">

@@ -34,7 +34,7 @@ When does light beat copper, and what does a photonic chip need to do it?
 
 A copper trace is a transmission line, and its loss grows with frequency: the current crowds into a skin a few micrometres thick at gigahertz frequencies, and the laminate around it absorbs more energy each cycle. A trace on a printed circuit board loses roughly a decibel per centimetre at tens of gigahertz, depending on the laminate, so a 100 Gb/s electrical lane can cross a board but not a room without equalisation, retimers and the power they burn.
 
-An optical fibre has none of these problems. Its loss, about 0.2 dB per *kilometre* at 1550 nm, does not depend on how fast the light is modulated, because the modulation is a tiny fraction of the optical carrier frequency of about 193 THz. The C band alone, 1530–1565 nm, spans about 4.4 THz of spectrum, and wavelength-division multiplexing (WDM) puts many independent channels into it, on the same fibre, without interference between them.
+An optical fibre has none of these problems. Its loss, about 0.2 dB per *kilometre* at 1550 nm, does not depend on how fast the light is modulated, because the modulation is a tiny fraction of the optical carrier frequency of about 193 THz. The C band alone, 1530–1565 nm, spans about 4.4 THz of spectrum ([Figure 1.5](#fig-1-5)), and wavelength-division multiplexing (WDM) puts many independent channels into it, on the same fibre, without interference between them.
 
 The price of light is the conversion. Every optical link needs a light source, a modulator to write the data, and a detector to read it, and each of these costs energy, area and decibels. Optics wins when the distance is long enough, or the bandwidth high enough, that the fixed cost of conversion is smaller than the growing cost of pushing electrons through copper. Over the last two decades that crossover has moved from kilometres (telecom) to metres (data-centre racks) and is now moving to millimetres, with optics placed beside the switch or accelerator chip itself.
 
@@ -89,7 +89,7 @@ The roadmap by Shekhar and co-authors reviews where silicon photonics stands in 
 
 Silicon photonics started from a simple observation: the silicon-on-insulator (SOI) wafers used for some CMOS processes also make excellent optical waveguides {% include cite.html keys="reedbook,hochberg2013" %}. A thin silicon film (most often 220 nm) sits on a buried oxide (BOX) 2–3 µm thick. Silicon is transparent at the telecom wavelengths, above about 1.1 µm, and its index of 3.48 against 1.44 for silica gives a very strong index contrast. Light can then be confined in a strip of silicon only 500 nm wide and turned around bends a few micrometres in radius, so complex circuits fit on a few square millimetres.
 
-The decisive advantage is manufacturing. Silicon photonics uses the lithography, etching, implantation and metallisation tools of the CMOS industry, on 200 mm and 300 mm wafers, with the yield and statistics of that industry. Germanium, already used in CMOS for strain engineering, makes photodetectors; doped junctions make modulators; metal heaters make tuners. Foundries offer this as a multi-project wafer (MPW) service with a process design kit, so a designer without a fab can tape out a chip (Chapters 29 and 30).
+The decisive advantage is manufacturing. Silicon photonics uses the lithography, etching, implantation and metallisation tools of the CMOS industry, on 200 mm and 300 mm wafers, with the yield and statistics of that industry. Germanium, already used in CMOS for strain engineering, makes photodetectors; doped junctions make modulators; metal heaters make tuners ([Figure 1.2](#fig-1-2)). Foundries offer this as a multi-project wafer (MPW) service with a process design kit, so a designer without a fab can tape out a chip (Chapters 29 and 30).
 
 Silicon has five weaknesses, and each one shapes the rest of this tutorial:
 
@@ -110,6 +110,13 @@ These weaknesses are why other materials have joined silicon: silicon nitride fo
   <figcaption><span class="capnum">Figure 1.1.</span> <strong>The blocks of a photonic link.</strong> Laser, modulator, multiplexer and coupler on the transmitter chip; fibre; coupler, demultiplexer and photodetectors on the receiver chip. The bars underneath are the foundations each block is built on.</figcaption>
 </figure>
 
+On a silicon chip these blocks are built from the layers of one wafer ([Figure 1.2](#fig-1-2)): the same 220 nm film is etched into waveguides and gratings, doped into modulators, and topped with germanium for detectors and with metal for heaters and wiring.
+
+<figure id="fig-1-2">
+  <img src="{{ '/assets/figs/ch01_soi_stack.svg' | relative_url }}" style="width:640px" alt="Cross-section of a 220 nm silicon-on-insulator chip drawn to scale: a grating coupler with shallow-etched teeth, a silicon strip waveguide with a TiN heater 1.7 µm above it, a p–n rib modulator with p++ and n++ contacts and tungsten vias to the first metal, and a germanium photodiode on p-doped silicon with vias to two metal layers and a pad opening, all on a 2 µm buried oxide over the silicon handle">
+  <figcaption><span class="capnum">Figure 1.2.</span> <strong>An SOI chip in cross-section.</strong> A representative 220 nm silicon-on-insulator stack, drawn to scale: a grating coupler (shallow 70 nm etch, cut along the waveguide), a 500 × 220 nm strip with a TiN heater 1.7 µm above it, a carrier-depletion p–n rib modulator on a 90 nm slab, and a 0.5 µm germanium photodiode, on a 2 µm buried oxide, with tungsten vias and two metal layers. On a real chip the devices are far apart; thicknesses are typical, not those of a particular process. Drawn by <code>figsrc/ch01_figs.py</code>.</figcaption>
+</figure>
+
 The electronics around the PIC (laser drivers, modulator drivers, transimpedance amplifiers, control loops for heaters) are as important as the optics. They can sit on the same die (**monolithic** integration, as in silicon-photonic processes that keep the CMOS transistors {% include cite.html keys="sun2015" %}), on a separate die placed beside the PIC on an interposer (**2.5D**), or stacked on top of it with dense bonds (**3D**). The choice is a trade between the best transistors, the best photonics, and the parasitics of the connection between them.
 
 ## <span class="secnum">1.5</span>Optical power and decibels
@@ -123,7 +130,7 @@ $$P_\mathrm{dBm} = 10\log_{10}\frac{P}{1\ \mathrm{mW}}, \qquad L_\mathrm{dB} = 1
 
 </div>
 
-So 1 mW is 0 dBm, 10 mW is +10 dBm and 1 µW is −30 dBm; 3 dB is a factor of two and 10 dB a factor of ten. Because losses multiply, their decibels add, and a link budget becomes a subtraction. Two warnings: dBm describes a power and dB a ratio, so adding two dBm values is meaningless; and power ratios use 10 log₁₀, field ratios 20 log₁₀.
+So 1 mW is 0 dBm, 10 mW is +10 dBm and 1 µW is −30 dBm; 3 dB is a factor of two and 10 dB a factor of ten ([Figure 1.3](#fig-1-3)). Because losses multiply, their decibels add, and a link budget becomes a subtraction. Two warnings: dBm describes a power and dB a ratio, so adding two dBm values is meaningless; and power ratios use 10 log₁₀, field ratios 20 log₁₀.
 
 Two more quantities describe a modulated signal. The **extinction ratio** ER is the ratio of the power in a "one" to the power in a "zero", $$P_1/P_0$$, usually in dB. The **optical modulation amplitude** OMA is their difference, $$P_1 - P_0$$, and it is what a receiver actually detects. For an average power $$\bar P = (P_1 + P_0)/2$$ and a linear extinction ratio $$r = P_1/P_0$$,
 
@@ -142,6 +149,11 @@ If the receiver needs −12 dBm average power at 50 Gb/s for the target error ra
 
 </div>
 
+<figure id="fig-1-3">
+  <img src="{{ '/assets/figs/ch01_dbm_ruler.svg' | relative_url }}" style="width:600px" alt="A ruler from −40 to +20 dBm with the matching powers from 100 nW to 100 mW, marking the laser at +10 dBm (10 mW), the received power of −2.7 dBm (0.54 mW) and the receiver's need of −12 dBm (63 µW), with brackets for 12.7 dB of losses and 9.3 dB of margin">
+  <figcaption><span class="capnum">Figure 1.3.</span> <strong>Decibels and milliwatts on one ruler.</strong> Every 10 dB is a factor of ten in power and every 3 dB a factor of two. The levels of Worked Example 1.1, the laser at +10 dBm, the received −2.7 dBm and the −12 dBm the receiver needs, turn the 12.7 dB of losses and the 9.3 dB of margin into lengths that simply add. Drawn by <code>figsrc/ch01_figs.py</code>.</figcaption>
+</figure>
+
 The margin is not free energy to waste. At a wall-plug efficiency of 15 %, a laser delivering 10 mW draws about 67 mW; at 50 Gb/s that is 1.3 pJ for every bit, from the laser alone. Every 3 dB of margin given back halves it.
 
 **Try it.** Change the losses and the laser power, and watch the margin and the laser's share of the energy per bit.
@@ -159,11 +171,11 @@ The fibre couplers usually dominate a short link's budget: two grating couplers 
 
 **Your first chip.** The labs build a passive chip in 220 nm SOI at 1550 nm, with grating couplers on a 127 µm pitch for a fibre array, of the kind fabricated in the SiEPIC openEBL runs {% include cite.html keys="openebl" %}. It carries the classic test structures: waveguide cut-backs to measure loss, Mach–Zehnder interferometers to measure the group index, ring resonators and Bragg gratings. You lay it out with open tools ([Chapter 30]({% link chapters/30_flow.md %})), and [Chapter 32]({% link chapters/32_analysis.md %}) analyses measured data from chips like it, so that the tutorial covers a whole design–fabrication–test cycle.
 
-**The reference link.** The system thread of the tutorial is a four-wavelength WDM link ([Figure 1.2](#fig-1-2)): four lasers, four ring modulators on one bus, a grating coupler into 2 km of single-mode fibre, and on the receiving chip four drop rings that separate the wavelengths onto germanium photodiodes. Ring modulators double as the multiplexer, which keeps the transmitter compact; the price is that every ring must be held on its wavelength by a heater and a control loop. [Table 1.3](#tab-1-3) lists its draft targets, and the chapter that sets or meets each.
+**The reference link.** The system thread of the tutorial is a four-wavelength WDM link ([Figure 1.4](#fig-1-4)): four lasers, four ring modulators on one bus, a grating coupler into 2 km of single-mode fibre, and on the receiving chip four drop rings that separate the wavelengths onto germanium photodiodes. Ring modulators double as the multiplexer, which keeps the transmitter compact; the price is that every ring must be held on its wavelength by a heater and a control loop. [Table 1.3](#tab-1-3) lists its draft targets, and the chapter that sets or meets each.
 
-<figure id="fig-1-2">
+<figure id="fig-1-4">
   <img src="{{ '/assets/figs/ch01_reflink.svg' | relative_url }}" style="width:820px" alt="The reference link: four lasers, four ring modulators on one bus, a grating coupler, 2 km of fibre, a grating coupler, four drop rings and four germanium photodiodes">
-  <figcaption><span class="capnum">Figure 1.2.</span> <strong>The reference link.</strong> Four wavelengths on the 400 GHz ITU grid near 1550 nm, each carrying 50 Gb/s NRZ, share one waveguide and one fibre. On the receiver, four drop rings demultiplex the channels onto germanium photodiodes and transimpedance amplifiers.</figcaption>
+  <figcaption><span class="capnum">Figure 1.4.</span> <strong>The reference link.</strong> Four wavelengths on the 400 GHz ITU grid near 1550 nm, each carrying 50 Gb/s NRZ, share one waveguide and one fibre. On the receiver, four drop rings demultiplex the channels onto germanium photodiodes and transimpedance amplifiers.</figcaption>
 </figure>
 
 **Table 1.3. Draft targets of the reference link.** Set here, checked block by block, and closed in Chapter 33.
@@ -184,7 +196,12 @@ The fibre couplers usually dominate a short link's budget: two grating couplers 
 | Link margin | ≥ 3 dB after all penalties | Ch 33 |
 | Energy | ≤ 5 pJ/bit for the whole link, including laser wall-plug power, drivers, receivers and heaters | Ch 33 |
 
-The 400 GHz spacing (about 3.2 nm) is wide enough that ring filters with a free spectral range above the 9.6 nm span of the four channels separate them cleanly, and it leaves room for the thermal drift that the heaters must correct. At 80 pm/K, a 50 K temperature change moves a silicon ring by 4 nm, more than one channel spacing: thermal control is not optional.
+The 400 GHz spacing (about 3.2 nm) is wide enough that ring filters with a free spectral range above the 9.6 nm span of the four channels separate them cleanly, and it leaves room for the thermal drift that the heaters must correct. At 80 pm/K, a 50 K temperature change moves a silicon ring by 4 nm, more than one channel spacing: thermal control is not optional. [Figure 1.5](#fig-1-5) places the four channels in the C band.
+
+<figure id="fig-1-5">
+  <img src="{{ '/assets/figs/ch01_bands.svg' | relative_url }}" style="width:640px" alt="The O, E, S, C, L and U telecom bands from 1260 to 1675 nm, with a frequency axis from about 238 to 179 THz above, and a zoom on the C band showing the four reference-link channels at 193.9, 193.5, 193.1 and 192.7 THz, 3.2 nm or 400 GHz apart">
+  <figcaption><span class="capnum">Figure 1.5.</span> <strong>The telecom bands and the reference link's channels.</strong> The six bands of single-mode fibre on wavelength (bottom) and frequency (top) axes {% include cite.html keys="itugsup39" %}. Equal wavelength steps are not equal frequency steps: the 35 nm C band spans 4.4 THz, the 100 nm O band 17.5 THz. Below, the four channels of the reference link, 400 GHz (3.2 nm) apart and 9.6 nm from first to last. Drawn by <code>figsrc/ch01_figs.py</code>.</figcaption>
+</figure>
 
 <div class="tbox tbox-specnote" markdown="1">
 <div class="tbox-title">Reference-link target</div>
