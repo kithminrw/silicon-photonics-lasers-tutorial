@@ -108,7 +108,7 @@
     if (ps) c += '<b>A quarter-wave shift in the middle turns the grating into a cavity</b>: a narrow transmission peak opens at the centre of the stop-band. The same idea makes a DFB laser single-mode (Chapter 26).';
     else if (kl < 1) c += 'With κL below 1 the grating is weak: the peak reflectivity is low and the bandwidth is set by the length, not by κ.';
     else c += 'With κL = ' + kl.toFixed(1) + ' the peak reflectivity is tanh²(κL); a stronger corrugation widens the stop-band, a longer grating sharpens its edges.';
-    if (apo && !ps) c += ' Apodising the coupling along the grating suppresses the side lobes at the price of a slightly narrower, lower peak.';
+    if (apo && !ps) c += ' Apodising the coupling along the grating suppresses the side lobes; for a weak grating like this one the peak also drops and broadens, for a strong one it is only slightly lower.';
     q('[data-o="cap"]').innerHTML = c;
   }
   BD.observe(root, draw);

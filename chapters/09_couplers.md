@@ -77,7 +77,7 @@ where $$L_b$$ is the extra effective length contributed by the bends, which stil
 <div class="tbox tbox-example" markdown="1">
 <div class="tbox-title">Worked Example 9.1 · A 3 dB coupler in silicon</div>
 
-At a 200 nm gap femwell gives $$n_\mathrm{even} = 2.4573$$ and $$n_\mathrm{odd} = 2.4368$$, so $$L_x = 1.55/(2 \times 0.0205) = 37.8$$ µm. With the bends adding about 2.5 µm, a 50/50 coupler needs a straight section of $$37.8/2 - 2.5 = 16.4$$ µm. At a 300 nm gap, $$L_x = 91$$ µm and the straight section grows to 43 µm. A 100 nm gap would need only about 5 µm, but small gaps are hard to fabricate reproducibly, and a 10 nm error in a 100 nm gap changes $$L_x$$ by about 9 %.
+At a 200 nm gap femwell gives $$n_\mathrm{even} = 2.4573$$ and $$n_\mathrm{odd} = 2.4368$$, so $$L_x = 1.55/(2 \times 0.0205) = 37.8$$ µm. With the bends adding about 2.5 µm, a 50/50 coupler needs a straight section of $$37.8/2 - 2.5 = 16.4$$ µm. At a 300 nm gap, $$L_x = 91$$ µm and the straight section grows to 43 µm. A 100 nm gap would need only about 5 µm, but small gaps are hard to fabricate reproducibly, and a 10 nm error in a 100 nm gap changes $$L_x$$ by about 10 %.
 
 </div>
 

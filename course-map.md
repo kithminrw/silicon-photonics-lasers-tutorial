@@ -14,7 +14,7 @@ The whole tutorial on one page: every part, chapter and section, and the interac
 
 Light as an electromagnetic wave, the Gaussian beams and fibres that carry it to a chip, and the materials (silicon, silicon nitride, lithium niobate, barium titanate, indium phosphide) that photonic chips are made of.
 
-### [1. Why Integrated Photonics?]({% link chapters/01_why.md %}) <span class="status status-written">written</span>
+### [1. Why Integrated Photonics?]({% link chapters/01_why.md %})
 
 *When does light beat copper, and what does a photonic chip need to do it?*
 
@@ -22,7 +22,7 @@ Light as an electromagnetic wave, the Gaussian beams and fibres that carry it to
 
 Demos: ● Power budget
 
-### [2. Electromagnetic Theory for Photonics]({% link chapters/02_em.md %}) <span class="status status-written">written</span>
+### [2. Electromagnetic Theory for Photonics]({% link chapters/02_em.md %})
 
 *What does light do at an interface, and how does that lead to confinement?*
 
@@ -30,7 +30,7 @@ Demos: ● Power budget
 
 Demos: ● Polarisation ellipse; ● Snell, Fresnel and total internal reflection; ● Wave packet
 
-### [3. Gaussian Beams and Optical Fibres]({% link chapters/03_gaussian.md %}) <span class="status status-written">written</span>
+### [3. Gaussian Beams and Optical Fibres]({% link chapters/03_gaussian.md %})
 
 *How much light gets from one Gaussian mode into another?*
 
@@ -38,7 +38,7 @@ Demos: ● Polarisation ellipse; ● Snell, Fresnel and total internal reflectio
 
 Demos: ● Gaussian beam and lens; ● Fibre modes
 
-### [4. Materials and Platforms: Si, SiN, TFLN, BTO and InP]({% link chapters/04_platforms.md %}) <span class="status status-written">written</span>
+### [4. Materials and Platforms: Si, SiN, TFLN, BTO and InP]({% link chapters/04_platforms.md %})
 
 *Which platform for which job?*
 
@@ -50,7 +50,7 @@ Demos: ● Platform comparator
 
 How a strip of high-index material guides light: slab and channel waveguides on SOI and other platforms, the losses that limit them, and the bends, tapers and transitions that route light around a chip.
 
-### [5. The Slab Waveguide]({% link chapters/05_slab.md %}) <span class="status status-written">written</span>
+### [5. The Slab Waveguide]({% link chapters/05_slab.md %})
 
 *What sets the number of guided modes and their effective index?*
 
@@ -58,7 +58,7 @@ How a strip of high-index material guides light: slab and channel waveguides on 
 
 Demos: ● Slab-waveguide mode solver
 
-### [6. Channel Waveguides on SOI and Beyond]({% link chapters/06_soi.md %}) <span class="status status-written">written</span>
+### [6. Channel Waveguides on SOI and Beyond]({% link chapters/06_soi.md %})
 
 *Which width and etch depth give single-mode, low-loss, compact routing?*
 
@@ -66,7 +66,7 @@ Demos: ● Slab-waveguide mode solver
 
 Demos: ● Effective-index explorer; ○ 2D mode solver
 
-### [7. Loss, Dispersion and Nonlinearity]({% link chapters/07_loss.md %}) <span class="status status-written">written</span>
+### [7. Loss, Dispersion and Nonlinearity]({% link chapters/07_loss.md %})
 
 *What limits a waveguide's propagation loss, and how do you measure it?*
 
@@ -74,7 +74,7 @@ Demos: ● Effective-index explorer; ○ 2D mode solver
 
 Demos: ● Cutback simulator; ○ Roughness scattering
 
-### [8. Bends, Tapers and Transitions]({% link chapters/08_bends.md %}) <span class="status status-written">written</span>
+### [8. Bends, Tapers and Transitions]({% link chapters/08_bends.md %})
 
 *How tight can a bend be, and how short a taper?*
 
@@ -86,7 +86,7 @@ Demos: ● Circular and Euler bends; ○ Taper adiabaticity
 
 The building blocks that split, combine, filter and route light without power: directional couplers, Y-branches and MMIs, Mach–Zehnder interferometers, ring resonators, Bragg gratings, and WDM and polarisation devices.
 
-### [9. Coupled-Mode Theory and Directional Couplers]({% link chapters/09_couplers.md %}) <span class="status status-written">written</span>
+### [9. Coupled-Mode Theory and Directional Couplers]({% link chapters/09_couplers.md %})
 
 *Which length and gap give a 50/50 split, and how robust is it?*
 
@@ -94,7 +94,7 @@ The building blocks that split, combine, filter and route light without power: d
 
 Demos: ● Directional coupler
 
-### [10. Y-Branches and Multimode Interference Couplers]({% link chapters/10_mmi.md %}) <span class="status status-written">written</span>
+### [10. Y-Branches and Multimode Interference Couplers]({% link chapters/10_mmi.md %})
 
 *Y-branch or MMI, and how long must the MMI be?*
 
@@ -102,7 +102,7 @@ Demos: ● Directional coupler
 
 Demos: ● MMI self-imaging
 
-### [11. Mach–Zehnder Interferometers]({% link chapters/11_mzi.md %}) <span class="status status-written">written</span>
+### [11. Mach–Zehnder Interferometers]({% link chapters/11_mzi.md %})
 
 *How does the arm-length difference set the spectrum?*
 
@@ -110,7 +110,7 @@ Demos: ● MMI self-imaging
 
 Demos: ● Mach–Zehnder interferometer
 
-### [12. Ring Resonators]({% link chapters/12_rings.md %}) <span class="status status-written">written</span>
+### [12. Ring Resonators]({% link chapters/12_rings.md %})
 
 *How do coupling and loss shape a ring's resonance?*
 
@@ -118,7 +118,7 @@ Demos: ● Mach–Zehnder interferometer
 
 Demos: ● Ring resonator
 
-### [13. Bragg Gratings and Photonic Crystals]({% link chapters/13_bragg.md %}) <span class="status status-written">written</span>
+### [13. Bragg Gratings and Photonic Crystals]({% link chapters/13_bragg.md %})
 
 *How long and how strong must a grating be for a given reflectivity and bandwidth?*
 
@@ -126,7 +126,7 @@ Demos: ● Ring resonator
 
 Demos: ● Bragg grating
 
-### [14. WDM Filters and Polarisation Management]({% link chapters/14_wdm.md %}) <span class="status status-written">written</span>
+### [14. WDM Filters and Polarisation Management]({% link chapters/14_wdm.md %})
 
 *How do you separate four wavelengths with low crosstalk?*
 
@@ -138,7 +138,7 @@ Demos: ○ Four-channel demultiplexer
 
 Getting light on and off the chip: grating couplers, edge couplers, fibre arrays, photonic wire bonds and the packaging that turns a die into a product.
 
-### [15. Grating Couplers]({% link chapters/15_gc.md %}) <span class="status status-written">written</span>
+### [15. Grating Couplers]({% link chapters/15_gc.md %})
 
 *Which period and angle couple 1550 nm TE light into a fibre tilted at 8°, and how much of the light can you expect to get?*
 
@@ -146,7 +146,7 @@ Getting light on and off the chip: grating couplers, edge couplers, fibre arrays
 
 Demos: ● Grating-coupler phase matching · ● Grating-coupler efficiency budget
 
-### [16. Edge Couplers and Spot-Size Converters]({% link chapters/16_edge.md %}) <span class="status status-written">written</span>
+### [16. Edge Couplers and Spot-Size Converters]({% link chapters/16_edge.md %})
 
 *How narrow must the taper tip be to match a 3 µm or a 10 µm spot?*
 
@@ -154,7 +154,7 @@ Demos: ● Grating-coupler phase matching · ● Grating-coupler efficiency budg
 
 Demos: ● Inverse-taper edge coupler
 
-### [17. Fibre Arrays, Photonic Wire Bonds and Packaging]({% link chapters/17_fiberarrays.md %}) <span class="status status-written">written</span>
+### [17. Fibre Arrays, Photonic Wire Bonds and Packaging]({% link chapters/17_fiberarrays.md %})
 
 *How tolerant is a coupling interface, and how do you find the peak quickly?*
 
@@ -166,7 +166,7 @@ Demos: ● Alignment tolerance · ● Fibre-array alignment
 
 Tuning, modulating and detecting light: thermo-optic phase shifters, electro-optic effects in each platform, modulators, and germanium photodetectors and receivers.
 
-### [18. Thermo-Optic Phase Shifters]({% link chapters/18_thermal.md %}) <span class="status status-written">written</span>
+### [18. Thermo-Optic Phase Shifters]({% link chapters/18_thermal.md %})
 
 *How many milliwatts for a π shift, and how fast?*
 
@@ -174,7 +174,7 @@ Tuning, modulating and detecting light: thermo-optic phase shifters, electro-opt
 
 Demos: ● Thermo-optic phase shifter · ● Ring locking
 
-### [19. Electro-Optic Effects Across Platforms]({% link chapters/19_eo.md %}) <span class="status status-written">written</span>
+### [19. Electro-Optic Effects Across Platforms]({% link chapters/19_eo.md %})
 
 *Which effect gives the best VπL for a given loss and bandwidth?*
 
@@ -182,7 +182,7 @@ Demos: ● Thermo-optic phase shifter · ● Ring locking
 
 Demos: ● PN depletion phase shifter
 
-### [20. Modulators]({% link chapters/20_modulators.md %}) <span class="status status-written">written</span>
+### [20. Modulators]({% link chapters/20_modulators.md %})
 
 *Mach–Zehnder or ring modulator for a four-wavelength link?*
 
@@ -190,11 +190,11 @@ Demos: ● PN depletion phase shifter
 
 Demos: ● MZM and eye diagram · ● Ring modulator
 
-### [21. Photodetectors and Receivers]({% link chapters/21_pd.md %}) <span class="status status-written">written</span>
+### [21. Photodetectors and Receivers]({% link chapters/21_pd.md %})
 
 *How much optical power does the receiver need for a target BER?*
 
-21.1 Absorption and responsivity · 21.2 Germanium-on-silicon photodiodes · 21.3 Bandwidth · 21.4 Dark current and noise · 21.5 Avalanche photodiodes · 21.6 Receivers · 21.7 Monitor photodiodes
+21.1 Absorption and responsivity · 21.2 Germanium-on-silicon photodiodes · 21.3 Bandwidth · 21.4 Dark current and noise · 21.5 Avalanche photodiodes · 21.6 Receivers · 21.7 Monitor photodiodes · 21.8 Designing the receiver front end, step by step · 21.9 Equalisation, clock recovery and measuring sensitivity
 
 Demos: ● Photodiode bandwidth · ● Receiver sensitivity
 
@@ -202,7 +202,7 @@ Demos: ● Photodiode bandwidth · ● Receiver sensitivity
 
 From the physics of gain to working lasers: emission and gain in semiconductors, the Fabry–Pérot laser and its rate equations, noise and linewidth, tunable and narrow-linewidth lasers, lasers on silicon, and semiconductor optical amplifiers.
 
-### [22. Light Meets Matter: Absorption, Emission and Gain]({% link chapters/22_emission.md %}) <span class="status status-written">written</span>
+### [22. Light Meets Matter: Absorption, Emission and Gain]({% link chapters/22_emission.md %})
 
 *What does it take for a material to amplify light?*
 
@@ -210,7 +210,7 @@ From the physics of gain to working lasers: emission and gain in semiconductors,
 
 Demos: ● Level-system model
 
-### [23. Semiconductor Gain Media]({% link chapters/23_gain.md %}) <span class="status status-written">written</span>
+### [23. Semiconductor Gain Media]({% link chapters/23_gain.md %})
 
 *How many carriers does it take to reach gain, and where is the gain peak?*
 
@@ -218,7 +218,7 @@ Demos: ● Level-system model
 
 Demos: ● Gain spectrum
 
-### [24. The Fabry–Pérot Laser and the Rate Equations]({% link chapters/24_fp.md %}) <span class="status status-written">written</span>
+### [24. The Fabry–Pérot Laser and the Rate Equations]({% link chapters/24_fp.md %})
 
 *What sets a laser's threshold current and slope efficiency?*
 
@@ -226,7 +226,7 @@ Demos: ● Gain spectrum
 
 Demos: ● Laser rate equations
 
-### [25. Laser Dynamics, Noise and Linewidth]({% link chapters/25_dynamics.md %}) <span class="status status-written">written</span>
+### [25. Laser Dynamics, Noise and Linewidth]({% link chapters/25_dynamics.md %})
 
 *How fast can you modulate a laser directly, and how narrow is its line?*
 
@@ -234,7 +234,7 @@ Demos: ● Laser rate equations
 
 Demos: ● Modulation response, RIN and linewidth
 
-### [26. Single-Frequency and Tunable Lasers]({% link chapters/26_tunable.md %}) <span class="status status-written">written</span>
+### [26. Single-Frequency and Tunable Lasers]({% link chapters/26_tunable.md %})
 
 *How do two rings select one lasing mode over a 40 nm range?*
 
@@ -242,7 +242,7 @@ Demos: ● Modulation response, RIN and linewidth
 
 Demos: ● Vernier ring laser
 
-### [27. Lasers on Silicon]({% link chapters/27_lasersonsi.md %}) <span class="status status-written">written</span>
+### [27. Lasers on Silicon]({% link chapters/27_lasersonsi.md %})
 
 *Which integration approach for which volume and performance?*
 
@@ -250,7 +250,7 @@ Demos: ● Vernier ring laser
 
 Demos: ● III–V/Si supermodes
 
-### [28. Semiconductor Optical Amplifiers]({% link chapters/28_soa.md %}) <span class="status status-written">written</span>
+### [28. Semiconductor Optical Amplifiers]({% link chapters/28_soa.md %})
 
 *How much gain, at what output power and noise figure?*
 
@@ -262,7 +262,7 @@ Demos: ● SOA gain and noise figure
 
 How photonic chips are made and verified: fabrication and its variations, the design flow and open PDKs, test setups and data analysis.
 
-### [29. Fabrication]({% link chapters/29_fab.md %}) <span class="status status-written">written</span>
+### [29. Fabrication]({% link chapters/29_fab.md %})
 
 *How do nanometre variations turn into nanometre wavelength shifts?*
 
@@ -270,7 +270,7 @@ How photonic chips are made and verified: fabrication and its variations, the de
 
 Demos: ● Wafer-map Monte Carlo
 
-### [30. Design Flow and Open PDKs]({% link chapters/30_flow.md %}) <span class="status status-written">written</span>
+### [30. Design Flow and Open PDKs]({% link chapters/30_flow.md %})
 
 *What happens between a simulation and a manufacturable layout?*
 
@@ -278,7 +278,7 @@ Demos: ● Wafer-map Monte Carlo
 
 Demos: ● Circuit simulator
 
-### [31. Testing Photonic Chips]({% link chapters/31_testing.md %}) <span class="status status-written">written</span>
+### [31. Testing Photonic Chips]({% link chapters/31_testing.md %})
 
 *How do you trust a measured spectrum?*
 
@@ -286,7 +286,7 @@ Demos: ● Circuit simulator
 
 Demos: ● Virtual test bench
 
-### [32. Data Analysis]({% link chapters/32_analysis.md %}) <span class="status status-written">written</span>
+### [32. Data Analysis]({% link chapters/32_analysis.md %})
 
 *How do you extract physical parameters, with error bars, from measured spectra?*
 
@@ -298,15 +298,15 @@ Demos: ● Ring-fit playground
 
 Everything together: optical links and transceivers, and the sensing, LiDAR, quantum and computing systems built from the same blocks.
 
-### [33. Optical Links and Transceivers]({% link chapters/33_links.md %}) <span class="status status-written">written</span>
+### [33. Optical Links and Transceivers]({% link chapters/33_links.md %})
 
 *Does the reference link close, and what does each block contribute?*
 
-33.1 Link architectures · 33.2 Power budget and penalties · 33.3 WDM transceivers · 33.4 Coherent transceivers · 33.5 Energy per bit · 33.6 Co-packaged optics · 33.7 The reference link, block by block
+33.1 Link architectures · 33.2 Power budget and penalties · 33.3 WDM transceivers · 33.4 Coherent transceivers · 33.5 Energy per bit · 33.6 Co-packaged optics · 33.7 The reference link, block by block · 33.8 NRZ or PAM4 · 33.9 Drivers and equalisation · 33.10 Clocking, jitter and the timing budget · 33.11 Optimising for energy
 
 Demos: ● Link budget
 
-### [34. Beyond Datacom: Sensing, LiDAR, Quantum and Computing]({% link chapters/34_apps.md %}) <span class="status status-written">written</span>
+### [34. Beyond Datacom: Sensing, LiDAR, Quantum and Computing]({% link chapters/34_apps.md %})
 
 *What changes when the chip is a sensor, a beam steerer or a processor instead of a transceiver?*
 

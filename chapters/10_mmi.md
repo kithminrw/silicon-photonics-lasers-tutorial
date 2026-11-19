@@ -49,7 +49,9 @@ Symmetry decides a lot. A centred input is even, so it has zero overlap with eve
 
 The multimode section of width $$W$$ supports many modes. In the effective-index picture it is a slab of index $$n_r$$ (the vertical slab index of the film, [Chapter 6]({% link chapters/06_soi.md %})) in a cladding $$n_c$$, and its modes are close to sines across an **effective width** that includes the penetration of the field into the cladding,
 
-$$W_e = W + \frac{\lambda_0}{\pi}\left(\frac{n_c}{n_r}\right)^{2\sigma}\left(n_r^2 - n_c^2\right)^{-1/2}, \qquad \sigma = 0\ (\text{TE}),\ 1\ (\text{TM}).$$
+$$W_e = W + \frac{\lambda_0}{\pi}\left(\frac{n_c}{n_r}\right)^{2\sigma}\left(n_r^2 - n_c^2\right)^{-1/2}, \qquad \sigma = \begin{cases} 0 & \text{field parallel to the side walls,} \\ 1 & \text{field normal to the side walls.} \end{cases}$$
+
+The TE-like modes of an SOI waveguide have their electric field normal to the side walls: in the effective-index method of [Chapter 6]({% link chapters/06_soi.md %}) their lateral slab is TM. So they take $$\sigma = 1$$, and the field reaches only $$(n_c/n_r)^2 \approx 0.26$$ times as far into the oxide as a field parallel to the walls would.
 
 The propagation constants of these modes are spaced quadratically, $$\beta_0 - \beta_\nu \approx \nu(\nu + 2)\pi/(3L_\pi)$$, with the **beat length** of the two lowest modes
 
@@ -75,11 +77,11 @@ Because $$\nu(\nu + 2)$$ is always either even or odd times a fixed step, all th
 <div class="tbox tbox-example" markdown="1">
 <div class="tbox-title">Worked Example 10.1 · A 1 × 2 MMI in 220 nm silicon</div>
 
-Take a 6 µm wide multimode section in 220 nm silicon at 1550 nm (TE), with $$n_r = 2.85$$ (the slab index of [Chapter 5]({% link chapters/05_slab.md %})) and $$n_c = 1.444$$. The effective width is $$W_e = 6 + (1.55/\pi)/\sqrt{2.85^2 - 1.444^2} = 6 + 0.20 = 6.20$$ µm, so
+Take a 6 µm wide multimode section in 220 nm silicon at 1550 nm (TE), with $$n_r = 2.85$$ (the slab index of [Chapter 5]({% link chapters/05_slab.md %})) and $$n_c = 1.444$$. The field is normal to the side walls, so $$\sigma = 1$$ and the effective width is $$W_e = 6 + (1.55/\pi)(1.444/2.85)^2/\sqrt{2.85^2 - 1.444^2} = 6 + 0.052 = 6.052$$ µm, so
 
-$$L_\pi = \frac{4 \times 2.85 \times 6.20^2}{3 \times 1.55} = 94.3\ \mu\mathrm{m}.$$
+$$L_\pi = \frac{4 \times 2.85 \times 6.052^2}{3 \times 1.55} = 89.8\ \mu\mathrm{m}.$$
 
-A centred input gives two images at $$3L_\pi/8 = 35.4$$ µm, at $$\pm W_e/4 = \pm1.55$$ µm from the centre, where the two output waveguides start. A 2 × 2 MMI by general interference needs $$3L_\pi/2 = 141$$ µm; by paired interference, with inputs at $$\pm W_e/6$$, $$L_\pi/2 = 47$$ µm.
+A centred input gives two images at $$3L_\pi/8 = 33.7$$ µm, at $$\pm W_e/4 = \pm1.51$$ µm from the centre, where the two output waveguides start. A 2 × 2 MMI by general interference needs $$3L_\pi/2 = 135$$ µm; by paired interference, with inputs at $$\pm W_e/6$$, $$L_\pi/2 = 45$$ µm. Taking $$\sigma = 0$$ by mistake would give $$W_e = 6.20$$ µm and a 1 × 2 MMI 35.4 µm long, 1.7 µm too long, which costs about 1 dB ([Lab 3]({% link labs/lab03_couplers.md %})).
 
 </div>
 
@@ -129,7 +131,7 @@ Free simulations by others that pair well with this chapter {% include cite.html
 - An adiabatic Y-branch splits 50/50 by symmetry; as a combiner fed from one arm it passes only half the power.
 - An abrupt junction excites the wide section's modes by overlap; centred inputs excite only even modes.
 - Self-imaging: $$L_\pi \approx 4n_rW_e^2/(3\lambda_0)$$; images at $$3L_\pi$$ (general), $$L_\pi$$ (paired) and $$3L_\pi/(4N)$$ (symmetric).
-- A 6 µm silicon MMI has $$L_\pi = 94$$ µm: a 1 × 2 splitter is 35 µm long, a 2 × 2 coupler 47–141 µm.
+- A 6 µm silicon MMI has $$L_\pi = 90$$ µm (TE, $$\sigma = 1$$): a 1 × 2 splitter is 34 µm long, a 2 × 2 coupler 45–135 µm.
 - Use Y-branches for compact 1 × 2 splits, MMIs or adiabatic couplers for broadband 2 × 2 splits.
 
 </div>
