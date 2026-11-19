@@ -113,7 +113,7 @@ Before tape-out, a design is checked:
 
 ## <span class="secnum">30.8</span>Tape-out through openEBL
 
-The openEBL runs accept designs through GitHub: a designer adds a GDS file to the run's repository by pull request, automated checks run DRC and the design-for-test rules on it, and the merged designs are combined and fabricated. The chips are measured on an automated probe station and the data come back through the same repository {% include cite.html keys="openebl" %}. The open designs and data of past runs are a rich source for learning, and for [Chapter 32]({% link chapters/32_analysis.md %}).
+The openEBL runs accept designs through GitHub: a designer adds a GDS file to the run's repository by pull request, automated checks run DRC and the design-for-test rules on it, and the merged designs are combined and fabricated. The chips are measured on an automated probe station and the data come back through a link in the same repository {% include cite.html keys="openebl" %}. The open designs and data of past runs are a rich source for learning, and for [Chapter 32]({% link chapters/32_analysis.md %}).
 
 <div class="tbox tbox-specnote" markdown="1">
 <div class="tbox-title">Your first chip</div>

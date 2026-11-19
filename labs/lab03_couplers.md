@@ -161,7 +161,7 @@ The best length is 2.3 % shorter than $$3L_\pi/8$$ because the higher modes run 
 
 ## Going further
 
-- [femwell](https://github.com/HelgeGehring/femwell) solves the full cross-section of the coupler and gives the numbers of Chapter 9 directly; [Lab 2]({% link labs.md %}) uses it.
+- [femwell](https://github.com/HelgeGehring/femwell) solves the full cross-section of the coupler and gives the numbers of Chapter 9 directly; [Lab 2]({% link labs/lab02_femwell.md %}) uses it.
 - [meow](https://github.com/gdsfactory/meow) is an open eigenmode-expansion solver: the same idea as L3.5, with vectorial modes, many sections and reflections, for tapers and S-bends too.
 - [MEEP](https://github.com/NanoComp/meep) simulates the coupler and the MMI in 2D or 3D FDTD, including the bends that this lab adds as a fixed 2.5 µm.
 - The coupler and MMI demos of Chapters 9 and 10 run simplified versions of these models in your browser.

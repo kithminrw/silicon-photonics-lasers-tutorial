@@ -65,7 +65,7 @@ Instead of a GDS file you may submit a Python script that builds it, in `submiss
 | `aggregation.yml` | after verification, merges the submissions into the run's layout (`merge/EBeam_merge.py`) |
 {: .lab-table }
 
-After the deadline the merged layout is written by 100 keV electron-beam lithography at Applied Nanotools, and the chips are measured on SiEPIC's automated probe station ([Chapter 31]({% link chapters/31_testing.md %})). The openEBL page gives results "typically 4-6 weeks after tape-out date", and a link to the measurements on the homepage of the submission repository; the README says the results "will be posted in this repository", and the repository of the October 2025 run also holds SEM images in a `SEMs/` folder. We found no published time between the submission deadline and tape-out. [Lab 9]({% link labs.md %}) analyses the kind of data that comes back.
+After the deadline the merged layout is written by 100 keV electron-beam lithography at Applied Nanotools, and the chips are measured on SiEPIC's automated probe station ([Chapter 31]({% link chapters/31_testing.md %})). The openEBL page gives results "typically 4-6 weeks after tape-out date", and a link to the measurements on the homepage of the submission repository; the README says the results "will be posted in this repository", and the repository of the October 2025 run also holds SEM images in a `SEMs/` folder. We found no published time between the submission deadline and tape-out. [Lab 9]({% link labs/lab09_analysis.md %}) analyses the kind of data that comes back.
 
 ## <span class="secnum">L8.2</span>Top cell, floorplan and layers
 
@@ -239,4 +239,4 @@ Use the run that is open when you submit, and the file-name prefix your course g
 
 - Install SiEPIC-Tools and the EBeam PDK in KLayout (Lab 7, Section L7.7) and run both the functional layout check (V) and the DRC (D) on your file; compare the marker browser's list with this script's output.
 - Run `lab08_checks.py` on a design from a past run: every file in the `submissions/` folders of the [openEBL repositories](https://github.com/SiEPIC) is public under the MIT licence. Which of this script's assumptions (labels in the top cell, one device per top-level cell) do they break?
-- [Lab 9]({% link labs.md %}) analyses the measurements of a chip like this one: the loopback, the MZI's fringes, the three rings and the cutback.
+- [Lab 9]({% link labs/lab09_analysis.md %}) analyses the measurements of a chip like this one: the loopback, the MZI's fringes, the three rings and the cutback.

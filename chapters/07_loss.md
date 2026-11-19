@@ -98,7 +98,7 @@ $$\alpha_\mathrm{leak} \propto e^{-2\gamma t_\mathrm{BOX}}.$$
 <div class="tbox tbox-example" markdown="1">
 <div class="tbox-title">Worked Example 7.2 · How thick must the buried oxide be?</div>
 
-For a 500 × 220 nm strip at 1550 nm, the TE mode has $$n_\mathrm{eff} = 2.446$$ ([Chapter 6]({% link chapters/06_soi.md %})), so $$\gamma = (2\pi/1.55)\sqrt{2.446^2 - 1.444^2} = 8.0\ \mu\mathrm{m}^{-1}$$. Every extra 100 nm of oxide reduces the leakage by $$e^{2\times8.0\times0.1} = 5$$, or 7 dB. The TM mode ($$n_\mathrm{eff} = 1.77$$) has $$\gamma = 4.2\ \mu\mathrm{m}^{-1}$$, and gains only 3.6 dB per 100 nm: it leaks far more for the same oxide. At 1310 nm the TE mode is more confined ($$\gamma = 11\ \mu\mathrm{m}^{-1}$$, 9.6 dB per 100 nm). This is why a 2 µm BOX is enough for TE at 1550 nm, while TM devices, longer wavelengths and weakly confined modes (narrow tapers, grating couplers) call for 3 µm.
+For a 500 × 220 nm strip at 1550 nm, the TE mode has $$n_\mathrm{eff} = 2.446$$ ([Chapter 6]({% link chapters/06_soi.md %})), so $$\gamma = (2\pi/1.55)\sqrt{2.446^2 - 1.444^2} = 8.0\ \mu\mathrm{m}^{-1}$$. Every extra 100 nm of oxide reduces the leakage by $$e^{2\times8.0\times0.1} = 5$$, or 7 dB. The TM mode ($$n_\mathrm{eff} = 1.77$$) has $$\gamma = 4.2\ \mu\mathrm{m}^{-1}$$, and gains only 3.6 dB per 100 nm: it leaks far more for the same oxide. At 1310 nm the TE mode is more confined ($$\gamma = 11\ \mu\mathrm{m}^{-1}$$, 9.6 dB per 100 nm). This is why a 2 µm BOX is enough for TE at 1550 nm, while weakly confined modes (TM in narrow strips, longer wavelengths, narrow tapers, grating couplers) call for 3 µm; the 500 nm strip's own TM mode leaks only about 0.002 dB/cm through 2 µm ([Lab 2]({% link labs/lab02_femwell.md %})).
 
 </div>
 

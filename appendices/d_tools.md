@@ -43,7 +43,7 @@ Commercial foundry PDKs (AMF, AIM, imec, GlobalFoundries, Tower and OpenLight, a
 ## Test and data
 
 - [SiEPIClab](https://github.com/SiEPIC/SiEPIClab): control software for automated probe stations {% include cite.html keys="siepiclab" %}.
-- openEBL repositories: each run's GitHub repository holds the submitted designs and, after testing, the measurement data. For example [openEBL-2024-05](https://github.com/SiEPIC/openEBL-2024-05) and [openEBL-2024-10-SiN](https://github.com/SiEPIC/openEBL-2024-10-SiN) (MIT).
+- openEBL repositories: each run's GitHub repository holds the submitted designs and, after testing, a link in its README to the measurement data on a UBC file share. For example [openEBL-2024-05](https://github.com/SiEPIC/openEBL-2024-05) and [openEBL-2024-10-SiN](https://github.com/SiEPIC/openEBL-2024-10-SiN) (MIT).
 - UBC ELEC 413 semiconductor-laser course designs and data: [UBC-ELEC413-2025Fall](https://github.com/SiEPIC/UBC-ELEC413-2025Fall) (MIT).
 
 ## This tutorial's own code

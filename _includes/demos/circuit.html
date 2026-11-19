@@ -97,7 +97,7 @@
     BD.pill(q('[data-o="pill"]'), (fc - fa) / (1550 * 1550 / (NG * S.dl * 1000)) > 0.4 ? 'flat top' : '', 'ok');   // a plain MZI holds 0.30 FSR within 1 dB
     var cap = 'Each block is a compact model: a coupler is a 2 × 2 matrix [[t, −jκ], [−jκ, t]], a delay a phase e<sup>−jβΔL</sup> with β from the femwell effective index and its dispersion. The circuit\'s response is their product, evaluated at each wavelength: the same thing SAX or a commercial circuit simulator does with full S-matrices. ';
     if (ck === 'mzi') cap += 'Two 50 % couplers and a delay make a sinusoidal filter with FSR = λ²/(n<sub>g</sub>ΔL). ';
-    else cap += 'Lattice filters cascade delays of ΔL and 2ΔL; the right coupling ratios flatten the passband and steepen its edges, like a higher-order digital filter: try about 78 %, 84 % and 70 % for the 2-stage lattice, which gives a 2.9 nm flat top (within 1 dB) against 1.7 nm for a plain MZI, with a −20 dB stop band. ';
+    else cap += 'Lattice filters cascade delays of ΔL and 2ΔL; the right coupling ratios flatten the passband and steepen its edges, like a higher-order digital filter: try about 78 %, 84 % and 70 % for the 2-stage lattice, which gives a 2.9 nm flat top (within 1 dB) against 1.7 nm for a plain MZI, with a stop band reaching about −20 dB. ';
     cap += ' <i>Lossless, reflectionless couplers with wavelength-independent coupling; the netlist text mimics the style of gdsfactory and SAX.</i>';
     q('[data-o="cap"]').innerHTML = cap;
   }

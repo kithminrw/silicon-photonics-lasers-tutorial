@@ -124,6 +124,6 @@ The EIM always overestimates here, for the two reasons given in Section 6.2: the
 
 ## Going further
 
-- [Lab 2]({% link labs.md %}) replaces the EIM with femwell, a full vectorial finite-element solver, and adds loss.
+- [Lab 2]({% link labs/lab02_femwell.md %}) replaces the EIM with femwell, a full vectorial finite-element solver, and adds loss.
 - The slab and EIM demos of Chapters 5 and 6 run the same equations in your browser.
 - Add a TM field function: $$H_y$$ has the same form, but its derivative is continuous only after dividing by $$n^2$$.

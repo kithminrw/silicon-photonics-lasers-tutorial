@@ -31,7 +31,7 @@ How do you extract physical parameters, with error bars, from measured spectra?
 
 ## <span class="secnum">32.1</span>Data formats and open datasets
 
-A passive measurement is a table of wavelength against detected power, usually in dBm, for each detector channel and each structure, with metadata: the structure's label and position, the laser power, the temperature, the polarisation. The openEBL runs return their data this way, as files in the run's repository, alongside the layouts that produced them {% include cite.html keys="openebl" %}. Because the designs are open too, anyone can compare measurement with intent: the most useful dataset there is for learning analysis. The UBC ELEC 413 repositories add laser data ([Chapter 27]({% link chapters/27_lasersonsi.md %})).
+A passive measurement is a table of wavelength against detected power, usually in dBm, for each detector channel and each structure, with metadata: the structure's label and position, the laser power, the temperature, the polarisation. The openEBL runs return their data this way, as files on a UBC file share linked from each run's repository, next to the layouts that produced them {% include cite.html keys="openebl" %}. Because the designs are open too, anyone can compare measurement with intent: the most useful dataset there is for learning analysis. The UBC ELEC 413 repositories add laser data ([Chapter 27]({% link chapters/27_lasersonsi.md %})).
 
 ## <span class="secnum">32.2</span>Calibrating out the grating couplers
 

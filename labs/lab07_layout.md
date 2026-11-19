@@ -38,7 +38,7 @@ python lab07_layout.py
 
 It prints a checkpoint for each part below, writes the layout `EBeam_YourName_firstchip.gds` and saves the figure `lab07_layout.png`, in a minute or two. Read each part, then the matching function in the script; change things and run it again. All lengths are in micrometres. Before you submit anything, set `USER` at the top of the script to your own name (letters and digits only): it goes into the file name, the top cell and every label.
 
-The chip is the "your first chip" of Chapters 6–32: a passive 220 nm SOI chip at 1550 nm, measured through grating couplers. [Lab 8]({% link labs.md %}) checks it and walks through the submission, and [Lab 9]({% link labs.md %}) analyses the kind of data it returns.
+The chip is the "your first chip" of Chapters 6–32: a passive 220 nm SOI chip at 1550 nm, measured through grating couplers. [Lab 8]({% link labs/lab08_submit.md %}) checks it and walks through the submission, and [Lab 9]({% link labs/lab09_analysis.md %}) analyses the kind of data it returns.
 
 ## <span class="secnum">L7.1</span>The openEBL rules
 
@@ -80,7 +80,7 @@ def loopback(name="loopback"):
     return c
 ```
 
-`route` calls gdsfactory's `route_single`, which draws a Manhattan route of 500 nm strip with 10 µm Euler bends, and keeps its length. The loopback is the shortest device: its spectrum is the couplers' own, and every other device's is divided by it ([Chapter 15]({% link chapters/15_gc.md %}), Section 15.7; [Lab 9]({% link labs.md %})).
+`route` calls gdsfactory's `route_single`, which draws a Manhattan route of 500 nm strip with 10 µm Euler bends, and keeps its length. The loopback is the shortest device: its spectrum is the couplers' own, and every other device's is divided by it ([Chapter 15]({% link chapters/15_gc.md %}), Section 15.7; [Lab 9]({% link labs/lab09_analysis.md %})).
 
 One detail matters for the verification of Lab 8. SiEPIC-Tools, which openEBL runs on every submission, recognises a component by a DevRec shape (68/0) around it, and finds which component connects to which by PinRec pins (1/10) at their ports: short paths across the port, pointing out, each with a text naming it. gdsfactory's routed straights and bends, and the parts inside its rings and spirals, have DevRec but no pins, so SiEPIC-Tools would see 196 unconnected pieces and no circuit at all. (In the versions tested, ubcpdk's own `add_pins_siepic` put its pins where SiEPIC-Tools reported them as invalid.) ubcpdk also redraws the pins of the PDK's fixed cells, the coupler and the Y-branch, as boxes, which SiEPIC-Tools does not recognise, so `pdk_cell` reads those cells from the PDK's GDS files exactly as they are. And the script routes with `straight_pins` and `bend_pins`, which pass each piece through `siepic`: flatten it, keep one DevRec polygon, and draw a 20 nm pin at each port the way SiEPIC-Tools' own `make_pin` does:
 
@@ -135,7 +135,7 @@ def ring_cell(gap=0.2, radius=RING_R):
     rg.dmirror_y()                                  # ring below the bus, away from the next device up
 ```
 
-A gap of 200 nm is more than twice the 70 nm minimum, so all three are safely drawable; [Lab 8]({% link labs.md %}) shrinks one below it on purpose.
+A gap of 200 nm is more than twice the 70 nm minimum, so all three are safely drawable; [Lab 8]({% link labs/lab08_submit.md %}) shrinks one below it on purpose.
 
 <div class="tbox tbox-specnote" markdown="1">
 <div class="tbox-title">Checkpoint C</div>
@@ -228,7 +228,7 @@ The script's figure is drawn from the GDS file with KLayout's Python module, whi
 
 ## Going further
 
-- [Lab 8]({% link labs.md %}) runs the openEBL checks on this file, breaks it on purpose, and walks through the pull request; [Lab 9]({% link labs.md %}) analyses measurements of the same set of devices.
+- [Lab 8]({% link labs/lab08_submit.md %}) runs the openEBL checks on this file, breaks it on purpose, and walks through the pull request; [Lab 9]({% link labs/lab09_analysis.md %}) analyses measurements of the same set of devices.
 - Add a Bragg grating ([Chapter 13]({% link chapters/13_bragg.md %})): the KLayout PDK has a parameterised `ebeam_bragg_te1550` cell; in gdsfactory, a corrugated waveguide can be drawn from `gf.components.dbr` with the period of [Lab 5]({% link labs/lab05_bragg.md %}), 317 nm. Run Lab 8 after adding it: a corrugation is the narrowest feature on the chip.
 - Simulate the layout before you submit it: extract the netlist in KLayout with SiEPIC-Tools, or simulate the gdsfactory component with SAX {% include cite.html keys="sax" %} ([Section 30.6]({% link chapters/30_flow.md %})).
 - SiEPIC's own example, [`EBeam_LukasChrostowski_MZI.py`](https://github.com/SiEPIC/openEBL-2024-10/blob/main/submissions/KLayout%20Python/EBeam_LukasChrostowski_MZI.py), draws MZIs with SiEPIC-Tools' Python API instead of gdsfactory; openEBL also accepts such a script in place of a GDS file.

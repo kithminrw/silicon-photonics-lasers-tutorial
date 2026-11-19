@@ -89,9 +89,10 @@
 .bd-check .bd-check-h{color:#9fd0ff;}
 .bd .bd-check-q{margin:0 !important;font-size:13.5px;}
 .bd-check-opts{display:flex;flex-direction:column;gap:5px;margin-top:8px;}
-.bd-check-opts button{display:flex;align-items:baseline;gap:8px;width:100%;text-align:left;font:inherit;font-size:13px;line-height:1.4;color:rgba(215,230,247,.94);background:rgba(120,170,225,.06);border:1px solid rgba(140,190,240,.3);border-radius:7px;padding:6px 10px;cursor:pointer;}
+.bd-check-opts button{display:block;width:100%;text-align:left;font:inherit;font-size:13px;line-height:1.4;color:rgba(215,230,247,.94);background:rgba(120,170,225,.06);border:1px solid rgba(140,190,240,.3);border-radius:7px;padding:6px 10px;cursor:pointer;}
 .bd-check-opts button:hover{border-color:#9fd0ff;color:#fff;}
-.bd-check-opts button::after{content:"";margin-left:auto;font-family:"IBM Plex Mono",monospace;font-weight:600;}
+/* block, not flex, so <sub>/<sup> inside an answer stay inline; the right/wrong marker floats right */
+.bd-check-opts button::after{content:"";float:right;margin-left:10px;font-family:"IBM Plex Mono",monospace;font-weight:600;}
 .bd-check-opts button[data-state="right"]{border-color:#7fe0a0;background:rgba(127,224,160,.12);color:#fff;}
 .bd-check-opts button[data-state="right"]::after{content:"✓ right";color:#7fe0a0;}
 .bd-check-opts button[data-state="wrong"]{border-color:rgba(243,154,124,.8);background:rgba(243,154,124,.08);}

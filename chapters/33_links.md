@@ -194,7 +194,7 @@ PAM4 has costs beyond the decibels {% include cite.html keys="palermo720l04,pale
 
 There are three ways to double the reference link to 400 Gb/s.
 
-- **Eight wavelengths at 50 Gb/s NRZ.** The 7.2 µm rings' 13.7 nm free spectral range holds only 4.3 channels at 3.2 nm, so eight channels need the 200 GHz grid, with tighter crosstalk ([Chapter 14]({% link chapters/14_wdm.md %})), or smaller rings; and four more lasers, drivers, receivers and heater loops.
+- **Eight wavelengths at 50 Gb/s NRZ.** The rings' free spectral range of about 13 nm (12.8 nm for the 7.15 µm demultiplexer rings) holds only four channels at 3.2 nm, so eight channels need the 200 GHz grid, with tighter crosstalk ([Chapter 14]({% link chapters/14_wdm.md %})), or smaller rings; and four more lasers, drivers, receivers and heater loops.
 - **Four lanes at 100 GBd NRZ.** Besides the 9.5 dB of ISI above, the dispersion tolerance falls as the square of the symbol rate: from 40–60 ps/nm at 50 GBd ([Example 2.5]({% link chapters/02_em.md %})) to 10–15 ps/nm at 100 GBd, against the 34 ps/nm of 2 km at 1550 nm. NRZ at 1550 nm runs out of tolerance between about 54 and 66 GBd.
 - **Four lanes at 50 GBd PAM4.** The optics and the symbol rate stay as they are, and the dispersion tolerance stays close to NRZ's (somewhat lower, as the eyes are smaller). The receiver needs −6.6 dBm at 10⁻¹², which leaves 0.9 dB of margin after the 3.0 dB of allowances, short of the 3 dB target. At the KP4 threshold it needs −9.9 dBm, which leaves 4.2 dB, from which PAM4's larger ISI and dispersion penalties must still be paid.
 

@@ -96,7 +96,7 @@ Heating one ring slides its comb against the other, and the coincidence jumps fr
 <div class="tbox tbox-example" markdown="1">
 <div class="tbox-title">Worked Example 26.1 · Two silicon rings for 40 nm of tuning</div>
 
-With $$n_g = 4.18$$, rings of 10 and 11 µm radius have FSRs of 9.148 and 8.316 nm, so $$\mathrm{FSR}_V = 9.148 \times 8.316/0.832 \approx 91$$ nm: one coincidence across more than the gain bandwidth, which covers a 40 nm range with margin. Shifting ring 2 by 0.83 nm, about 5 mW with the TiN heaters of Chapter 18 (0.18 nm/mW for a ring with a 9.15 nm FSR), moves the lasing wavelength by 9.15 nm, a gearing of 11. The price of such a large gearing is selectivity: the neighbouring coincidences, one FSR away, are only slightly misaligned, so the rings' resonances must be narrow (low coupling) for a good SMSR. The demo shows the trade.
+With $$n_g = 4.18$$, rings of 10 and 11 µm radius have FSRs of 9.148 and 8.316 nm, so $$\mathrm{FSR}_V = 9.148 \times 8.316/0.832 \approx 91$$ nm: one coincidence across more than the gain bandwidth, which covers a 40 nm range with margin. Shifting ring 2 by 0.83 nm, about 5 mW with the TiN heaters of Chapter 18 (8.32 nm per 52 mW, or 0.16 nm/mW, for ring 2), moves the lasing wavelength by 9.15 nm, a gearing of 11. The price of such a large gearing is selectivity: the neighbouring coincidences, one FSR away, are only slightly misaligned, so the rings' resonances must be narrow (low coupling) for a good SMSR. The demo shows the trade.
 
 </div>
 

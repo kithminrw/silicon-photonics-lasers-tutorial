@@ -195,6 +195,6 @@ The laser term is the only one that scales with the margin. Any margin above the
 ## Going further
 
 - The link-budget demo of Chapter 33 and the receiver demo of Chapter 21 run the same models in your browser.
-- Add chirp. A directly modulated laser's phase follows its power, $$\phi = (\alpha/2)\ln P$$ with $$\alpha \approx 4$$ ([Chapter 25]({% link chapters/25_dynamics.md %})): multiply the field by $$e^{i\phi}$$ before the fibre and watch the penalty grow. [Lab 10]({% link labs.md %}) models such a laser with its rate equations.
+- Add chirp. A directly modulated laser's phase follows its power, $$\phi = (\alpha/2)\ln P$$ with $$\alpha \approx 4$$ ([Chapter 25]({% link chapters/25_dynamics.md %})): multiply the field by $$e^{i\phi}$$ before the fibre and watch the penalty grow. [Lab 10]({% link labs/lab10_rate_equations.md %}) models such a laser with its rate equations.
 - Replace the Lorentzian with the full drop response of an add-drop ring ([Section 12.3]({% link chapters/12_rings.md %})), which repeats smoothly every FSR. With the same FWHM it rejects the neighbours by only 19.1 dB, so the loaded Q must rise to meet −20 dB.
 - Add the ring modulator's own response (Q<sub>L</sub> ≈ 8000, about 24 GHz) to the transmitter, and see why its driver needs equalisation.

@@ -40,7 +40,7 @@ $$\eta = \frac{4}{\left(\dfrac{w_x}{w_f} + \dfrac{w_f}{w_x}\right)\left(\dfrac{w
 
 </div>
 
-The trouble is the size mismatch ([Figure 16.1](#fig-16-1)). A 500 × 220 nm silicon strip has a mode about 0.4 µm across; SMF-28's is 10.4 µm. femwell gives an overlap of 1 % (−20 dB), and even a lensed fibre focused to 2.5 µm reaches only 12 % (−9 dB). Some kind of **spot-size converter** is needed to expand the waveguide mode before the facet.
+The trouble is the size mismatch ([Figure 16.1](#fig-16-1)). A 500 × 220 nm silicon strip has a mode about 0.4 µm across; SMF-28's is 10.4 µm. femwell gives an overlap of under 1 % (−21 dB), and even a lensed fibre focused to 2.5 µm reaches only 12 % (−9 dB). Some kind of **spot-size converter** is needed to expand the waveguide mode before the facet.
 
 <figure id="fig-16-1">
   <img src="{{ '/assets/figs/ch16_butt.svg' | relative_url }}" style="width:600px" alt="Left: to-scale facet view of the 500 by 220 nanometre silicon strip and its 0.4 micrometre mode inside the circles of a 2.5 micrometre lensed-fibre spot, a 4 micrometre UHNA mode, the 8.2 micrometre SMF-28 core and its 10.4 micrometre mode. Right: butt-coupling efficiency in dB against the chip's mode-field diameter for the three fibres, Gaussian-formula curves peaking at each fibre's own mode size, with femwell results for silicon tips as circles">
