@@ -6,7 +6,7 @@ permalink: /demos/
 
 # Interactive Demos
 
-All 47 demos of the tutorial on one page. Each runs in your browser with no installation, computes its pictures and numbers from a small model of the device, and reproduces the chapter's own numbers at its default settings. The link takes you to the demo inside its chapter, where the text explains what it shows.
+All 48 demos of the tutorial on one page. Each runs in your browser with no installation, computes its pictures and numbers from a small model of the device, and reproduces the chapter's own numbers at its default settings. The link takes you to the demo inside its chapter, where the text explains what it shows.
 {: .chapterlead }
 
 ## Part I · Foundations
@@ -150,6 +150,10 @@ All 47 demos of the tutorial on one page. Each runs in your browser with no inst
 ### [30. Design Flow and Open PDKs]({{ '/part-7/ch30/' | relative_url }})
 
 - [Circuit simulator]({{ '/part-7/ch30/' | relative_url }}#bdCircuit): Chain S-parameter models of couplers, delays and rings into circuits and see their spectra.
+
+### [31. How Photonic Simulators Work]({{ '/part-7/ch31/' | relative_url }})
+
+- [FDTD in the browser]({{ '/part-7/ch31/' | relative_url }}#bdFdtd): A real 2D finite-difference time-domain simulation: resolution, the Courant limit and absorbing boundaries.
 
 ## Part VIII · Fabrication, Testing and Data Analysis
 

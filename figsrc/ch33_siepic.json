@@ -1,0 +1,27 @@
+{
+ "errors": 0,
+ "components": [
+  "ebeam_gc_te1550",
+  "ebeam_gc_te1550",
+  "ebeam_wg_integral_1550"
+ ],
+ "netlist_lines": [
+  "* Spice output from KLayout SiEPIC-Tools v0.5.31, 2026-11-19 15:17:24.",
+  ".subckt TOP ebeam_gc_te1550_detector1 ebeam_gc_te1550_laser",
+  "ebeam_gc_te1550_0  ebeam_gc_te1550_detector1 N$0 ebeam_gc_te1550 library=\"Design kits/ebeam\"  lay_x=-19.985E-6 lay_y=84.0E-9 sch_x=-170.547791E-3 sch_y=716.838E-6",
+  "ebeam_gc_te1550_1  ebeam_gc_te1550_laser N$1 ebeam_gc_te1550 library=\"Design kits/ebeam\"  lay_x=-19.985E-6 lay_y=127.084E-6 sch_x=-170.547791E-3 sch_y=1.084508157E0",
+  "ebeam_wg_integral_1550_2  N$0 N$1 ebeam_wg_integral_1550 library=\"Design kits/EBeam\" wg_length=0.000163897 wg_width=5e-07 points=\"[[0.0,0.0],[20.0,0.0],[20.0,127.0],[0.0,127.0]]\" radius=5e-06 lay_x=10.375E-6 lay_y=63.5E-6 sch_x=88.53807E-3 sch_y=541.895659E-3",
+  ".ends TOP",
+  "TOP   ebeam_gc_te1550_detector1 ebeam_gc_te1550_laser TOP sch_x=-1 sch_y=-1"
+ ],
+ "wg_length_um": 163.89700000000002,
+ "wg_params": {
+  "waveguide_type": "Strip TE 1550 nm, w=500 nm"
+ },
+ "gc_bbox_um": [
+  -39.969,
+  -13.5,
+  0.05,
+  13.669
+ ]
+}

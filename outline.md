@@ -264,7 +264,9 @@ From a specification to a verified layout: design principles, how the simulators
 
 ### [29. Design Principles and Simulation Workflows]({% link chapters/29_design.md %})
 
-*Being written.*
+*How do you get from a system specification to a design that works on most of the dies, with the least simulation?*
+
+29.1 From specification to component targets · 29.2 Architecture and margins · 29.3 Choosing the level of model · 29.4 Simulations are experiments · 29.5 Corners, Monte Carlo and yield · 29.6 Optimisation and inverse design · 29.7 Compact models and their validity · 29.8 Closing the loop with measurement · 29.9 Reproducible simulation · 29.10 Design for manufacturing and for test
 
 ### [30. Design Flow and Open PDKs]({% link chapters/30_flow.md %})
 
@@ -276,7 +278,11 @@ Demos: Circuit simulator
 
 ### [31. How Photonic Simulators Work]({% link chapters/31_simulators.md %})
 
-*Being written.*
+*Which solver, and how fine a grid, gives an answer you can trust in a time you can afford?*
+
+31.1 What every simulator does · 31.2 Mode solvers · 31.3 Eigenmode expansion · 31.4 Beam propagation · 31.5 FDTD: the Yee grid and the leapfrog · 31.6 Stability and numerical dispersion · 31.7 Absorbing boundaries: the perfectly matched layer · 31.8 Sources, monitors and the Fourier transform · 31.9 Materials, meshes and symmetry · 31.10 Convergence and cost · 31.11 2D, 2.5D and frequency-domain solvers · 31.12 Semi-analytic, circuit and multiphysics solvers · 31.13 Choosing a method
+
+Demos: FDTD in the browser
 
 ### [32. Simulation Tools in Practice]({% link chapters/32_simtools.md %})
 
@@ -284,7 +290,9 @@ Demos: Circuit simulator
 
 ### [33. Layout with KLayout and GDSII]({% link chapters/33_layout.md %})
 
-*Being written.*
+*How does a drawing become masks, and what do the file format and its grid do to a curved waveguide?*
+
+33.1 What a layout is for · 33.2 GDSII as data · 33.3 KLayout · 33.4 Layout as code with gdsfactory · 33.5 Curves on a grid · 33.6 Floorplans, routing and labels · 33.7 Hierarchy hygiene and version control
 
 ### [34. Verification and Tape-Out]({% link chapters/34_verification.md %})
 

@@ -363,3 +363,25 @@
   text: "Manfred Hammer and Olena V. Ivanova. “Effective index approximations of photonic crystal slabs: a 2-to-1-D assessment.” *Optical and Quantum Electronics*, 41:267–283, 2009. doi:10.1007/s11082-009-9349-3. Open access."
 - key: shin2012
   text: "Wonseok Shin and Shanhui Fan. “Choice of the perfectly matched layer boundary condition for frequency-domain Maxwell's equations solvers.” *Journal of Computational Physics*, 231(8):3406–3431, 2012. doi:10.1016/j.jcp.2012.01.013"
+- key: lumericalproducts
+  text: "Ansys, Inc. (part of Synopsys). *Ansys Lumerical MODE, FDTD, Multiphysics and INTERCONNECT*, product pages (2026 R1 release). <https://www.ansys.com/products/optics>"
+- key: lumericaldocs
+  text: "Ansys, Inc. *Ansys Optics Help Center*: Lumerical solver documentation, tutorials and script command reference. <https://optics.ansys.com/hc/en-us>"
+- key: pylumerical
+  text: "Ansys, Inc. *PyLumerical (ansys-lumerical-core): Python automation for Ansys Lumerical*, documentation and examples. <https://lumerical.docs.pyansys.com>"
+- key: synopsys2025
+  text: "Synopsys, Inc. “Synopsys completes acquisition of Ansys.” Press release, 17 July 2025. <https://news.synopsys.com/2025-07-17-Synopsys-Completes-Acquisition-of-Ansys>"
+- key: tidy3ddocs
+  text: "Flexcompute, Inc. *Tidy3D documentation* (version 2.12), and the `tidy3d` Python package (LGPL). <https://docs.flexcompute.com/projects/tidy3d/>, <https://github.com/flexcompute/tidy3d>"
+- key: tidy3dsite
+  text: "Flexcompute, Inc. *Tidy3D*, product page. <https://www.flexcompute.com/tidy3d/>"
+- key: liu2025
+  text: "Zuyang Liu and Joyce K. S. Poon. “Comparison of Lumerical FDTD and Tidy3D for three-dimensional FDTD simulations of passive silicon photonic components.” arXiv:2506.16665 [physics.optics], 2025 (version 3). doi:10.48550/arXiv.2506.16665. Open access."
+- key: meepdocs
+  text: "MEEP contributors. *MEEP documentation* (MEEP is GPL-2.0-or-later). <https://meep.readthedocs.io>"
+- key: mpb
+  text: "Steven G. Johnson and J. D. Joannopoulos. “Block-iterative frequency-domain methods for Maxwell's equations in a planewave basis.” *Optics Express*, 8(3):173–190, 2001. doi:10.1364/OE.8.000173. Open access. Software: <https://mpb.readthedocs.io>"
+- key: gplugins
+  text: "gdsfactory contributors. *gplugins: simulation plugins for gdsfactory* (MIT licence). <https://github.com/gdsfactory/gplugins>"
+- key: gustavsen1999
+  text: "Bjørn Gustavsen and Adam Semlyen. “Rational approximation of frequency domain responses by vector fitting.” *IEEE Transactions on Power Delivery*, 14(3):1052–1061, 1999. doi:10.1109/61.772353"
