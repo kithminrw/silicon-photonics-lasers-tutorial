@@ -18,7 +18,9 @@ A modulator writes data onto light; its speed, swing and loss set the reach and 
 - design lumped and travelling-wave MZMs, with velocity and impedance matching;
 - design ring modulators, and trade their Q against bandwidth and extinction;
 - compare EAMs, TFLN and BTO modulators;
-- read NRZ, PAM4 and coherent eye and constellation diagrams, and see what the driver sees.
+- read NRZ, PAM4 and coherent eye and constellation diagrams, and see what the driver sees;
+- explain a ring modulator's dynamics: bandwidth peaking with detuning, unequal edges, and pre-emphasis for carrier injection;
+- drive, linearise and lock a ring modulator.
 
 </div>
 
@@ -122,9 +124,66 @@ Pockels modulators change the index instantly and without loss. Thin-film lithiu
 The electronics sees the modulator very differently depending on its type:
 
 - **A terminated MZM** is a resistive load. The driver must deliver a few volts into 50 Ω at tens of gigahertz, which costs power and needs a SiGe or III-V driver, or a **segmented** MZM whose short sections are each driven by small CMOS inverters, acting like an optical DAC.
-- **A ring or EAM** is a small capacitor, which suits CMOS drivers directly. The ring's resonance, though, makes its response depend on wavelength, temperature and the data pattern, so it needs equalisation and a thermal loop in the driver chip.
+- **A ring or EAM** is a small capacitor, which suits CMOS drivers directly. The ring's resonance, though, makes its response depend on wavelength, temperature and the data pattern, so it needs equalisation and a thermal loop in the driver chip (Sections 20.8 and 20.9).
 
 Every millimetre of wire between the driver and the modulator adds inductance and capacitance, which is why drivers are flip-chipped or 3D-stacked on top of the photonic die, or built into it ([Chapter 1]({% link chapters/01_why.md %})).
+
+## <span class="secnum">20.8</span>Ring-modulator dynamics
+
+At the operating point of Worked Example 20.2, the laser sits 109 pm, or 0.56 linewidths, blue of the resonance, where the insertion loss is 3.0 dB. How fast the ring follows its drive depends on that same detuning {% include cite.html keys="palermo721l11" %}. A coupled-mode model, one resonant mode whose stored field decays at half the linewidth and leaks into the bus, gives the small-signal response of [Figure 20.1](#fig-20-1):
+
+- With the laser at the centre of the resonance, the ring behaves as a single pole at half its linewidth: 12.1 GHz for the 24.2 GHz linewidth of $$Q_L = 8000$$.
+- Detuned, the response peaks. The light leaking out of the ring beats with the laser at the detuning frequency, so modulation near that frequency is enhanced. At the reference detuning the peak is 2.6 dB at 15 GHz and the 3 dB bandwidth is 38 GHz; a full linewidth away it would be 86 GHz.
+
+The price is extinction. The further the laser sits from the resonance, the less a given shift changes the transmission: with 2 Vpp at 50 pm/V, 12 dB at 0.35 linewidths, about 4 dB at the reference point, and 1 dB at a full linewidth. The operating point is therefore a three-way compromise between extinction, loss and speed. [Chapter 33]({% link chapters/33_links.md %}) conservatively models this transmitter as a single pole at the 24 GHz linewidth.
+
+<figure id="fig-20-1">
+  <img src="{{ '/assets/figs/ch20_rrm_response.svg' | relative_url }}" style="width:720px" alt="Left: small-signal modulation response of the reference ring for laser detunings from 0.15 to 1 linewidth, rising from a 12 GHz single pole to strongly peaked responses. Right: 3 dB bandwidth rising and extinction at 2 Vpp falling with detuning, with the operating point of Worked Example 20.2 at 0.56 linewidths and 38 GHz">
+  <figcaption><span class="capnum">Figure 20.1.</span> <strong>A detuned ring is faster but extinguishes less.</strong> (a) Small-signal response of the output power of the reference ring (\(Q_i = 15\,000\), \(Q_L = 8000\)) to a sinusoidal shift of its resonance, for the laser placed 0.15 to 1 linewidth blue of the resonance. (b) The 3 dB bandwidth (solid) and the extinction for a 2 Vpp, 50 pm/V drive (dashed) against the detuning; the dot is the operating point of Worked Example 20.2. Single-mode coupled-mode theory, no electrical (RC) limit. Drawn by <code>figsrc/ch20_rrm.py</code>.</figcaption>
+</figure>
+
+A 2 Vpp swing moves the resonance by 100 pm, half a linewidth, so the small-signal picture is only a guide: across the swing the detuning varies from 0.30 to 0.82 linewidths, and the speed with it. [Figure 20.2](#fig-20-2) shows the two edges for ideal voltage steps. When the reverse bias rises, the resonance moves away from the laser and the stored light escapes, beating with the laser: the output rises in 5.8 ps (10 to 90 %), overshooting by 42 %. When the bias falls, the resonance moves onto the laser and the ring must fill up: the output falls in 11.4 ps, with only 6 % overshoot. Rising and falling transitions therefore leave different intersymbol interference behind them, which a single linear equaliser cannot cancel at once.
+
+<figure id="fig-20-2">
+  <img src="{{ '/assets/figs/ch20_rrm_edges.svg' | relative_url }}" style="width:560px" alt="Normalised output-power transitions of the reference ring for a rising and a falling 2 V step: the rising edge is fast with a large overshoot, the falling edge slower and smoother">
+  <figcaption><span class="capnum">Figure 20.2.</span> <strong>A ring modulator's edges are unequal.</strong> Output power of the reference ring after ideal 2 V steps, normalised from its old to its new level. Moving the resonance away from the laser (blue) takes 5.8 ps from 10 to 90 % with 42 % overshoot; moving it onto the laser (red) takes 11.4 ps with 6 %. Coupled-mode theory at the operating point of Worked Example 20.2, no electrical limit. Drawn by <code>figsrc/ch20_rrm.py</code>.</figcaption>
+</figure>
+
+### Carrier injection and pre-emphasis
+
+[Chapter 19]({% link chapters/19_eo.md %}) described the other silicon junction, a forward-biased PIN diode that floods the waveguide with electrons and holes. In a ring it is very efficient {% include cite.html keys="palermo721l11" %}. With the core weight of Chapter 19's mode (0.92) and the Soref–Bennett relations, $$2.7\times10^{17}$$ cm⁻³ of each carrier in the core of a 7.2 µm ring moves the resonance 291 pm blue, one and a half linewidths. Holding them there against recombination, with a 1 ns lifetime, takes 172 µA, about 155 µW at 0.9 V. The carriers also absorb: the intrinsic Q falls from 15 000 to 11 200.
+
+Speed is the problem. The stored charge follows
+
+$$\frac{\mathrm{d}Q}{\mathrm{d}t} = I - \frac{Q}{\tau},$$
+
+so with the holding current alone the charge reaches only 9.5 % of its final value in a 100 ps bit at 10 Gb/s. Driving harder does not help ([Figure 20.3](#fig-20-3), red): five times the holding current shifts the ring quickly at first, but the charge keeps piling up during runs of "1"s and drains with the 1 ns lifetime, so the "0"s after a run stay bright and the eye closes. **Pre-emphasis** shapes the current instead (blue). A short forward pulse at each rising edge delivers the charge of a "1" in 40 ps, the holding current keeps it, and a reverse pulse at each falling edge sweeps it out. The pulse needs 25 times the holding current, but because a diode's current grows exponentially with its voltage, that takes only about 0.12 V more forward bias (ideality factor 1.5, series resistance neglected). The optical eye opens fully: the lowest "1" transmits 0.87, the highest "0" 0.004. The pulse width, the pulse depth and the DC bias all trade against each other, and a model that couples the diode's charge to the ring's optics is what lets a designer choose them.
+
+<figure id="fig-20-3">
+  <img src="{{ '/assets/figs/ch20_injection.svg' | relative_url }}" style="width:720px" alt="Top: stored charge in a carrier-injection ring at 10 Gb/s, which piles up and drains slowly under a plain NRZ current but switches cleanly between zero and the one level with pre-emphasis pulses. Bottom: the ring's transmission, closed for the plain drive and fully open with pre-emphasis">
+  <figcaption><span class="capnum">Figure 20.3.</span> <strong>Pre-emphasis for a carrier-injection ring.</strong> Top: stored charge, in units of the charge that shifts the resonance by 1.5 linewidths, for a 10 Gb/s pattern (shaded bits are "1"). A plain NRZ current of five times the holding current (red) piles charge up and drains it with the 1 ns carrier lifetime; the holding current with 40 ps forward and reverse pulses on the edges (blue) switches it cleanly. Bottom: the transmission of the ring, with the laser at the unbiased resonance; the carriers' absorption is included. Charge-control model, quasi-static ring (its 6.6 ps photon lifetime is far shorter than a bit). Drawn by <code>figsrc/ch20_rrm.py</code>.</figcaption>
+</figure>
+
+## <span class="secnum">20.9</span>Driving, linearising and locking a ring
+
+**High-swing drivers.** A depletion ring with half the reference ring's efficiency, 25 pm/V, needs 4 Vpp for the same 100 pm shift, four times the energy (80 fJ/bit at 20 fF), and more voltage than a thin-oxide CMOS transistor can switch {% include cite.html keys="palermo721l11" %}. Two techniques get there:
+
+- **Stacking.** Output stages with cascoded transistors between two supply rails let each transistor see only part of the swing. Merging the main and post-cursor taps into one stack, rather than putting a stack in every segment, keeps any transistor from being overstressed during transitions and cuts the output capacitance.
+- **Differential, AC-coupled drive.** Driving the cathode and the anode in antiphase doubles the swing across the junction, and coupling capacitors let each terminal sit at its own DC bias through a large resistor, so the junction stays reverse-biased whatever the supplies. With 2 pF coupling capacitors, 50 kΩ bias resistors and 70 fF of ring and pad capacitance, 97 % of the swing (−0.3 dB) reaches the ring, the high-pass corner is at 1.6 MHz, and a run of 72 identical bits at 50 Gb/s droops by only 1.4 %.
+
+Because the two edges differ ([Figure 20.2](#fig-20-2)), ring drivers use an **asymmetric FFE**: the post-cursor tap is set separately for rising and falling transitions, or for the "1" and "0" levels.
+
+**PAM4 on a ring.** The Lorentzian bends the ring's transfer curve. At the reference operating point, four equally spaced drive voltages give three eyes in the ratio 1.34 : 0.99 : 0.67 ([Figure 20.4](#fig-20-4)). The smallest eye sets the error rate, a penalty of 1.8 dB on top of PAM4's 4.8 dB. Pre-distorting the drive, with levels at 0, 0.48, 1.08 and 2 V instead of 0, 0.67, 1.33 and 2 V, makes the eyes equal again. Transmitters do this with a DAC-based output stage and a look-up table that also applies a nonlinear FFE, or with a ring whose phase shifter is split into two segments, driven by the most and the least significant bit with independently set swings: an optical DAC {% include cite.html keys="palermo721l11,palermo721l13" %}.
+
+<figure id="fig-20-4">
+  <img src="{{ '/assets/figs/ch20_pam4.svg' | relative_url }}" style="width:560px" alt="Transmission of the reference ring against drive voltage across the 2 Vpp swing, a concave curve; four equally spaced voltages give unequal output levels, while four pre-distorted voltages give equally spaced levels">
+  <figcaption><span class="capnum">Figure 20.4.</span> <strong>PAM4 on a ring modulator.</strong> Transmission of the reference ring across its 2 Vpp swing at the operating point of Worked Example 20.2. Equally spaced drive voltages (red dots) give eyes in the ratio 1.34 : 0.99 : 0.67, a 1.8 dB penalty for the smallest; pre-distorted voltages of 0, 0.48, 1.08 and 2 V (blue squares) give equal eyes. Static Lorentzian model of the ring demo. Drawn by <code>figsrc/ch20_rrm.py</code>.</figcaption>
+</figure>
+
+**Locking with data on.** Locking a modulator differs from locking a drop filter ([Chapter 18]({% link chapters/18_thermal.md %})): data are on, and the target is not the resonance but a detuning. A common loop holds the average through-port power at a reference that a DAC sets, as a fraction of the input power {% include cite.html keys="palermo721l11" %}. At the reference point the average transmission is 0.50 and changes by 0.0046 per picometre of detuning, so even a 0.1 K drift (7.5 pm) moves it by 0.034: a strong error signal, and a monotonic one on the blue side of the resonance, where the loop runs. On the red side the slope reverses, so at start-up the controller heats the ring through the dip before it closes the loop. Two actuators can share the work:
+
+- **Heaters** shift the ring red only, over a whole free spectral range, at about 0.26 nm/mW, but in tens of microseconds ([Chapter 18]({% link chapters/18_thermal.md %})).
+- **Bias** is fast. A depletion ring's DC bias moves it 50 pm per volt at almost no power, but ±1 V covers only ±0.67 K of drift, so bias suits fine, fast correction. An injection ring's forward bias moves it blue far more efficiently than heat (0.28 nm for about 150 µW, against 1.1 mW for a heater), but its carriers add loss: the intrinsic Q falls from 15 000 to 11 300.
 
 <div class="tbox tbox-insight" markdown="1">
 <div class="tbox-title">Answer to the design question</div>
@@ -142,7 +201,7 @@ Four depletion ring modulators with U-shaped junctions (about 50 pm/V), $$Q_L \a
 
 ## Reading
 
-{% include reflist.html keys="reed2010,wang2018tfln,zhu2021,chrostowski2015" %}
+{% include reflist.html keys="reed2010,wang2018tfln,zhu2021,chrostowski2015,sackinger2005,palermo721l11" %}
 
 <div class="tbox tbox-takeaways" markdown="1">
 <div class="tbox-title">Key takeaways</div>
@@ -152,5 +211,8 @@ Four depletion ring modulators with U-shaped junctions (about 50 pm/V), $$Q_L \a
 - Travelling-wave electrodes need velocity and impedance matching; RF loss limits long silicon MZMs.
 - Ring modulators use about 20 fJ/bit, but their Q trades extinction against bandwidth (c/λQ) and they need thermal locking.
 - TFLN gives low-loss, linear, > 100 GHz modulators; EAMs are short but narrow-band; PAM4 halves the symbol rate for a 4.8 dB penalty.
+- A detuned ring's response peaks: the reference ring's small-signal bandwidth rises from 12 GHz on resonance to 38 GHz at its operating point, at the cost of extinction. Its edges are unequal (5.8 and 11.4 ps), so drivers use asymmetric FFE.
+- Carrier-injection rings are efficient but held back by the 1 ns carrier lifetime; pre-emphasis pulses of about 25 times the holding current open the eye.
+- A ring bends PAM4 levels (a 1.8 dB penalty for the smallest eye) unless the drive is pre-distorted; ring modulators lock to an average-power reference with heaters, and fine-tune with bias.
 
 </div>

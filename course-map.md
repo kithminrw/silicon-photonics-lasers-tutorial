@@ -186,7 +186,7 @@ Demos: ● PN depletion phase shifter
 
 *Mach–Zehnder or ring modulator for a four-wavelength link?*
 
-20.1 Modulator metrics · 20.2 Mach–Zehnder modulators · 20.3 Ring modulators · 20.4 Electro-absorption modulators · 20.5 TFLN and BTO modulators · 20.6 Modulation formats · 20.7 Driver and modulator co-design
+20.1 Modulator metrics · 20.2 Mach–Zehnder modulators · 20.3 Ring modulators · 20.4 Electro-absorption modulators · 20.5 TFLN and BTO modulators · 20.6 Modulation formats · 20.7 Driver and modulator co-design · 20.8 Ring-modulator dynamics · 20.9 Driving, linearising and locking a ring
 
 Demos: ● MZM and eye diagram · ● Ring modulator
 
