@@ -100,6 +100,10 @@ where $$\rho$$ is the local half-width and $$\beta_1 - \beta_2$$ the local diffe
   <figcaption><span class="capnum">Figure 8.3.</span> <strong>An adiabatic taper from 500 nm to 3 µm</strong> (220 nm silicon, TE, 1550 nm, effective-index method). (a) Top view to scale of the 20 µm linear taper, with the local fundamental-mode profile at five positions. Dashed: a profile that satisfies the criterion everywhere with the same worst-case margin; it widens quickly where the modes are far apart and is only 12.0 µm long. (b) Love's criterion: the largest allowed \(\mathrm{d}\rho/\mathrm{d}z\), from the beat between TE0 and the next symmetric mode, TE2 (guided above 0.63 µm; below that width, the radiation modes at the oxide index). It peaks at 0.30 near 0.84 µm and falls for wide guides, so a linear taper's margin is smallest at its wide end: a factor 1.43 for 20 µm and 2.86 for 40 µm. Drawn by <code>figsrc/ch08_figs.py</code>.</figcaption>
 </figure>
 
+**Try it.** Choose the taper's profile, end width and length, and compare its rate of widening with the criterion at every width; the top view shows the local modes along the taper and how much light ends up in TE2.
+
+{% include demos/adiabatic.html %}
+
 ## <span class="secnum">8.4</span>Overlap integrals and butt coupling
 
 When two different waveguides meet abruptly, the fraction of power that enters the second one's mode is the overlap integral of [Chapter 3]({% link chapters/03_gaussian.md %}),

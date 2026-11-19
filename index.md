@@ -12,7 +12,7 @@ permalink: /
     <p class="fs-5">An open, interactive tutorial on integrated photonics: electromagnetic theory and Gaussian beams, waveguides on SOI, passive devices, coupling to fibre, modulators and detectors, lasers from first principles to lasers on silicon, and the fabrication, testing and data analysis that turn a layout into a working chip.</p>
     <p>
       <a class="btn btn-primary mr-2" href="{% link preface.md %}">Start reading</a>
-      <a class="btn mr-2" href="{% link course-map.md %}">See the course map</a>
+      <a class="btn mr-2" href="{% link outline.md %}">See the tutorial outline</a>
       <a class="btn" href="{% link devices-3d.md %}">PDK devices in 3D</a>
     </p>
   </div>
@@ -44,18 +44,18 @@ A photonic integrated circuit does with light what an electronic chip does with 
   <div class="card"><span class="card-label">Part VI · Ch 22–28</span><h3><a href="{% link parts/part-6.md %}">Lasers and amplifiers</a></h3><p>Gain from first principles, the Fabry–Pérot laser and its rate equations, noise and linewidth, tunable lasers, lasers on silicon and SOAs.</p></div>
   <div class="card"><span class="card-label">Part VII · Ch 29–32</span><h3><a href="{% link parts/part-7.md %}">Fabrication, testing and data</a></h3><p>Fabrication and its variations, the design flow and open PDKs, test setups and data analysis.</p></div>
   <div class="card"><span class="card-label">Part VIII · Ch 33–34</span><h3><a href="{% link parts/part-8.md %}">Systems and applications</a></h3><p>Optical links and transceivers, and the sensing, LiDAR, quantum and computing systems built from the same blocks.</p></div>
-  <div class="card"><span class="card-label">Labs · 12</span><h3><a href="{% link labs.md %}">Hands-on labs</a></h3><p>Simulate devices with free solvers, lay out and submit an openEBL chip, analyse real measurements, and model lasers and the reference link.</p></div>
+  <div class="card"><span class="card-label">Labs · 12</span><h3><a href="{% link labs.md %}">Hands-on labs</a></h3><p>Simulate devices with free solvers, lay out and submit an openEBL chip, analyse openEBL-style measurements, and model lasers and the reference link.</p></div>
   <div class="card"><span class="card-label">Gallery and appendices</span><h3><a href="{% link devices-3d.md %}">PDK devices in 3D</a></h3><p>Devices from the SiEPIC EBeam, CORNERSTONE and Luxtelligence open PDKs, with credit to their designers; plus formulas, constants, a glossary and a directory of open tools.</p></div>
 </div>
 
 ## Interactive demos
 
-Each chapter has one or more demos that run in the browser with no installation: a link power budget, polarisation and wave packets, a slab-waveguide mode solver, Fresnel reflection and total internal reflection, Gaussian beams and fibre coupling, fibre modes, a platform comparator, directional couplers, MMI self-imaging, Mach–Zehnder interferometers, ring resonators, Bragg gratings by transfer matrix, grating-coupler phase matching, a fibre-array alignment game, a laser rate-equation simulator and a Vernier tunable laser, with more to come. The [course map]({% link course-map.md %}) lists them all. Where a free simulation by someone else already does the job well, such as the MIT and AIM Photonics Academy virtual-lab simulations, the chapter links to it.
+Every chapter has one or more demos that run in the browser with no installation: a link power budget, polarisation and wave packets, a slab-waveguide mode solver, a full-vectorial 2D mode solver, Fresnel reflection and total internal reflection, Gaussian beams and fibre coupling, fibre modes, a platform comparator, directional couplers, MMI self-imaging, Mach–Zehnder interferometers, ring resonators, Bragg gratings by transfer matrix, a four-ring WDM demultiplexer, grating-coupler phase matching, a fibre-array alignment game, a Pockels phase shifter, a laser rate-equation simulator with self-heating and a Vernier tunable laser. The [tutorial outline]({% link outline.md %}) lists them all. Where a free simulation by someone else already does the job well, such as the MIT and AIM Photonics Academy virtual-lab simulations, the chapter links to it.
 
 ## About
 
-The tutorial's organisation draws on the open teaching material of the field, above all Chrostowski and Hochberg's *Silicon Photonics Design* and the UBC edX course built around it, the SiEPIC openEBL design–fabrication–test cycle, the AIM Photonics Academy courses and the open PDKs of SiEPIC and gdsfactory. It cites these works and links to them; it does not copy them. Every source is on the [References]({% link references.md %}) page.
+The tutorial has learned from the teaching material of the field, above all Chrostowski and Hochberg's *Silicon Photonics Design* and the UBC edX course built around it, the SiEPIC openEBL design–fabrication–test cycle, the AIM Photonics Academy courses and the open PDKs of SiEPIC and gdsfactory. It cites these works and links to them, but its text, figures and code are its own. Every source is on the [References]({% link references.md %}) page.
 
-**How this tutorial is made.** It is being developed with the help of AI tools, and this draft may contain mistakes.
+**How this tutorial is made.** Its text, figures, demos and labs were written and drawn for it with the help of AI tools; nothing is copied from elsewhere ([Preface]({% link preface.md %})). This draft may still contain mistakes, and any mistake will be corrected as soon as it is pointed out.
 
-This is a living draft (v0.1, November 2026): all eight parts (Chapters 1–34) are written, with forty-two interactive demos and the 3D gallery; the hands-on labs are the next part to be written.
+This is a living draft (v0.1, November 2026): all eight parts (Chapters 1–34) are written, with forty-seven interactive demos, twelve hands-on labs and the 3D gallery.

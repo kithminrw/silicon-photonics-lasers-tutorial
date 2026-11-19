@@ -1,4 +1,5 @@
-/* Shared helpers for the interactive demos (_includes/demos/*.html). No dependencies. */
+/* Shared helpers for the interactive demos (_includes/demos/*.html). No dependencies.
+   SPDX-License-Identifier: MIT. Copyright (c) 2026 the Open-Photonics authors. */
 (function () {
   if (window.BD) return;
   var C = { grid: 'rgba(140,190,240,.14)', axis: 'rgba(170,205,240,.62)', blue: '#7fb8f0', gold: '#e0b85a',
@@ -131,8 +132,10 @@
     g.strokeStyle = col || GEO.si; g.lineWidth = Math.max(1.2, widthPx); g.lineCap = 'butt'; g.lineJoin = 'round';
     g.beginPath(); pts.forEach(function (p, i) { if (i) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); }); g.stroke(); g.lineWidth = 1; g.lineCap = 'butt';
   }
-  function sbend(x0, y0, x1, y1, n) {   // points of a cosine S-bend from (x0,y0) to (x1,y1)
-    var pts = []; n = n || 24; for (var i = 0; i <= n; i++) { var t = i / n; pts.push([x0 + (x1 - x0) * t, y0 + (y1 - y0) * (1 - Math.cos(Math.PI * t)) / 2]); } return pts;
+  function offsetPath(from, to, steps) {   // a smooth lateral offset between two points: straight in x, raised-sine in y
+    var k = steps || 24, dx = to[0] - from[0], dy = to[1] - from[1], out = new Array(k + 1);
+    for (var j = 0; j <= k; j++) { var s = Math.sin(0.5 * Math.PI * j / k); out[j] = [from[0] + dx * j / k, from[1] + dy * s * s]; }
+    return out;
   }
   function wgr(g, pts, widthPx, col, rPx, cap) {   // a waveguide polyline with rounded corners (radius clamped to fit each corner)
     g.strokeStyle = col || GEO.si; g.lineWidth = Math.max(1.2, widthPx); g.lineJoin = 'round'; g.lineCap = cap || 'round';
@@ -319,6 +322,6 @@
 
   window.BD = { C: C, setup: setup, frame: frame, line: line, hline: hline, vline: vline, dot: dot, logticks: logticks,
                 eng: eng, fft: fft, gauss: gauss, rng: rng, bind: bind, seg: seg, toggle: toggle, observe: observe,
-                GEO: GEO, nice: nice, scalebar: scalebar, dim: dim, wg: wg, wgr: wgr, glow: glow, sbend: sbend, label: label,
+                GEO: GEO, nice: nice, scalebar: scalebar, dim: dim, wg: wg, wgr: wgr, glow: glow, offsetPath: offsetPath, label: label,
                 edges: edges, pill: pill, field: field, crests: crests };
 })();

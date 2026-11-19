@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 the Open-Photonics authors
 """Lab 8: check your first chip before you submit it to openEBL (Open-Photonics, Chapter 30).
 
 Run it from a terminal, in the folder where you saved lab07_layout.py:

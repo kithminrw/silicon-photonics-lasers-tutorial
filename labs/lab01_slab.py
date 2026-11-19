@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 the Open-Photonics authors
 """Lab 1: slab and channel waveguide modes in Python (Open-Photonics, Chapters 5 and 6).
 
 Run it from a terminal:

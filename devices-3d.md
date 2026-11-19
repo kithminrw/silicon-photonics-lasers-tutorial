@@ -73,7 +73,20 @@ Luxtelligence's LNOI400 PDK {% include cite.html keys="lxtpdk" %} is for thin-fi
 
 - **VTT 3 µm SOI.** VTT's public gdsfactory PDK {% include cite.html keys="vttpdk" %} draws its rib and strip waveguides with add and subtract mask layers but publishes no layer stack, so its devices will be added once the etch depths can be taken from a public source.
 - **More SiEPIC devices:** Bragg gratings, contra-directional couplers, the laser-integration cells of the Shuksan run {% include cite.html keys="shuksan" %}, and active devices with doping layers.
-- **InP and BTO.** There is no open InP or BTO PDK with published layouts yet; this page will add one when there is. Commercial PDKs, including OpenLight's heterogeneous InP-on-silicon platform, are under licence and are not shown.
+- **InP and BTO.** There is no open InP or BTO PDK with published layouts yet; this page will add one when there is. Commercial PDKs, including those of heterogeneous InP-on-silicon platforms, are under licence and are not shown.
+
+## Licences
+
+The device layouts come from four open-source PDKs, each under the MIT licence:
+
+- SiEPIC EBeam PDK: Copyright (c) 2016-2020 Lukas Chrostowski and contributors.
+- ubcpdk (gdsfactory): Copyright (c) 2020 gdsfactory.
+- cspdk (gdsfactory): Copyright (c) 2024 gdsfactory.
+- lxt_pdk_gf (Luxtelligence): Copyright (c) 2023-2026 Luxtelligence.
+
+The 3D models on this page are derived from those layouts and are shared under the same terms:
+
+<p class="text-small">Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
 
 ## How the models are made
 

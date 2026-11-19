@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 the Open-Photonics authors
 """Lab 6: a grating coupler in 2D FDTD with MEEP (Open-Photonics, Chapter 15).
 
 Run it from a terminal, on Linux or macOS (on Windows, in WSL or Docker):

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 the Open-Photonics authors
 """Lab 2: mode solving with femwell (Open-Photonics, Chapters 6 and 7).
 
 Run it from a terminal:

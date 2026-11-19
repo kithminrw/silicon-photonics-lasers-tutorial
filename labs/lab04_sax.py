@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 the Open-Photonics authors
 """Lab 4: MZI and ring circuits with S-parameters (Open-Photonics, Chapters 11, 12 and 30).
 
 Run it from a terminal:

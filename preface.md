@@ -7,7 +7,7 @@ chapter: 0
 
 # Preface
 
-Photonics is easiest to learn when you can change a number and watch what the light does.
+The quickest way into photonics is to vary a design and see the result for yourself.
 {: .chapterlead }
 
 ## Who this is for
@@ -48,8 +48,16 @@ The **[PDK devices in 3D]({% link devices-3d.md %})** page shows real devices fr
 
 ## Open material only
 
-The tutorial is open (text and figures CC BY 4.0, code MIT), and it uses only material that its authors have published openly or that is licensed for reuse: open-source PDKs and tools, open-access papers, and public datasets. Textbooks, courses and papers that are not open are cited and linked, never copied. Commercial PDKs are described only from what their owners have made public. If you think something here should be credited differently, please tell us.
+The tutorial is open: its text and figures are CC BY 4.0 and its own code is MIT. The only outside material it reproduces is openly licensed: device layouts from open-source PDKs, under their MIT licences. Everything else it draws on, open or not (textbooks, courses, papers, data sheets and public datasets), is cited where it is used and never copied. Commercial PDKs, foundries and products are described only from what their owners have made public.
+
+## How this tutorial was made
+
+Everything here was written and drawn for this tutorial, with the help of AI tools. No text, figure, table or code has been copied from textbooks, courses, papers or other websites: the explanations are our own, the worked examples use our own numbers, and the figures were drawn for this tutorial, nearly all of them by its own scripts from its own calculations. The one exception is open-source PDK layouts: the [PDK devices in 3D]({% link devices-3d.md %}) gallery renders devices from them, and two lab figures show PDK cells, each credited and used under its MIT licence. Ideas, results and data that come from other people's work are cited where they are used and listed in the [References]({% link references.md %}).
+
+This is a personal, independent project. It is not written for or on behalf of any company or institution, it contains no private or confidential information, and naming a company, foundry or product is not an endorsement.
+
+The text, figures, demos and labs have been checked and their numbers recomputed, but this is a draft and mistakes may remain. Any mistake will be corrected as soon as it is pointed out (the link at the bottom of every page opens an issue), and so will any credit that should be given differently.
 
 ## Acknowledgements
 
-The organisation of this tutorial owes much to Lukas Chrostowski and Michael Hochberg's *Silicon Photonics Design* {% include cite.html keys="chrostowski2015" %} and the UBC edX course built around it {% include cite.html keys="phot1x" %}, to the SiEPIC program's open PDK and openEBL runs {% include cite.html keys="ebeampdk,openebl" %}, to the AIM Photonics Academy courses and the MIT virtual-lab simulations {% include cite.html keys="aimacademy,vmlab" %}, to the gdsfactory community's open PDKs {% include cite.html keys="gdsfactory" %}, and to Mustafa Hammood's browser tools {% include cite.html keys="mustafash" %}. Any mistakes are ours.
+This tutorial has learned from the teaching material of the field, and points its readers to it throughout: Lukas Chrostowski and Michael Hochberg's *Silicon Photonics Design* {% include cite.html keys="chrostowski2015" %} and the UBC edX course built around it {% include cite.html keys="phot1x" %}; the SiEPIC program's open PDK and openEBL runs {% include cite.html keys="ebeampdk,openebl" %}; the AIM Photonics Academy courses and the MIT virtual-lab simulations {% include cite.html keys="aimacademy,vmlab" %}; the gdsfactory community's open PDKs {% include cite.html keys="gdsfactory" %}; and Sam Palermo's Texas A&M lectures on optical and high-speed links {% include cite.html keys="palermo721" %}, whose ideas inform the transmitter, receiver and link sections. The presentation of the interactive demos was inspired by Photonics Playground {% include cite.html keys="photonicsplayground" %}. None of this material was copied, and its authors are not responsible for anything written here. Any mistakes are ours.

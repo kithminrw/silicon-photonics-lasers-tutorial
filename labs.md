@@ -13,7 +13,7 @@ Labs
 # Hands-On Labs
 {: .part-title }
 
-Learning by doing, with free tools only: simulate the devices, lay out and submit a chip, and analyse real measurements.
+Learning by doing, with free tools only: simulate the devices, lay out and submit a chip, and analyse openEBL-style measurements.
 {: .part-blurb }
 
 <p>The labs are designed and listed below. Each lab has its own page and a script you can download from it.</p>

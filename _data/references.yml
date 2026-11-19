@@ -48,7 +48,7 @@
 - key: vttpdk
   text: "gdsfactory contributors. *Open-source photonics PDK for VTT's 3 µm SOI platform* (MIT licence). <https://github.com/gdsfactory/vtt>"
 - key: lxtpdk
-  text: "Luxtelligence and gdsfactory contributors. *lxt_pdk_gf: gdsfactory implementation of the Luxtelligence thin-film lithium niobate PDK* (MIT licence). <https://github.com/gdsfactory/lxt_pdk_gf>"
+  text: "Luxtelligence and gdsfactory contributors. *lxt_pdk_gf: gdsfactory implementation of the Luxtelligence thin-film lithium niobate PDK* (MIT licence). <https://github.com/Luxtelligence/lxt_pdk_gf>"
 - key: klayout
   text: "Matthias Köfferlein. *KLayout: a high-performance layout viewer and editor*. <https://www.klayout.de>"
 - key: sax
@@ -217,3 +217,71 @@
   text: "R. W. Tkach and A. R. Chraplyvy. “Regimes of feedback effects in 1.5-µm distributed feedback lasers.” *Journal of Lightwave Technology*, 4(11):1655–1661, 1986."
 - key: itugsup39
   text: "ITU-T. *G-series Recommendations, Supplement 39: Optical system design and engineering considerations*. International Telecommunication Union."
+- key: photonicsplayground
+  text: "Photonics Playground. *Interactive photonics simulations in the browser* (code MIT, text CC BY). <https://photonics-playground.github.io/Photonics-Playground/>"
+
+# ---- primary sources for Sections 20.8–20.9, 25.7–25.9 and 27.8, cited alongside the Palermo lecture slides (Nov 2026)
+- key: haus1984
+  text: "Hermann A. Haus. *Waves and Fields in Optoelectronics*. Prentice-Hall, 1984."
+- key: little1997
+  text: "B. E. Little, S. T. Chu, H. A. Haus, J. Foresi and J.-P. Laine. “Microring resonator channel dropping filters.” *Journal of Lightwave Technology*, 15(6):998–1005, 1997. doi:10.1109/50.588673"
+- key: sacher2008
+  text: "Wesley D. Sacher and Joyce K. S. Poon. “Dynamics of microring resonator modulators.” *Optics Express*, 16(20):15741–15753, 2008. doi:10.1364/OE.16.015741. Open access."
+- key: muller2014
+  text: "J. Müller, F. Merget, S. Sharif Azadeh, J. Hauck, S. Romero García, B. Shen and J. Witzens. “Optical peaking enhancement in high-speed ring modulators.” *Scientific Reports*, 4:6310, 2014. doi:10.1038/srep06310. Open access."
+- key: yu2014
+  text: "Hui Yu, Diqing Ying, Marianna Pantouvaki, Joris Van Campenhout, Philippe Absil, Yinlei Hao, Jianyi Yang and Xiaoqing Jiang. “Trade-off between optical modulation amplitude and modulation bandwidth of silicon micro-ring modulators.” *Optics Express*, 22(12):15178–15189, 2014. doi:10.1364/OE.22.015178. Open access."
+- key: xu2005
+  text: "Qianfan Xu, Bradley Schmidt, Sameer Pradhan and Michal Lipson. “Micrometre-scale silicon electro-optic modulator.” *Nature*, 435(7040):325–327, 2005. doi:10.1038/nature03569"
+- key: xu2007
+  text: "Qianfan Xu, Sasikanth Manipatruni, Brad Schmidt, Jagat Shakya and Michal Lipson. “12.5 Gbit/s carrier-injection-based silicon micro-ring silicon modulators.” *Optics Express*, 15(2):430–436, 2007. doi:10.1364/OE.15.000430. Open access."
+- key: li2014rrm
+  text: "Cheng Li, Rui Bai, Ayman Shafik, Ehsan Zhian Tabasy, Binhao Wang, Geng Tang, Chao Ma, Chin-Hui Chen, Zhen Peng, Marco Fiorentino, Raymond G. Beausoleil, Patrick Chiang and Samuel Palermo. “Silicon photonic transceiver circuits with microring resonator bias-based wavelength stabilization in 65 nm CMOS.” *IEEE Journal of Solid-State Circuits*, 49(6):1419–1436, 2014. doi:10.1109/JSSC.2014.2321574"
+- key: li2015rrm
+  text: "Hao Li, Zhe Xuan, Alex Titriku, Cheng Li, Kunzhi Yu, Binhao Wang, Ayman Shafik, Nan Qi, Yang Liu, Ran Ding, Thomas Baehr-Jones, Marco Fiorentino, Michael Hochberg, Samuel Palermo and Patrick Yin Chiang. “A 25 Gb/s, 4.4 V-swing, AC-coupled ring modulator-based WDM transmitter with wavelength stabilization in 65 nm CMOS.” *IEEE Journal of Solid-State Circuits*, 50(12):3145–3159, 2015. doi:10.1109/JSSC.2015.2470524"
+- key: palermo2006
+  text: "Samuel Palermo and Mark Horowitz. “High-speed transmitters in 90nm CMOS for high-density optical interconnects.” *Proceedings of the 32nd European Solid-State Circuits Conference (ESSCIRC)*, 508–511, 2006. doi:10.1109/ESSCIR.2006.307501"
+- key: moazeni2017
+  text: "Sajjad Moazeni, Sen Lin, Mark Wade, Luca Alloatti, Rajeev J. Ram, Miloš Popović and Vladimir Stojanović. “A 40-Gb/s PAM-4 transmitter based on a ring-resonator optical DAC in 45-nm SOI CMOS.” *IEEE Journal of Solid-State Circuits*, 52(12):3503–3516, 2017. doi:10.1109/JSSC.2017.2748620"
+- key: roshanzamir2017
+  text: "Ashkan Roshan-Zamir, Binhao Wang, Shashank Telaprolu, Kunzhi Yu, Cheng Li, M. Ashkan Seyedi, Marco Fiorentino, Raymond Beausoleil and Samuel Palermo. “A two-segment optical DAC 40 Gb/s PAM4 silicon microring resonator modulator transmitter in 65nm CMOS.” *2017 IEEE Optical Interconnects Conference (OI)*, 5–6, 2017. doi:10.1109/OIC.2017.7965503"
+- key: li2021pam4
+  text: "Hao Li, Ganesh Balamurugan, Taehwan Kim, Meer N. Sakib, Ranjeet Kumar, Haisheng Rong, James Jaussi and Bryan Casper. “A 3-D-integrated silicon photonic microring-based 112-Gb/s PAM-4 transmitter with nonlinear equalization and thermal control.” *IEEE Journal of Solid-State Circuits*, 56(1):19–29, 2021. doi:10.1109/JSSC.2020.3022851"
+- key: konnerth1964
+  text: "K. Konnerth and C. Lanza. “Delay between current pulse and light emission of a gallium arsenide injection laser.” *Applied Physics Letters*, 4(7):120–121, 1964. doi:10.1063/1.1753990"
+- key: mena1999
+  text: "P. V. Mena, J. J. Morikuni, S.-M. Kang, A. V. Harton and K. W. Wyatt. “A simple rate-equation-based thermal VCSEL model.” *Journal of Lightwave Technology*, 17(5):865–872, 1999. doi:10.1109/50.762905"
+- key: olshansky1987
+  text: "R. Olshansky, P. Hill, V. Lanzisera and W. Powazinik. “Universal relationship between resonant frequency and damping rate of 1.3 µm InGaAsP semiconductor lasers.” *Applied Physics Letters*, 50(11):653–655, 1987. doi:10.1063/1.98110"
+- key: dally1997
+  text: "William J. Dally and John Poulton. “Transmitter equalization for 4-Gbps signaling.” *IEEE Micro*, 17(1):48–56, 1997. doi:10.1109/40.566199"
+- key: rylyakov2012
+  text: "A. V. Rylyakov, C. L. Schow, B. G. Lee, F. E. Doany, C. W. Baks and J. A. Kash. “Transmitter predistortion for simultaneous improvements in bit rate, sensitivity, jitter, and power efficiency in 20 Gb/s CMOS-driven VCSEL links.” *Journal of Lightwave Technology*, 30(4):399–405, 2012. doi:10.1109/JLT.2011.2171917"
+- key: ohhata2010
+  text: "Kenichi Ohhata, Hironori Imamura, Yoshiki Takeshita, Kiichi Yamashita, Hisaaki Kanai and Norio Chujo. “Design of a 4 × 10 Gb/s VCSEL driver using asymmetric emphasis technique in 90-nm CMOS for optical interconnection.” *IEEE Transactions on Microwave Theory and Techniques*, 58(5):1107–1115, 2010. doi:10.1109/TMTT.2010.2045574"
+- key: raj2016
+  text: "Mayank Raj, Manuel Monge and Azita Emami. “A modelling and nonlinear equalization technique for a 20 Gb/s 0.77 pJ/b VCSEL transmitter in 32 nm SOI CMOS.” *IEEE Journal of Solid-State Circuits*, 51(8):1734–1743, 2016. doi:10.1109/JSSC.2016.2553040"
+- key: lau2009
+  text: "Erwin K. Lau, Liang Jie Wong and Ming C. Wu. “Enhanced modulation characteristics of optical injection-locked lasers: a tutorial.” *IEEE Journal of Selected Topics in Quantum Electronics*, 15(3):618–633, 2009. doi:10.1109/JSTQE.2009.2014779"
+- key: chrostowski2006
+  text: "L. Chrostowski, X. Zhao, C. J. Chang-Hasnain, R. Shau, M. Ortsiefer and M.-C. Amann. “50-GHz optically injection-locked 1.55-µm VCSELs.” *IEEE Photonics Technology Letters*, 18(2):367–369, 2006. doi:10.1109/LPT.2005.862370"
+- key: galal2003
+  text: "Sherif Galal and Behzad Razavi. “10-Gb/s limiting amplifier and laser/modulator driver in 0.18-µm CMOS technology.” *IEEE Journal of Solid-State Circuits*, 38(12):2138–2146, 2003. doi:10.1109/JSSC.2003.818567"
+- key: morley2005
+  text: "Sean Morley. “A 3 V 10.7 Gb/s differential laser diode driver with active back-termination output stage.” *IEEE International Solid-State Circuits Conference (ISSCC), Digest of Technical Papers*, 2005. doi:10.1109/ISSCC.2005.1493948"
+- key: tsai2008
+  text: "Chia-Ming Tsai and Mao-Cheng Chiu. “A 10 Gb/s laser-diode driver with active back-termination in 0.18 µm CMOS.” *IEEE International Solid-State Circuits Conference (ISSCC), Digest of Technical Papers*, 2008. doi:10.1109/ISSCC.2008.4523137"
+- key: mohan2000
+  text: "S. S. Mohan, M. del Mar Hershenson, S. P. Boyd and T. H. Lee. “Bandwidth extension in CMOS with optimized on-chip inductors.” *IEEE Journal of Solid-State Circuits*, 35(3):346–355, 2000. doi:10.1109/4.826816"
+- key: liang2009
+  text: "Di Liang, Marco Fiorentino, Tadashi Okumura, Hsu-Hao Chang, Daryl T. Spencer, Ying-Hao Kuo, Alexander W. Fang, Daoxin Dai, Raymond G. Beausoleil and John E. Bowers. “Electrically-pumped compact hybrid silicon microring lasers for optical interconnects.” *Optics Express*, 17(22):20355–20364, 2009. doi:10.1364/OE.17.020355. Open access."
+- key: liang2016
+  text: "D. Liang, X. Huang, G. Kurczveil, M. Fiorentino and R. G. Beausoleil. “Integrated finely tunable microring laser on silicon.” *Nature Photonics*, 10(11):719–722, 2016. doi:10.1038/nphoton.2016.163"
+- key: liang2020
+  text: "Di Liang, Ashkan Roshan-Zamir, Yang-Hang Fan, Chong Zhang, Binhao Wang, Antoine Descos, Wenqing Shen, Kunzhi Yu, Cheng Li, Gaofeng Fan, Geza Kurczveil, Yingtao Hu, Zhihong Huang, Marco Fiorentino, Satish Kumar, Samuel M. Palermo and Raymond G. Beausoleil. “Fully-integrated heterogeneous DML transmitters for high-performance computing.” *Journal of Lightwave Technology*, 38(13):3322–3337, 2020. doi:10.1109/JLT.2019.2959048. Open access."
+- key: wan2018
+  text: "Yating Wan, Daisuke Inoue, Daehwan Jung, Justin C. Norman, Chen Shang, Arthur C. Gossard and John E. Bowers. “Directly modulated quantum dot lasers on silicon with a milliampere threshold and high temperature stability.” *Photonics Research*, 6(8):776–781, 2018. doi:10.1364/PRJ.6.000776"
+- key: fan2019
+  text: "Yang-Hang Fan, Di Liang, Ashkan Roshan-Zamir, Chong Zhang, Binhao Wang, Marco Fiorentino, Raymond Beausoleil and Samuel Palermo. “A directly modulated quantum dot microring laser transmitter with integrated CMOS driver.” *Optical Fiber Communication Conference (OFC)*, paper W3E.5, 2019. doi:10.1364/OFC.2019.W3E.5"
+- key: fan2020
+  text: "Yang-Hang Fan, Sudharsanan Srinivasan, Yingtao Hu, Di Liang, Ruida Liu, Ankur Kumar, Erwen Li, Zhihong Huang, Raymond Beausoleil and Samuel Palermo. “A 22 Gb/s directly modulated optical injection-locked quantum-dot microring laser transmitter with integrated CMOS driver.” *2020 IEEE International Symposium on Circuits and Systems (ISCAS)*, 2020. doi:10.1109/ISCAS45731.2020.9180484"

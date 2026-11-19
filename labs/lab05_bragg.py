@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 the Open-Photonics authors
 """Lab 5: Bragg gratings with transfer matrices (Open-Photonics, Chapter 13).
 
 Run it from a terminal:

@@ -191,7 +191,7 @@ No single check catches everything. SiEPIC-Tools' verification follows circuits 
 
 <figure id="fig-l8-1">
   <img src="{{ '/assets/figs/lab08_expected.png' | relative_url }}" style="width:760px" alt="Two copies of the chip layout with the check results drawn on them: the Lab 7 chip with every label on its coupler and all checks passed; and a broken copy with a moved label, a ring gap below the minimum and a spiral outside the floorplan, each circled in red">
-  <figcaption><span class="capnum">Figure L8.1.</span> <strong>What the script draws.</strong> (a) The Lab 7 chip: every opt_in label (green) sits on the origin of an input coupler (blue triangles are the coupler ports), and all 40 checks pass. (b) The same chip broken three ways (<code>--break all</code>): ring250's label 15 µm below its coupler (red dot, joined to the nearest coupler), ring200's gap shrunk to 50 nm, and spiral3 pushed 40 µm past the right edge of the floorplan. Red circles mark where the five failed checks point.</figcaption>
+  <figcaption><span class="capnum">Figure L8.1.</span> <strong>What the script draws.</strong> (a) The Lab 7 chip: every opt_in label (green) sits on the origin of an input coupler (blue triangles are the coupler ports), and all 40 checks pass. (b) The same chip broken three ways (<code>--break all</code>): ring250's label 15 µm below its coupler (red dot, joined to the nearest coupler), ring200's gap shrunk to 50 nm, and spiral3 pushed 40 µm past the right edge of the floorplan. Red circles mark where the five failed checks point. PDK cells from the SiEPIC EBeam PDK through ubcpdk (both MIT licence).</figcaption>
 </figure>
 
 ## <span class="secnum">L8.8</span>Submitting

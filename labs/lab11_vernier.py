@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 the Open-Photonics authors
 """Lab 11: design a Vernier tunable laser in Python (Open-Photonics, Chapter 26).
 
 Run it from a terminal:

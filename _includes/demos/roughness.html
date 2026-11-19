@@ -1,0 +1,225 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdRough" role="group" aria-label="Interactive demo: sidewall-roughness scattering against waveguide width">
+  <div class="bd-head"><span>// try it · sidewall scattering, 220 nm Si strip (Payne–Lacey)</span>
+    <span class="bd-seg" role="group" aria-label="Cladding"><button type="button" data-clad="oxide" aria-pressed="true">oxide clad</button><button type="button" data-clad="air" aria-pressed="false">air clad</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>strip width W <b data-v="w"></b></span><input type="range" data-k="w" min="0.3" max="3" step="0.01" value="0.5" aria-label="strip width"></label>
+    <label class="bd-sl"><span>rms roughness σ <b data-v="sg"></b></span><input type="range" data-k="sg" min="0.5" max="5" step="0.1" value="1.5" aria-label="rms roughness"></label>
+    <label class="bd-sl"><span>correlation length L<sub>c</sub> <b data-v="lc"></b></span><input type="range" data-k="lc" min="10" max="200" step="1" value="50" aria-label="correlation length"></label>
+    <label class="bd-sl"><span>wavelength λ <b data-v="lam"></b></span><input type="range" data-k="lam" min="1.26" max="1.65" step="0.005" value="1.55" aria-label="wavelength"></label>
+  </div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">top view: guided and scattered field</span></div>
+  <div class="bd-status"><span data-o="fst"></span></div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="p" aria-hidden="true"></canvas><span class="bd-tag">lateral |E|², unit power (µm⁻¹)</span></div>
+    <div class="bd-scope tall"><canvas data-c="l" aria-hidden="true"></canvas><span class="bd-tag">sidewall loss against width (dB/cm)</span></div>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>field at the sidewall |E<sub>s</sub>|² <b data-o="es">–</b></span><span>sidewall loss <b data-o="db">–</b></span><span>loss ÷ loss at 500 nm <b data-o="rel">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Widen the strip.</b> Set W to 1, 2 and 3 µm. |E<sub>s</sub>|² falls from 0.548 µm⁻¹ to 0.114, 0.0187 and 0.00608, and the sidewall loss from 1.76 dB/cm to 0.358, 0.0582 and 0.0189 dB/cm: 0.203, 0.0330 and 0.0107 of the 500 nm strip’s, the numbers of Figure 7.2.</li>
+    <li><b>Smooth the walls.</b> At 500 nm, set σ to 0.8 nm: the loss falls from 1.76 to 0.501 dB/cm, (0.8/1.5)² = 0.28 of it. Then set L<sub>c</sub> to 20 and to 100 nm: 0.246 and 0.655 dB/cm, yet at W = 2 µm the ratio to the 500 nm strip stays between 0.0316 and 0.0338.</li>
+    <li><b>Take the top oxide away.</b> Press air clad: the larger index step at the sidewalls raises the 500 nm strip’s loss from 1.76 to 2.24 dB/cm. Back in oxide, set λ to 1310 nm: the loss rises to 2.47 dB/cm, because shorter waves scatter more.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>Widening a strip from 500 nm to 3 µm cuts its sidewall scattering about 90-fold, yet its measured loss falls only a few times. Why?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="This model counts only the sidewalls. The top surface and the absorption stay under the mode however wide the strip is, so they set a floor that the wide strip cannot get below.">The rest of the loss, from the top surface and from absorption, does not fall with width</button>
+      <button type="button" data-why="Only if light gets into them. An adiabatic taper keeps the light in the fundamental mode (Chapter 8), and the numbers here are for that mode.">Wide strips guide higher-order modes, which scatter more</button>
+      <button type="button" data-why="The roughness is set by the lithography and the etch, not by the width. With the same σ, the 3 µm strip’s sidewall loss is 0.0107 of the 500 nm strip’s.">The sidewalls of a wide strip are rougher</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdRough'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); }, clad = 'oxide';
+  var wfmt = function (x) { return x < 0.995 ? (1000 * x).toFixed(0) + ' nm' : x.toFixed(2) + ' µm'; };
+  var S = BD.bind(root, {
+    w: { fmt: wfmt }, sg: { fmt: function (x) { return x.toFixed(1) + ' nm'; } }, lc: { fmt: function (x) { return x.toFixed(0) + ' nm'; } },
+    lam: { fmt: function (x) { return (1000 * x).toFixed(0) + ' nm'; } }
+  }, function () { draw(); });
+  BD.seg(root, 'clad', function (v) { clad = v; draw(); });
+  var sig3 = function (v) { return v >= 100 ? v.toFixed(0) : v >= 10 ? v.toFixed(1) : v >= 1 ? v.toFixed(2) : v.toPrecision(3); };
+  // Sellmeier (Chapter 2), scaled so that 1550 nm gives the chapter's 3.476 and 1.444
+  function nsi(l) { var l1 = 1.1071; return Math.sqrt(11.6858 + 0.939816 / (l * l) + 0.00810461 * l1 * l1 / (l * l - l1 * l1)); }
+  function nox(l) { var l2 = l * l; return Math.sqrt(1 + 0.6961663 * l2 / (l2 - 0.0684043 * 0.0684043) + 0.4079426 * l2 / (l2 - 0.1162414 * 0.1162414) + 0.8974794 * l2 / (l2 - 9.896161 * 9.896161)); }
+  var NS0 = nsi(1.55), NO0 = nox(1.55);
+  function slab(n1, n2, n3, d, lam) {   // fundamental TE mode of a slab (core n1, claddings n2 and n3)
+    var k0 = 2 * Math.PI / lam, lo = Math.max(n2, n3) + 1e-9, hi = n1 - 1e-9;
+    var F = function (ne) { var ka = k0 * Math.sqrt(Math.max(n1 * n1 - ne * ne, 1e-18));
+      return ka * d - Math.atan(k0 * Math.sqrt(Math.max(ne * ne - n2 * n2, 0)) / ka) - Math.atan(k0 * Math.sqrt(Math.max(ne * ne - n3 * n3, 0)) / ka); };
+    if (F(lo) <= 0) return NaN;
+    for (var i = 0; i < 60; i++) { var c = (lo + hi) / 2; if (F(c) > 0) lo = c; else hi = c; }
+    return (lo + hi) / 2;
+  }
+  // step 1 of the effective-index method: the 220 nm film gives the lateral slab's core index (2.848 in oxide at 1550 nm)
+  function core(lam) {
+    var ns = 3.476 * nsi(lam) / NS0, no = 1.444 * nox(lam) / NO0, nc = clad === 'air' ? 1 : no;
+    return { n1: slab(ns, no, nc, 0.22, lam), n2: nc, lam: lam };
+  }
+  // step 2: TE0 of the lateral slab of width W, normalised to unit power (integral of phi^2 dx = 1), as in figsrc/ch07_figs.py
+  function mode(W, c) {
+    var k0 = 2 * Math.PI / c.lam, ne = slab(c.n1, c.n2, c.n2, W, c.lam), ka = k0 * Math.sqrt(c.n1 * c.n1 - ne * ne), g = k0 * Math.sqrt(ne * ne - c.n2 * c.n2), a = W / 2;
+    var norm = a + Math.sin(2 * ka * a) / (2 * ka) + Math.pow(Math.cos(ka * a), 2) / g;
+    return { ne: ne, ka: ka, g: g, a: a, norm: norm, es2: Math.pow(Math.cos(ka * a), 2) / norm };
+  }
+  function prof(x, m) { var ax = Math.abs(x); return (ax <= m.a ? Math.cos(m.ka * x) : Math.cos(m.ka * m.a) * Math.exp(-m.g * (ax - m.a))) / Math.sqrt(m.norm); }
+  // Payne-Lacey loss of the slab with both walls rough (uncorrelated, exponential autocorrelation R(u) = sg^2 exp(-|u|/lc)):
+  // alpha = 2 |E_s|^2 (n1^2 - n2^2)^2 k0^3/(4 pi n1) * integral over 0..pi of 2 sg^2 lc/(1 + lc^2 (beta - n2 k0 cos t)^2) dt.
+  // It equals their closed form sigma^2 g(V) f(x, gamma)/(sqrt2 k0 d^4 n1); lengths in um, result in dB/cm.
+  function loss(W, c, sg, lc) {
+    var m = mode(W, c), k0 = 2 * Math.PI / c.lam, b = m.ne * k0, k2 = c.n2 * k0, n = 200, s = 0;
+    for (var i = 0; i <= n; i++) { var om = b - k2 * Math.cos(Math.PI * i / n); s += (i === 0 || i === n ? 1 : i % 2 ? 4 : 2) / (1 + lc * lc * om * om); }
+    s *= Math.PI / n / 3;
+    var d2 = c.n1 * c.n1 - c.n2 * c.n2;
+    return { db: 4.343e4 * 2 * m.es2 * d2 * d2 * k0 * k0 * k0 / (4 * Math.PI * c.n1) * 2 * sg * sg * lc * s, m: m };
+  }
+  // ---- the rough walls for the field view: one period PZ (um) sampled at NZ points, the same random numbers every time,
+  // shaped by the exponential autocorrelation's spectrum 2 sg^2 lc/(1 + lc^2 q^2); stored as Fourier coefficients F_m
+  var NZ = 1024, PZ = 32, DZ = PZ / NZ, rnd = BD.rng(20261119), NOISE = [];
+  for (var wl = 0; wl < 2; wl++) { var nz = new Float64Array(NZ);
+    for (var k = 0; k < NZ; k++) { var u1 = 1 - rnd(), u2 = rnd(); nz[k] = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2); } NOISE.push(nz); }
+  function qOf(m) { return 2 * Math.PI * (m < NZ / 2 ? m : m - NZ) / PZ; }
+  function walls(sg, lc) {
+    return NOISE.map(function (nz) {
+      var re = new Float64Array(NZ), im = new Float64Array(NZ), fr = new Float64Array(NZ), fi = new Float64Array(NZ);
+      for (var m = 1; m < NZ / 2; m++) {
+        var qm = 2 * Math.PI * m / PZ, amp = Math.sqrt(2 * sg * sg * lc / (1 + lc * lc * qm * qm) / (2 * PZ));
+        re[m] = amp * nz[2 * m]; im[m] = amp * nz[2 * m + 1]; re[NZ - m] = re[m]; im[NZ - m] = -im[m];
+      }
+      for (m = 0; m < NZ; m++) { fr[m] = re[m]; fi[m] = -im[m]; }
+      BD.fft(fr, fi);   // wall shape f(z_n) = sum of F_m e^{+j q_m z_n} (conjugate trick)
+      return { re: re, im: im, f: fr };
+    });
+  }
+  var FV = BD.field(q('[data-c="g"]'), { button: q('.bd-status'), hz: 1.0 }), nfr = 0, GAIN = 20, ROUGH = 40, CLIP = 0.9;
+  function fieldView(c, m, sg, lc) {
+    var cv = q('[data-c="g"]'), W = cv.clientWidth, nar = W < 480;
+    cv.style.height = (nar ? 240 : 220) + 'px';
+    var H = cv.clientHeight, top = 22, bot = H - 2, a = m.a, s = (bot - top) / (2 * a + 2.8), yc = (top + bot) / 2;
+    var Y = function (x) { return yc - x * s; };
+    var k0 = 2 * Math.PI / c.lam, beta = m.ne * k0, k2 = c.n2 * k0, K2r = k2 * k2, K2i = -0.02 * k2 * k2;   // a little loss smooths the grazing-angle singularity
+    var WL = walls(sg, lc), C = k0 * k0 * (c.n1 * c.n1 - c.n2 * c.n2) * Math.sqrt(m.es2) * GAIN, pk = prof(0, m), cap = CLIP * pk;
+    FV.grid(0, top, W, bot - top);
+    var nx = FV.nx, ny = FV.ny, re = FV.re, im = FV.im, i, j;
+    // per column: z, the guided carrier e^{-j beta z} and where z falls among the wall samples
+    var cb = new Float64Array(nx), sb = new Float64Array(nx), i0 = new Int32Array(nx), tt = new Float64Array(nx);
+    for (i = 0; i < nx; i++) { var z = (i + 0.5) / s, nn = z / DZ, fl = Math.floor(nn); cb[i] = Math.cos(beta * z); sb[i] = Math.sin(beta * z); i0[i] = ((fl % NZ) + NZ) % NZ; tt[i] = nn - fl; }
+    // per Fourier component of the source f(z) e^{-j beta z}: lateral wavenumber kx = sqrt(k2^2 - (q - beta)^2), Im kx <= 0
+    var kr = new Float64Array(NZ), ki = new Float64Array(NZ);
+    for (var mm = 0; mm < NZ; mm++) { var kz = qOf(mm) - beta, ar = K2r - kz * kz, ai = K2i, rr = Math.sqrt(Math.sqrt(ar * ar + ai * ai));
+      var ph = Math.atan2(ai, ar) / 2; kr[mm] = rr * Math.cos(ph); ki[mm] = rr * Math.sin(ph); }
+    var gr = new Float64Array(NZ), gi = new Float64Array(NZ);
+    // each side of the guide, from the wall outwards: field of both walls' line sources, -j/(2 kx) e^{-j kx d} per component
+    [1, -1].forEach(function (side) {
+      var rows = [];
+      for (j = 0; j < ny; j++) { var x = (yc - (top + j + 0.5)) / s; if (side * x > a) rows.push([j, side * x]); }
+      rows.sort(function (p, r) { return p[1] - r[1]; });
+      if (!rows.length) return;
+      var near = side > 0 ? WL[0] : WL[1], far = side > 0 ? WL[1] : WL[0];   // the wall on this side and the one across the guide
+      var Pnr = new Float64Array(NZ), Pni = new Float64Array(NZ), Pfr = new Float64Array(NZ), Pfi = new Float64Array(NZ), Sr = new Float64Array(NZ), Si = new Float64Array(NZ);
+      var x0 = rows[0][1], st = 1 / s;
+      for (mm = 0; mm < NZ; mm++) {   // e^{-j kx d} at the first row, d = x0 - a (near wall) and x0 + a (far wall); later rows step by 1/s
+        var e1 = Math.exp(ki[mm] * (x0 - a)), e2 = Math.exp(ki[mm] * (x0 + a));
+        Pnr[mm] = e1 * Math.cos(kr[mm] * (x0 - a)); Pni[mm] = -e1 * Math.sin(kr[mm] * (x0 - a));
+        Pfr[mm] = e2 * Math.cos(kr[mm] * (x0 + a)); Pfi[mm] = -e2 * Math.sin(kr[mm] * (x0 + a));
+        var es = Math.exp(ki[mm] * st); Sr[mm] = es * Math.cos(kr[mm] * st); Si[mm] = -es * Math.sin(kr[mm] * st);
+      }
+      rows.forEach(function (row, n) {
+        if (n) for (mm = 0; mm < NZ; mm++) {
+          var t1 = Pnr[mm] * Sr[mm] - Pni[mm] * Si[mm]; Pni[mm] = Pnr[mm] * Si[mm] + Pni[mm] * Sr[mm]; Pnr[mm] = t1;
+          var t2 = Pfr[mm] * Sr[mm] - Pfi[mm] * Si[mm]; Pfi[mm] = Pfr[mm] * Si[mm] + Pfi[mm] * Sr[mm]; Pfr[mm] = t2;
+        }
+        for (mm = 0; mm < NZ; mm++) {   // (F_near P_near + F_far P_far) * (-j/(2 kx)), conjugated for the inverse transform
+          var ar2 = near.re[mm] * Pnr[mm] - near.im[mm] * Pni[mm] + far.re[mm] * Pfr[mm] - far.im[mm] * Pfi[mm];
+          var ai2 = near.re[mm] * Pni[mm] + near.im[mm] * Pnr[mm] + far.re[mm] * Pfi[mm] + far.im[mm] * Pfr[mm];
+          var d = 2 * (kr[mm] * kr[mm] + ki[mm] * ki[mm]), ir = kr[mm] / d, ii = -ki[mm] / d;   // 1/(2 kx)
+          var br = ar2 * ir - ai2 * ii, bi = ar2 * ii + ai2 * ir;
+          gr[mm] = bi; gi[mm] = br;   // -j (br + j bi) = bi - j br, conjugated: bi + j br
+        }
+        BD.fft(gr, gi);   // now gr - j gi is the field envelope at the NZ samples
+        var jj = row[0], p0 = jj * nx, ph2 = prof(row[1], m);
+        for (i = 0; i < nx; i++) {
+          var a0 = i0[i], a1 = (a0 + 1) % NZ, t = tt[i];
+          var er = C * (gr[a0] + t * (gr[a1] - gr[a0])), ei = -C * (gi[a0] + t * (gi[a1] - gi[a0]));
+          var vr = er * cb[i] + ei * sb[i], vi = ei * cb[i] - er * sb[i], mag = Math.sqrt(vr * vr + vi * vi);   // times e^{-j beta z}
+          if (mag > 1e-12) { var sc = cap * Math.tanh(mag / cap) / mag; vr *= sc; vi *= sc; }
+          re[p0 + i] = ph2 * cb[i] + vr; im[p0 + i] = -ph2 * sb[i] + vi;
+        }
+      });
+    });
+    for (j = 0; j < ny; j++) { var xx = (yc - (top + j + 0.5)) / s; if (Math.abs(xx) > a) continue;   // inside the core: the guided mode alone
+      var pv = prof(xx, m); for (i = 0; i < nx; i++) { re[j * nx + i] = pv * cb[i]; im[j * nx + i] = -pv * sb[i]; } }
+    var st2 = ['to scale, sidewall roughness drawn ×' + ROUGH, 'scattered field ×' + GAIN, 'first-order field of the same model: each bump radiates into the cladding'];
+    var fst = q('[data-o="fst"]'), stTxt = st2.join(' · '), msTxt = function () { return FV.ms ? ' · frame ' + FV.ms.toFixed(1) + ' ms' : ''; };
+    fst.textContent = stTxt + msTxt();
+    FV.overlay = function (gx) {
+      gx.strokeStyle = BD.GEO.edge; gx.lineWidth = 1;
+      [[WL[0].f, 1], [WL[1].f, -1]].forEach(function (wv) {
+        gx.beginPath();
+        for (var px = 0; px <= W; px += 1) { var zz = px / s, n2 = zz / DZ, f0 = Math.floor(n2), b0 = ((f0 % NZ) + NZ) % NZ, f = wv[0][b0] + (n2 - f0) * (wv[0][(b0 + 1) % NZ] - wv[0][b0]);
+          var yy = Y(wv[1] * (a + ROUGH * f)); if (px) gx.lineTo(px, yy); else gx.moveTo(px, yy); }
+        gx.stroke();
+      });
+      BD.label(gx, 'W = ' + wfmt(2 * a), W - 8, Y(a + ROUGH * 3 * sg) - 6, BD.C.white, 'right');
+      BD.scalebar(gx, W - 70, bot - 8, s, 60);
+      if (++nfr % 30 === 0) fst.textContent = stTxt + msTxt();
+    };
+    FV.render();
+  }
+  function draw() {
+    var c = core(S.lam), W = S.w, sg = S.sg / 1000, lc = S.lc / 1000;
+    var r = loss(W, c, sg, lc), r5 = loss(0.5, c, sg, lc), m = r.m, m5 = r5.m;
+    fieldView(c, m, sg, lc);
+    // ---- lateral |E|^2 profile, unit power
+    var dp = BD.setup(q('[data-c="p"]')), X = Math.max(1.6, m.a + 0.8), ymax = Math.max(3.8, 1.1 / m.norm), xt = [];
+    for (var v = -Math.floor(X); v <= Math.floor(X); v++) xt.push([v, v === Math.floor(X) ? v + ' µm' : String(v).replace('-', '−')]);
+    var f = BD.frame(dp, { x: [-X, X], y: [0, ymax], pad: { l: 30, b: 22 }, xt: xt, yt: [[0, '0'], [1, '1'], [2, '2'], [3, '3']] });
+    var g = dp.g; g.fillStyle = 'rgba(157,179,204,.13)'; g.fillRect(f.X(-m.a), f.p.t, f.X(m.a) - f.X(-m.a), dp.h - f.p.t - f.p.b);
+    var xs = [], ys = [], y5 = [];
+    for (var i = 0; i <= 300; i++) { var x = -X + 2 * X * i / 300; xs.push(x); ys.push(Math.pow(prof(x, m), 2)); y5.push(Math.pow(prof(x, m5), 2)); }
+    var same = Math.abs(W - 0.5) < 0.005;
+    if (!same) BD.line(f, xs, y5, BD.C.dim, 1.2, [4, 3]);
+    BD.line(f, xs, ys, BD.C.gold, 2);
+    BD.dot(f, -m.a, m.es2, BD.C.white, 3.5); BD.dot(f, m.a, m.es2, BD.C.white, 3.5);
+    var lab = '|E_s|² = ' + sig3(m.es2), lw = g.measureText(lab).width, lx = f.X(m.a) + 7, ly = f.Y(m.es2) - 6;
+    if (lx + lw > dp.w - f.p.r - 2) lx = dp.w - f.p.r - 2 - lw;
+    if (ly < f.p.t + 10) ly = f.p.t + 10;
+    if (lx < f.X(m.a) + 7 && ly > f.Y(m.es2) - 14) ly = f.Y(m.es2) - 12;
+    BD.label(g, lab, lx, ly, BD.C.white);
+    BD.label(g, 'W = ' + wfmt(W), f.p.l + 6, f.p.t + 12, BD.C.gold);
+    if (!same) BD.label(g, '500 nm (dashed)', f.p.l + 6, f.p.t + 25, BD.C.dim);
+    // ---- loss against width
+    var dl = BD.setup(q('[data-c="l"]')), f2 = BD.frame(dl, { x: [0.3, 3], y: [1e-3, 100], ylog: true, pad: { l: 40, b: 22 },
+      xt: [[0.5, '0.5'], [1, '1'], [1.5, '1.5'], [2, '2'], [2.5, '2.5'], [3, '3 µm']], yt: [[1e-3, '0.001'], [1e-2, '0.01'], [0.1, '0.1'], [1, '1'], [10, '10'], [100, '100']] });
+    var ws = [], ls = [], es = [];
+    for (i = 0; i <= 108; i++) { var ww = 0.3 + 2.7 * i / 108, rr = loss(ww, c, sg, lc); ws.push(ww); ls.push(rr.db); es.push(r5.db * rr.m.es2 / m5.es2); }
+    BD.vline(f2, 0.5, BD.C.dim, [2, 4]);
+    BD.line(f2, ws, es, BD.C.dim, 1.3, [2, 3]);
+    BD.line(f2, ws, ls, BD.C.gold, 2);
+    BD.dot(f2, W, r.db, BD.C.white, 4);
+    var g2 = dl.g, t1 = sig3(r.db) + ' dB/cm', tw = g2.measureText(t1).width, tx = f2.X(W) + 7, ty = f2.Y(r.db) - 7;
+    if (tx + tw > dl.w - f2.p.r - 2) tx = f2.X(W) - 7 - tw;
+    if (ty < f2.p.t + 10) ty = f2.Y(r.db) + 14;
+    BD.label(g2, t1, tx, ty, BD.C.white);
+    g2.textAlign = 'right'; g2.fillStyle = BD.C.gold; g2.fillText('Payne–Lacey', dl.w - f2.p.r - 4, f2.p.t + 12);
+    g2.fillStyle = BD.C.axis; g2.fillText('|E_s|² alone (dotted)', dl.w - f2.p.r - 4, f2.p.t + 25); g2.textAlign = 'left';
+    // ---- readouts
+    var rel = r.db / r5.db;
+    q('[data-o="es"]').textContent = sig3(m.es2) + ' µm⁻¹';
+    q('[data-o="db"]').textContent = sig3(r.db) + ' dB/cm';
+    q('[data-o="rel"]').textContent = sig3(rel);
+    BD.pill(q('[data-o="pill"]'), r.db < 0.1 ? 'low loss' : r.db > 3 ? 'high loss' : '', r.db < 0.1 ? 'ok' : 'bad');
+    var cap = 'Each bump on a sidewall radiates a little of the guided light, in proportion to the field there: the loss grows as σ²(n₁² − n₂²)²|E<sub>s</sub>|² times a function of L<sub>c</sub>. ';
+    if (W > 0.505) cap += 'At W = ' + wfmt(W) + ' the mode keeps away from the walls: |E<sub>s</sub>|² is ' + sig3(m.es2 / m5.es2) + ' of the 500 nm strip’s, and the sidewall loss ' + sig3(rel) + ' of it. ';
+    else if (W < 0.495) cap += 'Narrower than 500 nm, the mode presses harder on the walls and spreads into the cladding: |E<sub>s</sub>|² is ' + sig3(m.es2 / m5.es2) + ' times the 500 nm strip’s. ';
+    else cap += 'Widen the strip and the field at its walls falls, and the scattering with it. ';
+    if (Math.abs(S.sg - 1.5) < 0.05 && Math.abs(S.lc - 50) < 0.5 && Math.abs(S.lam - 1.55) < 0.003 && clad === 'oxide')
+      cap += 'The default σ = 1.5 nm and L<sub>c</sub> = 50 nm give the 500 nm strip ' + sig3(r5.db) + ' dB/cm of sidewall loss, most of the roughly 2 dB/cm measured on such strips: an effective roughness chosen to match, not a measurement. ';
+    cap += '<i>Payne and Lacey’s model (two uncorrelated rough walls, exponential autocorrelation, first-order radiation into the cladding) on the lateral slab of the effective-index method' + (clad === 'air' ? ' (air: core index of the film on oxide under air, sides in air)' : ', core index ' + c.n1.toFixed(3) + ' from the 220 nm film') + ', as in Figure 7.2. This is the sidewall part only: top-surface roughness and absorption do not fall with width, so measured losses fall several-fold rather than by these factors.</i>';
+    q('[data-o="cap"]').innerHTML = cap;
+  }
+  BD.observe(root, draw);
+})();
+</script>

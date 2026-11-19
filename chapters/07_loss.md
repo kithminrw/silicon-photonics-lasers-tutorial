@@ -62,6 +62,10 @@ where $$E_s$$ is the normalised mode field at the sidewall and $$F$$ a function 
   <figcaption><span class="capnum">Figure 7.2.</span> <strong>Why wider strips scatter less.</strong> The Payne–Lacey model applied to the lateral slab of the effective-index method (core index 2.848 from the 220 nm film, oxide either side) {% include cite.html keys="payne1994" %}. (a) Lateral \(|E|^2\) of the fundamental mode, normalised to unit power, for three widths; the dots mark the field at the sidewalls, which falls from 0.55 µm\(^{-1}\) at 500 nm to 0.11 at 1 µm and 0.019 at 2 µm. (b) Sidewall-scattering loss relative to the 500 nm strip: 0.20 at 1 µm, 0.033 at 2 µm and 0.011 at 3 µm, the same within 5 % for correlation lengths from 20 to 100 nm and set almost entirely by \(|E_s|^2\) (dotted). This is the sidewall contribution only: top-surface roughness and absorption do not fall with width, which is why measured losses fall several-fold rather than by these factors. Drawn by <code>figsrc/ch07_figs.py</code>.</figcaption>
 </figure>
 
+**Try it.** Widen the strip and watch the field at its sidewalls fall, and the scattering loss with it; then change the roughness, its correlation length, the wavelength and the cladding. The top view shows the light that the rough walls scatter out of the guide.
+
+{% include demos/roughness.html %}
+
 Polarisation matters too. A TE mode in a strip has its strongest field at the etched sidewalls, while a TM mode concentrates at the top and bottom surfaces, which are the polished film and buried-oxide interfaces and are far smoother. For the same cross-section the TM mode therefore scatters less, but it is less confined and leaks and bends worse (Sections 7.4 and 8.1).
 
 ## <span class="secnum">7.3</span>Absorption

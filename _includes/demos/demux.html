@@ -1,0 +1,257 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdDemux" role="group" aria-label="Interactive demo: a four-ring demultiplexer for the reference link">
+  <div class="bd-head"><span>// try it · four-ring demultiplexer for the reference link (R = 7.15 <span class="nc">µm</span>, <span class="nc">n<sub>g</sub></span> = 4.18)</span>
+    <span class="bd-seg" role="group" aria-label="Heaters"><button type="button" data-lk="off" aria-pressed="false">heaters off</button><button type="button" data-lk="own" aria-pressed="true">lock to own channel</button><button type="button" data-lk="near" aria-pressed="false">lock to nearest</button></span>
+    <span class="bd-seg nc" role="group" aria-label="Wavelength shown in the field view"><button type="button" data-pr="0" aria-pressed="false">λ<sub>1</sub></button><button type="button" data-pr="1" aria-pressed="true">λ<sub>2</sub></button><button type="button" data-pr="2" aria-pressed="false">λ<sub>3</sub></button><button type="button" data-pr="3" aria-pressed="false">λ<sub>4</sub></button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>κ² of each coupler <b data-v="k2"></b></span><input type="range" data-k="k2" min="2" max="40" step="0.1" value="14.5" aria-label="power coupling of each coupler"></label>
+    <label class="bd-sl"><span>propagation loss <b data-v="a"></b></span><input type="range" data-k="a" min="0" max="100" step="0.1" value="41.2" aria-label="propagation loss"></label>
+    <label class="bd-sl"><span>chip temperature <b data-v="T"></b></span><input type="range" data-k="T" min="20" max="70" step="0.5" value="20" aria-label="chip temperature"></label>
+    <label class="bd-sl"><span>fabrication offset <b data-v="fab"></b></span><input type="range" data-k="fab" min="-1.6" max="1.6" step="0.05" value="0" aria-label="fabrication offset of all four rings"></label>
+  </div>
+  <div class="bd-controls"><button type="button" class="bd-toggle" data-act="mis" aria-pressed="false">ring-to-ring mismatch</button><button type="button" class="bd-toggle" data-act="zoom" aria-pressed="false">zoom on the four channels</button></div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag" data-o="tag">field (red +, blue −), top view</span></div>
+  <div class="bd-status"><span data-o="fst"></span></div>
+  <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">drop ports and through port (dB)</span></div>
+  <div class="bd-read" aria-live="polite"><span>FWHM <b data-o="fw">–</b></span><span>loaded Q <b data-o="ql">–</b></span><span>drop loss λ<sub>1</sub> / λ<sub>2</sub> / λ<sub>3</sub> / λ<sub>4</sub> <b data-o="dl">–</b></span><span>worst crosstalk <b data-o="xt">–</b></span><span><span data-o="thc">λ<sub>4</sub></span> loss passing rings 1–3 <b data-o="th">–</b></span><span>heaters, total / largest <b data-o="ph">–</b></span><span class="bd-pill" data-o="p1" hidden></span><span class="bd-pill" data-o="p2" hidden></span><span class="bd-pill" data-o="p3" hidden></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Meet the −20 dB target.</b> Lower κ² to 13.0 %: the passband narrows to 0.57 nm (Q<sub>L</sub> 2710), the worst crosstalk reaches −20.1 dB and its pill turns green, while the drop losses hardly move (0.06 to 0.17 dB).</li>
+    <li><b>Switch the heaters off.</b> At 20 °C every ring sits 2 nm blue of its channel, and each photodiode gets its own channel 15.7 to 16.0 dB down. Warm the chip: at 47 °C the drift (74 pm/K over 27 K) has carried every ring onto its channel; at 70 °C they are 1.7 nm red, and the drop loss is back up to 14.5 to 14.6 dB.</li>
+    <li><b>Lock at 70 °C.</b> Locked to their own channels, the rings must be heated almost a whole FSR to their next orders: 45 mW each, 180 mW in all. Locked to the nearest channels they need 6.1 mW each: ring 1 now drops λ<sub>2</sub>, ring 2 λ<sub>3</sub>, ring 3 λ<sub>4</sub>, and ring 4 drops λ<sub>1</sub> through its next order. Pick λ<sub>1</sub> to watch its light pass three rings and leave at the last.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>Lowering κ² from 14.5 % to 13 % brings the crosstalk down to the −20 dB target. What does it cost?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="The crosstalk falls because the passband narrows, from 0.64 to 0.57 nm; the same narrowing cuts harder into the ≈ 0.4 nm of a 50 Gb/s signal, whose filtering penalty Lab 12 already puts near 1 dB at 0.64 nm.">A narrower passband, which filters the 50 Gb/s signal harder</button>
+      <button type="button" data-why="The drop losses barely move (0.06 to 0.17 dB against 0.06 to 0.19 dB): the rings are still strongly over-coupled, so the light leaves them long before the 2 dB/cm loss matters.">More drop loss, past the 1 dB target</button>
+      <button type="button" data-why="The heater power is set by how far each ring sits from its channel (2 nm blue at 20 °C here), not by its Q: it stays at 8.1 to 8.2 mW per ring.">More heater power</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdDemux'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  // Worked Example 14.1 and Figure 14.2: channels on the 400 GHz grid (Table 1.3), rings with FSR 12.8 nm at 1550 nm and n_g = 4.18
+  var C0 = 299792.458, NG = 4.18, NEFF = 2.446, FCH = [193.9, 193.5, 193.1, 192.7], LCH = FCH.map(function (f) { return C0 / f; });
+  var LR = 1550 * 1550 / (NG * 12.8) * 1e-3, RR = LR / (2 * Math.PI);   // ring length 44.9 um, radius 7.15 um
+  var TAU = NG * LR * 1e3 / C0, FSRF = 1 / TAU;   // round-trip group delay (1/THz) and FSR (THz): the phase is 2 pi TAU (nu - nu_res)
+  // Chapter 18: drift 74 pm/K for the strip; a heater moves a ring one FSR for 2 P_pi = 52 mW (plain TiN, Table 18.1), so 0.246 nm/mW here;
+  // rings designed 2 nm blue of their channels at the coolest temperature (20 C); 20 mW per ring is the budget of Worked Example 18.2
+  var DRIFT = 0.074, P2PI = 52, BLUE = 2.0, PBUD = 20, MIS = [0.3, -0.2, 0.45, -0.35], LE = 2.3;
+  var COL = [BD.C.blue, BD.C.gold, BD.C.red, BD.C.green], SUB = ['₁', '₂', '₃', '₄'];
+  var lock = 'own', probe = 1, mis = false, zoom = false, nfr = 0;
+  var S = BD.bind(root, {
+    k2: { map: function (v) { return v / 100; }, fmt: function (x) { return (100 * x).toFixed(1) + ' %'; } },
+    a: { map: function (v) { var x = 0.3 * Math.pow(10, 2 * v / 100); return x < 10 ? Math.round(100 * x) / 100 : Math.round(x); },   // rounded as shown: the default 41.2 is 2.00 dB/cm
+         fmt: function (x) { return x.toFixed(x < 10 ? 2 : 0) + ' dB/cm'; } },
+    T: { fmt: function (x) { return x.toFixed(1) + ' °C'; } },
+    fab: { fmt: function (x) { return Math.abs(x) < 1e-9 ? '0.00 nm' : (x > 0 ? '+' : '−') + Math.abs(x).toFixed(2) + ' nm ' + (x > 0 ? 'red' : 'blue'); } }
+  }, function () { draw(); });
+  BD.seg(root, 'lk', function (v) { lock = v; draw(); });
+  BD.seg(root, 'pr', function (v) { probe = +v; draw(); });
+  BD.toggle(q('[data-act="mis"]'), function (on) { mis = on; draw(); });
+  BD.toggle(q('[data-act="zoom"]'), function (on) { zoom = on; draw(); });
+  var FV = BD.field(q('[data-c="g"]'), { button: q('.bd-status'), hz: 1.1 });
+  var cmul = function (x, y) { return [x[0] * y[0] - x[1] * y[1], x[0] * y[1] + x[1] * y[0]]; };
+  var cdiv = function (x, y) { var d = y[0] * y[0] + y[1] * y[1]; return [(x[0] * y[0] + x[1] * y[1]) / d, (x[1] * y[0] - x[0] * y[1]) / d]; };
+  var dB = function (p) { return 10 * Math.log10(Math.max(p, 1e-12)); };
+  var mns = function (s) { return s.replace('-', '−'); };
+  function aOf(loss) { return Math.exp(-loss * 100 / 4.343 * LR * 1e-6 / 2); }
+  // where each ring sits (THz), its heater power (mW) and the channel its photodiode receives
+  function tune() {
+    var nu = [], i, k, best = null;
+    for (i = 0; i < 4; i++) nu.push(C0 / (LCH[i] - BLUE + S.fab + (mis ? MIS[i] : 0) + DRIFT * (S.T - 20)));
+    if (lock === 'off') return { nu: nu, P: [0, 0, 0, 0], ch: [0, 1, 2, 3], k: 0 };
+    for (k = 0; k < (lock === 'own' ? 1 : 4); k++) {   // nearest: rotate all the channel assignments together, the rotation with the smallest largest heater power
+      var P = [], nr = [], ch = [];
+      for (i = 0; i < 4; i++) {
+        var j = (i + k) % 4, d = ((nu[i] - FCH[j]) % FSRF + FSRF) % FSRF;   // a heater only moves a ring red (to lower frequency), to whichever order is next
+        if (d > FSRF - 1e-9) d = 0;
+        P.push(P2PI * d / FSRF); nr.push(nu[i] - d); ch.push(j);
+      }
+      var mx = Math.max.apply(null, P), sm = P[0] + P[1] + P[2] + P[3];
+      if (!best || mx < best.mx - 1e-9 || (Math.abs(mx - best.mx) < 1e-9 && sm < best.sm)) best = { nu: nr, P: P, ch: ch, k: k, mx: mx, sm: sm };
+    }
+    for (i = 0; i < 4; i++) { var dd = best.nu[i] - FCH[best.ch[i]]; best.nu[i] = FCH[best.ch[i]] + dd - FSRF * Math.round(dd / FSRF); }   // name the order nearest the ring's channel (same response)
+    return best;
+  }
+  // one symmetric add-drop ring (Chapter 12), resonant at nr: through and drop fields [tr, ti, dr, di]
+  function ringF(nu, nr, t, a) {
+    var phi = 2 * Math.PI * TAU * (nu - nr), ra = t * t * a, den = [1 - ra * Math.cos(phi), ra * Math.sin(phi)];
+    var th = cdiv([t - t * a * Math.cos(phi), t * a * Math.sin(phi)], den), m = -(1 - t * t) * Math.sqrt(a);
+    var dr = cdiv([m * Math.cos(phi / 2), -m * Math.sin(phi / 2)], den);
+    return [th[0], th[1], dr[0], dr[1]];
+  }
+  // the four rings in a row on one bus: drop powers of rings 1-4 and the through power
+  function cascade(nu, R, t, a) {
+    var ar = 1, ai = 0, out = [];
+    for (var i = 0; i < 4; i++) {
+      var f = ringF(nu, R[i], t, a);
+      out.push((ar * ar + ai * ai) * (f[2] * f[2] + f[3] * f[3]));
+      var nr = ar * f[0] - ai * f[1]; ai = ar * f[1] + ai * f[0]; ar = nr;
+    }
+    out.push(ar * ar + ai * ai);
+    return out;
+  }
+  // gap a ring touching a straight bus would need for this kappa^2: the point-coupler model of the ring demo (Chapter 9 supermodes)
+  function gapFor(k2) { var le = Math.sqrt(2 * Math.PI * RR / 8.75), lx = Math.PI * le / (2 * Math.asin(Math.sqrt(k2))), dn = 1.55 / (2 * lx); return 0.2 - Math.log(dn / 0.0205) / 8.75; }
+  function draw() {
+    var tn = tune(), R = tn.nu, P = tn.P, ch = tn.ch, t = Math.sqrt(1 - S.k2), a = aOf(S.a), i, j;
+    // ---- spectra
+    (function () {
+      var dv = BD.setup(q('[data-c="s"]')), g = dv.g, l0 = zoom ? 1544.5 : 1531, l1 = zoom ? 1557.5 : 1571, N = 1600;
+      var xt = zoom ? [[1545, '1545'], [1550, '1550'], [1555, '1555 nm']] : [[1535, '1535'], [1550, '1550'], [1565, '1565 nm']];
+      var f = BD.frame(dv, { x: [l0, l1], y: [-45, 3], pad: { l: 40, b: 22 }, xt: xt, yt: [[-40, '−40'], [-30, '−30'], [-20, '−20'], [-10, '−10'], [0, '0 dB']] });
+      g.strokeStyle = 'rgba(255,255,255,.35)'; g.lineWidth = 1;   // the empty 400 GHz slots: short ticks on the axis
+      for (var fs = 191.1; fs < 195.8; fs += 0.4) { var ls = C0 / fs, xs0 = f.X(ls); if (ls > l0 && ls < l1) { g.beginPath(); g.moveTo(xs0, dv.h - f.p.b); g.lineTo(xs0, dv.h - f.p.b - 6); g.stroke(); } }
+      for (j = 0; j < 4; j++) BD.vline(f, LCH[j], 'rgba(255,255,255,.4)', [2, 3], 'λ' + SUB[j]);
+      BD.hline(f, -20, BD.C.dim, [5, 4]); BD.label(g, 'target', f.p.l + 4, f.Y(-20) - 4, BD.C.dim);
+      var xs = [], ys = [[], [], [], [], []];
+      for (var n = 0; n <= N; n++) { var l = l0 + (l1 - l0) * n / N, D = cascade(C0 / l, R, t, a); xs.push(l); for (i = 0; i < 5; i++) ys[i].push(Math.max(dB(D[i]), -60)); }
+      BD.line(f, xs, ys[4], 'rgba(255,255,255,.7)', 1.2, [4, 3]);
+      for (i = 0; i < 4; i++) BD.line(f, xs, ys[i], COL[i], 1.6);
+      for (i = 0; i < 4; i++) { var Dc = cascade(FCH[ch[i]], R, t, a); if (LCH[ch[i]] > l0 && LCH[ch[i]] < l1) BD.dot(f, LCH[ch[i]], Math.max(dB(Dc[i]), -45), COL[i], 3.5); }
+      // legend above the plot, right-aligned
+      var parts = [['drop', BD.C.axis], ['1', COL[0]], ['2', COL[1]], ['3', COL[2]], ['4', COL[3]], ['· through (dashed)', 'rgba(255,255,255,.8)']], x = dv.w - f.p.r;
+      if (x - parts.reduce(function (s, p) { return s + g.measureText(p[0]).width + 5; }, 0) < dv.w * 0.55) parts[5][0] = '· thru';
+      for (i = parts.length - 1; i >= 0; i--) { BD.label(g, parts[i][0], x, 27, parts[i][1], 'right'); x -= g.measureText(parts[i][0]).width + 5; }
+    })();
+    // ---- top view with the optical field at the chosen channel, from the same transfer functions
+    var pD = [], pT = 0;
+    (function () {
+      var cv = q('[data-c="g"]'), W = cv.clientWidth, nar = W < 480, xa = nar ? -27 : -33, xb = nar ? 122 : 134, sc = (W - 8) / (xb - xa);
+      var X = function (x) { return 4 + (x - xa) * sc; };
+      var Rp = RR * sc, half = Math.max(0.25 * sc, 2.2), gpx = Math.max(0.15 * sc, 1.5), ccp = Rp + 2 * half + gpx, str = half / (0.25 * sc);
+      var pdH = Math.max(8, 4 * sc), yD = 34 + pdH / 2, cy = yD + ccp, yB = cy + ccp, H = Math.round(yB + half + 34);
+      cv.style.height = H + 'px';
+      var lam = LCH[probe] / 1000, ne = NEFF - (NG - NEFF) * (lam - 1.55) / 1.55, cr = BD.crests(lam / ne * sc, 6), bd = 2 * Math.PI * ne / (lam * cr.n);
+      var dec = Math.max(1.2, lam / (2 * Math.PI * Math.sqrt(ne * ne - 1.444 * 1.444)) * sc * str), thc = LE / RR, kap = Math.sqrt(S.k2), sa = Math.sqrt(a);
+      var md = Math.max(1, Math.round(Math.round(ne * LR / lam) / cr.n));   // display order: crests drawn 1 per cr.n wavelengths
+      var top = Math.floor(yD - half - 8);
+      FV.grid(0, top, W, Math.ceil(yB + half + 8) - top);
+      var A = [1, 0], busU = [xa - 4 / sc], busA = [[1, 0]], rings = [], drops = [];
+      for (i = 0; i < 4; i++) {
+        var xc = 36 * i, phi = 2 * Math.PI * TAU * (FCH[probe] - R[i]), dlt = phi - 2 * Math.PI * Math.round(phi / (2 * Math.PI));
+        var den = [1 - t * t * a * Math.cos(dlt), t * t * a * Math.sin(dlt)];
+        var E0 = cmul([0, -kap], cdiv(A, den)), Et = cmul(A, cdiv([t - t * a * Math.cos(dlt), t * a * Math.sin(dlt)], den)), Ed = cmul([0, -kap], [E0[0] * sa, E0[1] * sa]);
+        busU.push(xc - LE / 2, xc + LE / 2); busA.push(A, Et);
+        // the ring, from the end of the bus coupler round to its start: a^(theta/2 pi), t at the drop coupler, and back across
+        // the bus coupler to E0 (with the round-trip phase offset dlt, zero on resonance); field E0 just after the bus coupler
+        var Pc = bd * (xc - xa), Phd = 2 * Math.PI * md + dlt, th = [], nr = Math.max(96, Math.ceil(2 * Math.PI * Rp / 3)), cxp = X(xc);
+        for (j = 0; j <= nr; j++) th.push(thc / 2 + (2 * Math.PI - thc) * j / nr);
+        for (j = 1; j <= 6; j++) th.push(2 * Math.PI - thc / 2 + thc * j / 6);
+        var free = function (u) { var g2 = u < Math.PI - thc / 2 ? 1 : u > Math.PI + thc / 2 ? t : 1 + (t - 1) * (u - Math.PI + thc / 2) / thc, s = Math.pow(a, u / (2 * Math.PI)) * g2; return [E0[0] * s, E0[1] * s]; };
+        var ringA = th.map(function (u) {
+          if (u <= 2 * Math.PI - thc / 2) return free(u);
+          var w = (u - 2 * Math.PI + thc / 2) / thc, A1 = free(u), s = Math.pow(a, (u - 2 * Math.PI) / (2 * Math.PI)), A2 = cmul([E0[0] * s, E0[1] * s], [Math.cos(dlt), Math.sin(dlt)]);
+          return [(1 - w) * A1[0] + w * A2[0], (1 - w) * A1[1] + w * A2[1]];
+        });
+        var rp = th.map(function (u) { return [cxp + Rp * Math.sin(u), cy + Rp * Math.cos(u)]; });
+        FV.guide(rp, { half: half, decay: dec, amp: function (n) { return ringA[n]; }, phase: function (n) { return Pc + Phd * th[n] / (2 * Math.PI); } });
+        // the drop guide: light leaves to the left, into the photodiode; nothing enters from the right (the add port)
+        var du = [xc + 9, xc + LE / 2, xc - LE / 2, xc - 9.5], dA = [[0, 0], [0, 0], Ed, Ed], dp = du.map(function (u) { return [X(u), yD]; });
+        FV.guide(dp, { half: half, decay: dec, amp: function (n) { return dA[n]; }, phase: function (n) { return Pc + Phd / 2 + bd * (xc - du[n]); } });
+        rings.push(rp); drops.push(dp); pD.push(Ed[0] * Ed[0] + Ed[1] * Ed[1]);
+        A = Et;
+      }
+      busU.push(xa + (W - 4) / sc); busA.push(A); pT = A[0] * A[0] + A[1] * A[1];
+      var bus = busU.map(function (u) { return [X(u), yB]; });
+      FV.guide(bus, { half: half, decay: dec, amp: function (n) { return busA[n]; }, phase: function (n) { return bd * (busU[n] - xa); } });
+      // the field above the input amplitude drawn compressed (|E|^0.25), so the bus stays visible beside the rings
+      var re = FV.re, im = FV.im;
+      for (j = 0; j < re.length; j++) { var Ap = re[j] * re[j] + im[j] * im[j]; if (Ap > 1) { var cf = Math.pow(Ap, -0.375); re[j] *= cf; im[j] *= cf; } }
+      q('[data-o="tag"]').textContent = 'field at λ' + SUB[probe] + ' (red +, blue −)' + (cr.n > 1 ? ' · ' + cr.note : ', top view');
+      var st = [];
+      if (str > 1.05) st.push('widths and gaps ×' + str.toFixed(1));
+      if (cr.n > 1) st.push('crests drawn 1 per ' + cr.n + ' λ');
+      st.push('field above the input level drawn as |E|^¼');
+      st.push('% = share of the λ' + SUB[probe] + ' light at each photodiode');
+      st.push('from the ring transfer functions, not a full-wave solve');
+      var fst = q('[data-o="fst"]'), stTxt = st.join(' · '), msTxt = function () { return FV.ms ? ' · frame ' + FV.ms.toFixed(1) + ' ms' : ''; };
+      fst.textContent = stTxt + msTxt();
+      var pct = function (p) { return p >= 0.995 ? '100 %' : p < 0.0005 ? '0 %' : (100 * p).toFixed(p < 0.1 ? 1 : 0) + ' %'; };
+      FV.overlay = function (g) {
+        BD.edges(g, bus, half); drops.forEach(function (d) { BD.edges(g, d, half); });
+        for (var r = 0; r < 4; r++) {
+          var x0 = X(36 * r), pw = 15 * sc, px0 = X(36 * r - 24.5);
+          BD.edges(g, rings[r], half, COL[r]);
+          g.strokeStyle = 'rgba(224,138,58,' + (lock === 'off' ? 0.18 : 0.3 + 0.7 * Math.min(1, P[r] / PBUD)).toFixed(2) + ')'; g.lineWidth = 2.5;   // heater: two arcs beside the ring, brighter for more power
+          g.beginPath(); g.arc(x0, cy, Rp + half + 2.5, 2 * Math.PI / 3, 4 * Math.PI / 3); g.stroke();
+          g.beginPath(); g.arc(x0, cy, Rp + half + 2.5, -Math.PI / 3, Math.PI / 3); g.stroke(); g.lineWidth = 1;
+          g.fillStyle = 'rgba(150,160,175,.85)'; g.fillRect(px0, yD - pdH / 2, pw, pdH); g.strokeStyle = COL[r]; g.strokeRect(px0 + 0.5, yD - pdH / 2 + 0.5, pw - 1, pdH - 1);
+          if (pdH >= 14) BD.label(g, 'PD', px0 + pw / 2, yD + 3, '#0c2340', 'center');
+          BD.label(g, 'λ' + SUB[ch[r]], px0 + pw / 2, yD - pdH / 2 - 5, COL[r], 'center');
+          BD.label(g, pct(pD[r]), px0 + pw / 2, cy + 4, BD.C.white, 'center');
+          BD.label(g, lock === 'off' ? 'off' : P[r].toFixed(1) + (nar ? '' : ' mW'), x0, cy + 3, 'rgba(240,160,90,1)', 'center');
+        }
+        BD.label(g, 'in →', 6, yB + half + 13, BD.C.white);
+        BD.label(g, 'through ' + pct(pT), W - 6, yB + half + 13, BD.C.white, 'right');
+        var sbm = Math.min(70, W / 5), sbp = BD.nice(sbm / sc) * sc; BD.scalebar(g, W / 2 - sbp / 2, H - 7, sc, sbm);
+        if (++nfr % 30 === 0) fst.textContent = stTxt + msTxt();
+      };
+      FV.render();
+    })();
+    // ---- readouts at the four laser lines
+    var M = FCH.map(function (nu) { return cascade(nu, R, t, a); });   // M[j][i]: power of channel j at drop i (i = 4: through)
+    var dl = [0, 0, 0, 0], worst = -1e9, wi = 0, wj = 0;
+    for (i = 0; i < 4; i++) dl[ch[i]] = -dB(M[ch[i]][i]);
+    for (i = 0; i < 4; i++) for (j = 0; j < 4; j++) if (j !== ch[i]) { var x = dB(M[j][i]) - dB(M[ch[i]][i]); if (x > worst) { worst = x; wi = i; wj = j; } }
+    var j4 = ch[3], thr = 1;
+    for (i = 0; i < 3; i++) { var fr = ringF(FCH[j4], R[i], t, a); thr *= fr[0] * fr[0] + fr[1] * fr[1]; }
+    var ra = t * t * a, fw = (1 - ra) * 1550 * 1550 / (Math.PI * NG * LR * 1e3 * Math.sqrt(ra)), Ql = 1550 / fw;
+    var fmtL = function (v) { return v.toFixed(v < 10 ? 2 : 1); };
+    var Pt = P[0] + P[1] + P[2] + P[3], Pmx = Math.max.apply(null, P), Pmn = Math.min.apply(null, P);
+    q('[data-o="fw"]').textContent = fw.toFixed(2) + ' nm';
+    q('[data-o="ql"]').textContent = (10 * Math.round(Ql / 10)).toFixed(0);
+    q('[data-o="dl"]').textContent = dl.map(fmtL).join(' / ') + ' dB';
+    q('[data-o="xt"]').textContent = mns(worst.toFixed(1)) + ' dB';
+    q('[data-o="thc"]').innerHTML = 'λ<sub>' + (j4 + 1) + '</sub>';
+    q('[data-o="th"]').textContent = (-dB(thr)).toFixed(2) + ' dB';
+    q('[data-o="ph"]').textContent = lock === 'off' ? 'off' : Pt.toFixed(1) + ' / ' + Pmx.toFixed(1) + ' mW';
+    var dmax = Math.max.apply(null, dl), w10 = Math.round(10 * worst) / 10;   // the pill follows the value as shown
+    BD.pill(q('[data-o="p1"]'), w10 <= -20 ? 'crosstalk ≤ −20 dB' : 'crosstalk > −20 dB', w10 <= -20 ? 'ok' : 'bad');
+    BD.pill(q('[data-o="p2"]'), dmax <= 1 ? 'drop loss ≤ 1 dB' : 'drop loss > 1 dB', dmax <= 1 ? 'ok' : 'bad');
+    BD.pill(q('[data-o="p3"]'), lock === 'off' ? 'unlocked' : Pmx > PBUD ? 'heater over 20 mW' : 'locked', lock === 'off' ? 'warn' : Pmx > PBUD ? 'bad' : 'ok');
+    // ---- caption
+    var lamL = function (k) { return 'λ<sub>' + (k + 1) + '</sub>'; }, c = '';
+    var off = [], onCh = true; for (i = 0; i < 4; i++) { off.push(C0 / R[i] - LCH[ch[i]]); if (Math.abs(off[i]) > 0.05) onCh = false; }
+    var f1 = function (v) { return v.toFixed(1); }, mw = function () { return (f1(Pmn) === f1(Pmx) ? '' : f1(Pmn) + ' to ') + f1(Pmx) + ' mW per ring'; };
+    if (lock === 'off') {
+      var o0 = off.map(function (v) { return Math.abs(v); }), same = Math.max.apply(null, o0) - Math.min.apply(null, o0) < 0.02 && off[0] * off[3] > 0;
+      c += '<b>Heaters off.</b> The rings sit ' + (onCh ? 'on their channels' : same ? Math.abs(off[0]).toFixed(2) + ' nm ' + (off[0] < 0 ? 'blue' : 'red') + ' of their channels' :
+        off.map(function (v) { return (v > 0 ? '+' : '') + mns(v.toFixed(2)); }).join(', ') + ' nm from their channels') + ', where design (2 nm blue at 20 °C), fabrication and the 74 pm/K drift leave them. ';
+    } else if (tn.k === 0) {
+      c += '<b>Locked' + (lock === 'near' ? ' (the nearest channel is each ring\'s own)' : ' to their own channels') + '.</b> Each heater pulls its ring red onto its channel, ' + mw() + ' at 0.246 nm/mW. ';
+      if (Pmx > PBUD) c += 'A ring that sits red of its channel cannot be cooled back: it is heated almost a whole FSR, to its next order, far beyond the 20 mW per ring of Worked Example 18.2. Lock to the nearest channel instead. ';
+    } else {
+      c += '<b>Locked to the nearest channels.</b> Each ring is heated to the next channel to the red, ' + mw() + ', and the receiver relabels its outputs: ring 4 now drops ' + lamL(ch[3]) + ' through its next order, which works because the FSR is four channel spacings. ';
+    }
+    var dlr = []; for (i = 0; i < 4; i++) dlr.push(-dB(M[ch[i]][i]));
+    if (onCh) c += 'Light for the last ring passes three others first, so the drop loss grows along the bus (rings 1 to 4: ' + dlr.map(fmtL).join(', ') + ' dB). ';
+    else c += 'Each photodiode gets its own channel ' + fmtL(Math.min.apply(null, dlr)) + (Math.abs(Math.max.apply(null, dlr) - Math.min.apply(null, dlr)) < 0.05 ? '' : ' to ' + fmtL(Math.max.apply(null, dlr))) + ' dB down. ';
+    var via = Math.abs(FCH[wj] - R[wi]) > FSRF / 2 ? ' through its next order, one FSR away' : '';
+    c += 'The worst crosstalk is ' + (w10 > 0 ? '+' : '') + mns(worst.toFixed(1)) + ' dB (ring ' + (wi + 1) + ' passing ' + lamL(wj) + via + ')';
+    if (onCh) {
+      c += ', against ' + mns(dB(1 / (1 + Math.pow(6.4 / fw, 2))).toFixed(1)) + ' dB for a Lorentzian of the same width: the exact response repeats every FSR, so it climbs back towards the next order, and each ring has a neighbouring channel on both sides. ';
+      if (w10 > -20) {   // the largest coupling, on the slider's 0.1 % steps, that meets -20 dB as shown
+        var nk = Math.round(1000 * S.k2), kk = 0, wk = 0;
+        for (; nk >= 20; nk--) {
+          kk = nk / 1000; wk = -1e9;
+          var tk = Math.sqrt(1 - kk), Mk = FCH.map(function (nu) { return cascade(nu, R, tk, a); });
+          for (i = 0; i < 4; i++) for (j = 0; j < 4; j++) if (j !== ch[i]) wk = Math.max(wk, dB(Mk[j][i]) - dB(Mk[ch[i]][i]));
+          if (Math.round(10 * wk) / 10 <= -20) break;
+        }
+        var rk = (1 - kk) * a, fk = (1 - rk) * 1550 * 1550 / (Math.PI * NG * LR * 1e3 * Math.sqrt(rk));
+        c += nk >= 20 ? 'A higher Q meets the −20 dB of Table 1.3: κ² ≤ ' + (100 * kk).toFixed(1) + ' % here, Q<sub>L</sub> ≥ ' + (10 * Math.round(1550 / fk / 10)).toFixed(0) + '. ' : 'No coupling on the slider meets the −20 dB of Table 1.3 at this loss. ';
+      } else c += 'That meets the −20 dB of Table 1.3, with a passband of ' + fw.toFixed(2) + ' nm' + (fw < 0.4 ? ', narrower than the ≈ 0.4 nm of a 50 Gb/s signal itself. ' : ' that filters a 50 Gb/s signal harder (Lab 12). ');
+    } else c += w10 > 0 ? ': off their channels, the rings give a photodiode more of another channel than of its own. ' : '. ';
+    var gp = gapFor(S.k2);
+    c += 'κ² = ' + (100 * S.k2).toFixed(1) + ' % ' + (gp > 0.02 ? 'would need a ' + (1000 * gp).toFixed(0) + ' nm gap between a ring and a straight bus' : 'is more than a ring beside a straight bus can reach') + ', so such rings use racetrack or pulley couplers.';
+    c += ' <i>Exact add-drop rings (Chapter 12) cascaded on one bus, constant n<sub>g</sub> (so the FSR, 12.8 nm at 1550 nm, is 1597 GHz at every wavelength), uniform thermal drift, heaters 52 mW per FSR (Chapter 18); no backscatter or thermal crosstalk.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

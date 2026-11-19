@@ -219,8 +219,9 @@ def laplace_tfln():
     ex[ln] = 28.0; ey[ln] = 44.0                                      # x-cut: crystal z horizontal, x vertical (clamped)
     X, Y = np.meshgrid(x, y)
     fixed = np.zeros((ny, nx), bool); phi = np.zeros((ny, nx))
-    el_y = (Y >= 0.3) & (Y <= 1.1)
-    sig = el_y & (np.abs(X) <= 3.0); gnd = el_y & (np.abs(X) >= 8.0)
+    tol = 1e-9                                                         # grid lines at 0.3, 3 and 8 um are not exact in floating point
+    el_y = (Y >= 0.3 - tol) & (Y <= 1.1 + tol)
+    sig = el_y & (np.abs(X) <= 3.0 + tol); gnd = el_y & (np.abs(X) >= 8.0 - tol)
     fixed |= sig | gnd; phi[sig] = 1.0
     # edge coefficients: x-edges average the cells above and below, y-edges the cells left and right
     Ax = np.zeros((ny, nx - 1)); Ax[:-1] += ex; Ax[1:] += ex; Ax[1:-1] /= 2

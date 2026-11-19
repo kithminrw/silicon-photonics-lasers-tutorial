@@ -1,0 +1,303 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdPockels" role="group" aria-label="Interactive demo: a Pockels-effect phase shifter in thin-film lithium niobate or barium titanate">
+  <div class="bd-head"><span>// try it · Pockels phase shifter at 1550 nm</span>
+    <span class="bd-seg" role="group" aria-label="Material"><button type="button" data-mt="ln" aria-pressed="true">x-cut TFLN</button><button type="button" data-mt="bto" aria-pressed="false">BTO on Si</button></span>
+    <span class="bd-seg" role="group" aria-label="Drive"><button type="button" data-dr="one" aria-pressed="false">one arm</button><button type="button" data-dr="pp" aria-pressed="true">push–pull</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>electrode gap g <b data-v="g"></b></span><input type="range" data-k="g" min="2" max="12" step="0.1" value="5" aria-label="electrode gap"></label>
+    <label class="bd-sl"><span>overlap Γ <b data-v="G"></b></span><input type="range" data-k="G" min="0.1" max="1" step="0.01" value="0.5" aria-label="electro-optic overlap"></label>
+    <label class="bd-sl"><span>voltage V <b data-v="V"></b></span><input type="range" data-k="V" min="0" max="10" step="0.05" value="2" aria-label="voltage"></label>
+    <label class="bd-sl"><span>length L <b data-v="L"></b></span><input type="range" data-k="L" min="1" max="40" step="0.5" value="10" aria-label="length"></label>
+    <label class="bd-sl"><span>propagation loss <b data-v="a"></b></span><input type="range" data-k="a" min="-1.3" max="1.3" step="0.01" value="-0.52" aria-label="propagation loss"></label>
+  </div>
+  <div class="bd-scope"><canvas data-c="x" aria-hidden="true"></canvas><span class="bd-tag" data-o="xtag">cross-section to scale</span></div>
+  <div class="bd-status"><span data-o="fst"></span></div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="p" aria-hidden="true"></canvas><span class="bd-tag">phase difference against voltage</span></div>
+    <div class="bd-scope tall"><canvas data-c="t" aria-hidden="true"></canvas><span class="bd-tag">Mach–Zehnder output against voltage</span></div>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>Δn per volt, each arm <b data-o="dn">–</b></span><span>V<sub>π</sub>L <b data-o="vpl">–</b></span><span>V<sub>π</sub> <b data-o="vpi">–</b></span><span>phase at V <b data-o="ph">–</b></span><span>loss · αV<sub>π</sub>L <b data-o="a1">–</b> <b data-o="a2">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Reproduce Worked Example 19.2.</b> Switch to one arm: Δn is 1.51 × 10⁻⁵ per volt and V<sub>π</sub>L 5.12 V·cm. Push–pull halves it to 2.56 V·cm, so the 10 mm device needs 2.56 V for a π shift. The field solve's overlap at this 5 µm gap, 0.52, is close to the 0.5 the example assumes.</li>
+    <li><b>Close the gap to 2.5 µm.</b> At Γ = 0.5, V<sub>π</sub>L halves to 1.28 V·cm, better than silicon's 1.37. The solve's overlap rises to 0.58; set Γ to it and V<sub>π</sub>L is 1.10 V·cm. But the electrode corners now sit where the mode still has 0.27&nbsp;% of its peak intensity, and the metal there absorbs.</li>
+    <li><b>Switch to BTO on Si.</b> At the same gap and Γ = 0.5, V<sub>π</sub>L drops to 0.21 V·cm, and the loss jumps to a typical 3&nbsp;dB/cm, so αV<sub>π</sub>L is 0.64 dB·V. Only part of the mode is in the BTO: at Γ = 0.2 V<sub>π</sub>L is 0.53 V·cm, still under the 1&nbsp;V·cm of Table 19.2.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>Why does the phase of the Pockels shifter grow in a straight line with the voltage, while the silicon shifter's curve bends over?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="Δn = −½n³rE: the index follows the field, and the field in the gap is proportional to V. In silicon the depletion edges move only as √(V_bi + V), so each extra volt sweeps out fewer carriers (Section 19.2).">The index change is proportional to the field, and the field to the voltage</button>
+      <button type="button" data-why="Push–pull halves V_πL, but each arm on its own is just as linear: switch to one arm and the line stays straight.">Push–pull drive cancels the curvature of each arm</button>
+      <button type="button" data-why="That is why the Pockels shifter loses so little light, not why its phase is linear: the silicon curve bends because its depletion width grows as √(V_bi + V).">Lithium niobate has no free carriers to absorb the light</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdPockels'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  // femwell TE0 mode of the ridge below (LN isotropic at n_e = 2.14; n_eff 1.907): |E_x|^2 x 10000 on 0.1 um nodes,
+  // x from -2.5 um about the ridge centre, y from -1.5 um (y = 0 at the bottom of the film)
+  var MODE = {"x0":-2.5,"y0":-1.5,"h":0.1,"s":10000,"nx":51,"ny":36,"I":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,2,2,2,2,2,2,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,2,2,3,4,4,5,5,5,5,5,4,4,3,2,2,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,2,2,4,5,7,8,11,12,14,15,16,14,13,12,10,9,6,5,4,2,2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,2,4,6,9,13,18,24,29,34,40,44,42,42,40,35,29,23,18,13,9,6,4,2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,2,4,6,10,16,25,35,50,64,82,100,115,106,126,119,113,100,83,67,47,35,25,16,10,6,4,2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,3,5,9,16,26,42,66,96,137,181,236,274,321,343,354,344,312,272,232,178,138,93,66,42,26,16,9,5,3,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,4,7,12,21,38,66,110,174,261,377,504,653,795,931,1001,1037,984,923,802,661,508,378,260,175,111,67,38,21,12,6,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,2,4,8,14,28,51,94,167,282,461,695,1011,1413,1854,2278,2645,2913,2897,2912,2670,2300,1853,1414,1022,696,461,284,167,94,51,28,14,8,4,2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,2,3,6,12,23,43,81,152,278,499,850,1343,2019,2901,3902,4870,5701,6270,6446,6293,5686,4869,3903,2901,2019,1343,850,499,278,152,81,43,23,12,6,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0,1,2,3,6,11,21,39,74,144,279,543,1009,1616,2547,3851,5389,6842,8106,8917,9215,8918,8113,6838,5388,3851,2547,1616,1009,543,279,144,74,39,21,11,6,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,3,5,10,19,36,73,150,337,1066,1138,2234,3785,5551,7283,8722,9686,10000,9684,8719,7283,5551,3785,2234,1138,1066,337,150,73,36,19,10,5,3,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,3,7,13,28,66,174,553,318,1331,2781,4437,6009,7297,8158,8444,8157,7317,6010,4437,2781,1331,318,553,174,66,28,13,7,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,2,5,11,28,76,221,626,487,1477,2623,3695,4564,5131,5327,5129,4561,3695,2623,1477,487,626,221,76,28,11,5,2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,4,12,30,76,196,68,481,964,1404,1766,1991,2073,1990,1763,1404,957,481,67,196,76,30,11,4,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,4,10,25,50,79,138,245,345,441,492,518,506,446,354,243,137,79,50,25,11,4,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,3,7,14,24,39,64,90,108,127,133,126,111,90,62,39,24,14,7,4,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,4,7,11,16,23,28,31,31,33,28,23,16,11,6,4,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,2,3,4,6,8,8,8,8,7,6,4,3,2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,2,2,2,2,2,2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]};
+  // silicon reference: delta n_eff (x 1e-4) of the PN shifter of Worked Example 19.1 (5e17 cm^-3, junction centred) at
+  // 0, 0.2 ... 4 V reverse bias, from the pn demo's model (femwell weights of figsrc/ch19_pn.json, Soref-Bennett)
+  var SI = [0, 0.1412, 0.2747, 0.4051, 0.5272, 0.6423, 0.7516, 0.8558, 0.9556, 1.0515, 1.1335, 1.2077, 1.2795, 1.3492, 1.417, 1.4829, 1.5472, 1.6099, 1.6712, 1.7311, 1.7898];
+  var LAM = 1.55;   // um
+  var MAT = { ln: { n: 2.14, r: 30.9, a: -0.52 }, bto: { n: 2.3, r: 300, a: 0.48 } };   // r in pm/V; a: log10 of a typical loss in dB/cm
+  var mt = 'ln', dr = 'pp';
+  var S = BD.bind(root, {
+    g: { fmt: function (x) { return x.toFixed(1) + ' µm'; } }, G: { fmt: function (x) { return x.toFixed(2); } },
+    V: { fmt: function (x) { return x.toFixed(2) + ' V'; } }, L: { fmt: function (x) { return x.toFixed(1) + ' mm'; } },
+    a: { map: function (v) { return +Math.pow(10, v).toPrecision(2); }, fmt: function (x) { return (x < 1 ? x.toFixed(2) : x.toFixed(1)) + ' dB/cm'; } }
+  }, function () { draw(); });
+  BD.seg(root, 'mt', function (v) { mt = v; var el = q('[data-k="a"]'); el.value = MAT[v].a; el.dispatchEvent(new Event('input')); });   // the loss jumps to a typical value for the material (Table 19.2); the input event redraws
+  BD.seg(root, 'dr', function (v) { dr = v; draw(); });
+
+  // ---- electrostatics of Figure 19.4's electrodes on x-cut TFLN: film 0.6 um etched halfway, ridge 1.2 um wide at the
+  // top and 1.54 um at the foot in the middle of the gap, electrodes 0.8 um thick on the slab, signal 6 um wide, 2 um of
+  // oxide on silicon; LN eps 28 along crystal z (across the gap) and 44 across the film. Half the structure, from the
+  // signal's centre line (a mirror plane) to past the ground, on a 0.1 um grid, red-black SOR; signal at 1 V.
+  var SIG = 3, FT = 0.3, RH = 0.3, ET = 0.8, HG = 0.1, Y0 = -2.6, Y1 = 5.0, XPAD = 4, cache = {}, imgCache = {}, order = [];
+  function keep(store, key, val) {   // remember the last 16 solves and pictures only
+    store[key] = val; order.push([store, key]);
+    if (order.length > 32) { var o = order.shift(); delete o[0][o[1]]; }
+    return val;
+  }
+  function hw(y) { return 0.6 + 0.17 * (FT + RH - y) / RH; }   // half-width of the ridge at height y
+  function modeAt(x, y) {   // bilinear |E_x|^2 of the mode (peak 1), x about the ridge centre
+    var fx = (x - MODE.x0) / MODE.h, fy = (y - MODE.y0) / MODE.h, i = Math.floor(fx), j = Math.floor(fy);
+    if (i < 0 || j < 0 || i >= MODE.nx - 1 || j >= MODE.ny - 1) return 0;
+    var tx = fx - i, ty = fy - j, I = MODE.I, n = MODE.nx, k = j * n + i;
+    return ((I[k] * (1 - tx) + I[k + 1] * tx) * (1 - ty) + (I[k + n] * (1 - tx) + I[k + n + 1] * tx) * ty) / MODE.s;
+  }
+  function solve(g, ridge) {
+    var key = g.toFixed(1) + (ridge ? 'r' : 'n'); if (cache[key]) return cache[key];
+    var h = HG, nx = Math.round((SIG + g + XPAD) / h) + 1, ny = Math.round((Y1 - Y0) / h) + 1, cx = nx - 1, cy = ny - 1, xr = SIG + g / 2;
+    var ex = new Float64Array(cx * cy), ey = new Float64Array(cx * cy), ln = new Uint8Array(cx * cy), i, j, k, p;
+    for (j = 0; j < cy; j++) { var yc = Y0 + (j + 0.5) * h;
+      for (i = 0; i < cx; i++) { var xc = (i + 0.5) * h, e = yc < -2 ? 11.7 : yc < 0 ? 3.9 : 1; k = j * cx + i;
+        var isln = (yc >= 0 && yc < FT) || (ridge && yc >= FT && yc < FT + RH && Math.abs(xc - xr) <= hw(yc));
+        ln[k] = isln ? 1 : 0; ex[k] = isln ? 28 : e; ey[k] = isln ? 44 : e; } }
+    var n = nx * ny, phi = new Float64Array(n), fix = new Uint8Array(n), aL = new Float64Array(n), aR = new Float64Array(n), aD = new Float64Array(n), aU = new Float64Array(n);
+    var cell = function (arr, ci, cj) { return ci >= 0 && ci < cx && cj >= 0 && cj < cy ? arr[cj * cx + ci] : NaN; };
+    var avg = function (a, b) { return isNaN(a) ? (isNaN(b) ? 0 : b) : isNaN(b) ? a : (a + b) / 2; };   // edges on the outer boundary see one cell
+    for (j = 0; j < ny; j++) { var y = Y0 + j * h;
+      for (i = 0; i < nx; i++) { var x = i * h, el = y >= FT - 1e-9 && y <= FT + ET + 1e-9; p = j * nx + i;
+        if (el && x <= SIG + 1e-9) { fix[p] = 1; phi[p] = 1; } else if (el && x >= SIG + g - 1e-9) fix[p] = 1;
+        else phi[p] = Math.min(1, Math.max(0, (SIG + g - x) / g));
+        if (i > 0) aL[p] = avg(cell(ex, i - 1, j - 1), cell(ex, i - 1, j));
+        if (i < nx - 1) aR[p] = avg(cell(ex, i, j - 1), cell(ex, i, j));
+        if (j > 0) aD[p] = avg(cell(ey, i - 1, j - 1), cell(ey, i, j - 1));
+        if (j < ny - 1) aU[p] = avg(cell(ey, i - 1, j), cell(ey, i, j)); } }
+    var om = 2 / (1 + Math.sin(Math.PI / Math.max(nx, ny))), it, dmax;
+    for (it = 0; it < 3000; it++) { dmax = 0;
+      for (var c = 0; c < 2; c++) for (j = 0; j < ny; j++) for (i = (j + c) % 2; i < nx; i += 2) { p = j * nx + i; if (fix[p]) continue;
+        var nb = (i > 0 ? aL[p] * phi[p - 1] : 0) + (i < nx - 1 ? aR[p] * phi[p + 1] : 0) + (j > 0 ? aD[p] * phi[p - nx] : 0) + (j < ny - 1 ? aU[p] * phi[p + nx] : 0);
+        var d = nb / (aL[p] + aR[p] + aD[p] + aU[p]) - phi[p]; phi[p] += om * d; if (d > dmax) dmax = d; else if (-d > dmax) dmax = -d; }
+      if (dmax < 1e-5) break; }
+    // E at the nodes (V/um per volt) by centred differences, one-sided at the edges
+    var Ex = new Float32Array(n), Ey = new Float32Array(n);
+    for (j = 0; j < ny; j++) for (i = 0; i < nx; i++) { p = j * nx + i;
+      Ex[p] = -(phi[j * nx + Math.min(nx - 1, i + 1)] - phi[j * nx + Math.max(0, i - 1)]) / (h * (Math.min(nx - 1, i + 1) - Math.max(0, i - 1)));
+      Ey[p] = -(phi[Math.min(ny - 1, j + 1) * nx + i] - phi[Math.max(0, j - 1) * nx + i]) / (h * (Math.min(ny - 1, j + 1) - Math.max(0, j - 1))); }
+    // E along crystal z in each cell, and the overlap with the mode: Gamma = g * sum_LN E_x I / sum I
+    var Ec = new Float32Array(cx * cy), num = 0, den = 0;
+    for (j = 0; j < cy; j++) for (i = 0; i < cx; i++) { k = j * cx + i; p = j * nx + i;
+      Ec[k] = -((phi[p + 1] + phi[p + nx + 1]) - (phi[p] + phi[p + nx])) / (2 * h);
+      if (ridge) { var I = modeAt((i + 0.5) * h - xr, Y0 + (j + 0.5) * h); den += I; if (ln[k]) num += Ec[k] * I; } }
+    var S0 = { g: g, nx: nx, ny: ny, cx: cx, cy: cy, h: h, phi: phi, Ex: Ex, Ey: Ey, Ec: Ec, ln: ln, it: it + 1, xr: xr };
+    S0.Ecen = fieldAt(S0, xr, 0.45)[0] * g;   // E at the ridge centre, in units of V/g
+    S0.G = ridge && den > 0 ? g * num / den : NaN;
+    return keep(cache, key, S0);
+  }
+  function fieldAt(s, x, y) {   // bilinear (E_x, E_y) per volt, or null outside the half domain
+    var fx = x / s.h, fy = (y - Y0) / s.h, i = Math.floor(fx), j = Math.floor(fy);
+    if (i < 0 || j < 0 || i >= s.nx - 1 || j >= s.ny - 1) return null;
+    var tx = fx - i, ty = fy - j, n = s.nx, k = j * n + i, w00 = (1 - tx) * (1 - ty), w10 = tx * (1 - ty), w01 = (1 - tx) * ty, w11 = tx * ty;
+    return [s.Ex[k] * w00 + s.Ex[k + 1] * w10 + s.Ex[k + n] * w01 + s.Ex[k + n + 1] * w11, s.Ey[k] * w00 + s.Ey[k + 1] * w10 + s.Ey[k + n] * w01 + s.Ey[k + n + 1] * w11];
+  }
+  function metal(g, x, y, top) { return y >= FT && y <= top && (x <= SIG || x >= SIG + g); }
+  function trace(s, x, y, dir) {   // a field line from (x, y) along +E (dir 1) or -E (dir -1), midpoint steps of 50 nm
+    var pts = [[x, y]], ds = 0.05;
+    for (var k = 0; k < 900; k++) {
+      var e = fieldAt(s, x, y); if (!e) break; var m = Math.hypot(e[0], e[1]); if (m < 1e-7) break;
+      var e2 = fieldAt(s, x + dir * 0.5 * ds * e[0] / m, y + dir * 0.5 * ds * e[1] / m); if (!e2) break; var m2 = Math.hypot(e2[0], e2[1]); if (m2 < 1e-7) break;
+      x += dir * ds * e2[0] / m2; y += dir * ds * e2[1] / m2; pts.push([x, y]);
+      if (x < 0 || metal(s.g, x, y, FT + ET)) break;
+    }
+    return pts;
+  }
+  function fieldImage(sR, sL, key) {   // E along crystal z per V/g, both halves, one pixel per cell: red +, blue -
+    if (imgCache[key]) return imgCache[key];
+    var cx = sR.cx, cy = sR.cy, oc = document.createElement('canvas'); oc.width = 2 * cx; oc.height = cy;
+    var ox = oc.getContext('2d'), im = ox.createImageData(2 * cx, cy), D = im.data;
+    for (var r = 0; r < cy; r++) { var j = cy - 1 - r, yc = Y0 + (j + 0.5) * HG, fade = Math.max(0, Math.min(1, (Y1 - yc) / 1.2));
+      for (var c = 0; c < 2 * cx; c++) { var left = c < cx, i = left ? cx - 1 - c : c - cx, s = left ? sL : sR, xc = (i + 0.5) * HG;
+        var v = (left ? -1 : 1) * s.Ec[j * cx + i] * sR.g, wt = s.ln[j * cx + i] ? 0.95 : 0.4;   // brightest in the LN, where the field acts
+        var a = metal(sR.g, xc, yc, FT + ET) ? 0 : Math.pow(Math.min(1, Math.abs(v) / 1.1), 0.8) * wt * fade, o = 4 * (r * 2 * cx + c);
+        var col = v >= 0 ? [255, 84, 62] : [72, 160, 255];
+        D[o] = col[0]; D[o + 1] = col[1]; D[o + 2] = col[2]; D[o + 3] = Math.round(255 * a); } }
+    ox.putImageData(im, 0, 0);
+    return keep(imgCache, key, oc);
+  }
+  function arrowHead(g, x, y, ang, col, sz) {
+    g.fillStyle = col; g.beginPath(); g.moveTo(x + sz * Math.cos(ang), y + sz * Math.sin(ang));
+    g.lineTo(x + sz * Math.cos(ang + 2.5), y + sz * Math.sin(ang + 2.5)); g.lineTo(x + sz * Math.cos(ang - 2.5), y + sz * Math.sin(ang - 2.5)); g.fill();
+  }
+  function contour(g, lev, X, Y, ox) {   // marching squares on the mode table at level lev (fraction of the peak), centred on x = ox
+    var nx = MODE.nx, ny = MODE.ny, h = MODE.h, I = MODE.I, L = lev * MODE.s, cn = [[0, 0], [1, 0], [1, 1], [0, 1]];
+    g.beginPath();
+    for (var j = 0; j < ny - 1; j++) for (var i = 0; i < nx - 1; i++) {
+      var v = [I[j * nx + i], I[j * nx + i + 1], I[(j + 1) * nx + i + 1], I[(j + 1) * nx + i]], pts = [];
+      for (var k = 0; k < 4; k++) { var a = v[k], b = v[(k + 1) % 4]; if ((a < L) !== (b < L)) { var t = (L - a) / (b - a), A = cn[k], B = cn[(k + 1) % 4];
+        pts.push([MODE.x0 + (i + A[0] + t * (B[0] - A[0])) * h + ox, MODE.y0 + (j + A[1] + t * (B[1] - A[1])) * h]); } }
+      for (k = 0; k + 1 < pts.length; k += 2) { g.moveTo(X(pts[k][0]), Y(pts[k][1])); g.lineTo(X(pts[k + 1][0]), Y(pts[k + 1][1])); }
+    }
+    g.stroke();
+  }
+
+  // ---- the cross-section, to scale
+  function xsection(P) {
+    var cv = q('[data-c="x"]'), W = cv.clientWidth, nar = W < 480;
+    cv.style.height = Math.round(Math.max(160, Math.min(250, 6.4 * (W - 12) / 19.2 + 46))) + 'px';   // fits the 5 um gap's drawing; fixed per width so the panel does not jump
+    var dv = BD.setup(cv), g = dv.g, H = dv.h, gap = P.g, xr = SIG + gap / 2, XW = SIG + gap + 1.6;
+    var s = Math.min((W - 12) / (2 * XW), (H - 40) / 6.4), x0 = W / 2, base = 22 + 3.9 * s + Math.max(0, (H - 40 - 6.4 * s) / 2);
+    var X = function (x) { return x0 + x * s; }, Y = function (y) { return base - y * s; };
+    var ln = mt === 'ln', both = dr === 'pp', etop = ln ? FT + ET : 0.9, ebot = ln ? FT : 0.1;
+    // substrate, buried oxide
+    g.fillStyle = 'rgba(157,179,204,.32)'; g.fillRect(0, Y(-2), W, H - Y(-2));
+    g.fillStyle = BD.GEO.ox; g.fillRect(0, Y(0), W, Y(-2) - Y(0));
+    var ridges = both ? [-xr, xr] : [xr];
+    if (ln) {
+      var sR = solve(gap, true), sL = both ? sR : solve(gap, false), img = fieldImage(sR, sL, gap.toFixed(1) + dr);
+      // LN film and ridges (light fill), the field over them, then the outlines
+      g.fillStyle = 'rgba(238,154,170,.28)'; g.fillRect(0, Y(FT), W, Y(0) - Y(FT));
+      var ridgePath = function (xc) { g.beginPath(); g.moveTo(X(xc - 0.77), Y(FT)); g.lineTo(X(xc + 0.77), Y(FT)); g.lineTo(X(xc + 0.6), Y(FT + RH)); g.lineTo(X(xc - 0.6), Y(FT + RH)); g.closePath(); };
+      ridges.forEach(function (xc) { ridgePath(xc); g.fill(); });
+      g.imageSmoothingEnabled = true; var XD = SIG + gap + XPAD;
+      g.drawImage(img, X(-XD), Y(Y1), 2 * XD * s, (Y1 - Y0) * s);
+      g.strokeStyle = 'rgba(238,154,170,.85)'; g.lineWidth = 1;
+      g.beginPath(); g.moveTo(0, Y(0)); g.lineTo(W, Y(0)); g.moveTo(0, Y(FT));
+      ridges.forEach(function (xc) { g.lineTo(X(xc - 0.77), Y(FT)); g.lineTo(X(xc - 0.6), Y(FT + RH)); g.lineTo(X(xc + 0.6), Y(FT + RH)); g.lineTo(X(xc + 0.77), Y(FT)); });
+      g.lineTo(W, Y(FT)); g.stroke();
+      // field lines through the middle of each gap (both halves)
+      var seeds = [-1.9, -1.46, -1.02, -0.59, -0.15, 0.45, 1.3, 1.9, 2.6];
+      g.lineWidth = 0.8;
+      [[sR, 1], [sL, -1]].forEach(function (A) {
+        var sol = A[0], sg = A[1];
+        seeds.forEach(function (y0) {
+          var fw = trace(sol, xr, y0, 1), bw = trace(sol, xr, y0, -1), pts = bw.reverse().concat(fw.slice(1));
+          g.strokeStyle = 'rgba(235,242,250,.55)'; g.beginPath();
+          pts.forEach(function (pt, n) { var px = X(sg * pt[0]), py = Y(pt[1]); if (n) g.lineTo(px, py); else g.moveTo(px, py); }); g.stroke();
+          var e = fieldAt(sol, xr, y0); if (e) arrowHead(g, X(sg * xr), Y(y0), Math.atan2(-e[1], sg * e[0]), 'rgba(235,242,250,.85)', 4);
+        });
+      });
+      g.lineWidth = 1;
+    } else {
+      // BTO on Si, schematic after Figure 4.2: a 100 nm BTO film, a Si rib (50 nm slab, 220 nm in all, 0.6 um wide) on it
+      g.fillStyle = 'rgba(184,168,224,.55)'; g.fillRect(0, Y(0.1), W, Y(0) - Y(0.1));
+      [-1, 1].forEach(function (sg) {   // the film between the electrodes carries the field: uniform, schematic
+        g.fillStyle = sg > 0 ? 'rgba(255,84,62,.6)' : 'rgba(72,160,255,.6)'; g.fillRect(X(sg > 0 ? SIG : -SIG - gap), Y(0.1), gap * s, Y(0) - Y(0.1)); });
+      g.fillStyle = BD.GEO.si;
+      ridges.forEach(function (xc) { g.fillRect(X(xc - gap / 2 + 0.5), Y(0.15), (gap - 1) * s, Y(0.1) - Y(0.15)); g.fillRect(X(xc - 0.3), Y(0.32), 0.6 * s, Y(0.1) - Y(0.32)); });
+      // field lines of two thin coplanar electrodes: confocal ellipses with foci at the electrode edges
+      g.strokeStyle = 'rgba(235,242,250,.5)'; g.lineWidth = 0.8;
+      [-1, 1].forEach(function (sg) { var xc = sg * xr;
+        [0.35, 0.7, 1.1].forEach(function (u) { var A = gap / 2 * Math.cosh(u), B = gap / 2 * Math.sinh(u);
+          [1, -1].forEach(function (up) { g.beginPath();
+            for (var t = 0; t <= 60; t++) { var th = Math.PI * t / 60, px = X(xc + A * Math.cos(th)), py = Y(0.1 + up * B * Math.sin(th)); if (t) g.lineTo(px, py); else g.moveTo(px, py); }
+            g.stroke(); arrowHead(g, X(xc), Y(0.1 + up * B), sg > 0 ? 0 : Math.PI, 'rgba(235,242,250,.8)', 4); }); }); });
+      g.lineWidth = 1;
+    }
+    // electrodes
+    g.fillStyle = BD.GEO.metal;
+    g.fillRect(X(-SIG), Y(etop), 2 * SIG * s, (etop - ebot) * s);
+    g.fillRect(X(SIG + gap), Y(etop), W - X(SIG + gap), (etop - ebot) * s); g.fillRect(0, Y(etop), X(-SIG - gap), (etop - ebot) * s);
+    var ly = Y((etop + ebot) / 2) + 3.5;
+    BD.label(g, 'S', X(0), ly, '#0c2340', 'center');
+    if (W - X(SIG + gap) > 14) { BD.label(g, 'G', (W + X(SIG + gap)) / 2, ly, '#0c2340', 'center'); BD.label(g, 'G', X(-SIG - gap) / 2, ly, '#0c2340', 'center'); }
+    // the optical mode: femwell contours at 50 % and 1/e^2 of the peak (TFLN), an outline sketch (BTO)
+    g.strokeStyle = BD.C.gold; g.lineWidth = 1.2;
+    ridges.forEach(function (xc) {
+      if (ln) { contour(g, 0.5, X, Y, xc); g.setLineDash([3, 2]); contour(g, 0.135, X, Y, xc); g.setLineDash([]); }
+      else { g.setLineDash([3, 2]); g.beginPath(); g.ellipse(X(xc), Y(0.16), 0.55 * s, 0.3 * s, 0, 0, 7); g.stroke(); g.setLineDash([]); }
+    });
+    g.lineWidth = 1;
+    // +dn / -dn above each waveguide (the field points along -z in the left gap, +z in the right one), and the gap
+    // dimension over the right-hand gap, each label on a dark patch so the field lines do not run through it
+    var boxed = function (t, x, y, col, al) { var w = g.measureText(t).width, x0b = al === 'left' ? x : x - w / 2; g.fillStyle = 'rgba(5,16,32,.72)'; g.fillRect(x0b - 3, y - 9, w + 6, 12); BD.label(g, t, x, y, col, al || 'center'); };
+    ridges.forEach(function (xc) { boxed(xc < 0 ? '+Δn' : '−Δn', X(xc), Y(etop) + 1, '#ff8a70'); });
+    var yd = Y(etop) - 20; BD.dim(g, X(SIG), yd, X(SIG + gap), yd, '', BD.C.gold); boxed('g = ' + gap.toFixed(1) + ' µm', X(SIG + gap / 2), yd - 5, BD.C.gold);
+    // material and layer labels on the left, crystal axis at the top right
+    var lx = 6;
+    boxed(ln ? 'x-cut LiNbO₃ film' : 'BaTiO₃ film', lx, Y(0) + 12, ln ? 'rgba(238,154,170,1)' : 'rgba(200,186,240,1)', 'left');
+    if (Y(-2) - Y(0) > 34) BD.label(g, 'SiO₂', lx, Y(-2) - 6, BD.C.axis);
+    if (H - Y(-2) > 12) BD.label(g, 'Si', lx, Math.min(H - 4, Y(-2) + 12), BD.C.axis);
+    var ax1 = W - 8, ax0 = ax1 - 22, ay = 30;
+    if (ln) {   // x-cut: crystal z lies in the film plane, across the gap
+      g.strokeStyle = BD.C.white; g.beginPath(); g.moveTo(ax0, ay); g.lineTo(ax1, ay); g.stroke(); arrowHead(g, ax1, ay, 0, BD.C.white, 4);
+      BD.label(g, 'crystal z', ax0 - 5, ay + 3, BD.C.white, 'right');
+    } else {
+      BD.label(g, 'crystal axes 45° to E, in plane', ax1, ay + 3, BD.C.white, 'right');
+    }
+    BD.scalebar(g, W - 8 - Math.min(90, W * 0.25), H - 8, s, Math.min(90, W * 0.25));
+  }
+
+  function draw() {
+    if (!MODE) return;
+    var M = MAT[mt], n3 = Math.pow(M.n, 3), pp = dr === 'pp';
+    var dnV = 0.5 * n3 * M.r * 1e-12 * S.G / (S.g * 1e-6);            // per volt, in each arm
+    var vpl = LAM * 1e-4 * S.g / (n3 * M.r * 1e-12 * S.G * 1e6) * (pp ? 0.5 : 1);   // V cm
+    var vpi = vpl / (S.L / 10), ph = S.V / vpi, lossDb = S.a * S.L / 10, tr = Math.pow(10, -lossDb / 10);
+    var siPh = function (v) { var f = Math.min(20, v / 0.2), i = Math.min(19, Math.floor(f)), t = f - i; return 2 * (SI[i] * (1 - t) + SI[i + 1] * t) * 1e-4 * S.L * 1e-3 / (LAM * 1e-6); };
+    xsection({ g: S.g });
+    var sR = mt === 'ln' ? solve(S.g, true) : null;
+    // ---- status line under the cross-section
+    var st = mt === 'ln'
+      ? ['field along crystal z per volt (red +z, blue −z): electrostatic solve, LN ε 28 along z, 44 across', 'gold: femwell TE mode, 50 % and 1/e²', 'at the ridge centre E = ' + sR.Ecen.toFixed(2) + ' V/g; field × mode overlap Γ = ' + sR.G.toFixed(2)]
+      : ['schematic after Figure 4.2: Si rib on a 100 nm BTO film (arrangements vary); field of two thin electrodes; mode sketched', 'crystal axes at 45° to E in the film plane, to use r₄₂'];
+    q('[data-o="fst"]').textContent = st.join(' · ');
+    q('[data-o="xtag"]').textContent = 'cross-section to scale' + (mt === 'ln' ? ', field per volt' : ', schematic field');
+    // ---- phase difference against voltage, with the silicon PN shifter of the same length
+    var d2 = BD.setup(q('[data-c="p"]')), top = Math.max(1.25, 1.12 * ph, 1.1 * siPh(4)), stp = top <= 2.5 ? 0.5 : BD.nice(top / 3);
+    var yt = []; for (var k = 0; k * stp <= top + 1e-9; k++) { var v = k * stp; yt.push([v, v === 0 ? '0' : (Math.abs(v - 1) < 1e-9 ? '' : +v.toPrecision(3)) + 'π']); }
+    var f2 = BD.frame(d2, { x: [0, 10], y: [0, top], pad: { l: 40, b: 22 }, xt: [[0, '0'], [2, '2'], [4, '4'], [6, '6'], [8, '8'], [10, '10 V']], yt: yt });
+    BD.hline(f2, 1, BD.C.gold, [4, 3]);
+    var vs = [], ps = [], vs2 = [], ps2 = []; for (var i2 = 0; i2 <= 200; i2++) { var vv = 10 * i2 / 200; vs.push(vv); ps.push(vv / vpi); if (vv <= 4 + 1e-9) { vs2.push(vv); ps2.push(siPh(vv)); } }
+    BD.line(f2, vs2, ps2, BD.C.dim, 1.6, [5, 4]); BD.line(f2, vs, ps, BD.C.blue, 2); BD.dot(f2, S.V, ph, BD.C.white, 4.5);
+    // legend at the top left, or at the top right when the (steep) Pockels line runs through the top left: it has then
+    // left the plot before 4 V, where the silicon curve ends
+    var g2 = d2.g, lgA = mt === 'ln' ? 'Pockels, TFLN' : 'Pockels, BTO', lgB = 'Si PN, Example 19.1', lw = Math.max(g2.measureText(lgA).width, g2.measureText(lgB).width);
+    var vEnd = (f2.p.l + 10 + lw - f2.p.l) / (d2.w - f2.p.l - f2.p.r) * 10, yLow = top * (1 - 30 / (d2.h - f2.p.t - f2.p.b));
+    var br = vEnd / vpi >= yLow, lgx = br ? d2.w - f2.p.r - 6 - lw : f2.p.l + 6, lgy = f2.p.t + 12;
+    g2.fillStyle = BD.C.blue; g2.fillText(lgA, lgx, lgy); g2.fillStyle = BD.C.dim; g2.fillText(lgB, lgx, lgy + 12);
+    // ---- Mach-Zehnder output, unbiased: T = loss x cos^2(phase / 2)
+    var d3 = BD.setup(q('[data-c="t"]')), f3 = BD.frame(d3, { x: [0, 10], y: [0, 1.05], pad: { l: 40, b: 22 }, xt: [[0, '0'], [2, '2'], [4, '4'], [6, '6'], [8, '8'], [10, '10 V']], yt: [[0, '0'], [0.5, '0.5'], [1, '1']] });
+    var ts = []; vs = []; for (i2 = 0; i2 <= 800; i2++) { vv = 10 * i2 / 800; vs.push(vv); ts.push(tr * Math.pow(Math.cos(Math.PI * vv / (2 * vpi)), 2)); }
+    if (vpi <= 10) BD.vline(f3, vpi, BD.C.gold, [4, 3], 'Vπ = ' + vpi.toFixed(2) + ' V');
+    BD.line(f3, vs, ts, BD.C.green, 2); BD.dot(f3, S.V, tr * Math.pow(Math.cos(Math.PI * ph / 2), 2), BD.C.white, 4.5);
+    // ---- readouts
+    var ex10 = Math.floor(Math.log10(dnV)), sup = function (x) { return String(x).replace('-', '⁻').split('').map(function (ch) { return '⁰¹²³⁴⁵⁶⁷⁸⁹'[+ch] || ch; }).join(''); };
+    var dnTxt = (dnV / Math.pow(10, ex10)).toFixed(2) + ' × 10' + sup(ex10);
+    q('[data-o="dn"]').textContent = dnTxt + ' /V';
+    q('[data-o="vpl"]').textContent = vpl.toFixed(2) + ' V·cm';
+    q('[data-o="vpi"]').textContent = (vpi < 100 ? vpi.toFixed(2) : vpi.toFixed(0)) + ' V';
+    q('[data-o="ph"]').textContent = (ph < 10 ? ph.toFixed(2) : ph.toFixed(1)) + 'π (' + (180 * ph).toFixed(0) + '°)';
+    q('[data-o="a1"]').textContent = lossDb.toFixed(2) + ' dB';
+    q('[data-o="a2"]').textContent = (S.a * vpl).toFixed(2) + ' dB·V';
+    BD.pill(q('[data-o="pill"]'), ph >= 0.995 ? '180° reached' : '', 'ok');
+    // ---- caption
+    var c = 'The field changes the index in proportion to itself, Δn = −½n³rE, and the mode sees on average ΓV/g of it: here ' + dnTxt + ' per volt in each arm, so V<sub>π</sub>L = λg/(n³rΓ) = ' + vpl.toFixed(2) + ' V·cm' + (pp ? ', half the single arm\'s, because the two arms see opposite fields' : ' for one arm') + '. ';
+    c += 'The phase is a straight line in V and the loss does not change with it, unlike the silicon PN shifter (dashed), whose depletion edges move only as √(V<sub>bi</sub> + V) and whose carriers absorb 13 dB/cm. ';
+    c += 'The loss–efficiency product αV<sub>π</sub>L is ' + (S.a * vpl).toFixed(2) + ' dB·V against silicon\'s 18 dB·V (Table 19.1), so a Pockels shifter can afford to be long. ';
+    if (mt === 'ln') {
+      c += 'Closer electrodes cut V<sub>π</sub>L in proportion to g, but raise the capacitance per length and bring the metal towards the mode, where it absorbs light (not modelled). ';
+      var ic = modeAt(S.g / 2, FT);   // the mode's |E_x|^2 at the electrode's inner bottom corner
+      if (ic >= 5e-5) c += 'At this gap the electrode corners sit where the mode still has ' + (100 * ic).toPrecision(2) + ' % of its peak intensity. ';
+    } else c += 'BTO\'s coefficient is ten times LiNbO₃\'s, but its films are lossier (1–10 dB/cm) and only part of the mode is in the BTO, which lowers Γ. ';
+    c += ' <i>Model: V<sub>π</sub>L = λg/(n³rΓ), halved for push–pull, λ = 1550 nm; ' + (mt === 'ln' ? 'n<sub>e</sub> = 2.14 and r<sub>33</sub> = 30.9 pm/V (Worked Example 19.2)' : 'an illustrative effective r = 300 pm/V and n = 2.3 for BTO') + '; Γ and the loss are set by hand (typical losses from Table 19.2); unbiased MZI.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

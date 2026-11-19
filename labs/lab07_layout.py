@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 the Open-Photonics authors
 """Lab 7: lay out your first chip (Open-Photonics, Chapter 30).
 
 Run it from a terminal:

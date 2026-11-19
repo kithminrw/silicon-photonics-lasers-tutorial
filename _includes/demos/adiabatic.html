@@ -1,0 +1,251 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdAdia" role="group" aria-label="Interactive demo: adiabatic taper from a 500 nm strip to a wide one">
+  <div class="bd-head"><span>// try it · adiabatic taper from 500 nm, 220 nm Si, TE, 1550 nm</span>
+    <span class="bd-seg" role="group" aria-label="Taper profile"><button type="button" data-prof="lin" aria-pressed="true">linear</button><button type="button" data-prof="par" aria-pressed="false">parabolic</button><button type="button" data-prof="cm" aria-pressed="false">constant margin</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>end width W<sub>1</sub> <b data-v="w1"></b></span><input type="range" data-k="w1" min="0.8" max="3" step="0.01" value="3" aria-label="end width"></label>
+    <label class="bd-sl"><span>taper length L <b data-v="L"></b></span><input type="range" data-k="L" min="2" max="60" step="0.1" value="20" aria-label="taper length"></label>
+  </div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag" data-o="tag">top view: field of the local modes</span></div>
+  <div class="bd-status"><span data-o="fst"></span></div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="c" aria-hidden="true"></canvas><span class="bd-tag">Love’s criterion: allowed and actual dρ/dz</span></div>
+    <div class="bd-scope tall"><canvas data-c="t" aria-hidden="true"></canvas><span class="bd-tag">TE0 → TE2 against taper length</span></div>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>worst-case margin <b data-o="m">–</b></span><span>where <b data-o="wh">–</b></span><span>same margin: linear / constant <b data-o="ls">–</b></span><span>TE0 → TE2 (coupled modes) <b data-o="cv">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Check the PDK tapers.</b> The default is the EBeam PDK’s 20 µm linear taper from 500 nm to 3 µm: worst-case margin 1.43, at its wide end, and 0.60 % of the power into TE2 (the eigenmode expansion, the circle at 20 µm, gives 0.69 %). At L = 40 µm the margin doubles to 2.86 and TE2 falls to 0.16 %.</li>
+    <li><b>Shape the taper.</b> Press constant margin and set L to 12.0 µm: the margin is 1.43 all along, as for the 20 µm linear taper. The two-mode estimate reads 0.23 %, at a dip of its curve, but the expansion’s circle shows 0.61 %, about the linear taper’s 0.69 %: the same margin and about the same conversion in 60 % of the length.</li>
+    <li><b>Make it too short.</b> Back to linear, set L to 5 µm: the margin falls to 0.36, the pill reads CRITERION MISSED and 6.1 % goes into TE2 (the circles at 4 and 6 µm show 12 % and 7.2 %). In the top view the crests bend where TE2 beats with TE0.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>A linear taper from 500 nm to 3 µm is too lossy. Where should you add length to fix it most cheaply?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="The allowed rate falls from 0.30 near 0.84 µm to 0.089 at 3 µm, because TE0 and TE2 approach each other in wide guides. A linear taper’s margin is smallest at its wide end, so that is where it needs to slow down; the constant-margin profile does exactly this.">At the wide end, where TE0 and TE2 are closest in index</button>
+      <button type="button" data-why="At the narrow end the modes are far apart in index (TE2 is not even guided below 0.63 µm), so the taper may widen fast there: that is where a linear taper wastes length.">At the narrow end, where the mode is most confined</button>
+      <button type="button" data-why="Stretching the whole taper works, but it also lengthens the parts that were already slow enough; for the same worst-case margin the constant-margin profile is 12.0 µm long against 20 µm.">Evenly along the whole taper</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdAdia'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); }, prof = 'lin';
+  var um2 = function (x) { return x.toFixed(2) + ' µm'; }, um1 = function (x) { return x.toFixed(1) + ' µm'; };
+  var S = BD.bind(root, { w1: { fmt: um2 }, L: { fmt: um1 } }, function () { draw(); });
+  BD.seg(root, 'prof', function (v) { prof = v; draw(); });
+  var NAMES = { lin: 'linear', par: 'parabolic', cm: 'constant margin' };
+  // ---- the model of Figure 8.3 (figsrc/ch08_figs.py): effective-index method, 220 nm Si film in oxide, TE, 1550 nm.
+  // Step 1, the vertical TE slab gives n_I = 2.848; step 2, a lateral slab of width W (core n_I, oxide sides) with TM
+  // boundary conditions, whose even modes are TE0, TE2, ...; H_y profiles throughout.
+  var LAM = 1.55, K0 = 2 * Math.PI / LAM, NOX = 1.444, W0 = 0.5;
+  function slab(n1, n2, d, tm, m) {   // mode m of a symmetric slab, TE or TM boundary conditions
+    var lo = n2 + 1e-9, hi = n1 - 1e-9, r = tm ? n1 * n1 / (n2 * n2) : 1;
+    var F = function (ne) { var ka = K0 * Math.sqrt(Math.max(n1 * n1 - ne * ne, 1e-18)); return ka * d - 2 * Math.atan(r * K0 * Math.sqrt(Math.max(ne * ne - n2 * n2, 0)) / ka); };
+    if (F(lo) <= m * Math.PI) return NaN;
+    for (var i = 0; i < 60; i++) { var c = (lo + hi) / 2; if (F(c) > m * Math.PI) lo = c; else hi = c; }
+    return (lo + hi) / 2;
+  }
+  var NI = slab(3.476, NOX, 0.22, false, 0), E1 = NI * NI, E2 = NOX * NOX, WC = LAM / Math.sqrt(E1 - E2);   // TE2 cut-off width, 0.63 um
+  function modeOf(W, ne) {   // a lateral mode of index ne, scaled to unit power: P = beta/(2 k0) * integral of H^2/eps dx = 1
+    var rho = W / 2, ka = K0 * Math.sqrt(E1 - ne * ne), g = K0 * Math.sqrt(ne * ne - E2), b = ne * K0;
+    var N = (rho + Math.sin(2 * ka * rho) / (2 * ka)) / E1 + Math.pow(Math.cos(ka * rho), 2) / g / E2;
+    return { ne: ne, b: b, ka: ka, g: g, rho: rho, s: 1 / Math.sqrt(b * N / (2 * K0)) };
+  }
+  function hy(x, M) { var ax = Math.abs(x); return M.s * (ax <= M.rho ? Math.cos(M.ka * x) : Math.cos(M.ka * M.rho) * Math.exp(-M.g * (ax - M.rho))); }
+  // tables against width, 0.5 ... 3 um: TE0 and TE2 indices, Love's allowed d rho/dz = rho (n0 - n2)/lambda (n2 -> oxide
+  // below the TE2 cut-off), and the TE0 -> TE2 coupling per unit d rho of the moving sidewalls (the normal field enters
+  // through D_x, the tangential through E_z, both continuous at the wall)
+  var NT = 1001, DT = 2.5 / (NT - 1), T0 = [], T2 = [], TA = [], TC = [];
+  for (var it = 0; it < NT; it++) {
+    var Wt = W0 + it * DT, n0 = slab(NI, NOX, Wt, true, 0), n2 = Wt > WC ? slab(NI, NOX, Wt, true, 2) : NaN;
+    T0.push(n0); T2.push(n2); TA.push(Wt / 2 * (n0 - (isFinite(n2) ? n2 : NOX)) / LAM);
+    var cc = 0;
+    if (isFinite(n2)) {
+      var a = modeOf(Wt, n0), b = modeOf(Wt, n2), r = Wt / 2;
+      var p0 = a.s * Math.cos(a.ka * r), p2 = b.s * Math.cos(b.ka * r), q0 = -a.s * a.ka * Math.sin(a.ka * r) / E1, q2 = -b.s * b.ka * Math.sin(b.ka * r) / E1;
+      cc = (E1 - E2) * (q0 * q2 + a.b * b.b * p0 * p2 / (E1 * E2)) / (2 * K0 * (b.b - a.b));
+    }
+    TC.push(cc);
+  }
+  function ti(T, W) { var x = (W - W0) / DT, i = Math.max(0, Math.min(NT - 2, Math.floor(x))), t = x - i; return T[i] + t * (T[i + 1] - T[i]); }
+  function ti2(W) { var x = (W - W0) / DT, i = Math.max(0, Math.min(NT - 2, Math.floor(x))); return isFinite(T2[i]) && isFinite(T2[i + 1]) ? ti(T2, W) : NaN; }
+  var TI = [0];   // integral of dW/(2 allowed) from 0.5 um: the constant-margin profile
+  for (it = 1; it < NT; it++) TI.push(TI[it - 1] + DT * 0.5 * (1 / (2 * TA[it - 1]) + 1 / (2 * TA[it])));
+  // ---- profiles: u(W) = z/L from 0 to 1, du/dW, and W(u)
+  function P(pr, W1) {
+    var I1 = ti(TI, W1);
+    if (pr === 'lin') return { u: function (W) { return (W - W0) / (W1 - W0); }, du: function () { return 1 / (W1 - W0); }, W: function (u) { return W0 + (W1 - W0) * u; } };
+    if (pr === 'par') return { u: function (W) { return (W * W - W0 * W0) / (W1 * W1 - W0 * W0); }, du: function (W) { return 2 * W / (W1 * W1 - W0 * W0); },
+      W: function (u) { return Math.sqrt(W0 * W0 + (W1 * W1 - W0 * W0) * u); } };
+    return { u: function (W) { return ti(TI, W) / I1; }, du: function (W) { return 1 / (2 * ti(TA, W) * I1); },
+      W: function (u) { var t = u * I1, lo = 0, hi = NT - 1; while (hi - lo > 1) { var md = (lo + hi) >> 1; if (TI[md] < t) lo = md; else hi = md; }
+        return W0 + DT * (lo + (t - TI[lo]) / (TI[hi] - TI[lo] || 1)); } };
+  }
+  // ---- along the taper on a grid in W: u, the phases per unit length (Psi0 for TE0, Psi for TE0 - TE2) and the coupling
+  var NW = 600, NS = 240, SWEEP = {};   // grid steps along the taper: drawn taper, and the length sweep (cached per end width)
+  function grid(pr, W1, n) {
+    n = n || NW; var p = P(pr, W1), h = (W1 - W0) / n, G = { W: [], u: [], c: [], b0: [], db: [], ps0: [0], ps: [0], h: h, p: p, n: n };
+    for (var k = 0; k <= n; k++) { var W = W0 + h * k, n2 = ti2(W); G.W.push(W); G.u.push(p.u(W)); G.c.push(ti(TC, W));
+      G.b0.push(ti(T0, W) * K0 * p.du(W)); G.db.push(isFinite(n2) ? (ti(T0, W) - n2) * K0 * p.du(W) : 0); }
+    for (k = 1; k <= n; k++) { G.ps0.push(G.ps0[k - 1] + h * (G.b0[k - 1] + G.b0[k]) / 2); G.ps.push(G.ps[k - 1] + h * (G.db[k - 1] + G.db[k]) / 2); }
+    return G;
+  }
+  // two coupled local modes, slowly varying amplitudes: db2/dW = (c/2) e^{-j L Psi} b0, db0/dW = -(c/2) e^{+j L Psi} b2 (Heun)
+  function couple(G, L, keep) {
+    var r0 = 1, i0 = 0, r2 = 0, i2 = 0, h = G.h, out = keep ? { r0: [1], i0: [0], r2: [0], i2: [0] } : null;
+    function f(k, r0, i0, r2, i2) {
+      var c = G.c[k] / 2, ph = -L * G.ps[k], cr = Math.cos(ph), ci = Math.sin(ph);
+      return [-c * (cr * r2 + ci * i2), -c * (cr * i2 - ci * r2), c * (cr * r0 - ci * i0), c * (cr * i0 + ci * r0)];
+    }
+    for (var k = 0; k < G.n; k++) {
+      var k1 = f(k, r0, i0, r2, i2), k2 = f(k + 1, r0 + h * k1[0], i0 + h * k1[1], r2 + h * k1[2], i2 + h * k1[3]);
+      r0 += h / 2 * (k1[0] + k2[0]); i0 += h / 2 * (k1[1] + k2[1]); r2 += h / 2 * (k1[2] + k2[2]); i2 += h / 2 * (k1[3] + k2[3]);
+      if (out) { out.r0.push(r0); out.i0.push(i0); out.r2.push(r2); out.i2.push(i2); }
+    }
+    return out || r2 * r2 + i2 * i2;
+  }
+  function margin(G, L) {   // worst-case margin, allowed / (d rho/dz), and where
+    var best = Infinity, kb = 0;
+    for (var k = 0; k <= G.n; k++) { var m = ti(TA, G.W[k]) * 2 * L * G.p.du(G.W[k]); if (m < best - 1e-9) { best = m; kb = k; } }
+    return { M: best, W: G.W[kb], z: L * G.u[kb] };
+  }
+  function lenFor(M, W1) {   // linear and constant-margin lengths for a worst-case margin M
+    var amin = Infinity; for (var k = 0; k <= 400; k++) amin = Math.min(amin, ti(TA, W0 + (W1 - W0) * k / 400));
+    return { lin: M * (W1 - W0) / (2 * amin), cm: M * ti(TI, W1) };
+  }
+  // TE2 power from an eigenmode expansion of the same 2D slab (scratch Python check: finite-difference modes in a 12 um box,
+  // 120 sections, mode matching; converged in grid, sections and box size), 0.5 -> 3 um, [L um, power]
+  var EME = {"lin":[[4,0.1175],[6,0.07205],[8,0.03803],[10,0.02613],[12,0.01858],[14,0.01306],[16,0.01081],[20,0.006887],[25,0.00424],[30,0.003135],[40,0.001655],[50,0.001084],[60,0.0007519]],
+    "par":[[4,0.1116],[6,0.01222],[8,0.03111],[10,0.0052],[12,0.00783],[14,0.006958],[16,0.001757],[20,0.001933],[25,0.00137],[30,0.0009924],[40,0.0005845],[50,0.0004115],[60,0.0002877]],
+    "cm":[[4,0.1353],[6,0.00962],[8,0.02259],[10,0.01071],[12,0.006058],[14,0.004899],[16,0.004071],[20,0.002191],[25,0.001467],[30,0.001049],[40,0.0005982],[50,0.0003924],[60,0.0002553]]};
+  var pct = function (v) { var p = 100 * v; return (p >= 10 ? p.toFixed(0) : p >= 1 ? p.toFixed(1) : p >= 0.1 ? p.toFixed(2) : p.toPrecision(2)) + ' %'; };
+  var FV = BD.field(q('[data-c="g"]'), { button: q('.bd-status'), hz: 1.0 }), nfr = 0;
+  var COL = { lin: BD.C.gold, par: BD.C.blue, cm: BD.C.green };
+  function draw() {
+    var W1 = S.w1, L = S.L, G = grid(prof, W1), A = couple(G, L, true), mg = margin(G, L), ln = lenFor(mg.M, W1), conv = A.r2[NW] * A.r2[NW] + A.i2[NW] * A.i2[NW];
+    // ---- top view: the taper (to scale where it fits), the field of TE0 + TE2 with the coupled-mode amplitudes, local TE0 profiles
+    (function () {
+      var cv = q('[data-c="g"]'), Wc = cv.clientWidth, nar = Wc < 480;
+      cv.style.height = (nar ? 250 : 230) + 'px';
+      var H = cv.clientHeight, top = 34, bot = H - 26, av = bot - top, Le = Math.max(1.5, 0.1 * L), z0 = -Le, z1 = L + Le;
+      var sx = (Wc - 12) / (z1 - z0), sy = Math.min(av / (W1 + 1.4), Math.max(sx, 0.55 * av / (W1 + 1.4))), yc = (top + bot) / 2;
+      var X = function (z) { return 6 + (z - z0) * sx; }, Y = function (x) { return yc - x * sy; };
+      var cr = BD.crests(LAM / ti(T0, W1) * sx, 6), nn = cr.n;
+      var m0i = modeOf(W0, T0[0]), b0i = m0i.b, iW1 = modeOf(W1, ti(T0, W1)), n2e = ti2(W1), m2e = isFinite(n2e) ? modeOf(W1, n2e) : null;
+      FV.grid(0, top, Wc, av);
+      var nx = FV.nx, ny = FV.ny, re = FV.re, im = FV.im;
+      for (var i = 0; i < nx; i++) {
+        var z = z0 + (i + 0.5 - 6) / sx, W, M0, M2 = null, ph0, ph = 0, r0 = 1, i0 = 0, r2 = 0, i2 = 0;
+        if (z < 0) { W = W0; M0 = m0i; ph0 = b0i * z; }
+        else {
+          var k, t;
+          if (z <= L) { W = G.p.W(z / L); var x = (W - W0) / G.h; k = Math.max(0, Math.min(G.n - 1, Math.floor(x))); t = x - k; }
+          else { W = W1; k = G.n - 1; t = 1; }
+          var lerp = function (Ar) { return Ar[k] + t * (Ar[k + 1] - Ar[k]); };
+          ph0 = L * lerp(G.ps0); ph = L * lerp(G.ps); r0 = lerp(A.r0); i0 = lerp(A.i0); r2 = lerp(A.r2); i2 = lerp(A.i2);
+          if (z > L) { ph0 += iW1.b * (z - L); if (m2e) ph += (iW1.b - m2e.b) * (z - L); }
+          M0 = z > L ? iW1 : modeOf(W, ti(T0, W)); var n2 = z > L ? n2e : ti2(W); if (isFinite(n2)) M2 = z > L ? m2e : modeOf(W, n2);
+        }
+        var c0 = Math.cos(ph0 / nn), s0 = -Math.sin(ph0 / nn), cp = Math.cos(ph), sp = Math.sin(ph), pk = 1 / hy(0, M0);   // each z scaled to the TE0 peak
+        var ar = r2 * cp - i2 * sp, ai = r2 * sp + i2 * cp;   // b2 e^{+j(Phi0 - Phi2)}
+        for (var j = 0; j < (ny + 1) >> 1; j++) {   // even modes: the lower half mirrors the upper
+          var xx = (yc - (top + j + 0.5)) / sy, h0 = hy(xx, M0) * pk, h2 = M2 ? hy(xx, M2) * pk : 0;
+          var er = r0 * h0 + ar * h2, ei = i0 * h0 + ai * h2, p = j * nx + i, pm = (ny - 1 - j) * nx + i;
+          re[p] = re[pm] = er * c0 - ei * s0; im[p] = im[pm] = er * s0 + ei * c0;
+        }
+      }
+      var ratio = sy / sx, scl = Math.abs(ratio - 1) < 0.03 ? 'to scale' : 'widths ×' + (ratio >= 1 ? ratio.toFixed(1) : ratio.toFixed(2));
+      q('[data-o="tag"]').textContent = nn > 1 ? 'top view: local-mode field · ' + cr.note : 'top view: field of the local modes';
+      var st = [scl, 'TE0 + TE2 with the coupled-mode amplitudes, each z scaled to the TE0 peak'];
+      if (nn > 1) st.push('crests drawn 1 per ' + nn + ' λ');
+      var fst = q('[data-o="fst"]'), stTxt = st.join(' · '), msTxt = function () { return FV.ms ? ' · frame ' + FV.ms.toFixed(1) + ' ms' : ''; };
+      fst.textContent = stTxt + msTxt();
+      var alt = prof === 'cm' ? { p: P('lin', W1), L: ln.lin, n: 'linear' } : { p: P('cm', W1), L: ln.cm, n: 'constant margin' };
+      FV.overlay = function (gx) {
+        var edge = function (pp, LL, dash, col) {
+          gx.strokeStyle = col; gx.setLineDash(dash); gx.lineWidth = 1;
+          [1, -1].forEach(function (sg) {
+            gx.beginPath(); gx.moveTo(0, Y(sg * W0 / 2)); gx.lineTo(X(0), Y(sg * W0 / 2));
+            for (var k = 1; k <= 120; k++) { var u = k / 120; gx.lineTo(X(u * LL), Y(sg * pp.W(u) / 2)); }
+            gx.lineTo(Wc, Y(sg * W1 / 2)); gx.stroke();
+          });
+          gx.setLineDash([]);
+        };
+        edge(G.p, L, [], BD.GEO.edge);
+        edge(alt.p, alt.L, [5, 4], BD.C.green);
+        // local TE0 |H|^2 profiles at five positions, drawn sideways as in Figure 8.3a
+        var amp = Math.min(0.07 * (X(L) - X(0)), 46);
+        for (var n = 0; n <= 4; n++) {
+          var zp = L * n / 4, Wp = G.p.W(n / 4), Mp = modeOf(Wp, ti(T0, Wp)), hh = Wp / 2 + 0.55, pk = hy(0, Mp);
+          gx.strokeStyle = 'rgba(255,255,255,.35)'; gx.setLineDash([2, 3]); gx.beginPath(); gx.moveTo(X(zp), Y(hh)); gx.lineTo(X(zp), Y(-hh)); gx.stroke(); gx.setLineDash([]);
+          gx.strokeStyle = BD.C.gold; gx.lineWidth = 1.3; gx.beginPath();
+          for (var k = 0; k <= 80; k++) { var xx = -hh + 2 * hh * k / 80, v = Math.pow(hy(xx, Mp) / pk, 2); if (k) gx.lineTo(X(zp) + amp * v, Y(xx)); else gx.moveTo(X(zp) + amp * v, Y(xx)); }
+          gx.stroke(); gx.lineWidth = 1;
+        }
+        var lab = 'dashed: ' + alt.n + ', ' + alt.L.toFixed(1) + ' µm, same margin', lw = gx.measureText(lab).width;
+        BD.label(gx, lab, Math.max(8, Wc - 8 - lw), 28, BD.C.green);
+        BD.dim(gx, X(0), H - 12, X(L), H - 12, 'L = ' + L.toFixed(1) + ' µm', BD.C.gold, -6);
+        if (++nfr % 30 === 0) fst.textContent = stTxt + msTxt();
+      };
+      FV.render();
+    })();
+    // ---- Love's criterion against width, with this taper's d rho/dz over its widths
+    var dc = BD.setup(q('[data-c="c"]')), ws = [], al = [], tw = [], tr = [], tmax = 0;
+    for (var i = 0; i <= 250; i++) { var w = W0 + 2.5 * i / 250; ws.push(w); al.push(ti(TA, w)); }
+    for (i = 0; i <= 200; i++) { w = W0 + (W1 - W0) * i / 200; var d = 1 / (2 * L * G.p.du(w)); tw.push(w); tr.push(d); tmax = Math.max(tmax, d); }
+    var ymax = Math.max(0.32, 1.15 * tmax), yt = [[0, '0'], [0.1, '0.1'], [0.2, '0.2'], [0.3, '0.3']];
+    if (ymax > 0.6) yt = [[0, '0'], [0.25, '0.25'], [0.5, '0.5'], [0.75, '0.75'], [1, '1'], [1.25, '1.25'], [1.5, '1.5']];
+    var fc = BD.frame(dc, { x: [0.5, 3], y: [0, ymax], pad: { l: 36, b: 22 }, xt: [[0.5, '0.5'], [1, '1'], [1.5, '1.5'], [2, '2'], [2.5, '2.5'], [3, '3 µm']], yt: yt });
+    var gc = dc.g;
+    if (W1 < 2.999) { gc.fillStyle = 'rgba(5,16,32,.45)'; gc.fillRect(fc.X(W1), fc.p.t, fc.X(3) - fc.X(W1), dc.h - fc.p.t - fc.p.b); }
+    BD.vline(fc, WC, BD.C.dim, [2, 4]);
+    BD.line(fc, ws, al, BD.C.gold, 2);
+    BD.line(fc, tw, tr, BD.C.blue, 2);
+    BD.dot(fc, mg.W, 1 / (2 * L * G.p.du(mg.W)), BD.C.white, 4);
+    gc.textAlign = 'right'; gc.fillStyle = BD.C.gold; gc.fillText('allowed, ρ(β₀ − β₂)/2π', dc.w - fc.p.r - 4, fc.p.t + 12);
+    gc.fillStyle = BD.C.blue; gc.fillText('this taper', dc.w - fc.p.r - 4, fc.p.t + 25); gc.textAlign = 'left';
+    BD.label(gc, 'TE2 guided →', fc.X(WC) + 4, dc.h - fc.p.b - 6, BD.C.axis);
+    // ---- TE0 -> TE2 against length for the three profiles at this end width
+    var dt = BD.setup(q('[data-c="t"]')), ft = BD.frame(dt, { x: [0, 60], y: [1e-4, 0.3], ylog: true, pad: { l: 44, b: 22 },
+      xt: [[0, '0'], [10, '10'], [20, '20'], [30, '30'], [40, '40'], [50, '50'], [60, '60 µm']], yt: [[1e-4, '0.01 %'], [1e-3, '0.1 %'], [1e-2, '1 %'], [0.1, '10 %']] });
+    var key = W1.toFixed(3);
+    if (!SWEEP[key]) {   // the three curves depend only on the end width: compute once per W1 (coarser grid, checked against NW)
+      SWEEP = {}; SWEEP[key] = {};
+      ['lin', 'par', 'cm'].forEach(function (pr) {
+        var Gp = grid(pr, W1, NS), xs = [], ys = [];
+        for (var LL = 2; LL <= 60.001; LL += 0.5) { xs.push(LL); ys.push(couple(Gp, LL, false)); }
+        SWEEP[key][pr] = [xs, ys];
+      });
+    }
+    ['lin', 'par', 'cm'].forEach(function (pr) { if (pr !== prof) BD.line(ft, SWEEP[key][pr][0], SWEEP[key][pr][1], COL[pr], 1.1); });
+    BD.line(ft, SWEEP[key][prof][0], SWEEP[key][prof][1], COL[prof], 2);
+    var gt = dt.g, at3 = Math.abs(W1 - 3) < 0.005;
+    if (at3) ['lin', 'par', 'cm'].forEach(function (pr) {   // the eigenmode-expansion check (Python, the same 2D slab), 0.5 -> 3 um only
+      gt.strokeStyle = COL[pr]; gt.lineWidth = pr === prof ? 1.6 : 1;
+      EME[pr].forEach(function (e) { gt.beginPath(); gt.arc(ft.X(e[0]), ft.Y(e[1]), 3, 0, 7); gt.stroke(); });
+      gt.lineWidth = 1;
+    });
+    BD.dot(ft, L, Math.max(conv, 1e-4), BD.C.white, 4);
+    gt.textAlign = 'right';
+    [['lin', 'linear'], ['par', 'parabolic'], ['cm', 'constant margin']].forEach(function (e, n) { gt.fillStyle = COL[e[0]]; gt.fillText(e[1], dt.w - ft.p.r - 4, ft.p.t + 12 + 13 * n); });
+    if (at3) { gt.fillStyle = BD.C.axis; gt.fillText('circles: mode expansion', dt.w - ft.p.r - 4, ft.p.t + 51); }
+    gt.textAlign = 'left';
+    // ---- readouts and caption
+    q('[data-o="m"]').textContent = mg.M.toFixed(2);
+    q('[data-o="wh"]').textContent = prof === 'cm' ? 'all along' : 'W = ' + mg.W.toFixed(2) + ' µm, z = ' + mg.z.toFixed(1) + ' µm';
+    q('[data-o="ls"]').textContent = ln.lin.toFixed(1) + ' / ' + ln.cm.toFixed(1) + ' µm';
+    q('[data-o="cv"]').textContent = pct(conv);
+    BD.pill(q('[data-o="pill"]'), mg.M >= 1 ? 'criterion met' : 'criterion missed', mg.M >= 1 ? 'ok' : 'bad');
+    var c = 'Love’s criterion compares the rate at which the taper widens, dρ/dz, with ρ(β₀ − β₂)/2π, set by the beat between TE0 and TE2 (below the TE2 cut-off at ' + WC.toFixed(2) + ' µm, the radiation modes at the oxide index). The allowed rate peaks at 0.30 near 0.84 µm and falls for wider guides, where TE0 and TE2 approach each other. ';
+    if (prof === 'lin') c += 'A linear taper widens at one rate, so its margin is smallest at its wide end; the dashed constant-margin taper reaches the same margin in ' + ln.cm.toFixed(1) + ' µm. ';
+    else if (prof === 'par') c += 'A parabolic taper (W² rising linearly along z) widens fastest at its narrow end, so its margin is smallest at 500 nm. That is below the TE2 cut-off, where the criterion guards against radiation rather than TE2, so a parabolic taper can miss the criterion and still put less light into TE2 than a linear one. ';
+    else c += 'This profile widens at the allowed rate divided by one margin all along, so it is the shortest taper for that margin; the dashed linear taper needs ' + ln.lin.toFixed(1) + ' µm for the same margin. ';
+    c += (mg.M >= 1 ? 'With a worst-case margin of ' : 'With a worst-case margin of only ') + mg.M.toFixed(2) + ', the estimate puts ' + pct(conv) + ' of the power into TE2. ';
+    c += '<i>Effective-index method, as in Figure 8.3 (lateral slab: core 2.848, oxide sides, TM boundary conditions). The TE2 power is an estimate from two coupled local modes and leaves out radiation and TE4. For 3 µm tapers the circles check it with an eigenmode expansion of the same slab: within 25 % for linear tapers longer than 5 µm, but for the other two profiles the dips of the curves fall at different lengths, so at a given length the estimate can be off by up to a factor of 5.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

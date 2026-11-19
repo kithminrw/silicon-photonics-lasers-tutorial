@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 the Open-Photonics authors
 """Lab 10: laser rate equations in Python (Open-Photonics, Chapters 24 and 25).
 
 Run it from a terminal:

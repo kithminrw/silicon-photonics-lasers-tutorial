@@ -6,7 +6,8 @@
     <label class="bd-sl"><span>drive current I <b data-v="I"></b></span><input type="range" data-k="I" min="0" max="120" step="0.5" value="40" aria-label="current"></label>
     <label class="bd-sl"><span>cavity length L <b data-v="L"></b></span><input type="range" data-k="L" min="100" max="1500" step="10" value="400" aria-label="cavity length"></label>
     <label class="bd-sl"><span>front-facet reflectivity R<sub>1</sub> <b data-v="R"></b></span><input type="range" data-k="R" min="0.02" max="0.95" step="0.01" value="0.32" aria-label="reflectivity"></label>
-    <label class="bd-sl"><span>temperature T <b data-v="T"></b></span><input type="range" data-k="T" min="10" max="95" step="1" value="25" aria-label="temperature"></label>
+    <label class="bd-sl"><span>heat-sink temperature <b data-v="T"></b></span><input type="range" data-k="T" min="10" max="95" step="1" value="25" aria-label="heat-sink temperature"></label>
+    <label class="bd-sl"><span>thermal impedance Z<sub>th</sub> <b data-v="Z"></b></span><input type="range" data-k="Z" min="0" max="200" step="5" value="0" aria-label="thermal impedance"></label>
   </div>
   <div class="bd-scope short"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag" data-o="tag">cavity field (red +, blue −), side view</span></div>
   <div class="bd-status"><span data-o="fst"></span></div>
@@ -15,18 +16,18 @@
     <div class="bd-scope tall"><canvas data-c="tr" aria-hidden="true"></canvas><span class="bd-tag">switch-on: current stepped from 0 to I at t = 0</span></div>
   </div>
   <div class="bd-scope short"><canvas data-c="sp" aria-hidden="true"></canvas><span class="bd-tag">spectrum: longitudinal modes under the gain</span></div>
-  <div class="bd-read" aria-live="polite"><span>I<sub>th</sub> <b data-o="ith">–</b></span><span>slope <b data-o="se">–</b></span><span>η<sub>d</sub> <b data-o="ed">–</b></span><span>α<sub>m</sub> <b data-o="am">–</b></span><span>τ<sub>p</sub> <b data-o="tp">–</b></span><span>mode spacing <b data-o="dl">–</b></span><span>P at I <b data-o="p">–</b></span><span>f<sub>r</sub> <b data-o="fr">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
+  <div class="bd-read" aria-live="polite"><span>I<sub>th</sub> <b data-o="ith">–</b></span><span>slope <b data-o="se">–</b></span><span>η<sub>d</sub> <b data-o="ed">–</b></span><span>α<sub>m</sub> <b data-o="am">–</b></span><span>τ<sub>p</sub> <b data-o="tp">–</b></span><span>mode spacing <b data-o="dl">–</b></span><span>P at I <b data-o="p">–</b></span><span>f<sub>r</sub> <b data-o="fr">–</b></span><span data-h hidden>junction ΔT <b data-o="dt">–</b></span><span data-h hidden>heat IV − P<sub>out</sub> <b data-o="pd">–</b></span><span data-h hidden>I<sub>th</sub> when hot <b data-o="ithj">–</b></span><span data-h hidden>roll-over <b data-o="ro">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
   <p class="bd-caption" data-o="cap"></p>
   <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
     <li><b>Cross threshold.</b> Lower the current below 19.2 mA: the pill reads BELOW THRESHOLD and the cavity goes dark. At 50 mA the front facet gives 6.45 mW, the 6.5 mW of Worked Example 24.1.</li>
     <li><b>Coat the rear facet.</b> Switch to the HR-coated rear: the mirror loss falls, the threshold drops to 13.9 mA and the front facet now gets 92 % of the light. The standing wave is almost complete near the rear mirror.</li>
-    <li><b>Heat the laser.</b> At 85 °C the threshold climbs to 52.3 mA (T<sub>0</sub> = 60 K), so the 40 mA drive no longer lases. Raise the current to bring it back.</li>
+    <li><b>Heat it, or let it heat itself.</b> At 85 °C the threshold climbs to 52.3 mA (T<sub>0</sub> = 60 K). Back at 25 °C, set Z<sub>th</sub> = 80 K/W, a laser on the buried oxide: the current scale grows to 600 mA and the output peaks at 63.8 mW per facet at 420 mA, then rolls over. A 600 µm cavity on a 55 °C heat sink at 100 mA is Worked Example 27.1: 20.2 mW out at 1.50 V, 130 mW of heat, 10.4 K hotter, threshold +19 %.</li>
   </ol></div>
   <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>You raise the drive from 40 to 80 mA. What happens to the carrier density and the gain inside the cavity?</p>
     <div class="bd-check-opts" role="group" aria-label="Answers">
-      <button type="button" data-correct data-why="Above threshold the gain is clamped at the losses, Γg = αi + αm: any more gain would make the light grow without limit. Every extra electron becomes a photon, which is why the L–I line is straight.">They stay clamped at their threshold values</button>
+      <button type="button" data-correct data-why="Above threshold the gain is clamped at the losses, Γg = αi + αm: any more gain would make the light grow without limit. Every extra electron becomes a photon, which is why the L–I line is straight. With self-heating the gain stays clamped, but the carrier density it needs rises as the junction warms, so more of each extra milliampere is lost to recombination: that bends the L–I over.">They stay clamped at their threshold values</button>
       <button type="button" data-why="If the gain rose above the losses, the light would grow on every round trip without limit; the extra stimulated emission pulls the carrier density back down to N_th.">Both double, so the output quadruples</button>
-      <button type="button" data-why="Gain compression lowers the gain slightly at high power, but to first order the gain and carrier density stay pinned at threshold while the output grows linearly.">The gain falls, so the output saturates</button>
+      <button type="button" data-why="Gain compression lowers the gain slightly at high power, but to first order the gain and carrier density stay pinned at threshold while the output grows linearly. A real laser's output saturates mostly through heating: raise Z_th to see it.">The gain falls, so the output saturates</button>
     </div>
     <p class="bd-check-fb" aria-live="polite"></p>
   </div>
@@ -39,41 +40,95 @@
   var c = 3e10, ng = 3.6, vg = c / ng, hv = 1.2398 / 1.55 * 1.602e-19, qe = 1.602e-19;
   var w = 2e-4, dAct = 0.05e-4, Gam = 0.06, eta_i = 0.8, alpha_i = 15, g0 = 1500, Ntr0 = 2e18, T0 = 60, T0N = 143, eps = 2e-17, beta = 1e-4;
   var A = 1e8, B = 1e-10, Cc = 3e-29;
+  var V0 = 0.9, RS = 6, IMX = 600;   // self-heating: diode V = V0 + RS I (Figure 27.5: 1.5 V at 100 mA); current range (mA) when Z_th > 0
   var S = BD.bind(root, {
     I: { fmt: function (x) { return x.toFixed(1) + ' mA'; } }, L: { fmt: function (x) { return x.toFixed(0) + ' µm'; } },
-    R: { fmt: function (x) { return (100 * x).toFixed(0) + ' %'; } }, T: { fmt: function (x) { return x.toFixed(0) + ' °C'; } }
-  }, function () { draw(); });
+    R: { fmt: function (x) { return (100 * x).toFixed(0) + ' %'; } }, T: { fmt: function (x) { return x.toFixed(0) + ' °C'; } },
+    Z: { fmt: function (x) { return x > 0 ? x.toFixed(0) + ' K/W' : '0 (off)'; } }
+  }, function (k) { if (k === 'Z') range(); draw(); });
+  function range() {   // self-heating needs currents up to 600 mA to reach roll-over; without it the slider stops at 120 mA
+    var el = q('[data-k="I"]'), mx = S.Z > 0 ? IMX : 120;
+    if (+el.max !== mx) { el.max = mx; S.I = parseFloat(el.value); q('[data-v="I"]').textContent = S.I.toFixed(1) + ' mA'; }
+  }
+  range();
   BD.seg(root, 'hr', function (v) { hr = +v; draw(); });
   var FV = BD.field(q('[data-c="g"]'), { button: q('.bd-status'), hz: 1 }), nfr = 0;
-  function model() {
+  function model(T) {   // T: junction temperature (°C)
     var L = S.L * 1e-4, R1 = S.R, R2 = hr ? 0.9 : S.R, V = L * w * dAct;
-    var am = Math.log(1 / (R1 * R2)) / (2 * L), tp = 1 / (vg * (alpha_i + am)), Ntr = Ntr0 * Math.exp((S.T - 25) / T0N);   // T0N = 143 K gives the threshold itself T0 = 60 K (Ith ~ AN + BN² + CN³)
+    var am = Math.log(1 / (R1 * R2)) / (2 * L), tp = 1 / (vg * (alpha_i + am)), Ntr = Ntr0 * Math.exp((T - 25) / T0N);   // T0N = 143 K gives the threshold itself T0 = 60 K (Ith ~ AN + BN² + CN³)
     var gth = (alpha_i + am) / Gam, Nth = Ntr * Math.exp(gth / g0);
     var F1 = (1 - R1) / ((1 - R1) + Math.sqrt(R1 / R2) * (1 - R2));        // fraction of the output leaving the front facet
     return { L: L, V: V, am: am, tp: tp, Ntr: Ntr, gth: gth, Nth: Nth, F1: F1 };
   }
   function Rrec(N) { return A * N + B * N * N + Cc * N * N * N; }
   function gain(N, Sp, M) { return g0 * Math.log(Math.max(N, 1e10) / M.Ntr) / (1 + eps * Sp); }
-  function Pout(Sp, M) { return Sp * M.V / Gam * vg * M.am * hv * M.F1; }   // W from the front facet
-  function draw() {
-    var M = model(), Imax = 120e-3, Ith = qe * M.V / eta_i * Rrec(M.Nth);
-    // ---- steady-state L-I, parametric in N below its clamped value (gain compression neglected here)
-    var Is = [], Ps = [];
-    for (var k = 0; k <= 300; k++) {
-      var x = Math.pow(10, -0.2 - 7 * k / 300), N = M.Nth * (1 - x), gN = g0 * Math.log(N / M.Ntr);
-      var Sp = Gam * beta * B * N * N / (1 / M.tp - Gam * vg * gN);
-      var I = qe * M.V / eta_i * (Rrec(N) + vg * gN * Sp);
-      if (I > Imax * 1.05) break; Is.push(I * 1e3); Ps.push(Pout(Sp, M) * 1e3);
+  function Ptot(Sp, M) { return Sp * M.V / Gam * vg * M.am * hv; }   // W from both facets
+  function Pout(Sp, M) { return Ptot(Sp, M) * M.F1; }                 // W from the front facet
+  function thr(M) { return qe * M.V / eta_i * Rrec(M.Nth); }          // threshold current (A)
+  // ---- self-heating. Steady states without gain compression: at N = N_th(1 - x) the current and the output follow
+  // directly, so for a given current x is found by bisection; the junction temperature T = T_hs + Z_th (IV - P_out) by
+  // false position (the heat only grows with T, so there is one root between T_hs and T_hs + Z_th IV)
+  var sI = 0, sP = 0;
+  function ssx(x, M) {
+    var N = M.Nth * (1 - x), gN = g0 * Math.log(N / M.Ntr), Sp = Gam * beta * B * N * N / (1 / M.tp - Gam * vg * gN);
+    sI = qe * M.V / eta_i * (Rrec(N) + vg * gN * Sp); sP = Ptot(Sp, M);
+  }
+  function ssP(I, M) {   // output from both facets (W) at current I (A)
+    var lo = -9, hi = Math.log10(0.999); ssx(Math.pow(10, hi), M); if (sI >= I) return 0;
+    for (var k = 0; k < 40; k++) { var mid = (lo + hi) / 2; ssx(Math.pow(10, mid), M); if (sI > I) lo = mid; else hi = mid; }
+    ssx(Math.pow(10, (lo + hi) / 2), M); return sP;
+  }
+  function hot(I) {   // [junction temperature (°C), output from both facets (W)] at current I (A)
+    var IV = I * (V0 + RS * I), F = function (T) { return T - S.T - S.Z * (IV - ssP(I, model(T))); };
+    var a = S.T, b = S.T + S.Z * IV, fa = F(a), fb = F(b), side = 0, Tj = a;   // fa <= 0 <= fb
+    if (fa >= 0) return [a, ssP(I, model(a))];
+    for (var k = 0; k < 60 && b - a > 1e-7; k++) {   // Illinois false position: brackets the root like bisection, converges faster
+      Tj = (a * fb - b * fa) / (fb - fa); var fm = F(Tj);
+      if (fm > 0) { b = Tj; fb = fm; if (side === 1) fa /= 2; side = 1; } else { a = Tj; fa = fm; if (side === -1) fb /= 2; side = -1; }
+      if (Math.abs(fm) < 1e-9) break;
     }
-    var pI = Ps.length > 1 ? Ps[Ps.length - 1] : 1, pmax = Math.max(pI * 1.1, 1);
-    var dv = BD.setup(q('[data-c="li"]')), f = BD.frame(dv, { x: [0, 120], y: [0, pmax], pad: { l: 42, b: 22 },
-      xt: [[0, '0'], [40, '40'], [80, '80'], [120, '120 mA']], yt: [[0, '0'], [pmax / 2, (pmax / 2).toFixed(1)], [pmax, pmax.toFixed(1) + ' mW']] });
-    BD.line(f, Is, Ps, BD.C.gold, 2); BD.vline(f, Ith * 1e3, BD.C.dim, [3, 3], 'I_th');
-    var Pnow = 0; for (k = 1; k < Is.length; k++) if (Is[k] >= S.I) { var t0 = (S.I - Is[k - 1]) / (Is[k] - Is[k - 1]); Pnow = Ps[k - 1] + t0 * (Ps[k] - Ps[k - 1]); break; }
-    if (S.I >= Is[Is.length - 1]) Pnow = Ps[Ps.length - 1];
+    return [Tj, ssP(I, model(Tj))];
+  }
+  function draw() {
+    var Z = S.Z > 0, M0 = model(S.T), Ith0 = thr(M0), Imax = (Z ? IMX : 120) * 1e-3, Iop = S.I * 1e-3, k;
+    var op = Z ? hot(Iop) : [S.T, 0], Tj = op[0], M = Z ? model(Tj) : M0, IthJ = thr(M), on = Iop > IthJ;
+    var Ith = Ith0, Ion = Ith0;   // I_th at the heat-sink temperature; with self-heating the laser starts at Ion = I_th(T_hs + Z_th Ion V)
+    if (Z) { for (k = 0; k < 60; k++) { var i2 = thr(model(S.T + S.Z * Ion * (V0 + RS * Ion))); if (Math.abs(i2 - Ion) < 1e-9) { Ion = i2; break; } Ion = i2; }
+      if (!(Ion < Imax) || k === 60) Ion = NaN; }
+    // ---- steady-state L-I, parametric in N below its clamped value (gain compression neglected here)
+    var Is0 = [], Ps0 = [];
+    for (k = 0; k <= 300; k++) {
+      var x = Math.pow(10, -0.2 - 7 * k / 300), N = M0.Nth * (1 - x), gN = g0 * Math.log(N / M0.Ntr);
+      var Sp = Gam * beta * B * N * N / (1 / M0.tp - Gam * vg * gN);
+      var I = qe * M0.V / eta_i * (Rrec(N) + vg * gN * Sp);
+      if (I > Imax * 1.05) break; Is0.push(I * 1e3); Ps0.push(Pout(Sp, M0) * 1e3);
+    }
+    // with self-heating: the junction temperature solved at every 2.5 mA; the roll-over is the top of that curve
+    var Is = Is0, Ps = Ps0, Ir = NaN, Pr = NaN, Ptop = 0;
+    if (Z) {
+      Is = []; Ps = [];
+      for (k = 0; k <= 240; k++) { Is.push(2.5 * k); Ps.push(hot(2.5e-3 * k)[1] * M0.F1 * 1e3); }
+      var kb = 0; for (k = 1; k < Ps.length; k++) if (Ps[k] > Ps[kb]) kb = k;
+      Ptop = Ps[kb];
+      if (kb > 0 && kb < Ps.length - 1 && isFinite(Ion)) {
+        var pa = Ps[kb - 1], pc = Ps[kb + 1], dd = 0.5 * (pa - pc) / (pa - 2 * Ptop + pc);   // a parabola through the top three points
+        Ir = Is[kb] + 2.5 * dd; Pr = Ptop - 0.25 * (pa - pc) * dd;
+      }
+    }
+    var pI = Ps.length > 1 ? Ps[Ps.length - 1] : 1, pmax = Z ? Math.max(Ptop * 1.15, 1) : Math.max(pI * 1.1, 1), xm = Imax * 1e3;
+    var dv = BD.setup(q('[data-c="li"]')), f = BD.frame(dv, { x: [0, xm], y: [0, pmax], pad: { l: 42, b: 22 },
+      xt: Z ? [[0, '0'], [200, '200'], [400, '400'], [600, '600 mA']] : [[0, '0'], [40, '40'], [80, '80'], [120, '120 mA']],
+      yt: [[0, '0'], [pmax / 2, (pmax / 2).toFixed(1)], [pmax, pmax.toFixed(1) + ' mW']] });
+    if (Z) BD.line(f, Is0, Ps0, BD.C.dim, 1.2, [4, 3]);   // the same laser on an ideal heat sink
+    BD.line(f, Is, Ps, BD.C.gold, 2); if (isFinite(Ion)) BD.vline(f, Ion * 1e3, BD.C.dim, [3, 3], Z ? 'onset' : 'I_th');
+    if (isFinite(Ir)) { BD.vline(f, Ir, BD.C.red, [2, 3], 'roll-over', f.X(Ir) - f.X(Ion * 1e3) < 46 ? 12 : 0); BD.dot(f, Ir, Pr, BD.C.red, 3.5); }
+    var Pnow = 0;
+    if (Z) Pnow = op[1] * M0.F1 * 1e3;
+    else { for (k = 1; k < Is.length; k++) if (Is[k] >= S.I) { var t0 = (S.I - Is[k - 1]) / (Is[k] - Is[k - 1]); Pnow = Ps[k - 1] + t0 * (Ps[k] - Ps[k - 1]); break; }
+      if (S.I >= Is[Is.length - 1]) Pnow = Ps[Ps.length - 1]; }
     BD.dot(f, S.I, Pnow, BD.C.white, 4);
-    // ---- transient (RK4), current stepped from 0 to I
-    var Iop = S.I * 1e-3, dt = 0.5e-12, tEnd = 4e-9, N0 = 1e17, S0 = 1, ts = [], Pt = [], Nt = [], Pmx = 1e-6;
+    // ---- transient (RK4), current stepped from 0 to I; with self-heating at the settled junction temperature
+    var dt = 0.5e-12, tEnd = 4e-9, N0 = 1e17, S0 = 1, ts = [], Pt = [], Nt = [], Pmx = 1e-6;
     function deriv(N, Sp) {
       var gN = gain(N, Sp, M);
       return [eta_i * Iop / (qe * M.V) - Rrec(N) - vg * gN * Sp, Gam * vg * gN * Sp - Sp / M.tp + Gam * beta * B * N * N];
@@ -89,8 +144,8 @@
     BD.line(f2, ts, Nt.map(function (v) { return v * Pmx * 0.5; }), BD.C.teal, 1.2, [4, 3]);
     BD.line(f2, ts, Pt, BD.C.gold, 1.8);
     d2.g.fillStyle = BD.C.teal; d2.g.fillText('carrier density (N/N_th, half scale)', f2.p.l + 6, d2.h - f2.p.b - 6);
-    // ---- spectrum: mode amplitudes from a multimode steady state around the gain peak
-    var lamP = 1.55 + 0.0005 * (S.T - 25), dlam = 1.55 * 1.55 / (2 * ng * S.L), Dg = 0.03, d3 = BD.setup(q('[data-c="sp"]'));
+    // ---- spectrum: mode amplitudes from a multimode steady state around the gain peak (which moves 0.5 nm/K)
+    var lamP = 1.55 + 0.0005 * (Tj - 25), dlam = 1.55 * 1.55 / (2 * ng * S.L), Dg = 0.03, d3 = BD.setup(q('[data-c="sp"]'));
     var f3 = BD.frame(d3, { x: [lamP - 0.02, lamP + 0.02], y: [-50, 2], pad: { l: 42, b: 22 },
       xt: [[lamP - 0.02, (1000 * (lamP - 0.02)).toFixed(0)], [lamP, (1000 * lamP).toFixed(1) + ' nm'], [lamP + 0.02, (1000 * (lamP + 0.02)).toFixed(0)]], yt: [[-50, '−50'], [-25, '−25'], [0, '0 dB']] });
     var Nop = Math.min(N_, M.Nth), gp = g0 * Math.log(Nop / M.Ntr), base = Math.max(1 / M.tp - Gam * vg * gp, 1e6), lines = [];
@@ -111,7 +166,7 @@
     // Their sum is the cavity field; above threshold its shape no longer changes (the gain is clamped), only its size.
     (function () {
       var cv = q('[data-c="g"]'), W = cv.clientWidth, H = cv.clientHeight, x0 = 40, xmax = W - 120, sx = (xmax - x0) / 1500, Lp = S.L * sx, yc = H / 2 + 8;
-      var R1 = S.R, R2 = hr ? 0.9 : S.R, r1 = Math.sqrt(R1), lasing = S.I * 1e-3 > Ith;
+      var R1 = S.R, R2 = hr ? 0.9 : S.R, r1 = Math.sqrt(R1), lasing = on;
       var NPH = 3.6, cr = BD.crests(1.55 / NPH * sx, 6), md = Math.max(1, Math.round(2 * S.L / (cr.n * 1.55 / NPH))), bd = Math.PI * md / S.L;   // display β (rad/µm): a whole number of half-periods in L
       var ga = M.am / 2 * 1e-4, nv = 48, pts = [];   // amplitude gain per µm; vertices along the active layer
       for (var j = 0; j <= nv; j++) pts.push([x0 + Lp * j / nv, yc]);
@@ -157,14 +212,31 @@
     q('[data-o="tp"]').textContent = (M.tp * 1e12).toFixed(2) + ' ps';
     q('[data-o="dl"]').textContent = (dlam * 1e3).toFixed(2) + ' nm';
     q('[data-o="p"]').textContent = Pnow.toFixed(2) + ' mW';
-    var Sop = Pnow * 1e-3 / (M.V / Gam * vg * M.am * hv * M.F1), fr = S.I * 1e-3 > Ith ? Math.sqrt(vg * g0 / M.Nth * Sop / M.tp) / (2 * Math.PI) : NaN;
+    var Sop = Pnow * 1e-3 / (M.V / Gam * vg * M.am * hv * M.F1), fr = on ? Math.sqrt(vg * g0 / M.Nth * Sop / M.tp) / (2 * Math.PI) : NaN;
     q('[data-o="fr"]').textContent = isFinite(fr) ? (fr / 1e9).toFixed(1) + ' GHz' : 'below threshold';
-    BD.pill(q('[data-o="pill"]'), S.I * 1e-3 > Ith ? 'lasing' : 'below threshold', S.I * 1e-3 > Ith ? 'ok' : 'bad');
+    root.querySelectorAll('[data-h]').forEach(function (e) { e.hidden = !Z; });
+    var IV = Iop * (V0 + RS * Iop), Pboth = Z ? op[1] : 0, heat = IV - Pboth, dT = Tj - S.T, rise = 100 * (IthJ / Ith0 - 1);
+    if (Z) {
+      q('[data-o="dt"]').textContent = dT.toFixed(1) + ' K';
+      q('[data-o="pd"]').textContent = (heat * 1e3).toFixed(0) + ' mW';
+      q('[data-o="ithj"]').textContent = (IthJ * 1e3).toFixed(1) + ' mA (+' + rise.toFixed(0) + ' %)';
+      q('[data-o="ro"]').textContent = isFinite(Ir) ? Pr.toFixed(1) + ' mW at ' + Ir.toFixed(0) + ' mA' : isFinite(Ion) ? 'none below ' + IMX + ' mA' : 'never lases';
+    }
+    var past = Z && isFinite(Ir) && S.I > Ir;
+    BD.pill(q('[data-o="pill"]'), past ? 'rolled over' : on ? 'lasing' : 'below threshold', past ? 'warn' : on ? 'ok' : 'bad');
     var cap;
-    if (S.I * 1e-3 < Ith) cap = '<b>Below threshold</b>: the gain has not reached the losses, so the output is weak spontaneous emission spread over many modes. Raise the current past ' + (Ith * 1e3).toFixed(1) + ' mA.';
+    if (past) cap = '<b>Rolled over</b>: beyond ' + Ir.toFixed(0) + ' mA the heat raises the threshold faster than the current, so more current gives less light' + (on ? '. ' : ', and here the laser has stopped lasing altogether. ');
+    else if (!on) cap = '<b>Below threshold</b>: the gain has not reached the losses, so the output is weak spontaneous emission spread over many modes.' + (isFinite(Ion) ? ' Raise the current past ' + (Ion * 1e3).toFixed(1) + ' mA.' : ' With this much heating it never gets there.');
     else cap = 'Above threshold the carrier density clamps at N<sub>th</sub> and every extra electron becomes a photon, so the L–I curve turns into a straight line with slope η<sub>d</sub>hν/q. The switch-on shows a delay while the carriers build up, then relaxation oscillations at about ' + (fr / 1e9).toFixed(1) + ' GHz as photons and carriers trade energy. ';
-    cap += ' A shorter cavity or a less reflective facet raises the mirror loss: higher threshold, higher slope. Heating raises the transparency density, so the threshold climbs exponentially (T<sub>0</sub> = ' + T0 + ' K here: a factor of e per ' + T0 + ' K). ';
+    if (!Z) cap += ' A shorter cavity or a less reflective facet raises the mirror loss: higher threshold, higher slope. Heating raises the transparency density, so the threshold climbs exponentially (T<sub>0</sub> = ' + T0 + ' K here: a factor of e per ' + T0 + ' K). ';
+    else {
+      cap += ' <b>Self-heating</b>: of the ' + (IV * 1e3).toFixed(0) + ' mW that goes in at ' + (V0 + RS * Iop).toFixed(2) + ' V, ' + (Pboth * 1e3).toFixed(1) + ' mW leaves as light from both facets; the other ' + (heat * 1e3).toFixed(0) + ' mW flows out through Z<sub>th</sub> and warms the junction by ' + dT.toFixed(1) + ' K. At that temperature the threshold is ' + rise.toFixed(0) + ' % above the ' + (Ith * 1e3).toFixed(1) + ' mA it has at the heat sink (T<sub>0</sub> = ' + T0 + ' K), and the gain peak has moved ' + (0.5 * dT).toFixed(1) + ' nm. ';
+      if (isFinite(Ion)) cap += 'Lasing starts at ' + (Ion * 1e3).toFixed(1) + ' mA rather than at I<sub>th</sub>, because the current heats the junction even below threshold. ';
+      cap += isFinite(Ir) ? 'The front-facet output peaks at ' + Pr.toFixed(1) + ' mW at ' + Ir.toFixed(0) + ' mA and then rolls over. ' : isFinite(Ion) ? 'Up to ' + IMX + ' mA the output still rises. ' : '';
+      cap += 'The dashed L–I is the same laser on an ideal heat sink. ';
+    }
     if (isFinite(smsr)) cap += 'A Fabry–Pérot laser keeps several modes alive (side-mode suppression ≈ ' + smsr.toFixed(0) + ' dB here); Chapter 26 shows how gratings and rings pick one.';
+    if (Z) cap += ' <i>Self-heating model: steady state through one thermal impedance, with V = ' + V0 + ' V + ' + RS + ' Ω × I (the diode of Figure 27.5); the switch-on and the spectrum are drawn at the settled junction temperature, which a real chip reaches only after microseconds.</i>';
     q('[data-o="cap"]').innerHTML = cap;
   }
   BD.observe(root, draw);

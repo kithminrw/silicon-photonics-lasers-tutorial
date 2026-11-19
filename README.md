@@ -36,7 +36,7 @@ across the **Si, SiN, thin-film LiNbO₃ (TFLN), BaTiO₃ (BTO) and InP** platfo
 
 | Part | Chapters | State |
 |---|---|---|
-| Preface and course map | audience, reading paths, the whole outline on one page | written |
+| Preface and tutorial outline | audience, reading paths, the whole outline on one page | written |
 | I. Foundations | 1 Why integrated photonics · 2 Electromagnetic theory · 3 Gaussian beams and fibres · 4 Materials and platforms | **written** |
 | II. Waveguides | 5 Slab waveguide · 6 Channel waveguides · 7 Loss, dispersion, nonlinearity · 8 Bends, tapers, transitions | **written** |
 | III. Passive devices | 9 Couplers · 10 Y-branches and MMIs · 11 MZIs · 12 Rings · 13 Bragg gratings · 14 WDM and polarisation | **written** |
@@ -71,7 +71,7 @@ Then open <http://localhost:4000/silicon-photonics-lasers-tutorial/>. (An arm64 
 ## Repository layout
 
 ```
-index.md, preface.md, course-map.md   home page, preface, the whole outline on one page
+index.md, preface.md, outline.md      home page, preface, the whole outline on one page
 chapters/NN_name.md                   one page per chapter
 parts/part-N.md                       one page per part
 appendices/                           appendices A–E

@@ -93,6 +93,10 @@ The strip and the rib of the table are drawn to scale in [Figure 6.2](#fig-6-2),
   <figcaption><span class="capnum">Figure 6.3.</span> <strong>The effective-index method, step by step</strong>, for the rib of Table 6.1 (TE-like mode, 1550 nm). (a) The cross-section, to scale, is split into region I under the ridge and region II beside it. (b) Step 1: each region is solved as a vertical slab, giving \(n_\mathrm{I} = 2.848\) and \(n_\mathrm{II} = 2.103\). (c) Step 2: a lateral slab of width 500 nm with core index \(n_\mathrm{I}\) and cladding \(n_\mathrm{II}\) (dashed), solved with TM boundary conditions because the TE-like mode's electric field is normal to the sidewalls, gives \(n_\mathrm{eff} = 2.600\), against 2.568 from femwell. For the strip (\(n_\mathrm{II} = 1.444\)) the same steps give 2.491 against 2.446. Drawn by <code>figsrc/ch06_figs.py</code>.</figcaption>
 </figure>
 
+**Try it.** This is a full-vectorial finite-difference mode solver running in your browser. Start from the 500 × 220 nm strip and compare its effective and group indices with Table 6.1; then switch between TE-like and TM-like, show $$E_x$$, $$E_y$$ and $$E_z$$ separately, narrow the width until the first higher mode is cut off, and etch a rib.
+
+{% include demos/modesolver.html %}
+
 <div class="tbox tbox-example" markdown="1">
 <div class="tbox-title">Worked Example 6.1 · What the group index buys you</div>
 

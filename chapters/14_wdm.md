@@ -60,6 +60,10 @@ which fixes the trade between passband and crosstalk.
   <figcaption><span class="capnum">Figure 14.2.</span> <strong>A four-ring demultiplexer for the reference link.</strong> (a) Layout to scale: four add-drop rings of 7.15 µm radius (\(L = 44.9\) µm) on one bus, each with a heater and a drop waveguide to a 15 × 4 µm germanium photodiode; the coupling gaps are too narrow to see. Heaters, or radii stepped by about 25 nm, put each ring on its channel. (b) The four drop ports, cascaded along the bus, with symmetric couplers of \(\kappa^2 = 14.5\) % (FWHM 0.64 nm, \(Q_L \approx 2400\)) and 2 dB/cm. Each ring's next resonance falls one FSR, 12.8 nm, away, on an empty grid slot. Because the response is periodic, the first ring passes its neighbour λ\(_2\) and, through its next order, λ\(_4\) at −19 dB, a little more than the Lorentzian estimate of −20 dB. Drawn by <code>figsrc/ch14_figs.py</code>.</figcaption>
 </figure>
 
+**Try it.** The rings of Figure 14.2 on one bus, with their heaters. Lower κ² until the worst crosstalk meets −20 dB; switch the heaters off and warm the chip from 20 to 70 °C to watch the rings drift across their channels; then lock them again, to their own channels or to the nearest ones, and compare the heater power. Pick a channel to see its light leave the bus at its ring.
+
+{% include demos/demux.html %}
+
 The Lorentzian's slow roll-off is the weakness of single rings. **Second- and higher-order filters** (two or more coupled rings) give flat tops and much steeper skirts ([Figure 14.3](#fig-14-3)). **MZI lattices** ([Chapter 11]({% link chapters/11_mzi.md %})) do the same with cascaded interferometers: an interleaver splits odd and even channels, and a tree of them separates many.
 
 <figure id="fig-14-3">

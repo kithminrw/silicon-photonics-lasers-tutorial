@@ -70,9 +70,9 @@
       var cr = BD.crests(1.55 / NE[pf] * scl / 1000, 14), beta = 2 * Math.PI / cr.px;   // display phase per px of path; crests 14 px apart or more, so the arms' phase slip shows
       var fr = function (x, a, b) { return Math.max(0, Math.min(1, (x - a) / (b - a))); };
       function arm(sg) {   // sg = +1 upper, -1 lower: cosine S-bends and a straight part sampled every ~4 px
-        var pts = BD.sbend(x0, cy, xa, cy - sg * sep, 24), n = Math.max(2, Math.ceil((xb - xa) / 4));
+        var pts = BD.offsetPath([x0, cy], [xa, cy - sg * sep], 24), n = Math.max(2, Math.ceil((xb - xa) / 4));
         for (var jj = 1; jj <= n; jj++) pts.push([xa + (xb - xa) * jj / n, cy - sg * sep]);
-        return pts.concat(BD.sbend(xb, cy - sg * sep, x1, cy, 24).slice(1));
+        return pts.concat(BD.offsetPath([xb, cy - sg * sep], [x1, cy], 24).slice(1));
       }
       var up = arm(1), dn = arm(-1), sa = [0];
       for (var jj = 1; jj < up.length; jj++) sa.push(sa[jj - 1] + Math.hypot(up[jj][0] - up[jj - 1][0], up[jj][1] - up[jj - 1][1]));

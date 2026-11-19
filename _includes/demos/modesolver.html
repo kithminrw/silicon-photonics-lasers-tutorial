@@ -1,0 +1,514 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdModeSolver" role="group" aria-label="Interactive demo: full-vectorial finite-difference mode solver for strip and rib waveguides">
+  <div class="bd-head"><span>// try it · full-vector mode solver</span>
+    <span class="bd-seg" role="group" aria-label="Polarisation"><button type="button" data-pol="TE" aria-pressed="true">TE-like</button><button type="button" data-pol="TM" aria-pressed="false">TM-like</button></span></div>
+  <div class="bd-head" style="margin-top:-4px"><span>preset</span>
+    <span class="bd-seg" role="group" aria-label="Preset"><button type="button" data-pre="strip" aria-pressed="true">Si strip</button><button type="button" data-pre="rib" aria-pressed="false">Si rib</button><button type="button" data-pre="sin" aria-pressed="false">SiN</button></span>
+    <span class="bd-seg" role="group" aria-label="Top cladding"><button type="button" data-clad="ox" aria-pressed="true">oxide top</button><button type="button" data-clad="air" aria-pressed="false">air top</button></span></div>
+  <div class="bd-head" style="margin-top:-4px"><span>mode</span>
+    <span class="bd-seg" role="group" aria-label="Mode shown"><button type="button" data-mode="0" aria-pressed="true">fundamental</button><button type="button" data-mode="1" aria-pressed="false">first higher</button></span>
+    <span class="bd-seg" role="group" aria-label="Field shown"><button type="button" data-view="I" aria-pressed="true"><span class="nc">|E|²</span></button><button type="button" data-view="x" aria-pressed="false"><span class="nc">E<sub>x</sub></span></button><button type="button" data-view="y" aria-pressed="false"><span class="nc">E<sub>y</sub></span></button><button type="button" data-view="z" aria-pressed="false"><span class="nc">E<sub>z</sub></span></button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>width W <b data-v="w"></b></span><input type="range" data-k="w" min="0.2" max="1.6" step="0.005" value="0.5" aria-label="width"></label>
+    <label class="bd-sl"><span>core thickness t <b data-v="t"></b></span><input type="range" data-k="t" min="0.1" max="0.8" step="0.005" value="0.22" aria-label="thickness"></label>
+    <label class="bd-sl"><span>slab left after etch s <b data-v="s"></b></span><input type="range" data-k="s" min="0" max="0.6" step="0.005" value="0" aria-label="slab thickness"></label>
+    <label class="bd-sl"><span>wavelength λ <b data-v="lam"></b></span><input type="range" data-k="lam" min="1.26" max="1.65" step="0.005" value="1.55" aria-label="wavelength"></label>
+  </div>
+  <div class="bd-scope tall"><canvas data-c="f" aria-hidden="true"></canvas><span class="bd-tag" data-o="tag">|E|², cross-section to scale</span></div>
+  <div class="bd-status"><span data-o="st"></span></div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="c" aria-hidden="true"></canvas><span class="bd-tag" data-o="ctag">cuts through the core centre</span></div>
+    <div class="bd-scope tall"><canvas data-c="n" aria-hidden="true"></canvas><span class="bd-tag">effective index against width</span></div>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>n<sub>eff</sub> <b data-o="ne">–</b></span><span>n<sub>g</sub> <b data-o="ng">–</b></span><span>power in the <span data-o="matn">Si</span> <b data-o="g">–</b></span><span>TE fraction <b data-o="tf">–</b></span><span>mode area <b data-o="a">–</b></span><span data-o="otl">TE1 n<sub>eff</sub> <b data-o="on">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Check it against femwell.</b> The default 500 × 220 nm strip gives n<sub>eff</sub> = 2.4468 and n<sub>g</sub> = 4.181 (Table 6.1: 2.446 and 4.18); the effective-index method gave 2.492. Press E<sub>x</sub>: the field jumps up just outside the side walls, where it is normal to them. Press E<sub>z</sub>: the longitudinal field reaches 51 % of the peak.</li>
+    <li><b>Switch to TM-like.</b> n<sub>eff</sub> falls to 1.7731 and n<sub>g</sub> to 3.753 (Table 6.1: 1.771 and 3.74), and only 44 % of the power stays in the silicon: E<sub>y</sub> jumps by (n<sub>Si</sub>/n<sub>ox</sub>)² = 5.8 at the top and bottom faces, so much of the mode sits in the oxide above and below the core.</li>
+    <li><b>Find the single-mode width.</b> Back on TE-like, press first higher and narrow W: TE1 is still guided at 440 nm (n<sub>eff</sub> = 1.4462, just above the oxide's 1.444) and cut off at 430 nm, close to the 450 nm of Figure 6.1. Then press Si rib: n<sub>eff</sub> = 2.5684 (Table 6.1: 2.568), and the mode spreads into the slab.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>The TE-like mode of the strip has a TE fraction of 98.3 %, not 100 %. Where does the rest of its transverse field come from?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="At the corners the field cannot meet the boundary conditions of the side walls and of the top and bottom faces with a horizontal field alone, so a vertical field appears there, in four lobes of alternating sign: strong right at the corners, but only 1.7 % of the transverse field overall. Press the third field button. That coupling is what the semi-vectorial and effective-index methods leave out.">From the corners, where the side walls meet the top and bottom faces</button>
+      <button type="button" data-why="The oxide is isotropic here; the small vertical field of the TE-like mode is set by the shape of the cross-section and sits at the corners of the silicon. Press the third field button to see it.">From the birefringence of the oxide</button>
+      <button type="button" data-why="The TE fraction counts only the transverse fields. The longitudinal field is large too (about half the peak), but the missing 1.7 % is the vertical transverse field at the corners of the core.">From E<sub>z</sub>, the field along the waveguide</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdModeSolver'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); }, PI = Math.PI;
+  var pol = 'TE', order = 0, mat = 'si', clad = 'ox', view = 'I', quiet = false;
+  var um = function (x) { return (1000 * x).toFixed(0) + ' nm'; };
+  var S = BD.bind(root, { w: { fmt: um }, t: { fmt: um }, s: { fmt: function (x) { return x < 0.001 ? '0 (strip)' : um(x); } }, lam: { fmt: um } },
+    function (k) { if (k === 't' || k === 's') clampS(); if (!quiet) draw(); });
+  function setSl(k, v) { var el = q('[data-k="' + k + '"]'); el.value = v; quiet = true; el.dispatchEvent(new Event('input')); quiet = false; }
+  function clampS() { if (S.s > S.t - 0.01) setSl('s', Math.max(0, S.t - 0.01)); }
+  BD.seg(root, 'pol', function (v) { pol = v; draw(); });
+  BD.seg(root, 'mode', function (v) { order = +v; draw(); });
+  BD.seg(root, 'clad', function (v) { clad = v; draw(); });
+  BD.seg(root, 'view', function (v) { view = v; draw(); });
+  var PRE = { strip: ['si', 0.5, 0.22, 0], rib: ['si', 0.5, 0.22, 0.09], sin: ['sin', 1.2, 0.4, 0] };
+  BD.seg(root, 'pre', function (v) { var p = PRE[v]; mat = p[0]; setSl('w', p[1]); setSl('t', p[2]); setSl('s', p[3]); draw(); });
+
+  /* ---- materials (Sellmeier, Chapter 2): Si (Li 1980), SiO2 (Malitson 1965), Si3N4 (Luke 2015) */
+  function nsi(l) { var l1 = 1.1071; return Math.sqrt(11.6858 + 0.939816 / (l * l) + 0.00810461 * l1 * l1 / (l * l - l1 * l1)); }
+  function nox(l) { var l2 = l * l; return Math.sqrt(1 + 0.6961663 * l2 / (l2 - 0.0684043 * 0.0684043) + 0.4079426 * l2 / (l2 - 0.1162414 * 0.1162414) + 0.8974794 * l2 / (l2 - 9.896161 * 9.896161)); }
+  function nsin(l) { var l2 = l * l; return Math.sqrt(1 + 3.0249 * l2 / (l2 - 0.1353406 * 0.1353406) + 40314 * l2 / (l2 - 1239.842 * 1239.842)); }
+  function geo(W, t, s, lam) {
+    return { W: W, t: t, s: s, lam: lam, nc: mat === 'sin' ? nsin(lam) : nsi(lam), nb: nox(lam), nt: clad === 'air' ? 1 : nox(lam) };
+  }
+  /* asymmetric slab, mode m, by bisection on the transverse resonance (for the EIM estimates and the window size) */
+  function slab(n1, n2, n3, d, lam, tm, m) {
+    var k0 = 2 * PI / lam, lo = Math.max(n2, n3) + 1e-9, hi = n1 - 1e-9; if (!(d > 0) || hi <= lo) return NaN;
+    var F = function (ne) { var ka = k0 * Math.sqrt(Math.max(n1 * n1 - ne * ne, 1e-18)), g2 = k0 * Math.sqrt(Math.max(ne * ne - n2 * n2, 0)), g3 = k0 * Math.sqrt(Math.max(ne * ne - n3 * n3, 0));
+      return ka * d - Math.atan((tm ? g2 * n1 * n1 / (n2 * n2) : g2) / ka) - Math.atan((tm ? g3 * n1 * n1 / (n3 * n3) : g3) / ka); };
+    if (F(lo) <= m * PI) return NaN;
+    for (var it = 0, a = lo, b = hi; it < 60; it++) { var c = (a + b) / 2; if (F(c) > m * PI) a = c; else b = c; }
+    return (a + b) / 2;
+  }
+  function sideIndex(G, tm) { var n = G.s > 0.002 ? slab(G.nc, G.nb, G.nt, G.s, G.lam, tm, 0) : NaN; return isFinite(n) ? n : Math.max(G.nb, G.nt); }
+  function eim(G, tm) {   // effective-index method: vertical slabs, then a lateral slab with the other polarisation
+    var nI = slab(G.nc, G.nb, G.nt, G.t, G.lam, tm, 0), nII = sideIndex(G, tm);
+    return [slab(nI, nII, nII, G.W, G.lam, !tm, 0), slab(nI, nII, nII, G.W, G.lam, !tm, 1)];
+  }
+
+  /* ---- grid: cell faces on every interface, cells graded from h0 at the interfaces (ratio r, up to hc) inside the
+     core and growing outwards (ratio ro, up to hm) to a window of about 8 decay lengths */
+  function graded(a, b, h0, r, hc, ga, gb) {
+    var L = b - a, g = [], tot = 0, h = h0, sz = [], k;
+    while (h < hc) { var need = (ga ? h : 0) + (gb ? h : 0); if (tot + need > L) break; g.push(h); tot += need; h *= r; }
+    var rem = L - tot, nm = rem > 1e-9 ? Math.max(1, Math.ceil(rem / hc - 1e-9)) : 0;
+    if (ga) sz = g.slice();
+    for (k = 0; k < nm; k++) sz.push(rem / nm);
+    if (gb) for (k = g.length - 1; k >= 0; k--) sz.push(g[k]);
+    var sum = 0; sz.forEach(function (v) { sum += v; });
+    var out = [a], x = a; sz.forEach(function (v) { x += v * L / sum; out.push(x); }); out[out.length - 1] = b;
+    return out;
+  }
+  function outer(h0, r, hm, ext) { var o = [], x = 0, h = h0; while (x < ext - 1e-12) { h = Math.min(h * r, hm); x += h; o.push(x); } return o; }
+  var Q = { fine: { x: [0.006, 1.35, 0.035, 1.25, 0.35], y: [0.003, 1.2, 0.015, 1.15, 0.2], ext: 3 },
+            big: { x: [0.006, 1.35, 0.035, 1.3, 0.5], y: [0.003, 1.2, 0.015, 1.25, 0.35], ext: 4 },
+            coarse: { x: [0.012, 1.4, 0.06, 1.3, 0.5], y: [0.006, 1.3, 0.03, 1.25, 0.35], ext: 3 },
+            coarseBig: { x: [0.012, 1.4, 0.06, 1.3, 0.5], y: [0.006, 1.3, 0.03, 1.25, 0.35], ext: 4, big: true } };
+  Q.big.big = true;
+  function makeGrid(G, nWin, tm, P) {
+    var k0 = 2 * PI / G.lam, ncl = Math.max(G.nb, G.nt), ne = Math.max(nWin, ncl + 0.005), nII = sideIndex(G, tm);
+    var dec = function (n2) { return Math.min(8 / (k0 * Math.sqrt(Math.max(ne * ne - n2 * n2, 1e-6))), P.ext); };
+    var ex = dec(Math.max(nII, ncl)), eb = dec(G.nb), et = dec(G.nt), X = P.x, Y = P.y, hcx = Math.max(X[2], G.W / 28), hcy = Math.max(Y[2], G.t / 24);
+    var xl = graded(0, G.W / 2, X[0], X[1], hcx, false, true).concat(outer(X[0], X[3], X[4], ex).map(function (v) { return G.W / 2 + v; }));
+    var pts = [0].concat(G.s > 0.002 && G.s < G.t - 0.002 ? [G.s] : [], [G.t]), yl = outer(Y[0], Y[3], Y[4], eb).map(function (v) { return -v; }).reverse();
+    for (var k = 0; k + 1 < pts.length; k++) { var sg = graded(pts[k], pts[k + 1], Y[0], Y[1], hcy, true, true); yl = yl.concat(k ? sg.slice(1) : sg); }
+    yl = yl.concat(outer(Y[0], Y[3], Y[4], et).map(function (v) { return G.t + v; }));
+    return { xl: xl, yl: yl };
+  }
+
+  /* ---- the operator. Yee grid: lines x_i (x_0 = 0, the mirror plane), y_j; cells between them, one permittivity each.
+     E_x at (cell i, line j), E_y at (line i, row j), E_z at (line i, line j). With e^(-j beta z):
+       beta^2 E_t = k0^2 eps E_t + [Ax; Ay] Phi + [-By; Bx] Psi,
+       Phi = (Bx eps_x E_x + By eps_y E_y) / eps_z  (= j beta E_z),   Psi = Ax E_y - Ay E_x  (proportional to H_z).
+     Half domain: 'pec' (E_y = E_z = 0 on the plane: TE0, TM1, ...) or 'pmc' (H_y = H_z = 0: TM0, TE1, ...);
+     tangential E = 0 on the outer edges. Unknowns in blocks, one per row j: E_y of row j, then E_x of line j + 1. */
+  function makeOp(G, xl, yl, cls) {
+    var Nx = xl.length - 1, Ny = yl.length - 1, i, j, nc2 = G.nc * G.nc;
+    var xc = new Float64Array(Nx), dxc = new Float64Array(Nx), hx = new Float64Array(Nx), yc = new Float64Array(Ny), dyc = new Float64Array(Ny), hy = new Float64Array(Ny + 1);
+    for (i = 0; i < Nx; i++) { xc[i] = (xl[i] + xl[i + 1]) / 2; dxc[i] = xl[i + 1] - xl[i]; hx[i] = i ? xc[i] - xc[i - 1] : 2 * xc[0]; }
+    for (j = 0; j < Ny; j++) { yc[j] = (yl[j] + yl[j + 1]) / 2; dyc[j] = yl[j + 1] - yl[j]; if (j) hy[j] = yc[j] - yc[j - 1]; }
+    hy[0] = dyc[0]; hy[Ny] = dyc[Ny - 1];
+    var e = new Float64Array(Nx * Ny), core = new Uint8Array(Nx * Ny);
+    for (j = 0; j < Ny; j++) for (i = 0; i < Nx; i++) {
+      var y = yc[j], c = y > 0 && (y < G.s || (y < G.t && xc[i] < G.W / 2));
+      e[j * Nx + i] = c ? nc2 : y < 0 ? G.nb * G.nb : G.nt * G.nt; core[j * Nx + i] = c ? 1 : 0;
+    }
+    var ex = new Float64Array((Ny + 1) * Nx), ey = new Float64Array(Ny * (Nx + 1)), ez = new Float64Array((Ny + 1) * (Nx + 1));
+    for (j = 0; j <= Ny; j++) for (i = 0; i < Nx; i++) {
+      var ja = Math.max(j - 1, 0), jb = Math.min(j, Ny - 1), da = j ? dyc[j - 1] : 1, db = j < Ny ? dyc[j] : 1;
+      ex[j * Nx + i] = j === 0 ? e[i] : j === Ny ? e[(Ny - 1) * Nx + i] : (da * e[ja * Nx + i] + db * e[jb * Nx + i]) / (da + db);
+    }
+    for (j = 0; j < Ny; j++) for (i = 0; i <= Nx; i++) {
+      ey[j * (Nx + 1) + i] = i === 0 ? e[j * Nx] : i === Nx ? e[j * Nx + Nx - 1] : (dxc[i - 1] * e[j * Nx + i - 1] + dxc[i] * e[j * Nx + i]) / (dxc[i - 1] + dxc[i]);
+    }
+    for (j = 0; j <= Ny; j++) for (i = 0; i <= Nx; i++) {
+      ez[j * (Nx + 1) + i] = j === 0 ? ey[i] : j === Ny ? ey[(Ny - 1) * (Nx + 1) + i] : (dyc[j - 1] * ey[(j - 1) * (Nx + 1) + i] + dyc[j] * ey[j * (Nx + 1) + i]) / (dyc[j - 1] + dyc[j]);
+    }
+    var i0 = cls === 'pec' ? 1 : 0, nEyr = Nx - i0, blk = nEyr + Nx, n = Ny * nEyr + (Ny - 1) * Nx, pmc = !i0;
+    var Ex = new Float64Array((Ny + 1) * Nx), Ey = new Float64Array(Ny * (Nx + 1)), Phi = new Float64Array((Ny + 1) * (Nx + 1)), Psi = new Float64Array(Ny * Nx);
+    var N1 = Nx + 1, k2 = Math.pow(2 * PI / G.lam, 2);
+    function fields(v) {   // unpack v into E_x, E_y and form Phi and Psi
+      var i, j, b;
+      Ex.fill(0); Ey.fill(0); Phi.fill(0);
+      for (j = 0; j < Ny; j++) { b = j * blk; for (i = i0; i < Nx; i++) Ey[j * N1 + i] = v[b + i - i0]; if (j < Ny - 1) for (i = 0; i < Nx; i++) Ex[(j + 1) * Nx + i] = v[b + nEyr + i]; }
+      for (j = 1; j < Ny; j++) for (i = i0; i < Nx; i++) {
+        var bx = i ? (ex[j * Nx + i] * Ex[j * Nx + i] - ex[j * Nx + i - 1] * Ex[j * Nx + i - 1]) / hx[i] : 2 * ex[j * Nx] * Ex[j * Nx] / hx[0];
+        var by = (ey[j * N1 + i] * Ey[j * N1 + i] - ey[(j - 1) * N1 + i] * Ey[(j - 1) * N1 + i]) / hy[j];
+        Phi[j * N1 + i] = (bx + by) / ez[j * N1 + i];
+      }
+      for (j = 0; j < Ny; j++) for (i = 0; i < Nx; i++)
+        Psi[j * Nx + i] = (Ey[j * N1 + i + 1] - Ey[j * N1 + i]) / dxc[i] - (Ex[(j + 1) * Nx + i] - Ex[j * Nx + i]) / dyc[j];
+    }
+    function apply(v, out) {
+      fields(v);
+      var i, j, b;
+      for (j = 0; j < Ny; j++) {
+        b = j * blk;
+        for (i = i0; i < Nx; i++) {
+          var bp = i ? (Psi[j * Nx + i] - Psi[j * Nx + i - 1]) / hx[i] : 2 * Psi[j * Nx] / hx[0];
+          out[b + i - i0] = k2 * ey[j * N1 + i] * Ey[j * N1 + i] + (Phi[(j + 1) * N1 + i] - Phi[j * N1 + i]) / dyc[j] + bp;
+        }
+        if (j < Ny - 1) { var jl = j + 1;
+          for (i = 0; i < Nx; i++)
+            out[b + nEyr + i] = k2 * ex[jl * Nx + i] * Ex[jl * Nx + i] + (Phi[jl * N1 + i + 1] - Phi[jl * N1 + i]) / dxc[i] - (Psi[jl * Nx + i] - Psi[(jl - 1) * Nx + i]) / hy[jl];
+        }
+      }
+    }
+    function left(v, beta, out) {   // W (H_y, -H_x) from the discrete Maxwell equations: the exact left eigenvector
+      fields(v);
+      var i, j, b, k0 = Math.sqrt(k2);
+      for (j = 0; j < Ny; j++) {
+        b = j * blk;
+        for (i = i0; i < Nx; i++) { var hxv = (-beta * Ey[j * N1 + i] + (Phi[(j + 1) * N1 + i] - Phi[j * N1 + i]) / dyc[j] / beta) / k0;
+          out[b + i - i0] = -dyc[j] * (i ? hx[i] : xc[0]) * hxv; }
+        if (j < Ny - 1) { var jl = j + 1;
+          for (i = 0; i < Nx; i++) { var hyv = (beta * Ex[jl * Nx + i] - (Phi[jl * N1 + i + 1] - Phi[jl * N1 + i]) / dxc[i] / beta) / k0;
+            out[b + nEyr + i] = dxc[i] * hy[jl] * hyv; } }
+      }
+    }
+    function weights() {   // area of each unknown's dual cell, and the share of it inside the core material
+      var w = new Float64Array(n), f = new Float64Array(n), i, j, b;
+      for (j = 0; j < Ny; j++) {
+        b = j * blk;
+        for (i = i0; i < Nx; i++) { w[b + i - i0] = dyc[j] * (i ? hx[i] : xc[0]);
+          f[b + i - i0] = i ? (dxc[i - 1] * core[j * Nx + i - 1] + dxc[i] * core[j * Nx + i]) / (dxc[i - 1] + dxc[i]) : core[j * Nx]; }
+        if (j < Ny - 1) for (i = 0; i < Nx; i++) { w[b + nEyr + i] = dxc[i] * hy[j + 1];
+          f[b + nEyr + i] = (dyc[j] * core[j * Nx + i] + dyc[j + 1] * core[(j + 1) * Nx + i]) / (dyc[j] + dyc[j + 1]); }
+      }
+      return { w: w, f: f };
+    }
+    return { G: G, Nx: Nx, Ny: Ny, xl: xl, yl: yl, xc: xc, yc: yc, dxc: dxc, dyc: dyc, i0: i0, nEyr: nEyr, blk: blk, n: n, pmc: pmc, k0: Math.sqrt(k2),
+             apply: apply, left: left, fields: fields, weights: weights, Ex: Ex, Ey: Ey, Phi: Phi, N1: N1 };
+  }
+
+  /* ---- block-tridiagonal matrix, extracted from the operator by probing with 18 vectors (unknowns 3 apart in i and j) */
+  function extract(op) {
+    var Nx = op.Nx, Ny = op.Ny, i0 = op.i0, nEyr = op.nEyr, blk = op.blk, n = op.n, nb = Ny, D = [], L = [], U = [], m = [], j;
+    for (j = 0; j < nb; j++) { m.push(j < nb - 1 ? blk : nEyr); D.push(new Float64Array(m[j] * m[j])); L.push({ r: [], c: [], v: [] }); U.push({ r: [], c: [], v: [] }); }
+    var v = new Float64Array(n), w = new Float64Array(n);
+    var iEx = function (i, jl) { return (jl - 1) * blk + nEyr + i; }, iEy = function (i, jr) { return jr * blk + i - i0; };
+    var pick = function (lo, rr) { return lo + (((rr - lo) % 3) + 3) % 3; };
+    for (var c = 0; c < 2; c++) for (var ri = 0; ri < 3; ri++) for (var rj = 0; rj < 3; rj++) {
+      v.fill(0); var i, jj, r;
+      if (c === 0) { for (jj = 1; jj < Ny; jj++) if (jj % 3 === rj) for (i = ri; i < Nx; i += 3) v[iEx(i, jj)] = 1; }
+      else { for (jj = 0; jj < Ny; jj++) if (jj % 3 === rj) for (i = i0; i < Nx; i++) if (i % 3 === ri) v[iEy(i, jj)] = 1; }
+      op.apply(v, w);
+      for (r = 0; r < n; r++) {
+        var val = w[r]; if (val === 0) continue;
+        var rb = Math.floor(r / blk), p = r - rb * blk, ey = p < nEyr, ir = ey ? p + i0 : p - nEyr, jr = ey ? rb : rb + 1, a, bb;
+        if (!ey && c === 0) { a = pick(ir - 1, ri); bb = pick(jr - 1, rj); }
+        else if (!ey) { a = pick(ir, ri); bb = pick(jr - 1, rj); }
+        else if (c === 0) { a = pick(ir - 1, ri); bb = pick(jr, rj); }
+        else { a = pick(ir - 1, ri); bb = pick(jr - 1, rj); }
+        var col = c === 0 ? iEx(a, bb) : iEy(a, bb), cb = Math.floor(col / blk), pc = col - cb * blk;
+        if (cb === rb) D[rb][p * m[rb] + pc] += val;
+        else { var T = cb < rb ? L[rb] : U[rb]; T.r.push(p); T.c.push(pc); T.v.push(val); }
+      }
+    }
+    return { nb: nb, m: m, D: D, L: L, U: U, blk: blk, n: n };
+  }
+  function invert(A, m, piv) {   // in place, Gauss-Jordan with row pivoting
+    var i, k, c, p, big, t;
+    for (k = 0; k < m; k++) {
+      p = k; big = Math.abs(A[k * m + k]);
+      for (i = k + 1; i < m; i++) { t = Math.abs(A[i * m + k]); if (t > big) { big = t; p = i; } }
+      piv[k] = p;
+      if (p !== k) for (c = 0; c < m; c++) { t = A[k * m + c]; A[k * m + c] = A[p * m + c]; A[p * m + c] = t; }
+      var d = 1 / A[k * m + k], rk = k * m; A[rk + k] = 1;
+      for (c = 0; c < m; c++) A[rk + c] *= d;
+      for (i = 0; i < m; i++) { if (i === k) continue; var ri = i * m, f = A[ri + k]; if (f === 0) continue; A[ri + k] = 0; for (c = 0; c < m; c++) A[ri + c] -= f * A[rk + c]; }
+    }
+    for (k = m - 1; k >= 0; k--) if (piv[k] !== k) for (i = 0; i < m; i++) { t = A[i * m + k]; A[i * m + k] = A[i * m + piv[k]]; A[i * m + piv[k]] = t; }
+  }
+  function factor(B, sigma) {   // block LU of (P - sigma): S_j = D_j - sigma - L_j X_(j-1), X_j = S_j^-1 U_j
+    var Si = [], X = [], piv = new Int32Array(B.blk), j, k, t;
+    for (j = 0; j < B.nb; j++) {
+      var m = B.m[j], A = new Float64Array(B.D[j]);
+      for (k = 0; k < m; k++) A[k * m + k] -= sigma;
+      if (j) { var Lj = B.L[j], Xp = X[j - 1]; for (t = 0; t < Lj.r.length; t++) { var ra = Lj.r[t] * m, ca = Lj.c[t] * m, lv = Lj.v[t]; for (k = 0; k < m; k++) A[ra + k] -= lv * Xp[ca + k]; } }
+      invert(A, m, piv); Si.push(A);
+      if (j < B.nb - 1) { var mn = B.m[j + 1], Xj = new Float64Array(m * mn), Uj = B.U[j];
+        for (t = 0; t < Uj.r.length; t++) { var ru = Uj.r[t], cu = Uj.c[t], uv = Uj.v[t]; for (k = 0; k < m; k++) Xj[k * mn + cu] += A[k * m + ru] * uv; }
+        X.push(Xj); }
+    }
+    return { B: B, Si: Si, X: X, sigma: sigma, tmp: new Float64Array(B.blk) };
+  }
+  function bsolve(F, b, x) {
+    var B = F.B, blk = B.blk, tmp = F.tmp, j, k, r, t, s;
+    for (j = 0; j < B.nb; j++) {
+      var m = B.m[j], off = j * blk, Sj = F.Si[j];
+      for (k = 0; k < m; k++) tmp[k] = b[off + k];
+      if (j) { var Lj = B.L[j], op = off - blk; for (t = 0; t < Lj.r.length; t++) tmp[Lj.r[t]] -= Lj.v[t] * x[op + Lj.c[t]]; }
+      for (r = 0; r < m; r++) { s = 0; var rr = r * m; for (k = 0; k < m; k++) s += Sj[rr + k] * tmp[k]; x[off + r] = s; }
+    }
+    for (j = B.nb - 2; j >= 0; j--) {
+      var mj = B.m[j], mn = B.m[j + 1], o = j * blk, on = o + blk, Xj = F.X[j];
+      for (r = 0; r < mj; r++) { s = 0; var rx = r * mn; for (k = 0; k < mn; k++) s += Xj[rx + k] * x[on + k]; x[o + r] -= s; }
+    }
+  }
+  function dot(a, b) { var s = 0; for (var k = 0; k < a.length; k++) s += a[k] * b[k]; return s; }
+  function deflate(v, defl) { defl.forEach(function (d) { var c = dot(d.y, v) / d.yx; for (var k = 0; k < v.length; k++) v[k] -= c * d.x[k]; }); }
+  function iterate(F, v0, defl, maxit) {   // shift-invert inverse iteration, deflating the modes already found
+    var n = v0.length, v = new Float64Array(v0), w = new Float64Array(n), lam = NaN, it, k;
+    var nv = Math.sqrt(dot(v, v)); for (k = 0; k < n; k++) v[k] /= nv;
+    for (it = 0; it < maxit; it++) {
+      deflate(v, defl); bsolve(F, v, w); deflate(w, defl);
+      var ln = F.sigma + dot(v, v) / dot(v, w), nw = Math.sqrt(dot(w, w)), big = 0, sg = 1, dv = 0;
+      for (k = 0; k < n; k++) { w[k] /= nw; if (Math.abs(w[k]) > big) { big = Math.abs(w[k]); sg = w[k] < 0 ? -1 : 1; } }
+      for (k = 0; k < n; k++) { w[k] *= sg; dv += (w[k] - v[k]) * (w[k] - v[k]); v[k] = w[k]; }
+      if (it && Math.abs(ln - lam) < 1e-9 * Math.abs(ln) && dv < 1e-10) return { lam: ln, v: v, conv: true };
+      lam = ln;
+    }
+    return { lam: lam, v: v, conv: false };
+  }
+  function teFrac(op, v, W) { var a = 0, b = 0; for (var j = 0; j < op.Ny; j++) { var o = j * op.blk, k;
+    for (k = 0; k < op.nEyr; k++) b += W.w[o + k] * v[o + k] * v[o + k];
+    if (j < op.Ny - 1) for (k = 0; k < op.Nx; k++) a += W.w[o + op.nEyr + k] * v[o + op.nEyr + k] * v[o + op.nEyr + k]; }
+    return a / (a + b); }
+
+  /* the highest mode of one polarisation in one symmetry class: descend through the class from a shift above its top,
+     deflating each mode found (refining slow ones by a new shift just above them) until one of that polarisation appears */
+  function findMode(G, cls, tm, P) {
+    var k0 = 2 * PI / G.lam, ncl = Math.max(G.nb, G.nt), eTE = eim(G, false), eTM = eim(G, true);
+    var teE = eTE[cls === 'pec' ? 0 : 1], tmE = eTM[cls === 'pmc' ? 0 : 1], want = tm ? tmE : teE;
+    var top = Math.max(isFinite(teE) ? teE : 0, isFinite(tmE) ? tmE : 0, ncl + 0.01) + 0.03;
+    var gr = makeGrid(G, P.big ? ncl : isFinite(want) ? want : ncl + 0.02, tm, P), op = makeOp(G, gr.xl, gr.yl, cls), B = extract(op), W = op.weights();
+    var F0 = factor(B, Math.pow(k0 * top, 2)), defl = [], v0 = new Float64Array(op.n).fill(1), guard = 0, nf = 1, found = [];
+    for (var k = 0; k < 7; k++) {
+      var r = iterate(F0, v0, defl, 30);
+      for (var ref = 0; ref < 3 && !r.conv; ref++) { r = iterate(factor(B, r.lam * (1 + 1e-5)), r.v, defl, 30); nf++; }
+      if (r.lam > F0.sigma * 1.0001 && guard++ < 2) { F0 = factor(B, r.lam * 1.03); nf++; defl = []; found = []; k = -1; continue; }
+      var ne = Math.sqrt(Math.max(r.lam, 0)) / k0, tf = teFrac(op, r.v, W);
+      found.push([ne, tf]);
+      if (!(ne > ncl)) break;
+      if ((tf > 0.5) !== tm) return { ok: true, ne: ne, lam: r.lam, v: r.v, tf: tf, op: op, W: W, cls: cls, nf: nf, found: found };
+      var y = new Float64Array(op.n); op.left(r.v, Math.sqrt(r.lam), y);
+      defl.push({ x: r.v, y: y, yx: dot(y, r.v) });
+    }
+    return { ok: false, op: op, nf: nf, found: found, cls: cls };
+  }
+  /* group index by first-order perturbation: d(beta^2)/dk0 = y (dP/dk0) x / (y x), with dP/dk0 from the operator at
+     wavelengths 0.1 % either side (so material dispersion is included) */
+  function analyse(M, G) {
+    var op = M.op, n = op.n, beta = Math.sqrt(M.lam), y = new Float64Array(n), a = new Float64Array(n), b = new Float64Array(n), k;
+    op.left(M.v, beta, y);
+    var Gp = geo(G.W, G.t, G.s, G.lam * 0.999), Gm = geo(G.W, G.t, G.s, G.lam * 1.001), opp = makeOp(Gp, op.xl, op.yl, M.cls), opm = makeOp(Gm, op.xl, op.yl, M.cls);
+    opp.apply(M.v, a); opm.apply(M.v, b);
+    var dk = opp.k0 - opm.k0, num = 0, yx = dot(y, M.v), pin = 0;
+    for (k = 0; k < n; k++) { num += y[k] * (a[k] - b[k]) / dk; pin += y[k] * M.v[k] * M.W.f[k]; }
+    M.ng = num / yx / (2 * beta); M.gam = pin / yx;
+    // fields at cell centres: E_x, E_y and E_z = Phi / (j beta), normalised to a peak |E| of 1
+    op.fields(M.v);
+    var Nx = op.Nx, Ny = op.Ny, N1 = op.N1, cx = new Float32Array(Nx * Ny), cy = new Float32Array(Nx * Ny), cz = new Float32Array(Nx * Ny), I = new Float32Array(Nx * Ny), mx = 0, i, j;
+    for (j = 0; j < Ny; j++) for (i = 0; i < Nx; i++) {
+      var p = j * Nx + i;
+      cx[p] = (op.Ex[j * Nx + i] + op.Ex[(j + 1) * Nx + i]) / 2;
+      cy[p] = (op.Ey[j * N1 + i] + op.Ey[j * N1 + i + 1]) / 2;
+      cz[p] = (op.Phi[j * N1 + i] + op.Phi[j * N1 + i + 1] + op.Phi[(j + 1) * N1 + i] + op.Phi[(j + 1) * N1 + i + 1]) / 4 / beta;
+      I[p] = cx[p] * cx[p] + cy[p] * cy[p] + cz[p] * cz[p]; if (I[p] > mx) mx = I[p];
+    }
+    var s1 = 0, s2 = 0, main = M.tf > 0.5 ? cx : cy, big = 0, sg = 1, pk = { x: 0, y: 0, z: 0 }, sc = 1 / Math.sqrt(mx);
+    for (p = 0; p < Nx * Ny; p++) { var ar = op.dxc[p % Nx] * op.dyc[Math.floor(p / Nx)]; I[p] /= mx; s1 += I[p] * ar; s2 += I[p] * I[p] * ar;
+      if (Math.abs(main[p]) > big) { big = Math.abs(main[p]); sg = main[p] < 0 ? -1 : 1; }
+      pk.x = Math.max(pk.x, Math.abs(cx[p]) * sc); pk.y = Math.max(pk.y, Math.abs(cy[p]) * sc); pk.z = Math.max(pk.z, Math.abs(cz[p]) * sc); }
+    for (p = 0; p < Nx * Ny; p++) { cx[p] *= sg * sc; cy[p] *= sg * sc; cz[p] *= sg * sc; }
+    M.F = { I: I, x: cx, y: cy, z: cz }; M.aeff = 2 * s1 * s1 / s2; M.pk = pk;
+    return M;
+  }
+  var cache = {}, ckeys = [];
+  function solveSet(W, t, s, lam, P, withField) {   // fundamental and first higher mode of the chosen polarisation
+    var key = [W, t, s, lam, mat, clad, pol, P === Q.coarse ? 'c' : 'f', order, withField].join('|');
+    if (cache[key]) return cache[key];
+    var t0 = performance.now(), G = geo(W, t, s, lam), tm = pol === 'TM';
+    var m0 = findMode(G, tm ? 'pmc' : 'pec', tm, P), m1 = findMode(G, tm ? 'pec' : 'pmc', tm, P === Q.fine ? Q.big : Q.coarseBig);
+    if (withField) { var M = order ? m1 : m0; if (M.ok) analyse(M, G); }
+    var res = { G: G, m: [m0, m1], ms: performance.now() - t0, eim: eim(G, tm) };
+    cache[key] = res; ckeys.push(key); if (ckeys.length > 40) delete cache[ckeys.shift()];
+    return res;
+  }
+
+  /* ---- drawing */
+  var heat = function (v) { var a = Math.pow(v, 0.55); return [Math.round(232 + 23 * v), Math.round(150 + 95 * v), Math.round(60 + 160 * v * v), Math.round(255 * Math.min(1, 1.05 * a))]; };
+  function sample(M, comp) {   // value of the shown quantity at (x, y), from the cell centres, mirrored about x = 0
+    var op = M.op, Nx = op.Nx, Ny = op.Ny, xc = op.xc, yc = op.yc, A = M.F[comp], nrm = comp === 'I' ? 1 : 1 / M.pk[comp];   // a field component on its own scale
+    var par = comp === 'I' ? 1 : (comp === 'x') === op.pmc ? -1 : 1;   // E_x is odd across the plane in the pmc class; E_y and E_z are odd in the pec class
+    function locate(arr, nn, u) { if (u < arr[0]) return -1; var lo = 0, hi = nn - 1; if (u >= arr[hi]) return nn - 1; while (hi - lo > 1) { var mid = (lo + hi) >> 1; if (arr[mid] <= u) lo = mid; else hi = mid; } return lo; }
+    return function (x, y) {
+      var ax = Math.abs(x), j = locate(yc, Ny, y), i = locate(xc, Nx, ax), v;
+      if (j < 0 || j >= Ny - 1 || i >= Nx - 1) return 0;
+      var ty = (y - yc[j]) / (yc[j + 1] - yc[j]);
+      var at = function (ii) { return A[j * Nx + ii] * (1 - ty) + A[(j + 1) * Nx + ii] * ty; };
+      if (i < 0) { var a0 = at(0), tx = (ax + xc[0]) / (2 * xc[0]); v = par * a0 * (1 - tx) + a0 * tx; }
+      else { var tx2 = (ax - xc[i]) / (xc[i + 1] - xc[i]); v = at(i) * (1 - tx2) + at(i + 1) * tx2; }
+      return (x < 0 ? par * v : v) * nrm;
+    };
+  }
+  var off = document.createElement('canvas'), offg = off.getContext('2d');
+  function contour(g, vals, nx, ny, step, x0, y0, lev) {   // marching squares on a sampled grid
+    g.beginPath();
+    for (var j = 0; j + 1 < ny; j++) for (var i = 0; i + 1 < nx; i++) {
+      var a = vals[j * nx + i], b = vals[j * nx + i + 1], c = vals[(j + 1) * nx + i + 1], d = vals[(j + 1) * nx + i];
+      var pts = [], ed = function (p, q2, xa, ya, xb, yb) { if ((p >= lev) !== (q2 >= lev)) { var f = (lev - p) / (q2 - p); pts.push([x0 + (xa + f * (xb - xa)) * step, y0 + (ya + f * (yb - ya)) * step]); } };
+      ed(a, b, i, j, i + 1, j); ed(b, c, i + 1, j, i + 1, j + 1); ed(d, c, i, j + 1, i + 1, j + 1); ed(a, d, i, j, i, j + 1);
+      if (pts.length >= 2) { g.moveTo(pts[0][0], pts[0][1]); g.lineTo(pts[1][0], pts[1][1]); }
+      if (pts.length === 4) { g.moveTo(pts[2][0], pts[2][1]); g.lineTo(pts[3][0], pts[3][1]); }
+    }
+    g.stroke();
+  }
+  function drawSection(R, M, name) {
+    var cv = q('[data-c="f"]'); cv.style.height = (cv.clientWidth < 480 ? 250 : 300) + 'px';
+    var d = BD.setup(cv), g = d.g, G = R.G, W = G.W, t = G.t, top = 22, bot = d.h - 8;
+    // extent of the mode (|E|^2 above 1e-3 of its peak), padded, then fitted to the panel to scale
+    var X = Math.max(W / 2 + 0.15, 0.45), Y0 = -0.3, Y1 = t + 0.3, ok = M && M.ok, k;
+    if (ok) { var op = M.op, I = M.F.I; for (k = 0; k < I.length; k++) if (I[k] > 1e-3) { var xx = op.xc[k % op.Nx], yy = op.yc[Math.floor(k / op.Nx)]; X = Math.max(X, xx * 1.08); Y0 = Math.min(Y0, yy - 0.04); Y1 = Math.max(Y1, yy + 0.04); } }
+    X = Math.min(X, 4); Y0 = Math.max(Y0, -4); Y1 = Math.min(Y1, t + 4);
+    var sc = Math.min((d.w - 16) / (2 * X), (bot - top) / (Y1 - Y0)), cx = d.w / 2, cyp = top + (bot - top) / 2 + ((Y1 + Y0) / 2) * sc;
+    var PX = function (x) { return cx + x * sc; }, PY = function (y) { return cyp - y * sc; };
+    g.fillStyle = BD.GEO.ox; g.fillRect(0, PY(0), d.w, d.h - PY(0));
+    if (clad === 'ox') g.fillRect(0, top - 22, d.w, PY(0) - top + 22);
+    g.fillStyle = mat === 'sin' ? 'rgba(224,176,96,.30)' : 'rgba(157,179,204,.30)';
+    g.fillRect(PX(-W / 2), PY(t), W * sc, t * sc); if (G.s > 0.002) { g.fillRect(0, PY(G.s), PX(-W / 2), G.s * sc); g.fillRect(PX(W / 2), PY(G.s), d.w - PX(W / 2), G.s * sc); }
+    if (ok) {
+      var step = 2, nx = Math.ceil(d.w / step), ny = Math.ceil(d.h / step), f = sample(M, view), fI = view === 'I' ? f : sample(M, 'I');
+      off.width = nx; off.height = ny; var img = offg.createImageData(nx, ny), px = img.data, vals = new Float32Array(nx * ny), i, j;
+      for (j = 0; j < ny; j++) for (i = 0; i < nx; i++) {
+        var x = (i * step + step / 2 - cx) / sc, y = (cyp - j * step - step / 2) / sc, v = f(x, y), p4 = 4 * (j * nx + i), c;
+        vals[j * nx + i] = view === 'I' ? v : fI(x, y);
+        if (view === 'I') c = heat(Math.max(0, Math.min(1, v)));
+        else { var a = Math.min(1, Math.abs(v)), al = Math.pow(a, 0.8), wt = Math.max(0, al - 0.7) / 0.3 * 0.55, base = v >= 0 ? [255, 84, 62] : [72, 160, 255];
+          c = [base[0] + (255 - base[0]) * wt, base[1] + (255 - base[1]) * wt, base[2] + (255 - base[2]) * wt, 255 * al]; }
+        px[p4] = c[0]; px[p4 + 1] = c[1]; px[p4 + 2] = c[2]; px[p4 + 3] = c[3];
+      }
+      offg.putImageData(img, 0, 0); g.imageSmoothingEnabled = true; g.drawImage(off, 0, 0, nx * step, ny * step);
+      g.lineWidth = 1; g.setLineDash([3, 3]);
+      g.strokeStyle = 'rgba(255,255,255,.75)'; contour(g, vals, nx, ny, step, step / 2, step / 2, 0.5);
+      g.strokeStyle = 'rgba(255,255,255,.45)'; contour(g, vals, nx, ny, step, step / 2, step / 2, Math.exp(-2));
+      g.setLineDash([]);
+    }
+    // outline of the core (and slab), dimensions, labels
+    g.strokeStyle = BD.GEO.edge; g.lineWidth = 1; g.beginPath();
+    if (G.s > 0.002) { g.moveTo(0, PY(G.s)); g.lineTo(PX(-W / 2), PY(G.s)); g.lineTo(PX(-W / 2), PY(t)); g.lineTo(PX(W / 2), PY(t)); g.lineTo(PX(W / 2), PY(G.s)); g.lineTo(d.w, PY(G.s)); }
+    else g.rect(PX(-W / 2), PY(t), W * sc, t * sc);
+    g.moveTo(0, PY(0)); g.lineTo(d.w, PY(0)); g.stroke();
+    var lab = ['W ' + um(W), 't ' + um(t)];
+    if (PX(W / 2) + 34 + g.measureText(lab[1]).width < d.w - 4) BD.dim(g, PX(W / 2) + 10, PY(t), PX(W / 2) + 10, PY(0), lab[1], BD.C.gold, -(8 + g.measureText(lab[1]).width / 2));
+    if (PY(t) - 14 > top + 4) BD.dim(g, PX(-W / 2), PY(t) - 8, PX(W / 2), PY(t) - 8, lab[0], BD.C.gold, -6);
+    var nm = mat === 'sin' ? 'Si₃N₄' : 'Si';
+    if (W * sc > 34 && t * sc > 14) BD.label(g, nm, PX(-W / 2) + 4, PY(t) + 12, BD.C.white);
+    BD.label(g, 'BOX (SiO₂)', 6, bot - 2, BD.C.axis);
+    BD.label(g, clad === 'air' ? 'air' : 'SiO₂ cladding', d.w - 6, top + 10, BD.C.axis, 'right');
+    BD.scalebar(g, d.w - 96, bot - 4, sc, 80);
+    if (!ok) BD.label(g, name + ' is not guided here', d.w / 2, Math.min(bot - 20, PY(t) - 26), BD.C.red, 'center');
+  }
+  function drawCuts(R, M) {
+    var d = BD.setup(q('[data-c="c"]')), G = R.G, signed = view !== 'I', ok = M && M.ok;
+    var X = Math.max(G.W / 2 + 0.3, 0.6), f = BD.frame(d, { x: [-X, X], y: signed ? [-1.08, 1.08] : [0, 1.08], pad: { l: 34, b: 22 },
+      xt: [[-X, '−' + X.toFixed(1)], [0, '0'], [X, X.toFixed(1) + ' µm']], yt: signed ? [[-1, '−1'], [0, '0'], [1, '1']] : [[0, '0'], [0.5, '0.5'], [1, '1']] });
+    [[G.W / 2, BD.C.gold], [G.t / 2, BD.C.blue]].forEach(function (a) { [-1, 1].forEach(function (sg) { BD.vline(f, sg * a[0], a[1] === BD.C.gold ? 'rgba(224,184,90,.45)' : 'rgba(127,184,240,.45)', [2, 3]); }); });
+    if (!ok) return;
+    var smp = sample(M, view), xs = [], h = [], v = [], k;
+    for (k = 0; k <= 300; k++) { var u = -X + 2 * X * k / 300; xs.push(u); h.push(smp(u, G.t / 2)); v.push(smp(0, G.t / 2 + u)); }
+    BD.line(f, xs, v, BD.C.blue, 1.6); BD.line(f, xs, h, BD.C.gold, 1.8);
+    var g = d.g; BD.label(g, 'along x, mid-height', f.p.l + 4, f.p.t + 10, BD.C.gold); BD.label(g, 'along y, centre', f.p.l + 4, f.p.t + 22, BD.C.blue);
+  }
+  // femwell's TE0, TE1 and TM0 of 220 nm strips in oxide, Figure 6.1 (figsrc/ch06_sweep.json)
+  var FW = { w: [0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0],
+    1.55: { TE: [[1.602, 1.8272, 2.0537, 2.2276, 2.3537, 2.4459, 2.5148, 2.5675, 2.6086, 2.6413, 2.6677, 2.6893, 2.7073, 2.7224, 2.7352, 2.7461],
+                 [0, 0, 0, 0, 1.4495, 1.493, 1.5717, 1.6901, 1.8277, 1.9591, 2.073, 2.1688, 2.2487, 2.3156, 2.372, 2.4198]],
+            TM: [[1.5419, 1.593, 1.644, 1.6914, 1.7337, 1.7707, 1.8026, 1.8301, 1.8537, 1.8741, 1.8916, 1.9068, 1.9201, 1.9317, 1.9419, 1.9509]] },
+    1.31: { TE: [[1.9487, 2.2354, 2.429, 2.5583, 2.6478, 2.712, 2.7596, 2.7959, 2.8241, 2.8466, 2.8647, 2.8795, 2.8918, 2.9022, 2.9109, 2.9184],
+                 [0, 0, 1.4623, 1.5212, 1.6371, 1.8139, 1.9996, 2.1577, 2.2843, 2.385, 2.4657, 2.5312, 2.5851, 2.6299, 2.6675, 2.6995]],
+            TM: [[1.8193, 1.9247, 2.0082, 2.0734, 2.1244, 2.1647, 2.1969, 2.2231, 2.2445, 2.2622, 2.277, 2.2896, 2.3002, 2.3094, 2.3173, 2.3242]] } };
+  var sweep = { key: '', pts: [], timer: 0 };
+  function sweepRange(W) { return [0.2, Math.min(1.6, Math.max(1.0, W * 1.25))]; }
+  function drawWidth(R, M) {
+    var d = BD.setup(q('[data-c="n"]')), G = R.G, tm = pol === 'TM', ncl = Math.max(G.nb, G.nt), rg = sweepRange(G.W);
+    var nI = slab(G.nc, G.nb, G.nt, G.t, G.lam, tm, 0), ytop = Math.min(G.nc, (isFinite(nI) ? nI : G.nc) + 0.08);
+    var f = BD.frame(d, { x: rg, y: [ncl - 0.03, ytop], pad: { l: 40, b: 22 },
+      xt: [[0.5, '0.5'], [1, '1'], [1.5, '1.5']].filter(function (a) { return a[0] <= rg[1]; }).concat([[rg[1], rg[1].toFixed(1) + ' µm']]).filter(function (a, i, arr) { return i === arr.length - 1 || rg[1] - a[0] > 0.15; }),
+      yt: [[ncl, ncl.toFixed(2)], [ytop, ytop.toFixed(2)]] });
+    BD.hline(f, ncl, BD.C.dim, [2, 4], clad === 'air' ? 'cut-off (oxide)' : 'cut-off (cladding)');
+    var COL = [BD.C.gold, BD.C.blue], xs = [], e0 = [], e1 = [], k;
+    for (k = 0; k <= 80; k++) { var w = rg[0] + (rg[1] - rg[0]) * k / 80, e = eim(geo(w, G.t, G.s, G.lam), tm); xs.push(w); e0.push(e[0]); e1.push(e[1]); }
+    BD.line(f, xs, e0, 'rgba(224,184,90,.55)', 1.2, [4, 3]); BD.line(f, xs, e1, 'rgba(127,184,240,.55)', 1.2, [4, 3]);
+    var fwl = Math.abs(G.lam - 1.55) < 0.003 ? 1.55 : Math.abs(G.lam - 1.31) < 0.003 ? 1.31 : 0;
+    var fwOn = mat === 'si' && clad === 'ox' && G.s < 0.002 && Math.abs(G.t - 0.22) < 0.003 && fwl;
+    if (fwOn) {
+      FW[fwl][pol].forEach(function (arr, m) { arr.forEach(function (nv, i) { if (!nv) return; var gg = d.g; gg.strokeStyle = BD.C.white; gg.lineWidth = 1; gg.beginPath(); gg.arc(f.X(FW.w[i]), f.Y(nv), 3, 0, 7); gg.stroke(); }); });
+    }
+    var key = sweepKey(G);
+    if (sweep.key === key && sweep.pts.length) {
+      [0, 1].forEach(function (m) { BD.line(f, sweep.pts.map(function (p) { return p[0]; }), sweep.pts.map(function (p) { return p[m + 1]; }), COL[m], m ? 1.6 : 2); });
+    }
+    BD.vline(f, G.W, BD.C.dim, [3, 3]);
+    [0, 1].forEach(function (m) { var mm = R.m[m]; if (mm.ok) BD.dot(f, G.W, mm.ne, m === order ? BD.C.white : COL[m], m === order ? 4 : 3); });
+    var gq = d.g, nm = pol + '0', n1 = pol + '1';
+    BD.label(gq, nm, f.p.l + 6, f.p.t + 10, BD.C.gold); BD.label(gq, n1, f.p.l + 6 + gq.measureText(nm + '  ').width, f.p.t + 10, BD.C.blue);
+    BD.label(gq, fwOn ? 'dashed: EIM · circles: femwell' : 'dashed: EIM', f.p.l + 6, f.p.t + 22, BD.C.dim);
+  }
+  function sweepKey(G) { return [G.t, G.s, G.lam, mat, clad, pol, sweepRange(G.W).join(',')].join('|'); }
+  function runSweep(G) {   // the curves of the width panel, solved on a coarser grid a width at a time after each change
+    var key = sweepKey(G); if (sweep.key === key && sweep.done) return;
+    if (sweep.key !== key) { sweep.key = key; sweep.pts = []; sweep.done = false; }
+    clearTimeout(sweep.timer);
+    var rg = sweepRange(G.W), nW = 15;
+    var stepFn = function () {
+      if (sweep.key !== key) return;
+      var k = sweep.pts.length; if (k > nW) { sweep.done = true; return; }
+      var w = rg[0] + (rg[1] - rg[0]) * k / nW, r = solveSet(w, G.t, G.s, G.lam, Q.coarse, false);
+      sweep.pts.push([w, r.m[0].ok ? r.m[0].ne : NaN, r.m[1].ok ? r.m[1].ne : NaN]);
+      if (sweep.pts.length > nW) sweep.done = true; else sweep.timer = setTimeout(stepFn, 0);
+      if (sweep.done || k % 4 === 3) drawWidth(last.R, last.M);
+    };
+    sweep.timer = setTimeout(stepFn, 120);
+  }
+  var last = {};
+  function draw() {
+    var R = solveSet(S.w, S.t, S.s, S.lam, Q.fine, true), M = R.m[order], other = R.m[1 - order], G = R.G, tm = pol === 'TM';
+    var name = pol + order, oname = pol + (1 - order);
+    last = { R: R, M: M };
+    drawSection(R, M, name); drawCuts(R, M); drawWidth(R, M); runSweep(G);
+    var op = M.op;
+    q('[data-o="tag"]').textContent = view === 'I' ? '|E|² of ' + name + ', to scale · 50 %, 1/e²' : 'E' + view + ' of ' + name + ' (red +, blue −), own scale';
+    q('[data-o="ctag"]').textContent = (view === 'I' ? '|E|²' : 'E' + view + ', own scale,') + ' along cuts through the centre';
+    q('[data-o="st"]').textContent = 'full-vector FD on ' + 2 * op.Nx + ' × ' + op.Ny + ' cells (half solved, mirrored) · ' + R.ms.toFixed(0) + ' ms for both modes';
+    q('[data-o="matn"]').textContent = mat === 'sin' ? 'SiN' : 'Si';
+    q('[data-o="ne"]').textContent = M.ok ? M.ne.toFixed(4) : 'cut off';
+    q('[data-o="ng"]').textContent = M.ok ? M.ng.toFixed(3) : '–';
+    q('[data-o="g"]').textContent = M.ok ? (100 * M.gam).toFixed(0) + ' %' : '–';
+    q('[data-o="tf"]').textContent = M.ok ? (100 * M.tf).toFixed(1) + ' %' : '–';
+    q('[data-o="a"]').textContent = M.ok ? M.aeff.toFixed(3) + ' µm²' : '–';
+    q('[data-o="otl"]').firstChild.textContent = oname + ' n';
+    q('[data-o="on"]').textContent = other.ok ? other.ne.toFixed(4) : 'cut off';
+    var multi = R.m[1].ok;
+    BD.pill(q('[data-o="pill"]'), !M.ok ? 'cut off' : multi ? 'multimode' : 'single-mode', !M.ok ? 'bad' : multi ? 'warn' : 'ok');
+    var e0 = R.eim[order], c = '';
+    c += 'A <b>full-vectorial finite-difference</b> solver running in your browser: E<sub>x</sub> and E<sub>y</sub> on a Yee grid whose cells shrink to 3–6 nm at every interface, solved for the mode nearest a shift by inverse iteration. ';
+    c += 'Against femwell (Table 6.1) its n<sub>eff</sub> is within 0.05 % for TE-like modes and 0.15 % for TM-like ones, and n<sub>g</sub> (which includes the dispersion of the materials) within 0.4 %. ';
+    if (M.ok) {
+      if (isFinite(e0)) c += 'The effective-index method gives ' + e0.toFixed(3) + ' for ' + name + ' (' + (e0 > M.ne ? '+' : '−') + Math.abs(100 * (e0 / M.ne - 1)).toFixed(1) + ' %). ';
+      var pct = function (k) { return (100 * M.pk[k]).toFixed(0) + ' % of the peak |E|'; };
+      if (view !== 'I') c += 'Each component is drawn on its own scale; the peak of E<sub>' + view + '</sub> is ' + pct(view) + '. ';
+      if (view === 'x' && !tm) c += 'E<sub>x</sub> is normal to the side walls, so it jumps up by (n<sub>core</sub>/n<sub>clad</sub>)² just outside them. ';
+      if (view === 'y') c += tm ? 'E<sub>y</sub> is normal to the top and bottom faces and jumps by (n<sub>core</sub>/n<sub>clad</sub>)² across them. ' : 'The small E<sub>y</sub> of a TE-like mode sits at the corners, four lobes of alternating sign: the coupling that semi-vectorial and effective-index models leave out. ';
+      if (view === 'z') c += 'E<sub>z</sub> is 90° out of phase with the transverse field, and so large because a high-contrast mode is far from transverse. ';
+      if (tm && view !== 'y') c += 'Only ' + (100 * M.gam).toFixed(0) + ' % of the power is in the core: the TM-like mode lies largely in the cladding above and below it. ';
+      if (G.s > 0.002) c += 'The rib\'s slab lowers the lateral contrast, so the mode spreads sideways into it. ';
+      var weak = multi && R.m[1].ne - Math.max(G.nb, G.nt) < 0.06;
+      if (order === 0) c += multi ? '<b>' + oname + ' is guided too</b> (n<sub>eff</sub> = ' + R.m[1].ne.toFixed(3) + '), so this guide is multimode for ' + pol + '-like light' + (weak ? ', though only just: ' + oname + ' sits barely above the cladding index and the first bend strips it (Section 6.5).' : '.') : oname + ' is cut off: the guide is single-mode for ' + pol + '-like light.';
+      else c += 'The first higher mode is odd: its main field changes sign at the centre line (press E' + (tm ? '<sub>y</sub>' : '<sub>x</sub>') + ').';
+    } else c += '<b>' + name + ' is not guided</b>: its index would fall below the cladding' + (order ? '; widen the guide or shorten the wavelength.' : '.');
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

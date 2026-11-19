@@ -194,7 +194,7 @@ Eight devices, sixteen couplers in four columns. The silicon spans $$x$$ = 12.5 
 
 <figure id="fig-l7-1">
   <img src="{{ '/assets/figs/lab07_expected.png' | relative_url }}" style="width:760px" alt="The layout drawn by the lab script: a 605 by 410 micrometre floorplan with four columns of grating couplers, a loopback, three rings, an MZI and three spirals, with red dots at the labelled input couplers; a zoom on the MZI; and a zoom on a ring's 200 nm coupling gap">
-  <figcaption><span class="capnum">Figure L7.1.</span> <strong>What the script draws.</strong> (a) The chip in its design area: grating couplers (grey) on a 127 µm pitch, the loopback, the rings (blue), the MZI (purple) and the spirals of the cutback set (green); the red dots are the opt_in labels on the input couplers. (b) The MZI: two Y-branches, a 50 µm arm and a 150 µm arm with a 56.7 µm dip. (c) The coupler of the 200 nm ring, to scale.</figcaption>
+  <figcaption><span class="capnum">Figure L7.1.</span> <strong>What the script draws.</strong> (a) The chip in its design area: grating couplers (grey) on a 127 µm pitch, the loopback, the rings (blue), the MZI (purple) and the spirals of the cutback set (green); the red dots are the opt_in labels on the input couplers. (b) The MZI: two Y-branches, a 50 µm arm and a 150 µm arm with a 56.7 µm dip. (c) The coupler of the 200 nm ring, to scale. PDK cells from the SiEPIC EBeam PDK through ubcpdk (both MIT licence).</figcaption>
 </figure>
 
 ## <span class="secnum">L7.7</span>The same layout in KLayout

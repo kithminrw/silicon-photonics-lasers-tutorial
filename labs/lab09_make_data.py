@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 the Open-Photonics authors
 """Lab 9: make the simulated openEBL-style measurement files (Open-Photonics, Chapters 31 and 32).
 
 The files imitate the sweep files an openEBL chip returns (Chapter 32, Section 32.1), with the imperfections

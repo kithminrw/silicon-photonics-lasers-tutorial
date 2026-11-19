@@ -148,7 +148,7 @@
     // ---- readouts
     q('[data-o="R"]').textContent = (100 * R).toFixed(1) + ' %';
     q('[data-o="T"]').textContent = (100 * (1 - R)).toFixed(1) + ' %';
-    q('[data-o="tc"]').textContent = isFinite(tc) ? tc.toFixed(1) + '°' : 'none (n₁ ≤ n₂)';
+    q('[data-o="tc"]').textContent = isFinite(tc) ? tc.toFixed(1) + '°' : 'no TIR, as n₁ ≤ n₂';
     q('[data-o="tb"]').textContent = tb.toFixed(1) + '°';
     var dpo = q('[data-o="dp"]');
     if (tir) { var kk = 2 * Math.PI / 1550 * Math.sqrt(n1 * n1 * Math.sin(a) * Math.sin(a) - n2 * n2); dpo.textContent = (1 / kk).toFixed(0) + ' nm (field)'; }

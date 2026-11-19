@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 the Open-Photonics authors
 """Lab 3: directional coupler and MMI design in Python (Open-Photonics, Chapters 9 and 10).
 
 Run it from a terminal:

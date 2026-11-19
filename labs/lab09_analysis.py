@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 the Open-Photonics authors
 """Lab 9: analyse measured openEBL data (Open-Photonics, Chapter 32), here simulated files that imitate it.
 
 Run it from a terminal, with the data files in a folder data/ beside this script:

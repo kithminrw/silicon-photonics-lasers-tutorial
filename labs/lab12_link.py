@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2026 the Open-Photonics authors
 """Lab 12: close the reference link budget (Open-Photonics, Chapters 1, 2, 14, 21 and 33).
 
 Run it from a terminal:
