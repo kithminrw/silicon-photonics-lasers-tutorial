@@ -31,7 +31,7 @@ How do two rings select one lasing mode over a 40 nm range?
 
 ## <span class="secnum">26.1</span>Why single-frequency
 
-A Fabry–Pérot laser spreads its power over several modes a nanometre apart ([Chapter 24]({% link chapters/24_fp.md %})). That is a problem in three ways. Fibre dispersion delays each mode differently and smears the pulses. WDM needs each channel in its own slot ([Chapter 14]({% link chapters/14_wdm.md %})). Coherent detection and FMCW sensing need one stable frequency to beat against. A **single-frequency laser** adds a wavelength-selective element that gives one mode clearly more net gain than all the others. Its quality is measured by the **side-mode suppression ratio** (SMSR), the power in the lasing mode over the strongest other mode: 35 dB or more for telecom.
+A Fabry–Pérot laser spreads its power over several modes a nanometre apart ([Chapter 24]({% link chapters/24_fp.md %})). That is a problem in three ways. Fibre dispersion delays each mode differently and smears the pulses. WDM needs each channel in its own slot ([Chapter 14]({% link chapters/14_wdm.md %})). Coherent detection and FMCW sensing need one stable frequency to beat against. A **single-frequency laser** adds a wavelength-selective element that gives one mode clearly more net gain than all the others. Its quality is measured by the **side-mode suppression ratio** (SMSR), the power in the lasing mode over the strongest other mode: 35 dB or more for telecom. (A VCSEL reaches a single longitudinal mode another way: its cavity is so short that only one mode fits under the gain, [Section 24.8]({% link chapters/24_fp.md %}#248the-vertical-cavity-surface-emitting-laser).)
 
 ## <span class="secnum">26.2</span>DFB lasers
 

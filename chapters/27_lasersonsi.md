@@ -17,7 +17,8 @@ Silicon cannot lase efficiently, so the light source is brought in: bonded, prin
 - compare off-chip, flip-chip, heterogeneous, micro-transfer-printed and monolithic lasers;
 - explain how light moves between a III–V gain region and a silicon waveguide through supermodes and tapers;
 - estimate self-heating and the thermal impedance of a laser on silicon-on-insulator;
-- describe open laser-integration projects (the SiEPICfab Shuksan run, UBC ELEC 413).
+- describe open laser-integration projects (the SiEPICfab Shuksan run, UBC ELEC 413);
+- explain how directly modulated microring lasers combine source, modulator and WDM, and what limits them.
 
 </div>
 
@@ -36,6 +37,7 @@ Silicon's indirect gap rules it out as a laser material ([Chapter 22]({% link ch
 
 - **Off-chip sources.** A packaged laser, often in its own module, feeds the silicon chip through a fibre. It is simple, replaceable and keeps the heat away from the photonic chip, and it is the choice of many co-packaged-optics designs ([Chapter 17]({% link chapters/17_fiberarrays.md %})). The cost is fibre-coupling loss at both ends and the space for the module.
 - **Flip-chip and butt coupling.** A finished laser die is placed face down on the silicon chip, aligned to an edge coupler, either passively against lithographic stops or actively ([Chapter 17]({% link chapters/17_fiberarrays.md %})). Micro-optical benches with lenses and an isolator are a variant. The laser can be tested before assembly, so only good dies are used.
+- **Vertical-cavity lasers.** A VCSEL ([Section 24.8]({% link chapters/24_fp.md %}#248the-vertical-cavity-surface-emitting-laser)) emits from its surface, so it can be flip-chipped face down over a grating coupler ([Chapter 15]({% link chapters/15_gc.md %})) after being tested on its own wafer. The 850 nm VCSELs of multimode links are absorbed by silicon, though, so this needs long-wavelength VCSELs, which are harder to make, or silicon-nitride waveguides, which are transparent at 850 nm.
 
 ## <span class="secnum">27.3</span>Heterogeneous integration
 
@@ -97,6 +99,12 @@ Reliability follows temperature: III–V lasers age faster when hot, through def
 
 Laser integration has mostly been the domain of companies, but open projects now let students and researchers design lasers on silicon. The **SiEPICfab Shuksan** process design kit, released under the MIT licence, supports a multi-project run with laser integration {% include cite.html keys="shuksan" %}. UBC's **ELEC 413** course designs semiconductor lasers on these runs and publishes its designs and measurements {% include cite.html keys="elec413" %}, a source of real L–I curves and spectra for the analysis of [Chapter 32]({% link chapters/32_analysis.md %}).
 
+## <span class="secnum">27.8</span>Directly modulated microring lasers
+
+Most silicon transceivers modulate a continuous laser externally. A research alternative removes the modulator: make the laser itself a ring on silicon, and modulate its current directly {% include cite.html keys="palermo721l12" %}. A heterogeneous **microring laser** is a III–V ring tens of micrometres across, bonded over a silicon bus waveguide that collects its light. It needs no facets or Bragg mirrors, its small volume gives a low threshold, and its diameter sets its wavelengths. A row of rings of slightly different sizes on one bus is then a WDM transmitter with one directly modulated laser per channel and no separate multiplexer.
+
+The ring's sensitivity is also its difficulty. A 40 µm ring with $$n_g = 3.7$$ has modes 3.69 nm apart at 1310 nm, but making it 0.1 % larger moves every mode by 1.31 nm, so lithography alone cannot place the channels, and each ring needs tuning, by a heater or by a MOS capacitor built into the ring. With an effective-index change of $$2\times10^{-4}$$ per kelvin, the modes also drift by 0.07 nm/K as the ring heats with its own drive current, so a thermal shunt (Section 27.6) matters as much as for any laser on silicon. Driving such a laser raises every problem of [Chapter 25]({% link chapters/25_dynamics.md %}): its response is fast and ringing on rising edges and slow on falling ones, so its CMOS driver equalises the two edges separately, designed against a compact model of the ring. Quantum-dot gain ([Section 27.5](#275monolithic-growth)) lowers the threshold and steadies it against temperature, and injection locking from an external master laser extends the modulation bandwidth several times.
+
 <div class="tbox tbox-insight" markdown="1">
 <div class="tbox-title">Answer to the design question</div>
 
@@ -113,7 +121,7 @@ Four flip-chipped DFB lasers, tested before assembly and butt-coupled to edge co
 
 ## Reading
 
-{% include reflist.html keys="liang2010,komljenovic2016,zhou2015,shuksan,elec413" %}
+{% include reflist.html keys="liang2010,komljenovic2016,zhou2015,shuksan,elec413,palermo721l12" %}
 
 <div class="tbox tbox-takeaways" markdown="1">
 <div class="tbox-title">Key takeaways</div>
@@ -123,5 +131,7 @@ Four flip-chipped DFB lasers, tested before assembly and butt-coupled to edge co
 - Adiabatic tapers sweep through the crossing to transfer the light with little loss.
 - Self-heating, ΔT = Z<sub>th</sub>(IV − P<sub>out</sub>), is worse on the BOX; thermal shunts help.
 - Open PDKs and course data (SiEPICfab Shuksan, UBC ELEC 413) make laser integration accessible.
+- Surface-emitting VCSELs can be flip-chipped over grating couplers, but only long-wavelength ones suit silicon waveguides.
+- Directly modulated microring lasers give one laser per WDM channel without modulators (modes 3.69 nm apart for a 40 µm ring), at the price of tuning (1.31 nm per 0.1 % of diameter), self-heating and edge-dependent dynamics.
 
 </div>

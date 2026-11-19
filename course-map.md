@@ -222,7 +222,7 @@ Demos: ● Gain spectrum
 
 *What sets a laser's threshold current and slope efficiency?*
 
-24.1 The optical cavity · 24.2 Threshold · 24.3 Rate equations · 24.4 The L–I curve and efficiency · 24.5 Temperature · 24.6 Transients · 24.7 The Fabry–Pérot spectrum
+24.1 The optical cavity · 24.2 Threshold · 24.3 Rate equations · 24.4 The L–I curve and efficiency · 24.5 Temperature · 24.6 Transients · 24.7 The Fabry–Pérot spectrum · 24.8 The vertical-cavity surface-emitting laser
 
 Demos: ● Laser rate equations
 
@@ -230,7 +230,7 @@ Demos: ● Laser rate equations
 
 *How fast can you modulate a laser directly, and how narrow is its line?*
 
-25.1 Small-signal modulation · 25.2 Chirp and the α-factor · 25.3 Relative intensity noise · 25.4 Phase noise and linewidth · 25.5 Optical feedback · 25.6 Narrowing the linewidth
+25.1 Small-signal modulation · 25.2 Chirp and the α-factor · 25.3 Relative intensity noise · 25.4 Phase noise and linewidth · 25.5 Optical feedback · 25.6 Narrowing the linewidth · 25.7 Driving a laser: bias, modulation and extinction ratio · 25.8 The laser as a circuit, and equalisation · 25.9 Output stages and temperature control
 
 Demos: ● Modulation response, RIN and linewidth
 
@@ -246,7 +246,7 @@ Demos: ● Vernier ring laser
 
 *Which integration approach for which volume and performance?*
 
-27.1 Why the light source is the hard part · 27.2 External and flip-chip lasers · 27.3 Heterogeneous integration · 27.4 Micro-transfer printing · 27.5 Monolithic growth · 27.6 Thermal and reliability · 27.7 Open laser-integration projects
+27.1 Why the light source is the hard part · 27.2 External and flip-chip lasers · 27.3 Heterogeneous integration · 27.4 Micro-transfer printing · 27.5 Monolithic growth · 27.6 Thermal and reliability · 27.7 Open laser-integration projects · 27.8 Directly modulated microring lasers
 
 Demos: ● III–V/Si supermodes
 
