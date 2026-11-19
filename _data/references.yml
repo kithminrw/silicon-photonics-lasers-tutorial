@@ -385,3 +385,87 @@
   text: "gdsfactory contributors. *gplugins: simulation plugins for gdsfactory* (MIT licence). <https://github.com/gdsfactory/gplugins>"
 - key: gustavsen1999
   text: "Bjørn Gustavsen and Adam Semlyen. “Rational approximation of frequency domain responses by vector fitting.” *IEEE Transactions on Power Delivery*, 14(3):1052–1061, 1999. doi:10.1109/61.772353"
+
+# ---- Section 27.9: laser reliability
+- key: fukuda1991
+  text: "Mitsuo Fukuda. *Reliability and Degradation of Semiconductor Lasers and LEDs*. Artech House, 1991. ISBN 978-0-89006-465-8."
+- key: ueda1996
+  text: "Osamu Ueda. *Reliability and Degradation of III–V Optical Devices*. Artech House, 1996. ISBN 978-0-89006-652-2."
+- key: gr468
+  text: "Telcordia Technologies. *GR-468-CORE: Generic Reliability Assurance Requirements for Optoelectronic Devices Used in Telecommunications Equipment*, Issue 2, September 2004."
+- key: ewing2001
+  text: "Kevin Ewing. “Environmental testing in optical-networking applications.” *Evaluation Engineering*, April 2001. <https://www.electronicdesign.com/home/article/21200594/environmental-testing-in-optical-networking-applications>"
+- key: nistreliability
+  text: "NIST/SEMATECH. *e-Handbook of Statistical Methods*, Chapter 8: Assessing Product Reliability. National Institute of Standards and Technology. doi:10.18434/M32189. <https://www.itl.nist.gov/div898/handbook/apr/apr.htm>"
+- key: js001
+  text: "ESD Association and JEDEC. *ANSI/ESDA/JEDEC JS-001-2024: ESDA/JEDEC Joint Standard for Electrostatic Discharge Sensitivity Testing – Human Body Model (HBM) – Device Level*, 2024. <https://esda.org/store/standards/product/392/ansiesdajedec-js-001-2023>"
+- key: petroff1973
+  text: "P. Petroff and R. L. Hartman. “Defect structure introduced during operation of heterojunction GaAs lasers.” *Applied Physics Letters*, 23(8):469–471, 1973. doi:10.1063/1.1654962"
+- key: kimerling1978
+  text: "L. C. Kimerling. “Recombination enhanced defect reactions.” *Solid-State Electronics*, 21(11–12):1391–1401, 1978. doi:10.1016/0038-1101(78)90215-0"
+- key: tomm2011
+  text: "J. W. Tomm, M. Ziegler, M. Hempel and T. Elsaesser. “Mechanisms and fast kinetics of the catastrophic optical damage (COD) in GaAs-based diode lasers.” *Laser & Photonics Reviews*, 5(3):422–441, 2011. doi:10.1002/lpor.201000023"
+- key: coppeta2023
+  text: "R. A. Coppeta, R. Fabbro, M. Pusterhofer, T. Haber and G. Fasching. “Thermomechanical model of an oxide-confined GaAs-based VCSEL emitter.” *Microelectronics Reliability*, 140:114828, 2023. doi:10.1016/j.microrel.2022.114828"
+- key: hawkins2002
+  text: "B. M. Hawkins, R. A. Hawthorne, J. K. Guenter, J. A. Tatum and J. R. Biard. “Reliability of various size oxide aperture VCSELs.” *52nd Electronic Components and Technology Conference (ECTC)*, pp. 540–550, 2002. doi:10.1109/ECTC.2002.1008148"
+- key: guenter2013
+  text: "James Guenter, Luke Graham, Bobby Hawkins, Robert Hawthorne, Ralph Johnson, Gary Landry and Jim Tatum. “The range of VCSEL wearout reliability acceleration behavior and its effects on applications.” *Proc. SPIE* 8639, Vertical-Cavity Surface-Emitting Lasers XVII, 86390I, 2013. doi:10.1117/12.2002840"
+- key: xie2003
+  text: "Suning Xie, R. W. Herrick, D. Chamberlin, S. J. Rosner, S. McHugo, G. Girolami, M. Mayonte, Seongsin Kim and W. Widjaja. “Failure mode analysis of oxide VCSELs in high humidity and high temperature.” *Journal of Lightwave Technology*, 21(4):1013–1019, 2003. doi:10.1109/JLT.2003.809546"
+- key: zhang2023esd
+  text: "Jide Zhang, Shaohua Yang, Wenyuan Liao, Puning Wang, Yuebo Liu, Guoguang Lu, Xiaohua Wang and Zhipeng Wei. “Electrostatic discharge induced degradation of optical-electrical properties and defect evolution of GaAs-based oxide-confined VCSELs.” *Optics Express*, 31(24):40675, 2023. doi:10.1364/OE.505583. Open access."
+- key: zenari2026
+  text: "Michele Zenari, Matteo Buffolo, Filippo Perale, Carlo De Santi, Jeroen Goyvaerts, Alexander Grabowski, Johan S. Gustavsson, Roel Baets, Günther Roelkens, Gaudenzio Meneghesso, Enrico Zanoni and Matteo Meneghini. “Optical degradation of 845 nm VCSELs with different oxide apertures for silicon photonics.” *IEEE Journal of Selected Topics in Quantum Electronics*, 32(6):1700807, 2026. doi:10.1109/JSTQE.2026.3702031"
+- key: coenen2023
+  text: "David Coenen, Herman Oprins, Mathias Berciano, Grigorij Muliuk, Peter De Heyn, Joris Van Campenhout and Ingrid De Wolf. “Electro-absorption modulator thermo-optical self-heating analysis.” *Journal of Lightwave Technology*, 41(18):6000–6006, 2023. doi:10.1109/JLT.2023.3269507"
+- key: srinivasan2013
+  text: "S. Srinivasan, N. Julian, J. Peters, D. Liang and J. E. Bowers. “Reliability of hybrid silicon distributed feedback lasers.” *IEEE Journal of Selected Topics in Quantum Electronics*, 19(4):1501305, 2013. doi:10.1109/JSTQE.2013.2240438"
+- key: jones2019
+  text: "Richard Jones, Pierre Doussiere, Jeffrey B. Driscoll, Wenhua Lin, Haijiang Yu, Yulia Akulova, Tin Komljenovic and John E. Bowers. “Heterogeneously integrated InP/silicon photonics: fabricating fully functional transceivers.” *IEEE Nanotechnology Magazine*, 13(2):17–26, 2019. doi:10.1109/MNANO.2019.2891369"
+- key: buffolo2021
+  text: "Matteo Buffolo, Carlo De Santi, Justin Norman, Chen Shang, John Edward Bowers, Gaudenzio Meneghesso, Enrico Zanoni and Matteo Meneghini. “A review of the reliability of integrated IR laser diodes for silicon photonics.” *Electronics*, 10(22):2734, 2021. doi:10.3390/electronics10222734. Open access."
+- key: liu2015qd
+  text: "Alan Y. Liu, Robert W. Herrick, Osamu Ueda, Pierre M. Petroff, Arthur C. Gossard and John E. Bowers. “Reliability of InAs/GaAs quantum dot lasers epitaxially grown on silicon.” *IEEE Journal of Selected Topics in Quantum Electronics*, 21(6):1900708, 2015. doi:10.1109/JSTQE.2015.2418226"
+- key: jung2018
+  text: "Daehwan Jung, Robert Herrick, Justin Norman, Katherine Turnlund, Catherine Jan, Kaiyin Feng, Arthur C. Gossard and John E. Bowers. “Impact of threading dislocation density on the lifetime of InAs quantum dot lasers on Si.” *Applied Physics Letters*, 112(15):153507, 2018. doi:10.1063/1.5026147"
+- key: selvidge2019
+  text: "Jennifer Selvidge, Justin Norman, Michael E. Salmon, Eamonn T. Hughes, John E. Bowers, Robert Herrick and Kunal Mukherjee. “Non-radiative recombination at dislocations in InAs quantum dots grown on silicon.” *Applied Physics Letters*, 115(13):131102, 2019. doi:10.1063/1.5113517"
+- key: mukherjee2020
+  text: "Kunal Mukherjee, Jennifer Selvidge, Daehwan Jung, Justin Norman, Aidan A. Taylor, Mike Salmon, Alan Y. Liu, John E. Bowers and Robert W. Herrick. “Recombination-enhanced dislocation climb in InAs quantum dot lasers on silicon.” *Journal of Applied Physics*, 128(2):025703, 2020. doi:10.1063/1.5143606"
+- key: selvidge2020
+  text: "Jennifer Selvidge, Justin Norman, Eamonn T. Hughes, Chen Shang, Daehwan Jung, Aidan A. Taylor, M. J. Kennedy, Robert Herrick, John E. Bowers and Kunal Mukherjee. “Defect filtering for thermal expansion induced dislocations in III–V lasers on silicon.” *Applied Physics Letters*, 117(12):122101, 2020. doi:10.1063/5.0023378"
+- key: shang2021
+  text: "Chen Shang, Eamonn Hughes, Yating Wan, Mario Dumont, Rosalyn Koscica, Jennifer Selvidge, Robert Herrick, Arthur C. Gossard, Kunal Mukherjee and John E. Bowers. “High-temperature reliable quantum-dot lasers on Si with misfit and threading dislocation filters.” *Optica*, 8(5):749–754, 2021. doi:10.1364/OPTICA.423360. Open access."
+- key: norman2019
+  text: "Justin C. Norman, Daehwan Jung, Zeyu Zhang, Yating Wan, Songtao Liu, Chen Shang, Robert W. Herrick, Weng W. Chow, Arthur C. Gossard and John E. Bowers. “A review of high-performance quantum dot lasers on silicon.” *IEEE Journal of Quantum Electronics*, 55(2):2000511, 2019. doi:10.1109/JQE.2019.2901508"
+
+# ---- Section 25.10 (laser transmitters compared), Nov 2026
+- key: agrawal2021
+  text: "Govind P. Agrawal. *Fiber-Optic Communication Systems*, 5th edition. Wiley, 2021. ISBN 978-1-119-73736-0."
+- key: larsson2011
+  text: "Anders Larsson. “Advances in VCSELs for communication and sensing.” *IEEE Journal of Selected Topics in Quantum Electronics*, 17(6):1552–1567, 2011. doi:10.1109/JSTQE.2011.2119469"
+- key: tatum2015
+  text: "Jim A. Tatum et al. “VCSEL-based interconnects for current and future data centers.” *Journal of Lightwave Technology*, 33(4):727–732, 2015. doi:10.1109/JLT.2014.2370633"
+- key: babichev2023
+  text: "A. Babichev, S. Blokhin, E. Kolodeznyi, L. Karachinsky, I. Novikov, A. Egorov, S.-C. Tian and D. Bimberg. “Long-wavelength VCSELs: status and prospects.” *Photonics*, 10(3):268, 2023. doi:10.3390/photonics10030268. Open access."
+- key: koch1984
+  text: "T. L. Koch and J. E. Bowers. “Nature of wavelength chirping in directly modulated semiconductor lasers.” *Electronics Letters*, 20(25):1038–1040, 1984. doi:10.1049/el:19840709"
+- key: koyama1988
+  text: "Fumio Koyama and Kenichi Iga. “Frequency chirping in external modulators.” *Journal of Lightwave Technology*, 6(1):87–93, 1988. doi:10.1109/50.3969"
+- key: aoki1993
+  text: "M. Aoki, M. Suzuki, H. Sano, T. Kawano, T. Ido, T. Taniwatari, K. Uomi and A. Takai. “InGaAs/InGaAsP MQW electroabsorption modulator integrated with a DFB laser fabricated by band-gap energy control selective area MOCVD.” *IEEE Journal of Quantum Electronics*, 29(6):2088–2096, 1993. doi:10.1109/3.234473"
+- key: li2025eml
+  text: "Zhenyao Li, Chen Lyu, Xuliang Zhou, Mengqi Wang, Haotian Qiu, Yejin Zhang, Hongyan Yu and Jiaoqing Pan. “High-speed electro-absorption modulated laser” (review). *Journal of Semiconductors*, 46(11):111401, 2025. doi:10.1088/1674-4926/25030015"
+- key: matsui2021
+  text: "Yasuhiro Matsui, Richard Schatz, Di Che, Ferdous Khan, Martin Kwakernaak and Tsurugi Sudo. “Low-chirp isolator-free 65-GHz-bandwidth directly modulated lasers.” *Nature Photonics*, 15:59–63, 2021. doi:10.1038/s41566-020-00742-2"
+- key: ieee8023
+  text: "IEEE. *IEEE Std 802.3-2022: IEEE Standard for Ethernet*. IEEE, 2022. Optical PMDs cited: Clauses 52 (10GBASE-SR, -LR, -ER), 88 (100GBASE-LR4), 95 (100GBASE-SR4), 112 (25GBASE-SR), 114 (25GBASE-LR), 124 (400GBASE-DR4), 140 (100GBASE-DR, -FR1, -LR1) and 151 (400GBASE-FR4, -LR4-6)."
+- key: cwdm4msa
+  text: "CWDM4 MSA. *100G CWDM4 MSA Technical Specifications*, Revision 1.1, 23 November 2015. <https://cwdm4-msa.org/>"
+- key: oif400zr
+  text: "Optical Internetworking Forum. *Implementation Agreement 400ZR* (OIF-400ZR-01.0), March 2020. <https://www.oiforum.com/technical-work/implementation-agreements-ias/>"
+- key: goldsmid2016
+  text: "H. Julian Goldsmid. *Introduction to Thermoelectricity*, 2nd edition. Springer Series in Materials Science 121, Springer, 2016. doi:10.1007/978-3-662-49256-7"
+- key: piprek2002
+  text: "Joachim Piprek, Yi-Jen Chiu and John E. Bowers. “Multi-quantum-well electroabsorption modulators.” *Proceedings of SPIE*, 4646 (Physics and Simulation of Optoelectronic Devices X):609, 2002. doi:10.1117/12.470567"

@@ -57,7 +57,7 @@ The budget of [Chapter 1]({% link chapters/01_why.md %}) subtracts each block's 
 
 - **Extinction ratio**: a finite ER wastes average power on the "0" level ([Chapter 21]({% link chapters/21_pd.md %}) already includes the 4 dB ER in its −11.6 dBm sensitivity).
 - **Crosstalk**: light from neighbouring channels leaking through the demultiplexer adds noise and a power penalty. With −20 dB of adjacent-channel rejection ([Chapter 14]({% link chapters/14_wdm.md %})) the two neighbours leak about 2 % of the power, a penalty of roughly 0.1 dB; the budget allows a generous 0.5 dB.
-- **Dispersion and chirp**: 2 km at 1550 nm accumulate 34 ps/nm ([Example 2.5]({% link chapters/02_em.md %})), inside the 40–60 ps/nm tolerance of 50 Gb/s NRZ but not free: a few tenths of a decibel with a chirp-free modulator, more with chirp, so the budget allows 0.5 dB. Directly modulated lasers, with their large chirp, fare much worse ([Chapter 25]({% link chapters/25_dynamics.md %})).
+- **Dispersion and chirp**: 2 km at 1550 nm accumulate 34 ps/nm ([Example 2.5]({% link chapters/02_em.md %})), inside the 40–60 ps/nm tolerance of 50 Gb/s NRZ but not free: a few tenths of a decibel with a chirp-free modulator, more with chirp, so the budget allows 0.5 dB. Directly modulated lasers, with their large chirp, fare much worse ([Chapter 25]({% link chapters/25_dynamics.md %}), Worked Example 25.4).
 - **Noise and jitter**: laser RIN, electrical jitter and intersymbol interference from limited bandwidth.
 - **Drift and ageing**: rings slightly off their lasers, lasers that lose power over their lifetime.
 
