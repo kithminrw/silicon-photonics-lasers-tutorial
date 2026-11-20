@@ -101,7 +101,7 @@ def load_fields():
     return json.load(open(os.path.join(HERE, "ch09_fields.json")))
 
 
-N_SI, N_OX = 3.4757, 1.444                       # at 1550 nm (femwell_modes.py)
+N_SI, N_OX = 3.4757, 1.444                       # at 1550 nm (femwell_modes.py's Li formula gives 3.4764; kept so the figures reproduce)
 
 
 def to_D(xs, line, cores):

@@ -11,7 +11,7 @@
   <div class="bd-read"><span>grid (with PML) <b data-o="grid">–</b></span><span>Δx · Δt <b data-o="dxdt">–</b></span><span>steps per period <b data-o="spp">–</b></span><span>time simulated <b data-o="tsim">–</b></span><span>fields in memory: 2D · 3D, 2 µm tall <b data-o="mem">–</b></span><span><span data-o="m1l">n<sub>eff</sub> in the run</span> <b data-o="m1">–</b></span><span><span data-o="m2l">reflection from the far end</span> <b data-o="m2">–</b></span><span class="bd-pill" data-o="pS" hidden></span><span class="bd-pill" data-o="pM" hidden></span></div>
   <div class="bd-sliders">
     <label class="bd-sl"><span>wavelength λ <b data-v="lam"></b></span><input type="range" data-k="lam" min="1.5" max="1.6" step="0.0005" value="1.55" aria-label="wavelength"></label>
-    <label class="bd-sl"><span>cells per λ in Si, N · Δx <b data-v="N"></b></span><input type="range" data-k="N" min="6" max="30" step="1" value="12" aria-label="cells per wavelength in silicon"></label>
+    <label class="bd-sl"><span>cells per λ in core, N · Δx <b data-v="N"></b></span><input type="range" data-k="N" min="6" max="30" step="1" value="12" aria-label="cells per wavelength in the core"></label>
     <label class="bd-sl"><span>Courant number S = c<sub>ox</sub>Δt/Δx <b data-v="S"></b></span><input type="range" data-k="S" min="0.3" max="0.8" step="0.01" value="0.5" aria-label="Courant number"></label>
     <label class="bd-sl"><span>PML thickness <b data-v="P"></b></span><input type="range" data-k="P" min="4" max="24" step="1" value="12" aria-label="PML thickness in cells"></label>
     <label class="bd-sl" data-o="rsl"><span>bend radius R <b data-v="R"></b></span><input type="range" data-k="R" min="0.75" max="3" step="0.25" value="1.5" aria-label="bend radius"></label>
@@ -425,7 +425,7 @@
       BD.vline(fd, g.N, BD.C.dim, [2, 3]);
       var gi2 = CV.ns.indexOf(g.N); if (gi2 >= 0 && CV.pg[gi2] > 0) BD.dot(fd, g.N, CV.pg[gi2], BD.C.gold, 4);
       var lx = dd.w - fd.p.r - 4, ly = fd.p.t + 12;
-      BD.label(dg, nar ? 'plane wave in Si: x / diagonal' : 'plane wave in silicon: along x / diagonal', lx, ly, BD.C.blue, 'right');
+      BD.label(dg, nar ? 'plane wave in core: x / diagonal' : 'plane wave in the core: along x / diagonal', lx, ly, BD.C.blue, 'right');
       BD.label(dg, 'guided mode on this grid', lx, ly + 12, BD.C.gold, 'right');
       var R0 = g.res, haveN = g.st === 'straight' && R0 && R0.n && (g.settled || g.done) && S.S <= Math.SQRT1_2;
       if (haveN) { var em2 = 100 * (R0.n / CV.nex - 1); if (em2 > 0) BD.dot(fd, g.N, em2, BD.C.green, 3); BD.label(dg, 'measured in the run', lx, ly + 24, BD.C.green, 'right'); }

@@ -224,8 +224,10 @@ def fig_anatomy():
     a2.plot(dl, Tz, color=C1)
     tmin = Tz.min(); half = (1 + tmin) / 2
     # FWHM from the curve
-    idx = np.where(Tz < half)[0]; xl, xr = dl[idx[0]], dl[idx[-1]]
-    fw = fwhm_pm(A0, t); er = -10 * np.log10(tmin)
+    idx = np.where(Tz < half)[0]; i0, i1 = idx[0], idx[-1]
+    xl = dl[i0 - 1] + (half - Tz[i0 - 1]) * (dl[i0] - dl[i0 - 1]) / (Tz[i0] - Tz[i0 - 1])   # interpolated half-depth crossings
+    xr = dl[i1] + (half - Tz[i1]) * (dl[i1 + 1] - dl[i1]) / (Tz[i1 + 1] - Tz[i1])
+    fw = xr - xl; er = -10 * np.log10(tmin)                     # measured at this resonance, not the 1550 nm formula
     print(f"m=99 at {1000*l0:.3f} nm: FWHM {fw:.2f} pm (formula {fwhm_pm(A0, t):.2f}), T_min {tmin:.4f}, ER {er:.1f} dB, Q_L {1000*l0/(fw*1e-3):.3g}, finesse {LAM**2/(NG*2*np.pi*R0)*1e6/fw:.0f}")
     dim(a2, (xl, half), (xr, half), "")
     a2.text(xr + 2.5, half, f"FWHM\n{fw:.1f} pm", ha="left", va="center", fontsize=6.8, color=INK)

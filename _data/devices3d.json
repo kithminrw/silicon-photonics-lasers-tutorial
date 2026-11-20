@@ -437,5 +437,108 @@
    }
   },
   "kb": 305
+ },
+ {
+  "pdk": "SiEPIC EBeam PDK",
+  "platform": "220 nm SOI, 1550 nm, electron-beam lithography",
+  "pdk_url": "https://github.com/SiEPIC/SiEPIC_EBeam_PDK",
+  "licence": "MIT",
+  "via": "its own KLayout parametric cell (siepic_ebeam_pdk 0.4.53)",
+  "cell": "ebeam_bragg_te1550",
+  "title": "Waveguide Bragg grating",
+  "designers": "Lukas Chrostowski (UBC), parametric cell (2015); setting κ by sidewall misalignment from Xu Wang et al. (UBC and Lumerical)",
+  "refs": [
+   "wang2014bragg"
+  ],
+  "blurb": "A 500 nm strip whose sidewalls step in and out by 50 nm every half period: 300 periods of 317 nm (95 µm) that reflect a band near 1550 nm back down the guide. Offsetting the teeth of one sidewall against the other (the cell's misalignment parameter) sets how strongly it reflects.",
+  "chapters": [
+   [
+    "Chapter 13",
+    "/part-3/ch13/"
+   ]
+  ],
+  "params": {
+   "number_of_periods": 300,
+   "grating_period": 0.317,
+   "corrugation_width": 0.05,
+   "misalignment": 0.0,
+   "sinusoidal": false,
+   "wg_width": 0.5
+  },
+  "slug": "siepic-bragg",
+  "file": "siepic-bragg.glb",
+  "size_um": [
+   95.1,
+   0.55
+  ],
+  "height_um": 0.22,
+  "layers": {
+   "core": {
+    "colour": "#9eb2cc",
+    "thickness_um": 0.22,
+    "zmin_um": 0.0,
+    "material": "si"
+   }
+  },
+  "kb": 171
+ },
+ {
+  "pdk": "SiEPIC EBeam PDK",
+  "platform": "220 nm SOI, 1550 nm, electron-beam lithography",
+  "pdk_url": "https://github.com/SiEPIC/SiEPIC_EBeam_PDK",
+  "licence": "MIT",
+  "via": "its own KLayout parametric cell (siepic_ebeam_pdk 0.4.53)",
+  "cell": "contra_directional_coupler",
+  "title": "Contra-directional coupler (add-drop filter)",
+  "designers": "Mustafa Hammood (UBC), parametric cell; the device and its anti-reflection layout from Wei Shi et al. (UBC)",
+  "refs": [
+   "shi2013cdc",
+   "shi2013cwdm"
+  ],
+  "blurb": "Two strips, 560 and 440 nm wide with a 100 nm gap, corrugated over 1000 periods of 316 nm (316 µm): the grating reflects one C-band channel from the forward mode of one guide into the backward mode of the other, an add-drop filter with no free spectral range. Each guide's two sidewalls are offset by half a period to cancel its own reflection, and a Gaussian apodisation leaves visible teeth (sidewall steps of up to 50 and 25 nm) only in the middle 80 µm or so.",
+  "chapters": [
+   [
+    "Chapter 13 (Section 13.6)",
+    "/part-3/ch13/#fig-13-6"
+   ],
+   [
+    "Chapter 14",
+    "/part-3/ch14/"
+   ]
+  ],
+  "params": {
+   "number_of_periods": 1000,
+   "grating_period": 0.316,
+   "gap": 0.1,
+   "corrugation1_width": 0.05,
+   "corrugation2_width": 0.025,
+   "AR": true,
+   "sinusoidal": false,
+   "wg1_width": 0.56,
+   "wg2_width": 0.44,
+   "sbend": true,
+   "sbend_r": 15.0,
+   "sbend_length": 11.0,
+   "apodization_index": 10.0,
+   "port_w": 0.5,
+   "rib": false,
+   "metal": false
+  },
+  "slug": "siepic-contradc",
+  "file": "siepic-contradc.glb",
+  "size_um": [
+   344.16,
+   3.03
+  ],
+  "height_um": 0.22,
+  "layers": {
+   "core": {
+    "colour": "#9eb2cc",
+    "thickness_um": 0.22,
+    "zmin_um": 0.0,
+    "material": "si"
+   }
+  },
+  "kb": 639
  }
 ]

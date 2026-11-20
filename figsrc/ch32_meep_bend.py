@@ -2,7 +2,7 @@
 
 The same set-up as the Tidy3D and Lumerical versions of the chapter: strip in oxide (constant indices 3.476 and
 1.444, as in Lab 6), TE-like mode launched by an eigenmode source 1 um before the bend, mode monitors 0.5 um before
-the bend and 1 um after it, 1 um of oxide between the guide and the PML, 0.78 um of oxide above and below the core,
+the bend and 1 um after it, 1 um of oxide between the guide and the PML, 0.89 um of oxide above and below the core,
 a mirror plane at the core's mid-height. Prints and saves the transmission into the output TE mode at 1550 nm, the
 reflection, the grid size, MEEP's own memory estimate and the CPU time.
 

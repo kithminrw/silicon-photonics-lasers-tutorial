@@ -10,7 +10,13 @@ size, layers and colours for the page legend.
 Run from the repository root:
     .venv/bin/python tools/export_3d.py                    # SiEPIC EBeam (ubcpdk) and CORNERSTONE (cspdk)
     .venv-lxt/bin/python tools/export_3d.py --pdk lxt      # Luxtelligence TFLN (lnoi400, its own venv)
-The VTT 3 µm SOI PDK (gvtt) publishes no layer stack, so its devices are not exported yet.
+    python tools/export_3d.py --pdk ebeam                 # SiEPIC Bragg grating and contra-DC (KLayout PCells)
+The "ebeam" group needs siepic_ebeam_pdk and klayout beside ubcpdk; it was run in the photonics-labs Docker
+container (gdsfactory 9.51, ubcpdk 3.3.5, siepic_ebeam_pdk 0.4.53, klayout 0.30.13):
+    MSYS_NO_PATHCONV=1 docker exec -w /repo photonics-labs /opt/conda/envs/labs/bin/python tools/export_3d.py --pdk ebeam
+The VTT 3 µm SOI PDK (gvtt 0.1.0, checked Nov 2026) still publishes no layer stack, so its devices are not
+exported yet. The CORNERSTONE laser_* cells are not exported either: they hold only a silicon taper and
+laser-site marker layers, with no stack levels and no laser die geometry.
 """
 from __future__ import annotations
 
@@ -148,6 +154,73 @@ def siepic_ebeam():
     return out
 
 
+def siepic_ebeam_pcells():
+    """SiEPIC EBeam cells that ubcpdk does not implement, drawn by the PDK's own KLayout PCells.
+
+    The PCell runs in KLayout (importing siepic_ebeam_pdk registers its "EBeam" library), the result is
+    written to a temporary GDS file and read into gdsfactory, and it is then extruded with ubcpdk's layer
+    stack, exactly like the other SiEPIC devices (silicon is layer 1/0 in both). The parameters are the
+    PCell defaults, written out so that a change of default in a later PDK release cannot change the model
+    silently; for the contra-DC they are also the first design of the PDK's compact-model table
+    (CML/EBeam/source_data/contraDC/contraDC.xml). Credits: the PCell headers and version history, and the
+    PDK wiki's "Component Library description" for the papers.
+    """
+    import importlib.metadata
+    import tempfile
+
+    import gdsfactory as gf
+    import pya
+    import siepic_ebeam_pdk  # noqa: F401  (registers the EBeam PCell libraries)
+    from ubcpdk import PDK
+    PDK.activate()
+    pdk = dict(pdk="SiEPIC EBeam PDK", platform="220 nm SOI, 1550 nm, electron-beam lithography",
+               pdk_url="https://github.com/SiEPIC/SiEPIC_EBeam_PDK", licence="MIT",
+               via="its own KLayout parametric cell (siepic_ebeam_pdk %s)" % importlib.metadata.version("siepic_ebeam_pdk"))
+    items = [
+        ("ebeam_bragg_te1550",
+         dict(number_of_periods=300, grating_period=0.317, corrugation_width=0.05, misalignment=0.0,
+              sinusoidal=False, wg_width=0.5),
+         "siepic-bragg", "Waveguide Bragg grating",
+         "Lukas Chrostowski (UBC), parametric cell (2015); setting κ by sidewall misalignment from Xu Wang et al. "
+         "(UBC and Lumerical)", ["wang2014bragg"],
+         "A 500 nm strip whose sidewalls step in and out by 50 nm every half period: 300 periods of 317 nm (95 µm) "
+         "that reflect a band near 1550 nm back down the guide. Offsetting the teeth of one sidewall against the other "
+         "(the cell's misalignment parameter) sets how strongly it reflects.",
+         [["Chapter 13", "/part-3/ch13/"]]),
+        ("contra_directional_coupler",
+         dict(number_of_periods=1000, grating_period=0.316, gap=0.1, corrugation1_width=0.05,
+              corrugation2_width=0.025, AR=True, sinusoidal=False, wg1_width=0.56, wg2_width=0.44, sbend=True,
+              sbend_r=15.0, sbend_length=11.0, apodization_index=10.0, port_w=0.5, rib=False, metal=False),
+         "siepic-contradc", "Contra-directional coupler (add-drop filter)",
+         "Mustafa Hammood (UBC), parametric cell; the device and its anti-reflection layout from Wei Shi et al. (UBC)", ["shi2013cdc", "shi2013cwdm"],
+         "Two strips, 560 and 440 nm wide with a 100 nm gap, corrugated over 1000 periods of 316 nm (316 µm): the "
+         "grating reflects one C-band channel from the forward mode of one guide into the backward mode of the other, an "
+         "add-drop filter with no free spectral range. Each guide's two sidewalls are offset by half a period to cancel "
+         "its own reflection, and a Gaussian apodisation leaves visible teeth (sidewall steps of up to 50 and 25 nm) only "
+         "in the middle 80 µm or so.",
+         [["Chapter 13 (Section 13.6)", "/part-3/ch13/#fig-13-6"], ["Chapter 14", "/part-3/ch14/"]]),
+    ]
+    out = []
+    for cell, params, slug, title, by, refs, blurb, chapters in items:
+        ly = pya.Layout()
+        ly.dbu = 0.001
+        ly.technology_name = "EBeam"
+        pc = ly.create_cell(cell, "EBeam", params)
+        if pc is None:
+            print("  no PCell", cell)
+            continue
+        top = ly.create_cell(slug.replace("-", "_"))
+        top.insert(pya.CellInstArray(pc.cell_index(), pya.Trans()))
+        top.flatten(True)
+        with tempfile.TemporaryDirectory() as tmp:
+            gds = pathlib.Path(tmp) / f"{slug}.gds"
+            top.write(str(gds))
+            comp = gf.import_gds(gds)
+        out.append(export(comp, PDK.layer_stack, slug, dict(pdk, cell=cell, title=title, designers=by, refs=refs,
+                                                             blurb=blurb, chapters=chapters, params=params)))
+    return out
+
+
 def cornerstone():
     out = []
     from cspdk.si220 import PDK as SI
@@ -208,11 +281,11 @@ def luxtelligence():
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--pdk", default="siepic,cornerstone",
-                    help="comma-separated: siepic, cornerstone (main .venv), lxt (.venv-lxt)")
+                    help="comma-separated: siepic, cornerstone (main .venv), ebeam (needs siepic_ebeam_pdk + klayout), lxt (.venv-lxt)")
     args = ap.parse_args()
     manifest_path = ROOT / "_data" / "devices3d.json"   # read by devices-3d.md
     manifest = json.loads(manifest_path.read_text()) if manifest_path.exists() else []
-    run = {"siepic": siepic_ebeam, "cornerstone": cornerstone, "lxt": luxtelligence}
+    run = {"siepic": siepic_ebeam, "ebeam": siepic_ebeam_pcells, "cornerstone": cornerstone, "lxt": luxtelligence}
     new = [d for name in args.pdk.split(",") for d in run[name.strip()]()]
     slugs = {d["slug"] for d in new}
     manifest = [d for d in manifest if d["slug"] not in slugs] + new
