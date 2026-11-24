@@ -286,7 +286,9 @@ Demos: FDTD in the browser
 
 ### [32. Simulation Tools in Practice]({% link chapters/32_simtools.md %})
 
-*Being written.*
+*You need the loss of a 2 µm-radius silicon bend to within 0.01 dB. Which tool, which settings, and how do you know the answer is right?*
+
+32.1 From a solver to a tool · 32.2 Ansys Lumerical · 32.3 Tidy3D · 32.4 Open tools · 32.5 Setting up a run, step by step · 32.6 One problem, three tools: a 2 µm bend · 32.7 Choosing a tool
 
 ### [33. Layout with KLayout and GDSII]({% link chapters/33_layout.md %})
 

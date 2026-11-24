@@ -13,16 +13,17 @@ across the **Si, SiN, thin-film LiNbO₃ (TFLN), BaTiO₃ (BTO) and InP** platfo
 ## What makes it different
 
 - **Interactive demos in every chapter.** Small physical models that run in the browser with no
-  installation: change a slider and watch the light. Forty-two are built so far, including a slab-waveguide
-  mode solver, exact fibre LP modes, Fresnel reflection and evanescent fields, Gaussian-beam coupling,
+  installation: change a slider and watch the light. Forty-eight are built so far, including a slab-waveguide
+  mode solver, a full-vectorial 2D mode solver, sidewall roughness loss, taper adiabaticity, exact fibre LP modes, Fresnel reflection and evanescent fields, Gaussian-beam coupling,
   directional couplers, MMI self-imaging, Mach–Zehnder interferometers, ring resonators, Bragg gratings by
-  transfer matrix, grating-coupler phase matching and efficiency budget, an inverse-taper edge coupler from
+  transfer matrix, a four-ring demultiplexer, grating-coupler phase matching and efficiency budget, an inverse-taper edge coupler from
   femwell modes, Gaussian alignment tolerances, a fibre-array alignment game, heater cross-sections
-  with computed temperature maps, ring locking, a PN depletion phase shifter, MZM eye diagrams, a ring
+  with computed temperature maps, ring locking, a Pockels phase shifter, a PN depletion phase shifter, MZM eye diagrams, a ring
   modulator, photodiode bandwidth, receiver sensitivity, level systems, semiconductor gain spectra, laser
   dynamics and linewidth, III–V/Si supermodes, an SOA, a wafer-map Monte Carlo, a circuit simulator, a virtual
   test bench, ring fitting, the full link budget, a biosensor, an optical phased array, a laser rate-equation
-  simulator and a Vernier tunable laser.
+  simulator, a Vernier tunable laser and a 2D FDTD simulation that runs in the browser. All of them are listed on the
+  [demos page](https://www.kithminrw.com/silicon-photonics-lasers-tutorial/demos/).
 - **Real devices in 3D.** Devices from open process design kits (SiEPIC EBeam, CORNERSTONE, Luxtelligence
   TFLN) extruded from their layouts with their PDK layer stacks, which you can rotate, slice by layer
   and stretch vertically, with credit to the people who designed them.
@@ -46,8 +47,8 @@ across the **Si, SiN, thin-film LiNbO₃ (TFLN), BaTiO₃ (BTO) and InP** platfo
 | VII. Design, simulation, layout | 29 Design principles and workflows · 30 Design flow and open PDKs · 31 How simulators work · 32 Simulation tools in practice · 33 KLayout and GDSII · 34 Verification and tape-out | **written** |
 | VIII. Fabrication, testing, data | 35 Fabrication · 36 Testing · 37 Data analysis | **written** |
 | IX. Systems | 38 Links and transceivers · 39 Sensing, LiDAR, quantum, computing | **written** |
-| Hands-on labs | 12 labs: simulate, make (openEBL), lasers and links | planned |
-| PDK devices in 3D | 13 devices from three open PDKs | working |
+| Hands-on labs | 12 labs: simulate, make (openEBL), lasers and links | **written** |
+| PDK devices in 3D | 15 devices from three open PDKs | working |
 | Appendices | A formulas · B materials · C glossary · D open tools, PDKs, data · E reading and free simulations | in progress |
 
 ## Run it locally
