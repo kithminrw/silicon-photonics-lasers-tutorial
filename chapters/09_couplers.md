@@ -158,3 +158,7 @@ Free simulations by others that pair well with this chapter {% include cite.html
 - A lossless coupler's matrix is unitary, and its −j cross-coupling phase is required by energy conservation.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

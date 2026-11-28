@@ -494,6 +494,64 @@ def fig_microring():
     save(fig, "ch27_microring")
 
 
+# ================================================================== Figure 27.11: a magneto-optic MZI isolator (Section 27.10)
+def fig_isolator():
+    """(a) Schematic of an MZI isolator: magneto-optic garnet on both arms, magnetised in opposite directions, gives
+    non-reciprocal phases +-pi/4 (pi/2 between the arms), and a reciprocal delay gives -pi/2: forward the arms meet in
+    phase, backward in antiphase, so the backward light leaves through the other port. (b) Forward and backward
+    transmission against wavelength for a short and a long reciprocal delay (orders 1 and 20), n_g = 4.2; the
+    non-reciprocal phase is taken as constant with wavelength."""
+    lam0, ng = 1.55, 4.2
+    lam = np.linspace(1.50, 1.60, 2001)
+    fig = plt.figure(figsize=(6.3, 2.6))
+    a = fig.add_axes([0.0, 0.0, 0.45, 1.0]); frameless(a, (0, 100), (-9, 62), equal=False)
+    y0, dy, SI = 31, 13, dict(color=MAT["si"], lw=2.2, solid_capstyle="butt")
+    a.plot([2, 12], [y0, y0], **SI)                                       # input and Y-branch
+    for sg in (1, -1):
+        xs = np.linspace(12, 24, 30); a.plot(xs, y0 + sg * dy * (1 - np.cos(np.pi * (xs - 12) / 12)) / 2, **SI)
+        a.plot([24, 70], [y0 + sg * dy] * 2, **SI)
+        xs = np.linspace(70, 80, 30); a.plot(xs, y0 + sg * (dy - (dy - 3) * (1 - np.cos(np.pi * (xs - 70) / 10)) / 2), **SI)
+        a.plot([88, 98], [y0 + sg * 3] * 2, **SI)
+        box(a, 30, y0 + sg * dy - 3, 26, 6, "#D9C7E8", ec=VIOLET, lw=0.6, z=3)
+    box(a, 80, y0 - 6, 8, 12, MAT["si"], z=3); label(a, 84, y0 - 9, "2×2", fs=5.8)
+    arrow(a, (33, y0 + dy + 5.5), (53, y0 + dy + 5.5), col=VIOLET, lw=0.8, ms=6)
+    arrow(a, (53, y0 - dy - 5.5), (33, y0 - dy - 5.5), col=VIOLET, lw=0.8, ms=6)
+    label(a, 43, y0 + dy + 10, "garnet, M →: +π/4 forward, −π/4 back", fs=FS_SMALL, col=VIOLET)
+    label(a, 43, y0 - dy - 10, "garnet, M ←: −π/4 forward, +π/4 back", fs=FS_SMALL, col=VIOLET)
+    box(a, 60, y0 + dy - 2.5, 7, 5, "tin", z=3)
+    callout(a, (63.5, y0 + dy + 2.5), (72, y0 + dy + 14), "reciprocal −π/2", ha="left")
+    arrow(a, (2, y0 + 4), (10, y0 + 4), col=RED, lw=1.1, ms=7); label(a, 2, y0 + 8, "in", fs=FS_SMALL, ha="left", col=RED)
+    label(a, 99, y0 + 7, "out", fs=FS_SMALL, ha="right", col=RED)
+    label(a, 99, y0 - 7, "monitor", fs=FS_SMALL, ha="right", col=MUTED)
+    label(a, 50, -1.5, "forward: the arms meet in phase → out", fs=FS_SMALL)
+    label(a, 50, -6.0, "backward (from out): in antiphase → radiated at the Y-branch", fs=FS_SMALL)
+    panel(a, "a", 0.0, 1.0)
+    b = fig.add_axes([0.55, 0.17, 0.43, 0.62])
+    for m, col in ((1, C1), (20, C2)):
+        nL = (m - 0.25) * lam0                                    # n_eff dL (um) for a reciprocal phase of 2 pi m - pi/2 (n_eff 2.45)
+        dphi = 2 * np.pi * (m - 0.25) + 2 * np.pi * (nL / 2.45) * ng * (1 / lam - 1 / lam0)
+        Tf = np.cos((dphi + np.pi / 2) / 2) ** 2
+        Tb = np.cos((dphi - np.pi / 2) / 2) ** 2
+        b.plot(1e3 * lam, 10 * np.log10(Tf + 1e-9), color=col, lw=1.3, label=f"order {m}: forward")
+        b.plot(1e3 * lam, 10 * np.log10(Tb + 1e-9), color=col, lw=1.0, ls=(0, (3, 2)), label=f"order {m}: backward")
+        iso = 10 * np.log10(Tf + 1e-12) - 10 * np.log10(Tb + 1e-12)
+        i0 = int(np.argmin(np.abs(lam - lam0))); i1 = i2 = i0                 # the contiguous window around 1550 nm
+        while i1 > 0 and iso[i1 - 1] >= 20: i1 -= 1
+        while i2 < len(lam) - 1 and iso[i2 + 1] >= 20: i2 += 1
+        print(f"Fig 27.11: order {m}: delta L {1e3 * nL / 2.45:.0f} nm; isolation >= 20 dB from {1e3 * lam[i1]:.1f} to {1e3 * lam[i2]:.1f} nm"
+              f" ({1e3 * (lam[i2] - lam[i1]):.1f} nm)")
+    b.set_ylim(-40, 2); b.set_xlim(1500, 1600)
+    finish(b, "Wavelength (nm)", "Transmission (dB)")
+    b.legend(loc="lower left", bbox_to_anchor=(0.0, 1.02), fontsize=5.8, ncol=2, handlelength=1.6, borderaxespad=0)
+    b.text(-0.12, 1.32, "b", transform=b.transAxes, fontweight="bold", color=INK, fontsize=9.5, ha="right")
+    save(fig, "ch27_isolator")
+
+
+
 if __name__ == "__main__":
-    fig_options(); fig_printing(); fig_monolithic(); fig_thermal(); fig_microring()
-    fig_hetero()
+    import sys as _s
+    if len(_s.argv) > 1:
+        for _n in _s.argv[1:]: globals()['fig_' + _n]()
+    else:
+        fig_options(); fig_printing(); fig_monolithic(); fig_thermal(); fig_microring()
+        fig_hetero(); fig_isolator()

@@ -161,3 +161,7 @@ Free simulations by others that pair well with this chapter {% include cite.html
 - Crossings, escalators and mode converters all work by managing the mode adiabatically or by phase matching.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

@@ -118,7 +118,7 @@ Grating couplers make testing easy because a fibre array can land on them anywhe
 
 **Lensed fibres.** A lensed fibre has its end shaped into a lens. It may be polished into a cone with a rounded tip, or carry a short piece of graded-index fibre spliced on and cut to length. Either way it focuses the fibre's 10.4 µm mode to a spot of 2–3 µm a few micrometres to some tens of micrometres in front of the tip. One lensed fibre at the input and one at the output, each on its own six-axis stage, is the classic edge-coupled test. It is slow: each fibre is aligned actively to within a fraction of a micrometre, at the right working distance, for every device.
 
-**Lensed fibre arrays.** A **lensed fibre array** holds a row of such fibres in V-grooves at the array pitch, usually 127 µm, facing a row of edge couplers at the same pitch on the chip's facet. As with grating couplers (Section 17.1), the array is rigid. A loopback between the outermost couplers aligns it, and one alignment then serves every channel. The difficulty is that every spot must sit on its coupler at the same time, within about ±0.6 µm and at the same working distance to within a few micrometres ([Table 36.1](#tab-36-1)). Several errors add up: the positions of the cores in their grooves, the pointing and focal length of each lens, and the array's rotation. Over 889 µm of an eight-fibre array, a rotation of only 0.04° costs the far channel 1 dB (Worked Example 17.1). Lensed arrays are built in several ways:
+**Lensed fibre arrays.** A **lensed fibre array** holds a row of such fibres in V-grooves at the array pitch, usually 127 µm, facing a row of edge couplers at the same pitch on the chip's facet. As with grating couplers (Section 17.1), the array is rigid. A loopback between the outermost couplers aligns it, and one alignment then serves every channel. The difficulty is that every spot must sit on its coupler at the same time, within about ±0.6 µm and at the same working distance to within a few micrometres ([Figure 36.6](#fig-36-6), [Table 36.1](#tab-36-1)). Several errors add up: the positions of the cores in their grooves, the pointing and focal length of each lens, and the array's rotation. Over 889 µm of an eight-fibre array, a rotation of only 0.04° costs the far channel 1 dB (Worked Example 17.1). Lensed arrays are built in several ways:
 
 - shaped lensed fibres placed one by one in the grooves;
 - a micro-lens array of glass or silicon on the same pitch in front of a standard array, with one lens imaging each core;
@@ -126,6 +126,11 @@ Grating couplers make testing easy because a fibre array can land on them anywhe
 - lenses printed on each fibre by two-photon lithography ([Section 17.5]({% link chapters/17_fiberarrays.md %})).
 
 Back-reflections, which add fringes to the spectrum ([Section 13.5]({% link chapters/13_bragg.md %})), are reduced with anti-reflection coatings on the lenses and with edge couplers that meet an angled facet ([Chapter 16]({% link chapters/16_edge.md %})).
+
+<figure id="fig-36-6">
+  <img src="{{ '/assets/figs/ch36_lensedfa.svg' | relative_url }}" style="width:620px" alt="a: to-scale top view of four lensed fibres on a 127 micrometre pitch, each ending in a cone with a rounded tip about 12 micrometres from a chip facet, focusing onto four inverse-taper edge couplers, with a loopback joining the outer pair. b: one channel at the facet, to scale: the 2.5 micrometre coupler mode, a fibre spot offset by half a micrometre, and the 1 dB tolerance circle of radius 0.6 micrometres">
+  <figcaption><span class="capnum">Figure 36.6.</span> <strong>A lensed fibre array at a row of edge couplers.</strong> (a) Top view to scale: four lensed fibres on the 127 µm pitch, each tip focusing to a 2.5 µm spot about 12 µm in front of it (illustrative working distance), on four inverse-taper edge couplers; a loopback between the outer pair aligns the array. (b) One channel at the facet, to scale: the coupler's 2.5 µm mode, a fibre spot 0.5 µm off, and the 1 dB circle of ±0.60 µm (Table 36.1). Every channel must sit inside its circle at the same time. Drawn by <code>figsrc/ch36_figs.py</code>.</figcaption>
+</figure>
 
 **Lenses on the chip as well.** If the chip's edge couplers also carry printed lenses, the test interface becomes the pair of expanded beams of Section 17.5. The tolerances grow to ±6 µm and hundreds of micrometres of gap, while the angle tolerance falls to about ±1° ([Table 36.1](#tab-36-1)). A station can then place the array passively and step quickly from die to die; angle errors are controlled by flat reference faces. Printed probes that dip into deep-etched trenches go further: they reach edge couplers on the wafer before it is diced {% include cite.html keys="trappen2020" %}.
 
@@ -165,3 +170,7 @@ Back-reflections, which add fringes to the spectrum ([Section 13.5]({% link chap
 - Edge couplers are tested with lensed fibres or lensed fibre arrays: 2.5 µm spots need about ±0.6 µm on every channel at once. Printed lenses on the chip and the fibres widen that to about ±6 µm, at the cost of angle tolerance.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

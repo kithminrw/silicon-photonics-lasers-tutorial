@@ -241,3 +241,7 @@ Four depletion ring modulators with U-shaped junctions (about 50 pm/V), $$Q_L \a
 - A ring bends PAM4 levels (a 1.8 dB penalty for the smallest eye) unless the drive is pre-distorted; ring modulators lock to an average-power reference with heaters, and fine-tune with bias.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

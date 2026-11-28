@@ -357,3 +357,7 @@ One subtlety of KLayout's tiling: with a window larger than its step, each windo
 - Before an MPW run, follow a checklist: rule deck, derived layers, grid, density and fill, connectivity, LVS, labels and couplers, unique cell names, and a package with the report, waivers and the exact version of the design.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

@@ -169,3 +169,7 @@ Wider waveguides are less sensitive to width errors (the curve flattens), lose l
 - A 1 nm width error shifts a silicon resonance by about 0.6 nm; a 1 nm thickness error by about 1.4 nm.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

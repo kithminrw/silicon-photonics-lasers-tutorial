@@ -182,3 +182,7 @@ TiN heaters over every ring (the budget above assumes plain TiN; deep trenches w
 - Heaters only heat: rings are designed blue of their lasers, and locked with dithered feedback loops whose power is a real part of the link's energy budget.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

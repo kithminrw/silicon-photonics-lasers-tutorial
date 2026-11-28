@@ -77,6 +77,13 @@ Active silicon photonics adds the CMOS front-end and back-end steps ([Figure 35.
   <figcaption><span class="capnum">Figure 35.5.</span> <strong>An active SOI process in cross-section, at true scale.</strong> Front end, in the 220 nm film: a rib phase shifter with p, n and heavily doped contact regions in its 90 nm slab, a vertical germanium photodiode (4 µm wide, 0.5 µm thick) on a p-doped silicon pad, a strip waveguide and a shallow-etched grating coupler. Back end: tungsten contacts, a TiN heater 1.9 µm above the waveguide (contacted at its ends, outside this plane), two metal levels joined by vias, a pad opening, and an oxide window over the grating coupler. Device dimensions follow Chapters 18, 19 and 21; the metal thicknesses are illustrative. Drawn by <code>figsrc/ch35_figs.py</code>.</figcaption>
 </figure>
 
+**The same chip in 3D.** The model below takes the cross-section of [Figure 35.5](#fig-35-5) and gives it a length and ends. The photodiode is 10 µm long and fed by a strip waveguide. The heater has contact pads at both ends, the grating coupler is 12 µm wide, and tungsten plugs rise in rows to the two metal levels. Hide the cladding in the legend to see the devices, switch to the exploded view to separate the front end from the back end, and stretch the height to see the 90 nm slab and the 70 nm grating teeth. The laser and SOA stacks of [Section 24.9]({% link chapters/24_fp.md %}#249inside-the-chip-layer-stacks-in-3d) are drawn the same way.
+
+{% include stack3d-assets.html %}
+<div class="d3-grid">
+{% include stack3d.html slug="soi" %}
+</div>
+
 ## <span class="secnum">35.5</span>Other platforms
 
 - **Silicon nitride** is deposited, either by low-pressure CVD at high temperature (low loss, but high stress that limits film thickness unless managed) or by plasma-enhanced CVD at low temperature (compatible with finished electronics, but with more hydrogen-related absorption near 1520 nm), then annealed and etched ([Chapter 4]({% link chapters/04_platforms.md %})).
@@ -154,3 +161,7 @@ Submit to an openEBL run (electron-beam lithography, 220 nm SOI, full etch). Exp
 - Design for manufacturing: tolerant geometries, matched layouts, tuning budgets, fill rules, corners; MPW runs and openEBL give access.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

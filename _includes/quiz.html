@@ -1,0 +1,20 @@
+{%- comment -%}
+  Three self-check questions for the current chapter, from _data/quizzes.json (written by tools/make_quizzes.py).
+  Uses the demos' "Check yourself" markup; demos.js wires every .bd-check on the page.
+{%- endcomment -%}
+{%- assign qkey = page.chapter | append: "" -%}
+{%- assign qs = site.data.quizzes[qkey] -%}
+{%- if qs -%}
+{% include demos/assets.html %}
+<div class="bd bd-quiz" role="group" aria-label="Self-check questions for this chapter">
+  <div class="bd-head"><span>// check yourself · chapter {{ page.chapter }}</span></div>
+  {%- for q in qs %}
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Question {{ forloop.index }} of {{ qs.size }}</span>{{ q.q }}</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers to question {{ forloop.index }}">
+      {%- for o in q.options %}<button type="button"{% if o.ok %} data-correct{% endif %} data-why="{{ o.why | escape }}">{{ o.t }}</button>{% endfor %}
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
+  {%- endfor %}
+</div>
+{%- endif -%}

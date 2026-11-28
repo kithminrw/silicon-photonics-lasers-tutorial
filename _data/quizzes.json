@@ -1,0 +1,2420 @@
+{
+ "1": [
+  {
+   "q": "Why does optics win over copper for long or fast links?",
+   "options": [
+    {
+     "t": "Fibre loss does not grow with frequency, copper loss does",
+     "ok": true,
+     "why": "Fibre loses about 0.2 dB/km at 1550 nm at any data rate; copper's loss rises with frequency, so beyond some distance or bandwidth optics pays for its conversion cost."
+    },
+    {
+     "t": "Photons are faster than electrons in a wire",
+     "ok": false,
+     "why": "Both signals travel at a good fraction of c; the difference is loss and bandwidth, not speed."
+    },
+    {
+     "t": "Optical circuits have compact transistors and memory",
+     "ok": false,
+     "why": "They do not: photonic circuits are linear and interferometric, with no compact equivalent of the transistor."
+    }
+   ]
+  },
+  {
+   "q": "In decibels, how do you combine a link's laser power, losses and receiver sensitivity?",
+   "options": [
+    {
+     "t": "Subtract the losses from the launch power and compare with the sensitivity",
+     "ok": true,
+     "why": "A link budget in dB is a subtraction: launch power minus losses minus penalties, compared with the sensitivity, leaves the margin."
+    },
+    {
+     "t": "Average them",
+     "ok": false,
+     "why": "Averaging has no meaning here; powers and losses add and subtract in dB."
+    },
+    {
+     "t": "Multiply them",
+     "ok": false,
+     "why": "Multiplication is for linear ratios; in dB the same budget becomes additions and subtractions."
+    }
+   ]
+  },
+  {
+   "q": "Which of these does silicon lack?",
+   "options": [
+    {
+     "t": "An efficient laser and the Pockels effect",
+     "ok": true,
+     "why": "Silicon's indirect gap gives no efficient laser and its symmetric crystal no Pockels effect; other materials fill these gaps."
+    },
+    {
+     "t": "Strong optical confinement",
+     "ok": false,
+     "why": "Silicon's high index gives the strongest confinement of the common platforms."
+    },
+    {
+     "t": "CMOS-compatible manufacturing",
+     "ok": false,
+     "why": "That is silicon's main advantage."
+    }
+   ]
+  }
+ ],
+ "2": [
+  {
+   "q": "What is the group index of a 500 × 220 nm silicon wire at 1550 nm, roughly?",
+   "options": [
+    {
+     "t": "About 2.4",
+     "ok": false,
+     "why": "That is the effective index; dispersion pushes the group index higher."
+    },
+    {
+     "t": "About 4.2",
+     "ok": true,
+     "why": "n_g = n − λ dn/dλ is about 4.2 for the wire, well above its effective index of about 2.4."
+    },
+    {
+     "t": "3.476, the index of bulk silicon",
+     "ok": false,
+     "why": "That is the material index; a guided mode's indices differ."
+    }
+   ]
+  },
+  {
+   "q": "How far does the evanescent field reach into the oxide beyond a silicon core?",
+   "options": [
+    {
+     "t": "About 10 µm",
+     "ok": false,
+     "why": "That is fibre-mode scale; the tail of a high-contrast silicon mode is much shorter."
+    },
+    {
+     "t": "Nothing reaches the oxide under total internal reflection",
+     "ok": false,
+     "why": "Total internal reflection still leaves an evanescent field on the low-index side."
+    },
+    {
+     "t": "About 100 nm",
+     "ok": true,
+     "why": "The field decays as e^(−γx) with 1/γ of about 100 nm, which is why couplers, sensors and scattering depend on what is near the core."
+    }
+   ]
+  },
+  {
+   "q": "A loss of α in 1/cm corresponds to how many dB/cm?",
+   "options": [
+    {
+     "t": "4.343 α",
+     "ok": true,
+     "why": "α_dB = 10 log₁₀(e) α = 4.343 α."
+    },
+    {
+     "t": "α",
+     "ok": false,
+     "why": "Decibels and natural-log units differ by a factor."
+    },
+    {
+     "t": "10 α",
+     "ok": false,
+     "why": "The factor is 10 log₁₀ e, not 10."
+    }
+   ]
+  }
+ ],
+ "3": [
+  {
+   "q": "What sets a Gaussian beam's divergence?",
+   "options": [
+    {
+     "t": "Its waist: θ₀ = λ/(π n w₀)",
+     "ok": true,
+     "why": "Small waists diverge fast; that is why small chip modes need lenses or tapers to meet a fibre."
+    },
+    {
+     "t": "Its power",
+     "ok": false,
+     "why": "In linear optics the divergence does not depend on power."
+    },
+    {
+     "t": "Only the lens after it",
+     "ok": false,
+     "why": "A lens changes the beam, but the divergence of a given beam is set by its waist."
+    }
+   ]
+  },
+  {
+   "q": "What is the mode-field diameter of standard single-mode fibre at 1550 nm?",
+   "options": [
+    {
+     "t": "About 10.4 µm",
+     "ok": true,
+     "why": "SMF-28 has an MFD of about 10.4 µm at 1550 nm and 9.2 µm at 1310 nm."
+    },
+    {
+     "t": "About 50 µm",
+     "ok": false,
+     "why": "That is the core of multimode fibre."
+    },
+    {
+     "t": "About 2.5 µm",
+     "ok": false,
+     "why": "That is a lensed-fibre or inverse-taper spot."
+    }
+   ]
+  },
+  {
+   "q": "A waist mismatch of a factor of two between two aligned Gaussian modes costs about:",
+   "options": [
+    {
+     "t": "10 dB",
+     "ok": false,
+     "why": "Too large for a factor of two; that would take a far bigger mismatch."
+    },
+    {
+     "t": "0.2 dB",
+     "ok": false,
+     "why": "Too small: the overlap of mismatched waists falls quickly."
+    },
+    {
+     "t": "1.9 dB",
+     "ok": true,
+     "why": "η = (2w₁w₂/(w₁² + w₂²))² = 0.64, 1.9 dB."
+    }
+   ]
+  }
+ ],
+ "4": [
+  {
+   "q": "Which platform offers everything, including gain, in one material?",
+   "options": [
+    {
+     "t": "Silicon",
+     "ok": false,
+     "why": "Silicon has no efficient laser."
+    },
+    {
+     "t": "Indium phosphide",
+     "ok": true,
+     "why": "InP can guide, modulate, detect and amplify, at the price of higher loss and smaller wafers."
+    },
+    {
+     "t": "Silicon nitride",
+     "ok": false,
+     "why": "SiN has the lowest loss but no fast modulation, detection or gain."
+    }
+   ]
+  },
+  {
+   "q": "Why does germanium detect C-band light?",
+   "options": [
+    {
+     "t": "It has a Pockels effect",
+     "ok": false,
+     "why": "Detection needs absorption, not the Pockels effect."
+    },
+    {
+     "t": "It is transparent at 1550 nm",
+     "ok": false,
+     "why": "A detector must absorb."
+    },
+    {
+     "t": "Its direct gap of 0.80 eV puts its absorption edge near 1550 nm",
+     "ok": true,
+     "why": "λ_g = 1.24/E_g µm: 0.80 eV gives an edge at about 1.55 µm."
+    }
+   ]
+  },
+  {
+   "q": "How do most modern silicon transceivers get their light?",
+   "options": [
+    {
+     "t": "From the fibre only",
+     "ok": false,
+     "why": "Some use external lasers, but most integrate or attach III–V lasers."
+    },
+    {
+     "t": "From silicon lasers",
+     "ok": false,
+     "why": "Silicon does not lase efficiently."
+    },
+    {
+     "t": "From attached or bonded III–V lasers",
+     "ok": true,
+     "why": "Monolithic, hybrid, heterogeneous and transfer-printed integration bring III–V gain to silicon."
+    }
+   ]
+  }
+ ],
+ "5": [
+  {
+   "q": "When is a symmetric slab waveguide single-mode?",
+   "options": [
+    {
+     "t": "For V < π",
+     "ok": true,
+     "why": "The first higher mode appears at V = π; 220 nm of silicon in oxide is just below the 245 nm limit at 1550 nm."
+    },
+    {
+     "t": "For V < 2.405",
+     "ok": false,
+     "why": "2.405 is the single-mode limit of a step-index fibre."
+    },
+    {
+     "t": "Always",
+     "ok": false,
+     "why": "Thicker films guide more modes."
+    }
+   ]
+  },
+  {
+   "q": "What is the effective index of the TE0 mode of a 220 nm silicon slab in oxide at 1550 nm?",
+   "options": [
+    {
+     "t": "2.85",
+     "ok": true,
+     "why": "The slab solver gives 2.85, with n_g = 3.70 and 81 % of the power in the silicon."
+    },
+    {
+     "t": "3.48",
+     "ok": false,
+     "why": "That is bulk silicon; a mode's index lies between core and cladding."
+    },
+    {
+     "t": "1.44",
+     "ok": false,
+     "why": "That is the oxide cladding."
+    }
+   ]
+  },
+  {
+   "q": "In thin silicon films, how do TM modes compare with TE modes?",
+   "options": [
+    {
+     "t": "They are more confined",
+     "ok": false,
+     "why": "It is the other way round in thin films."
+    },
+    {
+     "t": "They are less confined",
+     "ok": true,
+     "why": "TM's field jumps at the horizontal interfaces and spreads into the cladding, so its index and confinement are lower."
+    },
+    {
+     "t": "They are identical",
+     "ok": false,
+     "why": "Only in a symmetric square guide could they be degenerate."
+    }
+   ]
+  }
+ ],
+ "6": [
+  {
+   "q": "Which index sets a ring's free spectral range?",
+   "options": [
+    {
+     "t": "The effective index",
+     "ok": false,
+     "why": "The FSR depends on how the phase changes with wavelength, which is the group index."
+    },
+    {
+     "t": "The group index",
+     "ok": true,
+     "why": "FSR = λ²/(n_g L): use n_g, about 4.18 for a 500 × 220 nm strip."
+    },
+    {
+     "t": "The cladding index",
+     "ok": false,
+     "why": "The cladding only enters through the mode."
+    }
+   ]
+  },
+  {
+   "q": "A 1 nm thickness error shifts a silicon ring resonance by about:",
+   "options": [
+    {
+     "t": "0.6 nm",
+     "ok": false,
+     "why": "That is the shift per nm of width."
+    },
+    {
+     "t": "1.4 nm",
+     "ok": true,
+     "why": "About 1.4 nm per nm of thickness and 0.6 nm per nm of width."
+    },
+    {
+     "t": "0.1 nm",
+     "ok": false,
+     "why": "Too small: thickness matters more than width."
+    }
+   ]
+  },
+  {
+   "q": "When does a 500 × 220 nm-style silicon strip start to guide TE1 at 1550 nm?",
+   "options": [
+    {
+     "t": "Never",
+     "ok": false,
+     "why": "Wider strips always guide more modes."
+    },
+    {
+     "t": "Near 450 nm width",
+     "ok": true,
+     "why": "TE1 appears near 450 nm, so the standard 500 nm strip is close to the multimode limit."
+    },
+    {
+     "t": "Near 1 µm",
+     "ok": false,
+     "why": "That is far wider than needed."
+    }
+   ]
+  }
+ ],
+ "7": [
+  {
+   "q": "What mostly causes the 1–3 dB/cm loss of silicon strips?",
+   "options": [
+    {
+     "t": "Sidewall-roughness scattering",
+     "ok": true,
+     "why": "It grows with the index contrast and the field at the sidewall; wider strips and ribs lose less."
+    },
+    {
+     "t": "Material absorption of silicon",
+     "ok": false,
+     "why": "Undoped silicon is transparent at 1550 nm."
+    },
+    {
+     "t": "Bending",
+     "ok": false,
+     "why": "Straight strips lose this much too."
+    }
+   ]
+  },
+  {
+   "q": "Why can silicon nitride carry watts at 1550 nm while silicon saturates?",
+   "options": [
+    {
+     "t": "SiN has a larger Kerr coefficient",
+     "ok": false,
+     "why": "Silicon's is larger; the problem is absorption."
+    },
+    {
+     "t": "SiN guides less light",
+     "ok": false,
+     "why": "Weaker confinement helps a little, but the key is the absence of TPA."
+    },
+    {
+     "t": "SiN has no two-photon absorption there",
+     "ok": true,
+     "why": "Silicon absorbs two photons together at 1550 nm and the free carriers this creates absorb more; SiN's wide gap avoids both."
+    }
+   ]
+  },
+  {
+   "q": "What does periodic poling do in thin-film lithium niobate?",
+   "options": [
+    {
+     "t": "Makes it centrosymmetric",
+     "ok": false,
+     "why": "It is the lack of symmetry that gives χ⁽²⁾ in the first place."
+    },
+    {
+     "t": "Flips the nonlinearity every coherence length, so the second harmonic keeps growing",
+     "ok": true,
+     "why": "Quasi-phase-matching: with periods of about 4 µm in thin-film LN, the power grows at (2/π)² of the ideal."
+    },
+    {
+     "t": "Removes the material's loss",
+     "ok": false,
+     "why": "Poling changes the sign of the nonlinear coefficient, not the loss."
+    }
+   ]
+  }
+ ],
+ "8": [
+  {
+   "q": "Why does an Euler bend lose less than a circular one?",
+   "options": [
+    {
+     "t": "It ramps the curvature, avoiding the mode mismatch at the junctions",
+     "ok": true,
+     "why": "A circular bend's sudden curvature change makes a mismatch loss at each straight–bend junction."
+    },
+    {
+     "t": "It is shorter",
+     "ok": false,
+     "why": "It is usually longer; the gain is at the junctions."
+    },
+    {
+     "t": "It uses a different material",
+     "ok": false,
+     "why": "The shape, not the material, makes the difference."
+    }
+   ]
+  },
+  {
+   "q": "When is a taper adiabatic?",
+   "options": [
+    {
+     "t": "When it is made of oxide",
+     "ok": false,
+     "why": "Adiabaticity is about rate of change, not material."
+    },
+    {
+     "t": "Whenever it is longer than 1 µm",
+     "ok": false,
+     "why": "The required length depends on the modes involved."
+    },
+    {
+     "t": "When its width changes slowly compared with the local beat length to the nearest coupled mode",
+     "ok": true,
+     "why": "Then the mode follows the geometry without coupling power into other modes."
+    }
+   ]
+  },
+  {
+   "q": "Roughly what bend radius suits a silicon TE strip?",
+   "options": [
+    {
+     "t": "100 nm",
+     "ok": false,
+     "why": "Far too tight: the mode would radiate."
+    },
+    {
+     "t": "A few micrometres",
+     "ok": true,
+     "why": "Silicon TE strips are fine above about 2–3 µm; TM, ribs and SiN need much more."
+    },
+    {
+     "t": "Several millimetres",
+     "ok": false,
+     "why": "That is weakly confining SiN."
+    }
+   ]
+  }
+ ],
+ "9": [
+  {
+   "q": "What is the cross-over length of two 500 × 220 nm strips 200 nm apart?",
+   "options": [
+    {
+     "t": "3.8 µm",
+     "ok": false,
+     "why": "Ten times too short."
+    },
+    {
+     "t": "37.8 µm",
+     "ok": true,
+     "why": "L_x = λ/(2Δn) = 37.8 µm at 200 nm gap, growing 2.4× per 100 nm of gap."
+    },
+    {
+     "t": "378 µm",
+     "ok": false,
+     "why": "Ten times too long for this gap."
+    }
+   ]
+  },
+  {
+   "q": "What does complete power transfer in a directional coupler require?",
+   "options": [
+    {
+     "t": "A gap below 50 nm",
+     "ok": false,
+     "why": "Any gap works if the length matches; small gaps only shorten it."
+    },
+    {
+     "t": "Two different materials",
+     "ok": false,
+     "why": "Identical guides are the usual choice."
+    },
+    {
+     "t": "Phase matching between the two guides",
+     "ok": true,
+     "why": "Without equal propagation constants, only part of the power crosses over."
+    }
+   ]
+  },
+  {
+   "q": "Why is the cross-coupling term of a lossless coupler −j?",
+   "options": [
+    {
+     "t": "Loss in the coupler",
+     "ok": false,
+     "why": "It holds for a lossless coupler."
+    },
+    {
+     "t": "Energy conservation requires the matrix to be unitary",
+     "ok": true,
+     "why": "A 90° phase between bar and cross outputs keeps the total power constant."
+    },
+    {
+     "t": "It is a convention with no physical meaning",
+     "ok": false,
+     "why": "It has consequences, for example in MZI interference."
+    }
+   ]
+  }
+ ],
+ "10": [
+  {
+   "q": "Fed from one arm, a Y-branch combiner passes:",
+   "options": [
+    {
+     "t": "All the power",
+     "ok": false,
+     "why": "Half goes into an odd mode that radiates."
+    },
+    {
+     "t": "Half the power",
+     "ok": true,
+     "why": "By symmetry, light from one arm excites even and odd modes equally; only the even one is guided out."
+    },
+    {
+     "t": "None",
+     "ok": false,
+     "why": "The even half still passes."
+    }
+   ]
+  },
+  {
+   "q": "What is the beat length L_π of a 6 µm silicon MMI (TE)?",
+   "options": [
+    {
+     "t": "About 90 µm",
+     "ok": true,
+     "why": "L_π ≈ 4n_r W_e²/(3λ) gives 90 µm; a 1 × 2 splitter is then 34 µm long."
+    },
+    {
+     "t": "About 900 µm",
+     "ok": false,
+     "why": "Ten times too long."
+    },
+    {
+     "t": "About 9 µm",
+     "ok": false,
+     "why": "Ten times too short."
+    }
+   ]
+  },
+  {
+   "q": "A centred input to an MMI excites:",
+   "options": [
+    {
+     "t": "All modes equally",
+     "ok": false,
+     "why": "Overlap integrals vanish for the odd modes."
+    },
+    {
+     "t": "Only even modes",
+     "ok": true,
+     "why": "Symmetry forbids odd modes, which gives the short symmetric-interference images."
+    },
+    {
+     "t": "Only odd modes",
+     "ok": false,
+     "why": "A symmetric input cannot excite antisymmetric modes."
+    }
+   ]
+  }
+ ],
+ "11": [
+  {
+   "q": "The FSR of an unbalanced MZI with ΔL = 100 µm in a silicon strip at 1550 nm is about:",
+   "options": [
+    {
+     "t": "5.75 nm",
+     "ok": true,
+     "why": "λ²/(n_g ΔL) with n_g ≈ 4.18 gives 5.75 nm."
+    },
+    {
+     "t": "57.5 nm",
+     "ok": false,
+     "why": "Ten times too large."
+    },
+    {
+     "t": "0.58 nm",
+     "ok": false,
+     "why": "Ten times too small."
+    }
+   ]
+  },
+  {
+   "q": "What limits an MZI's extinction?",
+   "options": [
+    {
+     "t": "The arm length",
+     "ok": false,
+     "why": "Length sets the FSR, not the extinction."
+    },
+    {
+     "t": "The wavelength",
+     "ok": false,
+     "why": "Only through the couplers' wavelength dependence."
+    },
+    {
+     "t": "Unequal couplers or arm losses",
+     "ok": true,
+     "why": "A 55/45 coupler caps the extinction near 26 dB."
+    }
+   ]
+  },
+  {
+   "q": "How can an unbalanced MZI measure the group index on a chip?",
+   "options": [
+    {
+     "t": "From the insertion loss",
+     "ok": false,
+     "why": "Loss does not reveal the group index."
+    },
+    {
+     "t": "n_g = λ²/(FSR · ΔL)",
+     "ok": true,
+     "why": "Measure the FSR, know ΔL, and solve for n_g."
+    },
+    {
+     "t": "From the extinction ratio",
+     "ok": false,
+     "why": "Extinction tells about coupler balance, not n_g."
+    }
+   ]
+  }
+ ],
+ "12": [
+  {
+   "q": "What is the FSR of a 10 µm-radius silicon ring at 1550 nm?",
+   "options": [
+    {
+     "t": "About 9.15 nm",
+     "ok": true,
+     "why": "FSR = λ²/(n_g L) with L = 2π × 10 µm gives about 9.15 nm."
+    },
+    {
+     "t": "About 0.9 nm",
+     "ok": false,
+     "why": "Ten times too small."
+    },
+    {
+     "t": "About 91 nm",
+     "ok": false,
+     "why": "That is the Vernier FSR of two rings."
+    }
+   ]
+  },
+  {
+   "q": "At critical coupling (t = a), the all-pass ring:",
+   "options": [
+    {
+     "t": "Transmits everything",
+     "ok": false,
+     "why": "That is far from resonance."
+    },
+    {
+     "t": "Has its highest loaded Q",
+     "ok": false,
+     "why": "Q_L = Q_i/2 at critical coupling; under-coupled rings have higher Q_L."
+    },
+    {
+     "t": "Has a full null on resonance",
+     "ok": true,
+     "why": "The coupled-in loss exactly matches the ring's round-trip loss, and the through port goes to zero."
+    }
+   ]
+  },
+  {
+   "q": "Why can one through-port spectrum not tell under- from over-coupling?",
+   "options": [
+    {
+     "t": "Rings have no resonances",
+     "ok": false,
+     "why": "They do; the ambiguity is in the fit."
+    },
+    {
+     "t": "The formula is symmetric in a and t",
+     "ok": true,
+     "why": "Swapping loss and coupling gives the same spectrum; use several gaps or an add-drop ring."
+    },
+    {
+     "t": "The spectrum has noise",
+     "ok": false,
+     "why": "Even noiseless data has the ambiguity."
+    }
+   ]
+  }
+ ],
+ "13": [
+  {
+   "q": "What period gives a first-order Bragg grating at 1550 nm in a 500 × 220 nm silicon strip?",
+   "options": [
+    {
+     "t": "316.8 nm",
+     "ok": true,
+     "why": "Λ = λ/(2 n_eff) with n_eff = 2.446."
+    },
+    {
+     "t": "633.6 nm",
+     "ok": false,
+     "why": "That would be second order."
+    },
+    {
+     "t": "1550 nm",
+     "ok": false,
+     "why": "Bragg reflection needs Λ = λ/(2n_eff)."
+    }
+   ]
+  },
+  {
+   "q": "A lossless Fabry–Pérot cavity with two 99 % mirrors, on resonance, transmits:",
+   "options": [
+    {
+     "t": "All of it",
+     "ok": true,
+     "why": "(1 − R)²/(1 − R)² = 1: equal lossless mirrors transmit everything on resonance."
+    },
+    {
+     "t": "0.01 %",
+     "ok": false,
+     "why": "Multiplying the two mirrors ignores the in-phase round trips."
+    },
+    {
+     "t": "1 %",
+     "ok": false,
+     "why": "That is one mirror; the round trips build up the light inside."
+    }
+   ]
+  },
+  {
+   "q": "With loss inside, what does setting R₁ = R₂e^(−2αL) achieve?",
+   "options": [
+    {
+     "t": "A wider FSR",
+     "ok": false,
+     "why": "The FSR depends on length and group index."
+    },
+    {
+     "t": "100 % transmission",
+     "ok": false,
+     "why": "Loss still absorbs part of the light."
+    },
+    {
+     "t": "No reflection on resonance",
+     "ok": true,
+     "why": "The front mirror leaks as fast as everything behind it loses; the rest is transmitted or absorbed."
+    }
+   ]
+  }
+ ],
+ "14": [
+  {
+   "q": "What sets the DWDM channel grid?",
+   "options": [
+    {
+     "t": "The ITU frequency grid (for example 100 or 400 GHz spacing)",
+     "ok": true,
+     "why": "DWDM channels sit on the ITU grid; CWDM uses 20 nm spacing."
+    },
+    {
+     "t": "The laser's linewidth",
+     "ok": false,
+     "why": "Linewidth must be far below the spacing, but it does not set it."
+    },
+    {
+     "t": "The fibre's mode size",
+     "ok": false,
+     "why": "Unrelated to channel spacing."
+    }
+   ]
+  },
+  {
+   "q": "Why does every ring demultiplexer need heaters and locking?",
+   "options": [
+    {
+     "t": "Heaters improve the Q",
+     "ok": false,
+     "why": "Heaters tune the wavelength, not the Q."
+    },
+    {
+     "t": "To amplify the light",
+     "ok": false,
+     "why": "Heaters do not amplify."
+    },
+    {
+     "t": "Rings drift with temperature and fabrication",
+     "ok": true,
+     "why": "About 75 pm/K plus nanometres of fabrication offset: they must be tuned and kept on their channels."
+    }
+   ]
+  },
+  {
+   "q": "In mode-division multiplexing, what does an asymmetric directional coupler phase-match?",
+   "options": [
+    {
+     "t": "Two different wavelengths",
+     "ok": false,
+     "why": "Mode multiplexing works at the same wavelength."
+    },
+    {
+     "t": "TE0 of a narrow guide to TE1 of a wide bus",
+     "ok": true,
+     "why": "A 0.45 µm strip's TE0 matches TE1 of a 0.93 µm bus; the bus's own TE0 passes untouched."
+    },
+    {
+     "t": "TE to TM",
+     "ok": false,
+     "why": "That is a polarisation rotator."
+    }
+   ]
+  }
+ ],
+ "15": [
+  {
+   "q": "Why are fibres tilted by 8–12° over grating couplers?",
+   "options": [
+    {
+     "t": "To avoid the strong second-order Bragg reflection of vertical coupling",
+     "ok": true,
+     "why": "At normal incidence the grating also reflects back into the waveguide."
+    },
+    {
+     "t": "To fit the fibre array",
+     "ok": false,
+     "why": "Arrays can be made at any angle; the reason is optical."
+    },
+    {
+     "t": "To increase bandwidth",
+     "ok": false,
+     "why": "Tilt does not mainly serve bandwidth."
+    }
+   ]
+  },
+  {
+   "q": "A grating coupler's efficiency is the product of:",
+   "options": [
+    {
+     "t": "Period and angle",
+     "ok": false,
+     "why": "Those set phase matching, not efficiency directly."
+    },
+    {
+     "t": "Length and width",
+     "ok": false,
+     "why": "They enter through directionality and overlap."
+    },
+    {
+     "t": "Directionality and mode overlap",
+     "ok": true,
+     "why": "How much light goes up, times how well its profile matches the fibre mode."
+    }
+   ]
+  },
+  {
+   "q": "What limits a grating coupler's 1 dB bandwidth to 30–40 nm?",
+   "options": [
+    {
+     "t": "The laser",
+     "ok": false,
+     "why": "Bandwidth is a property of the coupler."
+    },
+    {
+     "t": "The fibre's angular acceptance against the grating's angular dispersion",
+     "ok": true,
+     "why": "The beam angle changes with wavelength, and the fibre only accepts a narrow range of angles."
+    },
+    {
+     "t": "Silicon absorption",
+     "ok": false,
+     "why": "Silicon is transparent across the band."
+    }
+   ]
+  }
+ ],
+ "16": [
+  {
+   "q": "Butt-coupling a 500 × 220 nm strip straight to SMF-28 loses about:",
+   "options": [
+    {
+     "t": "1 dB",
+     "ok": false,
+     "why": "Far too optimistic: the modes differ greatly in size."
+    },
+    {
+     "t": "20 dB",
+     "ok": true,
+     "why": "The mode must be expanded first, by an inverse taper or a spot-size converter."
+    },
+    {
+     "t": "100 dB",
+     "ok": false,
+     "why": "Overlap losses are large, but not this large."
+    }
+   ]
+  },
+  {
+   "q": "How does an inverse taper expand the mode?",
+   "options": [
+    {
+     "t": "By widening the silicon",
+     "ok": false,
+     "why": "A wider strip confines more, not less."
+    },
+    {
+     "t": "By adding a lens",
+     "ok": false,
+     "why": "The taper alone does it; lenses are an extra option."
+    },
+    {
+     "t": "By narrowing the silicon tip so the mode spreads into the cladding",
+     "ok": true,
+     "why": "A 180 nm tip gives a 2.9 µm spot, 140 nm about 10 µm (TE)."
+    }
+   ]
+  },
+  {
+   "q": "What advantage does edge coupling have over grating coupling?",
+   "options": [
+    {
+     "t": "Larger alignment tolerance",
+     "ok": false,
+     "why": "Small edge spots need tighter alignment."
+    },
+    {
+     "t": "Over 100 nm bandwidth and both polarisations",
+     "ok": true,
+     "why": "Grating couplers instead offer wafer-scale testing and relaxed alignment."
+    },
+    {
+     "t": "Wafer-scale testing before dicing",
+     "ok": false,
+     "why": "That is the grating coupler's advantage."
+    }
+   ]
+  }
+ ],
+ "17": [
+  {
+   "q": "What is the 1 dB lateral tolerance of a lensed fibre on an inverse taper (2.5 µm spots)?",
+   "options": [
+    {
+     "t": "±0.6 µm",
+     "ok": true,
+     "why": "d = √(0.115 (w₁² + w₂²)): about ±0.6 µm, four times tighter than a grating coupler."
+    },
+    {
+     "t": "±6 µm",
+     "ok": false,
+     "why": "That is a pair of printed lenses with a 25 µm beam."
+    },
+    {
+     "t": "±25 µm",
+     "ok": false,
+     "why": "Far beyond any single-mode interface."
+    }
+   ]
+  },
+  {
+   "q": "Facet-attached microlenses expand the beam to about 25 µm. What becomes harder?",
+   "options": [
+    {
+     "t": "Holding the angle",
+     "ok": true,
+     "why": "A wide beam has a narrow far field: about ±1° of tilt for 1 dB."
+    },
+    {
+     "t": "The gap",
+     "ok": false,
+     "why": "Hundreds of micrometres of gap cost almost nothing."
+    },
+    {
+     "t": "Lateral alignment",
+     "ok": false,
+     "why": "It becomes ten times easier, about ±6 µm."
+    }
+   ]
+  },
+  {
+   "q": "How is the alignment of a whole fibre array found quickly?",
+   "options": [
+    {
+     "t": "Use the largest fibre",
+     "ok": false,
+     "why": "All fibres are the same."
+    },
+    {
+     "t": "Align a loopback between the outer fibres",
+     "ok": true,
+     "why": "When the loopback peaks, the rigid array is aligned for every channel."
+    },
+    {
+     "t": "Align each fibre separately",
+     "ok": false,
+     "why": "The fibres are fixed in the array; aligning one pair aligns all."
+    }
+   ]
+  }
+ ],
+ "18": [
+  {
+   "q": "How fast does a silicon ring drift with temperature?",
+   "options": [
+    {
+     "t": "About 75 pm/K",
+     "ok": true,
+     "why": "dn_eff/dT ≈ 2.0 × 10⁻⁴ /K for a 500 × 220 nm strip gives about 75 pm/K."
+    },
+    {
+     "t": "About 7.5 nm/K",
+     "ok": false,
+     "why": "A hundred times too much."
+    },
+    {
+     "t": "It does not drift",
+     "ok": false,
+     "why": "Silicon's thermo-optic coefficient is large."
+    }
+   ]
+  },
+  {
+   "q": "Does P_π of a thermo-optic phase shifter depend on its length?",
+   "options": [
+    {
+     "t": "Yes: twice the length halves P_π",
+     "ok": false,
+     "why": "That is true of electro-optic V_π, not thermal P_π."
+    },
+    {
+     "t": "Yes: twice the length doubles P_π",
+     "ok": false,
+     "why": "Length cancels out."
+    },
+    {
+     "t": "No: longer heaters spread the same total power",
+     "ok": true,
+     "why": "P_π = λG'/(2 dn_eff/dT), with G' the thermal conductance per length."
+    }
+   ]
+  },
+  {
+   "q": "What do trenches and undercuts trade?",
+   "options": [
+    {
+     "t": "Nothing: they only help",
+     "ok": false,
+     "why": "Speed is the price."
+    },
+    {
+     "t": "Lower power for slower response",
+     "ok": true,
+     "why": "Isolation lowers P_π (to 4.5 mW with an undercut) but slows the response (to 180 µs)."
+    },
+    {
+     "t": "Lower loss for higher power",
+     "ok": false,
+     "why": "They concern thermal isolation, not optical loss."
+    }
+   ]
+  }
+ ],
+ "19": [
+  {
+   "q": "In silicon, which carriers change the index more per unit of loss?",
+   "options": [
+    {
+     "t": "Holes",
+     "ok": true,
+     "why": "At 10¹⁸ cm⁻³, holes change the index three times more per unit loss than electrons."
+    },
+    {
+     "t": "Electrons",
+     "ok": false,
+     "why": "It is the other way round."
+    },
+    {
+     "t": "Both equally",
+     "ok": false,
+     "why": "They differ by about three."
+    }
+   ]
+  },
+  {
+   "q": "What V_πL does a lateral PN junction at 5 × 10¹⁷ cm⁻³ give in a silicon rib?",
+   "options": [
+    {
+     "t": "About 0.01 V·cm",
+     "ok": false,
+     "why": "Far beyond silicon's plasma effect."
+    },
+    {
+     "t": "About 100 V·cm",
+     "ok": false,
+     "why": "Far worse than real devices."
+    },
+    {
+     "t": "About 1.4 V·cm",
+     "ok": true,
+     "why": "With about 13 dB/cm of loss; doping trades efficiency against loss and capacitance."
+    }
+   ]
+  },
+  {
+   "q": "What makes thin-film lithium niobate attractive for modulators?",
+   "options": [
+    {
+     "t": "It lases",
+     "ok": false,
+     "why": "LN does not provide gain here."
+    },
+    {
+     "t": "The Pockels effect: about 2.6 V·cm push–pull, low loss, > 100 GHz",
+     "ok": true,
+     "why": "A pure field effect, with no free-carrier loss and very fast."
+    },
+    {
+     "t": "Two-photon absorption",
+     "ok": false,
+     "why": "That is a loss mechanism."
+    }
+   ]
+  }
+ ],
+ "20": [
+  {
+   "q": "What is OMA in terms of average power and extinction ratio?",
+   "options": [
+    {
+     "t": "2P_avg(ER − 1)/(ER + 1)",
+     "ok": true,
+     "why": "The optical modulation amplitude is the difference between the one and zero levels."
+    },
+    {
+     "t": "P_avg × ER",
+     "ok": false,
+     "why": "That overstates it."
+    },
+    {
+     "t": "P_avg/ER",
+     "ok": false,
+     "why": "That is not the modulation amplitude."
+    }
+   ]
+  },
+  {
+   "q": "What does a ring modulator's Q trade?",
+   "options": [
+    {
+     "t": "Size against colour",
+     "ok": false,
+     "why": "Not a meaningful trade."
+    },
+    {
+     "t": "Nothing: higher Q is always better",
+     "ok": false,
+     "why": "Too high a Q limits speed."
+    },
+    {
+     "t": "Extinction against bandwidth (c/λQ)",
+     "ok": true,
+     "why": "High Q gives steep slopes and extinction but limits the photon-lifetime bandwidth."
+    }
+   ]
+  },
+  {
+   "q": "PAM4 instead of NRZ at the same bit rate:",
+   "options": [
+    {
+     "t": "Has no penalty",
+     "ok": false,
+     "why": "Smaller eyes cost decibels."
+    },
+    {
+     "t": "Halves the symbol rate, for a penalty of about 4.8 dB in eye amplitude",
+     "ok": true,
+     "why": "Each eye is a third of the swing; the penalty is the price of half the bandwidth."
+    },
+    {
+     "t": "Doubles the symbol rate",
+     "ok": false,
+     "why": "It halves it."
+    }
+   ]
+  }
+ ],
+ "21": [
+  {
+   "q": "What is the maximum responsivity at 1550 nm?",
+   "options": [
+    {
+     "t": "About 1.25 A/W",
+     "ok": true,
+     "why": "R = η λ[µm]/1.24 with η = 1."
+    },
+    {
+     "t": "1 W/A",
+     "ok": false,
+     "why": "Wrong units and value."
+    },
+    {
+     "t": "12.5 A/W",
+     "ok": false,
+     "why": "Without internal gain, at most 1.25 A/W."
+    }
+   ]
+  },
+  {
+   "q": "What Q factor gives a BER of 10⁻¹²?",
+   "options": [
+    {
+     "t": "3.0",
+     "ok": false,
+     "why": "Far too low."
+    },
+    {
+     "t": "20",
+     "ok": false,
+     "why": "Far beyond what is needed."
+    },
+    {
+     "t": "7.03",
+     "ok": true,
+     "why": "BER = ½ erfc(Q/√2); Q = 3.49 gives the KP4 FEC threshold."
+    }
+   ]
+  },
+  {
+   "q": "What dominates the noise of short-reach receivers?",
+   "options": [
+    {
+     "t": "Fibre loss",
+     "ok": false,
+     "why": "Loss lowers signal; it is not a noise source."
+    },
+    {
+     "t": "The TIA's thermal noise",
+     "ok": true,
+     "why": "Shot noise is small at these powers; the front end's thermal noise dominates."
+    },
+    {
+     "t": "Laser phase noise",
+     "ok": false,
+     "why": "Intensity detection ignores phase."
+    }
+   ]
+  }
+ ],
+ "22": [
+  {
+   "q": "Why can a two-level system never invert?",
+   "options": [
+    {
+     "t": "Absorption and stimulated emission have equal coefficients, so pumping at most equalises the populations",
+     "ok": true,
+     "why": "B₁₂ = B₂₁; three- and four-level systems are needed."
+    },
+    {
+     "t": "Spontaneous emission is too slow",
+     "ok": false,
+     "why": "The problem is the symmetry of B coefficients."
+    },
+    {
+     "t": "It has no photons",
+     "ok": false,
+     "why": "Not the reason."
+    }
+   ]
+  },
+  {
+   "q": "Why does silicon emit light poorly?",
+   "options": [
+    {
+     "t": "It is too transparent",
+     "ok": false,
+     "why": "Transparency at 1550 nm is unrelated to emission at its gap."
+    },
+    {
+     "t": "It conducts heat too well",
+     "ok": false,
+     "why": "Not the reason."
+    },
+    {
+     "t": "Its band gap is indirect: B ≈ 10⁻¹⁴ against 10⁻¹⁰ cm³/s for InGaAsP",
+     "ok": true,
+     "why": "Radiative recombination needs a phonon, so it is very slow."
+    }
+   ]
+  },
+  {
+   "q": "What does gain saturation look like?",
+   "options": [
+    {
+     "t": "Gain is constant",
+     "ok": false,
+     "why": "Only for small signals."
+    },
+    {
+     "t": "γ₀/(1 + I/I_sat)",
+     "ok": true,
+     "why": "Strong signals use up the inversion and the gain falls."
+    },
+    {
+     "t": "Gain grows without limit with intensity",
+     "ok": false,
+     "why": "It must saturate."
+    }
+   ]
+  }
+ ],
+ "23": [
+  {
+   "q": "What is the condition for gain in a semiconductor?",
+   "options": [
+    {
+     "t": "E_g < hν < E_Fc − E_Fv",
+     "ok": true,
+     "why": "The quasi-Fermi-level separation must exceed the photon energy (Bernard–Duraffourg)."
+    },
+    {
+     "t": "hν < E_g",
+     "ok": false,
+     "why": "Below the gap there is no interband transition."
+    },
+    {
+     "t": "Any injected current",
+     "ok": false,
+     "why": "Only above transparency."
+    }
+   ]
+  },
+  {
+   "q": "What counts as the modal gain of a waveguide laser?",
+   "options": [
+    {
+     "t": "The material gain",
+     "ok": false,
+     "why": "The mode only partly overlaps the gain."
+    },
+    {
+     "t": "The cladding gain",
+     "ok": false,
+     "why": "Claddings have no gain."
+    },
+    {
+     "t": "Γg: the material gain times the mode's overlap with the active region",
+     "ok": true,
+     "why": "Only the part of the mode in the active layer sees gain."
+    }
+   ]
+  },
+  {
+   "q": "What do quantum dots add over quantum wells?",
+   "options": [
+    {
+     "t": "Higher loss",
+     "ok": false,
+     "why": "Not their advantage."
+    },
+    {
+     "t": "Temperature stability and tolerance to defects",
+     "ok": true,
+     "why": "Which is why they suit growth on silicon."
+    },
+    {
+     "t": "A direct gap in silicon",
+     "ok": false,
+     "why": "Dots are III–V."
+    }
+   ]
+  }
+ ],
+ "24": [
+  {
+   "q": "What is the threshold condition of a Fabry–Pérot laser?",
+   "options": [
+    {
+     "t": "Γg_th = α_i + ln(1/R₁R₂)/(2L)",
+     "ok": true,
+     "why": "Gain equals internal plus mirror loss; above threshold gain and carriers clamp."
+    },
+    {
+     "t": "Γg_th = 0",
+     "ok": false,
+     "why": "That is transparency, not threshold."
+    },
+    {
+     "t": "Γg_th = α_i only",
+     "ok": false,
+     "why": "Mirror loss must be paid too."
+    }
+   ]
+  },
+  {
+   "q": "What threshold and slope does the 400 µm example laser have?",
+   "options": [
+    {
+     "t": "1.9 mA and 2.1 W/A",
+     "ok": false,
+     "why": "Off by ten in both."
+    },
+    {
+     "t": "190 mA and 0.021 W/A",
+     "ok": false,
+     "why": "Off by ten in both."
+    },
+    {
+     "t": "19 mA and 0.21 W/A per facet",
+     "ok": true,
+     "why": "From the rate equations and the example's parameters."
+    }
+   ]
+  },
+  {
+   "q": "How does a buried-heterostructure laser differ from a ridge laser?",
+   "options": [
+    {
+     "t": "Its ridge stops above the wells",
+     "ok": false,
+     "why": "That describes the ridge laser."
+    },
+    {
+     "t": "Its mesa is etched through the wells and buried again in regrown InP",
+     "ok": true,
+     "why": "No exposed surface, current only through the mesa, strong guiding."
+    },
+    {
+     "t": "It has no quantum wells",
+     "ok": false,
+     "why": "It has wells, buried in InP."
+    }
+   ]
+  }
+ ],
+ "25": [
+  {
+   "q": "How does a laser's relaxation frequency grow with current?",
+   "options": [
+    {
+     "t": "As √(I − I_th)",
+     "ok": true,
+     "why": "So bandwidth rises with bias until damping caps it."
+    },
+    {
+     "t": "Linearly with I",
+     "ok": false,
+     "why": "It grows as a square root."
+    },
+    {
+     "t": "It does not change",
+     "ok": false,
+     "why": "It grows with the photon density."
+    }
+   ]
+  },
+  {
+   "q": "How does the α-factor change the linewidth?",
+   "options": [
+    {
+     "t": "It narrows it by α",
+     "ok": false,
+     "why": "It broadens."
+    },
+    {
+     "t": "It has no effect",
+     "ok": false,
+     "why": "It matters greatly."
+    },
+    {
+     "t": "It broadens it by 1 + α²",
+     "ok": true,
+     "why": "Gain changes drag the index, adding phase noise."
+    }
+   ]
+  },
+  {
+   "q": "Above about what feedback level can a laser become unstable?",
+   "options": [
+    {
+     "t": "Only above 0 dB",
+     "ok": false,
+     "why": "Much weaker feedback is enough."
+    },
+    {
+     "t": "About −40 dB",
+     "ok": true,
+     "why": "Coherence collapse can begin at −40 to −30 dB for typical lasers."
+    },
+    {
+     "t": "About −100 dB",
+     "ok": false,
+     "why": "Far below the danger zone."
+    }
+   ]
+  }
+ ],
+ "26": [
+  {
+   "q": "What side-mode suppression do single-frequency lasers typically need?",
+   "options": [
+    {
+     "t": "35 dB or more",
+     "ok": true,
+     "why": "Enough that the other modes do not matter over fibre."
+    },
+    {
+     "t": "3 dB",
+     "ok": false,
+     "why": "Far too little."
+    },
+    {
+     "t": "100 dB",
+     "ok": false,
+     "why": "More than required."
+    }
+   ]
+  },
+  {
+   "q": "How do λ/4-shifted DFB lasers tune?",
+   "options": [
+    {
+     "t": "Over 100 nm by current",
+     "ok": false,
+     "why": "That needs Vernier or external cavities."
+    },
+    {
+     "t": "They cannot tune at all",
+     "ok": false,
+     "why": "Temperature tunes them a little."
+    },
+    {
+     "t": "Only with temperature, about 0.1 nm/K",
+     "ok": true,
+     "why": "They are the telecom workhorse but tune slowly and narrowly."
+    }
+   ]
+  },
+  {
+   "q": "What Vernier FSR do 10 and 11 µm silicon rings give?",
+   "options": [
+    {
+     "t": "About 1 nm",
+     "ok": false,
+     "why": "Far too small."
+    },
+    {
+     "t": "About 91 nm",
+     "ok": true,
+     "why": "FSR₁FSR₂/|ΔFSR|, with a tuning gearing of 11."
+    },
+    {
+     "t": "About 9 nm",
+     "ok": false,
+     "why": "That is one ring's FSR."
+    }
+   ]
+  }
+ ],
+ "27": [
+  {
+   "q": "Why is self-heating worse for lasers on SOI?",
+   "options": [
+    {
+     "t": "The buried oxide insulates them thermally",
+     "ok": true,
+     "why": "Higher thermal impedance raises the temperature; thermal shunts help."
+    },
+    {
+     "t": "Silicon absorbs the light",
+     "ok": false,
+     "why": "The issue is heat flow, not absorption."
+    },
+    {
+     "t": "SOI lasers draw no current",
+     "ok": false,
+     "why": "They are electrically pumped like others."
+    }
+   ]
+  },
+  {
+   "q": "In a heterogeneous laser, what moves the light from the III–V into the silicon?",
+   "options": [
+    {
+     "t": "A mirror",
+     "ok": false,
+     "why": "The transfer is by supermode evolution."
+    },
+    {
+     "t": "A grating coupler",
+     "ok": false,
+     "why": "That couples to fibre."
+    },
+    {
+     "t": "Widening the silicon along an adiabatic taper",
+     "ok": true,
+     "why": "The supermode follows from the MQW region into the silicon past the crossing near 0.85 µm."
+    }
+   ]
+  },
+  {
+   "q": "Why can't a passive silicon circuit act as an isolator?",
+   "options": [
+    {
+     "t": "Rings are too large",
+     "ok": false,
+     "why": "Size is irrelevant."
+    },
+    {
+     "t": "Lorentz reciprocity: linear, unbiased structures transmit equally both ways",
+     "ok": true,
+     "why": "Isolation needs a magnetic bias, time modulation or nonlinearity."
+    },
+    {
+     "t": "Silicon has too much loss",
+     "ok": false,
+     "why": "Loss does not break reciprocity."
+    }
+   ]
+  }
+ ],
+ "28": [
+  {
+   "q": "What turns a laser chip into an SOA?",
+   "options": [
+    {
+     "t": "AR coatings and an angled waveguide that remove the feedback",
+     "ok": true,
+     "why": "Light passes once and is amplified, below the lasing threshold."
+    },
+    {
+     "t": "A higher current",
+     "ok": false,
+     "why": "Current alone would make it lase."
+    },
+    {
+     "t": "Removing the wells",
+     "ok": false,
+     "why": "The wells provide the gain."
+    }
+   ]
+  },
+  {
+   "q": "What is the lowest possible noise figure of an amplifier?",
+   "options": [
+    {
+     "t": "0 dB",
+     "ok": false,
+     "why": "Amplifiers always add noise."
+    },
+    {
+     "t": "10 dB",
+     "ok": false,
+     "why": "Real SOAs can be better."
+    },
+    {
+     "t": "3 dB",
+     "ok": true,
+     "why": "The quantum limit of a high-gain amplifier; input coupling loss adds to it."
+    }
+   ]
+  },
+  {
+   "q": "How small must an SOA's facet reflections be?",
+   "options": [
+    {
+     "t": "Reflections do not matter",
+     "ok": false,
+     "why": "They turn the SOA into a weak laser cavity."
+    },
+    {
+     "t": "Below about 10⁻⁴",
+     "ok": true,
+     "why": "Otherwise the gain ripples: 1.7 dB of ripple at 10⁻³ with 20 dB gain."
+    },
+    {
+     "t": "Below about 10 %",
+     "ok": false,
+     "why": "Far too reflective."
+    }
+   ]
+  }
+ ],
+ "29": [
+  {
+   "q": "How should independent variations be combined in a design margin?",
+   "options": [
+    {
+     "t": "Not as stacked worst cases: use the spread",
+     "ok": true,
+     "why": "Stacking worst cases of independent variables is pessimistic; centre the design and use statistics."
+    },
+    {
+     "t": "Always add all worst cases",
+     "ok": false,
+     "why": "That over-designs."
+    },
+    {
+     "t": "Ignore them",
+     "ok": false,
+     "why": "Margin must account for the spread."
+    }
+   ]
+  },
+  {
+   "q": "What error does a Monte Carlo yield estimate carry?",
+   "options": [
+    {
+     "t": "Y/N",
+     "ok": false,
+     "why": "Not the standard error."
+    },
+    {
+     "t": "None",
+     "ok": false,
+     "why": "Every finite sample has an error."
+    },
+    {
+     "t": "√(Y(1 − Y)/N)",
+     "ok": true,
+     "why": "Binomial statistics: more samples, smaller error."
+    }
+   ]
+  },
+  {
+   "q": "Which model should you use first?",
+   "options": [
+    {
+     "t": "No model",
+     "ok": false,
+     "why": "Design needs models."
+    },
+    {
+     "t": "The cheapest that answers the question",
+     "ok": true,
+     "why": "Formulas and mode solvers first; one final 3D FDTD check."
+    },
+    {
+     "t": "Always full 3D FDTD",
+     "ok": false,
+     "why": "Too slow for design sweeps."
+    }
+   ]
+  }
+ ],
+ "30": [
+  {
+   "q": "What does a PDK contain?",
+   "options": [
+    {
+     "t": "Layers, validated cells, compact models, rules and the layer stack",
+     "ok": true,
+     "why": "Open PDKs make public designs possible."
+    },
+    {
+     "t": "Only a GDS template",
+     "ok": false,
+     "why": "Much more than that."
+    },
+    {
+     "t": "Only simulation software",
+     "ok": false,
+     "why": "It is foundry data, not a simulator."
+    }
+   ]
+  },
+  {
+   "q": "What does gdsfactory add to layout?",
+   "options": [
+    {
+     "t": "Fabrication",
+     "ok": false,
+     "why": "It is a design tool."
+    },
+    {
+     "t": "Measurement",
+     "ok": false,
+     "why": "Testing is separate."
+    },
+    {
+     "t": "Layout as code, versioned and rerunnable",
+     "ok": true,
+     "why": "Designs can be swept, tested and regenerated."
+    }
+   ]
+  },
+  {
+   "q": "How are circuits simulated?",
+   "options": [
+    {
+     "t": "They cannot be simulated",
+     "ok": false,
+     "why": "Circuit simulation is routine."
+    },
+    {
+     "t": "From S-matrix compact models and a netlist",
+     "ok": true,
+     "why": "SAX and SiEPIC-Tools work this way."
+    },
+    {
+     "t": "Always with 3D FDTD of the whole chip",
+     "ok": false,
+     "why": "Far too expensive."
+    }
+   ]
+  }
+ ],
+ "31": [
+  {
+   "q": "When is 3D FDTD stable?",
+   "options": [
+    {
+     "t": "For a Courant number S ≤ 1/√3",
+     "ok": true,
+     "why": "The time step must be short enough for the grid."
+    },
+    {
+     "t": "Always",
+     "ok": false,
+     "why": "Too large a time step diverges."
+    },
+    {
+     "t": "Only in 2D",
+     "ok": false,
+     "why": "3D has its own limit."
+    }
+   ]
+  },
+  {
+   "q": "How does 3D FDTD cost grow as the grid is refined?",
+   "options": [
+    {
+     "t": "Linearly",
+     "ok": false,
+     "why": "Far faster than linear."
+    },
+    {
+     "t": "It does not change",
+     "ok": false,
+     "why": "Finer grids cost more."
+    },
+    {
+     "t": "Memory ∝ Δx⁻³, time ∝ Δx⁻⁴",
+     "ok": true,
+     "why": "More cells and smaller time steps."
+    }
+   ]
+  },
+  {
+   "q": "What is EME good at?",
+   "options": [
+    {
+     "t": "Nothing",
+     "ok": false,
+     "why": "It is very useful for tapers and MMIs."
+    },
+    {
+     "t": "Long devices, since length costs almost nothing",
+     "ok": true,
+     "why": "Each uniform section is exact; it struggles with radiation."
+    },
+    {
+     "t": "Broadband transients",
+     "ok": false,
+     "why": "That is FDTD's strength."
+    }
+   ]
+  }
+ ],
+ "32": [
+  {
+   "q": "What should you do before sweeping a design in any tool?",
+   "options": [
+    {
+     "t": "Converge the simulation",
+     "ok": true,
+     "why": "Check grid and settings; differences between tools are usually set-up differences."
+    },
+    {
+     "t": "Sweep first, check later",
+     "ok": false,
+     "why": "Unconverged sweeps mislead."
+    },
+    {
+     "t": "Nothing",
+     "ok": false,
+     "why": "Convergence is the first habit."
+    }
+   ]
+  },
+  {
+   "q": "Which open tools cover mode solving and FDTD?",
+   "options": [
+    {
+     "t": "Only commercial tools",
+     "ok": false,
+     "why": "Open tools cover much of the work."
+    },
+    {
+     "t": "Spreadsheets",
+     "ok": false,
+     "why": "Not for field solvers."
+    },
+    {
+     "t": "MEEP, MPB and femwell",
+     "ok": true,
+     "why": "With SAX for circuits and gdsfactory as glue."
+    }
+   ]
+  },
+  {
+   "q": "Two tools built on the same method disagree. Most likely:",
+   "options": [
+    {
+     "t": "One tool is always right",
+     "ok": false,
+     "why": "Check the set-up first."
+    },
+    {
+     "t": "Their set-ups differ",
+     "ok": true,
+     "why": "Grids, materials, sources and monitors must match."
+    },
+    {
+     "t": "Physics is broken",
+     "ok": false,
+     "why": "The method is the same."
+    }
+   ]
+  }
+ ],
+ "33": [
+  {
+   "q": "What are GDSII coordinates?",
+   "options": [
+    {
+     "t": "32-bit integers in database units, usually 1 nm",
+     "ok": true,
+     "why": "Hence a ±2.15 m range at 1 nm."
+    },
+    {
+     "t": "Floating-point micrometres",
+     "ok": false,
+     "why": "GDSII stores integers."
+    },
+    {
+     "t": "Pixels",
+     "ok": false,
+     "why": "It is a vector format."
+    }
+   ]
+  },
+  {
+   "q": "Why use hierarchy in a layout?",
+   "options": [
+    {
+     "t": "It improves fabrication",
+     "ok": false,
+     "why": "The mask is the same."
+    },
+    {
+     "t": "It is required by GDSII",
+     "ok": false,
+     "why": "Flat layouts are legal, just large."
+    },
+    {
+     "t": "It keeps files small: 10 000 rings take 4 kB as an array, 37.7 MB flat",
+     "ok": true,
+     "why": "Cells are defined once and placed many times."
+    }
+   ]
+  },
+  {
+   "q": "How does GDSII store a ring, which has a hole?",
+   "options": [
+    {
+     "t": "It cannot",
+     "ok": false,
+     "why": "The cut line handles it."
+    },
+    {
+     "t": "As a polygon with a cut line",
+     "ok": true,
+     "why": "GDSII has no holes."
+    },
+    {
+     "t": "As a circle primitive",
+     "ok": false,
+     "why": "GDSII has no circles."
+    }
+   ]
+  }
+ ],
+ "34": [
+  {
+   "q": "Which check catches a component moved 50 nm off its waveguide?",
+   "options": [
+    {
+     "t": "Connectivity and LVS, not DRC",
+     "ok": true,
+     "why": "Every width and space rule can still pass."
+    },
+    {
+     "t": "DRC",
+     "ok": false,
+     "why": "Shapes may all be legal."
+    },
+    {
+     "t": "None",
+     "ok": false,
+     "why": "Connectivity checks catch it."
+    }
+   ]
+  },
+  {
+   "q": "How should false DRC errors on curves be handled?",
+   "options": [
+    {
+     "t": "By disabling DRC",
+     "ok": false,
+     "why": "Real errors would then pass."
+    },
+    {
+     "t": "By ignoring all markers",
+     "ok": false,
+     "why": "Count mistakes, not markers."
+    },
+    {
+     "t": "With tolerances, angle limits, on-grid drawing and written waivers",
+     "ok": true,
+     "why": "Never by blanket suppression."
+    }
+   ]
+  },
+  {
+   "q": "In the chapter's test, how many real mistakes made the 373 markers?",
+   "options": [
+    {
+     "t": "0",
+     "ok": false,
+     "why": "There were real mistakes."
+    },
+    {
+     "t": "9",
+     "ok": true,
+     "why": "Most markers came from a few mistakes, an intended grating and a snapped coupler."
+    },
+    {
+     "t": "373",
+     "ok": false,
+     "why": "Markers are not mistakes."
+    }
+   ]
+  }
+ ],
+ "35": [
+  {
+   "q": "How are SOI wafers made?",
+   "options": [
+    {
+     "t": "By Smart Cut",
+     "ok": true,
+     "why": "Hydrogen implantation, bonding and splitting."
+    },
+    {
+     "t": "By growing silicon on glass",
+     "ok": false,
+     "why": "Not the standard process."
+    },
+    {
+     "t": "By oxidising silicon fully",
+     "ok": false,
+     "why": "That leaves no film."
+    }
+   ]
+  },
+  {
+   "q": "Why is tuning mandatory for silicon rings?",
+   "options": [
+    {
+     "t": "Rings have no resonances without heaters",
+     "ok": false,
+     "why": "They resonate; just at the wrong wavelength."
+    },
+    {
+     "t": "Tuning reduces loss",
+     "ok": false,
+     "why": "It shifts wavelength."
+    },
+    {
+     "t": "Wafer-scale variation spreads resonances by several nanometres",
+     "ok": true,
+     "why": "About 0.6 nm per nm of width and 1.4 nm per nm of thickness."
+    }
+   ]
+  },
+  {
+   "q": "What does electron-beam lithography offer over DUV?",
+   "options": [
+    {
+     "t": "Lower resolution",
+     "ok": false,
+     "why": "It resolves finer features."
+    },
+    {
+     "t": "Resolution and flexibility for prototypes",
+     "ok": true,
+     "why": "DUV gives throughput and repeatability."
+    },
+    {
+     "t": "Higher throughput",
+     "ok": false,
+     "why": "EBL is slow."
+    }
+   ]
+  }
+ ],
+ "36": [
+  {
+   "q": "How are grating couplers de-embedded from a measurement?",
+   "options": [
+    {
+     "t": "With a loopback or a fitted envelope",
+     "ok": true,
+     "why": "Relative quantities are more robust than absolute losses."
+    },
+    {
+     "t": "They cannot be",
+     "ok": false,
+     "why": "Loopbacks remove them."
+    },
+    {
+     "t": "By ignoring them",
+     "ok": false,
+     "why": "They dominate the raw spectrum."
+    }
+   ]
+  },
+  {
+   "q": "What does testing edge couplers with a lensed fibre array demand?",
+   "options": [
+    {
+     "t": "Nothing special",
+     "ok": false,
+     "why": "Small spots need tight alignment."
+    },
+    {
+     "t": "About ±60 µm",
+     "ok": false,
+     "why": "Far beyond single-mode tolerances."
+    },
+    {
+     "t": "About ±0.6 µm on every channel at once",
+     "ok": true,
+     "why": "Printed lenses on chip and fibres widen that to about ±6 µm."
+    }
+   ]
+  },
+  {
+   "q": "Why are grating couplers good for wafer-scale testing?",
+   "options": [
+    {
+     "t": "They have the lowest loss",
+     "ok": false,
+     "why": "Edge couplers can lose less."
+    },
+    {
+     "t": "A fibre array can reach them anywhere on the wafer before dicing",
+     "ok": true,
+     "why": "Wafer maps reveal the process variation."
+    },
+    {
+     "t": "They are polarisation-independent",
+     "ok": false,
+     "why": "They are not."
+    }
+   ]
+  }
+ ],
+ "37": [
+  {
+   "q": "What gives the propagation loss in a cutback measurement?",
+   "options": [
+    {
+     "t": "The slope of insertion loss against length",
+     "ok": true,
+     "why": "Its error bar shrinks with the spread of lengths."
+    },
+    {
+     "t": "The intercept",
+     "ok": false,
+     "why": "The intercept is the coupler loss."
+    },
+    {
+     "t": "The average",
+     "ok": false,
+     "why": "Not a loss measurement."
+    }
+   ]
+  },
+  {
+   "q": "How is the group index measured from a ring?",
+   "options": [
+    {
+     "t": "From the extinction",
+     "ok": false,
+     "why": "Extinction relates to coupling."
+    },
+    {
+     "t": "From the Q alone",
+     "ok": false,
+     "why": "Q gives loss, not n_g."
+    },
+    {
+     "t": "n_g = λ²/(FSR · L)",
+     "ok": true,
+     "why": "It checks the fabricated cross-section."
+    }
+   ]
+  },
+  {
+   "q": "A ring fit gives two mirror solutions. What resolves them?",
+   "options": [
+    {
+     "t": "Nothing",
+     "ok": false,
+     "why": "Several gaps resolve it."
+    },
+    {
+     "t": "A series of gaps",
+     "ok": true,
+     "why": "Coupling changes with gap; loss does not."
+    },
+    {
+     "t": "A longer sweep",
+     "ok": false,
+     "why": "The ambiguity remains."
+    }
+   ]
+  }
+ ],
+ "38": [
+  {
+   "q": "In a coherent receiver, why does the local oscillator help?",
+   "options": [
+    {
+     "t": "The beat current grows as √(P_S P_LO), lifting the signal above the TIA noise",
+     "ok": true,
+     "why": "About 30 dB more electrical signal for −20 dBm signal and +10 dBm LO."
+    },
+    {
+     "t": "It adds power to the fibre",
+     "ok": false,
+     "why": "It is local to the receiver."
+    },
+    {
+     "t": "It removes the need for photodiodes",
+     "ok": false,
+     "why": "Balanced photodiodes still detect."
+    }
+   ]
+  },
+  {
+   "q": "What dominates the energy per bit of the reference link?",
+   "options": [
+    {
+     "t": "The modulators",
+     "ok": false,
+     "why": "They use little energy."
+    },
+    {
+     "t": "The fibre",
+     "ok": false,
+     "why": "Fibre is passive."
+    },
+    {
+     "t": "Laser wall-plug power and ring heaters",
+     "ok": true,
+     "why": "Modulators are nearly free by comparison."
+    }
+   ]
+  },
+  {
+   "q": "How much margin does the reference link close with?",
+   "options": [
+    {
+     "t": "50 dB",
+     "ok": false,
+     "why": "Far too optimistic."
+    },
+    {
+     "t": "About 5.9 dB at about 3.7 pJ/bit",
+     "ok": true,
+     "why": "Its tight spots are the ring modulator, the couplers and the heaters."
+    },
+    {
+     "t": "−3 dB",
+     "ok": false,
+     "why": "It closes."
+    }
+   ]
+  }
+ ],
+ "39": [
+  {
+   "q": "What sets FMCW LiDAR's range resolution?",
+   "options": [
+    {
+     "t": "The chirp bandwidth: c/(2B)",
+     "ok": true,
+     "why": "A wider sweep resolves smaller distances."
+    },
+    {
+     "t": "The laser power",
+     "ok": false,
+     "why": "Power sets reach, not resolution."
+    },
+    {
+     "t": "The fibre",
+     "ok": false,
+     "why": "Unrelated."
+    }
+   ]
+  },
+  {
+   "q": "What happens if an optical phased array's emitter pitch exceeds λ/2?",
+   "options": [
+    {
+     "t": "Nothing",
+     "ok": false,
+     "why": "Pitch matters."
+    },
+    {
+     "t": "The beam narrows without limit",
+     "ok": false,
+     "why": "Lobes, not infinite narrowing."
+    },
+    {
+     "t": "Grating lobes appear",
+     "ok": true,
+     "why": "The array then radiates in several directions."
+    }
+   ]
+  },
+  {
+   "q": "What sensitivity does a silicon strip ring sensor in water reach, TE versus TM?",
+   "options": [
+    {
+     "t": "Both 1 nm/RIU",
+     "ok": false,
+     "why": "Far too low."
+    },
+    {
+     "t": "54 and 206 nm/RIU",
+     "ok": true,
+     "why": "TM's field reaches further into the water."
+    },
+    {
+     "t": "206 and 54 nm/RIU",
+     "ok": false,
+     "why": "TM is the more sensitive one."
+    }
+   ]
+  }
+ ]
+}

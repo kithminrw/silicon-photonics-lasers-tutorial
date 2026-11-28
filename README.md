@@ -7,7 +7,7 @@ across the **Si, SiN, thin-film LiNbO₃ (TFLN), BaTiO₃ (BTO) and InP** platfo
 
 **Read it online:** <https://www.kithminrw.com/silicon-photonics-lasers-tutorial/>
 
-> **Status: draft v0.1 (November 2026).** All nine parts and thirteen labs are written. Corrections are very welcome
+> **Status: draft v0.1 (November 2026).** All nine parts and fifteen labs are written. Corrections are very welcome
 > (see [Contributing](#contributing)).
 
 ## What makes it different
@@ -47,7 +47,7 @@ across the **Si, SiN, thin-film LiNbO₃ (TFLN), BaTiO₃ (BTO) and InP** platfo
 | VII. Design, simulation, layout | 29 Design principles and workflows · 30 Design flow and open PDKs · 31 How simulators work · 32 Simulation tools in practice · 33 KLayout and GDSII · 34 Verification and tape-out | **written** |
 | VIII. Fabrication, testing, data | 35 Fabrication · 36 Testing · 37 Data analysis | **written** |
 | IX. Systems | 38 Links and transceivers · 39 Sensing, LiDAR, quantum, computing | **written** |
-| Hands-on labs | 13 labs: simulate, make (openEBL), lasers and links, Fabry–Pérot fringes | **written** |
+| Hands-on labs | 15 labs: simulate, make (openEBL), lasers and links, Fabry–Pérot fringes, coupling, laser heating | **written** |
 | PDK devices in 3D | 15 devices from three open PDKs | working |
 | Appendices | A formulas · B materials · C glossary · D open tools, PDKs, data · E reading and free simulations | in progress |
 

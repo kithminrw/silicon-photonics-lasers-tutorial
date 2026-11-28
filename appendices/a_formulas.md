@@ -57,6 +57,11 @@ The key equations of the tutorial on one page, in the notation used throughout, 
 | Bragg wavelength | $$\lambda_B = 2n_\mathrm{eff}\Lambda$$ | [13]({% link chapters/13_bragg.md %}) |
 | Bragg peak reflectivity | $$R = \tanh^2(\kappa L)$$ | [13]({% link chapters/13_bragg.md %}) |
 | Bragg stop band ($$\kappa L \gg 1$$) | $$\Delta\lambda \approx \lambda^2\kappa/(\pi n_g)$$ | [13]({% link chapters/13_bragg.md %}) |
+| Fabry–Pérot transmission | $$T = \frac{(1 - R_1)(1 - R_2)A}{(1 - \rho)^2 + 4\rho\sin^2(\phi/2)}, \quad \rho = \sqrt{R_1R_2}\,A$$ | [13]({% link chapters/13_bragg.md %}) |
+| Fabry–Pérot FSR and finesse | $$\mathrm{FSR} = \lambda^2/(2n_gL), \quad F = \frac{\pi}{2\arcsin[(1 - \rho)/(2\sqrt{\rho})]} \approx \frac{\pi\sqrt{\rho}}{1 - \rho}$$ | [13]({% link chapters/13_bragg.md %}) |
+| Bragg-mirror penetration depth | $$L_p = \tanh(\kappa L_g)/(2\kappa), \quad L_\mathrm{eff} = L + L_{p1} + L_{p2}$$ | [13]({% link chapters/13_bragg.md %}) |
+| Fringe contrast and loss (Fabry–Pérot method) | $$K = 2\rho/(1 + \rho^2), \quad \alpha = \ln(R/\rho)/L$$ | [13]({% link chapters/13_bragg.md %}) |
+| Second-harmonic power (undepleted, phase-matched) | $$P_{2\omega} = \eta\,P_\omega^2L^2$$; coherence length $$L_c = \lambda/[4(n_{2\omega} - n_\omega)]$$ | [7]({% link chapters/07_loss.md %}) |
 | Vernier FSR | $$\mathrm{FSR}_V = \mathrm{FSR}_1\mathrm{FSR}_2/\lvert\mathrm{FSR}_1 - \mathrm{FSR}_2\rvert$$ | [26]({% link chapters/26_tunable.md %}) |
 
 ## Coupling to fibres
@@ -67,6 +72,9 @@ The key equations of the tutorial on one page, in the notation used throughout, 
 | BOX directionality period | $$\Delta t = \lambda/(2n_\mathrm{ox}\cos\theta_\mathrm{ox})$$ | [15]({% link chapters/15_gc.md %}) |
 | Grating-coupler angular dispersion | $$\mathrm{d}\theta/\mathrm{d}\lambda = -(n_g - \sin\theta)/(\lambda\cos\theta)$$ | [15]({% link chapters/15_gc.md %}) |
 | Butt coupling (elliptical mode) | $$\eta = 4/[(w_x/w_f + w_f/w_x)(w_y/w_f + w_f/w_y)]$$ | [16]({% link chapters/16_edge.md %}) |
+| 1 dB lateral offset of two Gaussian modes | $$d_\mathrm{1dB} = \sqrt{0.115\,(w_1^2 + w_2^2)}$$ | [17]({% link chapters/17_fiberarrays.md %}) |
+| Facet-lens length (waist $$w_0$$ to $$W$$) | $$L = z_R\sqrt{(W/w_0)^2 - 1}, \quad z_R = \pi n w_0^2/\lambda$$ | [17]({% link chapters/17_fiberarrays.md %}) |
+| Expanded-beam 1 dB tolerances | $$d = 0.48\,W, \quad \theta = 0.153\,\lambda/W, \quad g = 1.02\,\pi W^2/\lambda$$ | [17]({% link chapters/17_fiberarrays.md %}), [36]({% link chapters/36_testing.md %}) |
 
 ## Active devices
 
@@ -97,6 +105,7 @@ The key equations of the tutorial on one page, in the notation used throughout, 
 | Threshold current | $$I_\mathrm{th} = qVR(N_\mathrm{th})/\eta_i$$ | [24]({% link chapters/24_fp.md %}) |
 | Differential efficiency | $$\eta_d = \eta_i\alpha_m/(\alpha_i + \alpha_m)$$ | [24]({% link chapters/24_fp.md %}) |
 | Mode spacing | $$\Delta\lambda = \lambda^2/(2n_gL)$$ | [24]({% link chapters/24_fp.md %}) |
+| Gain below threshold (Hakki–Paoli) | $$\sqrt{R_1R_2}\,G = (\sqrt{r} - 1)/(\sqrt{r} + 1)$$, $$r$$ = peak-to-valley ratio | [13]({% link chapters/13_bragg.md %}), [24]({% link chapters/24_fp.md %}) |
 | Temperature dependence | $$I_\mathrm{th}(T) = I_\mathrm{th,0}\,e^{\Delta T/T_0}$$ | [24]({% link chapters/24_fp.md %}) |
 | Relaxation-oscillation frequency | $$f_r = \frac{1}{2\pi}\sqrt{v_gaS/[\tau_p(1 + \varepsilon S)]}$$ | [25]({% link chapters/25_dynamics.md %}) |
 | K-factor and maximum bandwidth | $$K = 4\pi^2(\tau_p + \varepsilon/v_ga), \quad f_\mathrm{max} = 2\pi\sqrt{2}/K$$ | [25]({% link chapters/25_dynamics.md %}) |
@@ -109,6 +118,7 @@ The key equations of the tutorial on one page, in the notation used throughout, 
 
 | Quantity | Formula | Chapter |
 |---|---|---|
+| Coherent balanced detection (90° hybrid) | $$i_I = \mathcal{R}\sqrt{P_SP_\mathrm{LO}}\cos\Delta\phi, \quad i_Q = \mathcal{R}\sqrt{P_SP_\mathrm{LO}}\sin\Delta\phi$$ | [38]({% link chapters/38_links.md %}) |
 | Link margin | $$P_\mathrm{launch} - \sum L_i - \sum \mathrm{penalties} - P_\mathrm{sens}$$ | [38]({% link chapters/38_links.md %}) |
 | Ring sensor | $$S = (\lambda/n_g)\,\partial n_\mathrm{eff}/\partial n_c, \quad \mathrm{LOD} = 3\sigma_\lambda/S$$ | [39]({% link chapters/39_apps.md %}) |
 | Phased-array steering | $$\sin\theta = \Delta\phi\,\lambda/(2\pi d)$$ | [39]({% link chapters/39_apps.md %}) |

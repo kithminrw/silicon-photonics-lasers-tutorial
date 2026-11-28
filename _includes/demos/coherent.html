@@ -1,0 +1,124 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdCoh" role="group" aria-label="Interactive demo: an IQ modulator, its constellation and the impairments that blur it">
+  <div class="bd-head"><span>// try it · coherent transmission: IQ modulator and constellation</span>
+    <span class="bd-seg" role="group" aria-label="Format"><button type="button" data-fmt="4" aria-pressed="false">QPSK</button><button type="button" data-fmt="16" aria-pressed="true">16QAM</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>drive swing (peak, × V<sub>π</sub>) <b data-v="sw"></b></span><input type="range" data-k="sw" min="0.15" max="1" step="0.01" value="0.5" aria-label="drive swing as a fraction of the half-wave voltage"></label>
+    <label class="bd-sl"><span>signal-to-noise ratio <b data-v="snr"></b></span><input type="range" data-k="snr" min="4" max="30" step="0.1" value="20" aria-label="signal-to-noise ratio in dB"></label>
+    <label class="bd-sl"><span>I–Q phase error (from 90°) <b data-v="qe"></b></span><input type="range" data-k="qe" min="0" max="20" step="0.1" value="0" aria-label="error of the 90 degree phase between the I and Q arms"></label>
+    <label class="bd-sl"><span>residual phase noise (rms) <b data-v="pn"></b></span><input type="range" data-k="pn" min="0" max="10" step="0.1" value="0" aria-label="residual phase noise after carrier recovery, rms in degrees"></label>
+  </div>
+  <div class="bd-scope short"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">IQ modulator: two MZMs at null, 90° apart</span></div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="c" aria-hidden="true"></canvas><span class="bd-tag">constellation: 3000 received symbols</span></div>
+    <div class="bd-scope tall"><canvas data-c="t" aria-hidden="true"></canvas><span class="bd-tag">one MZM: field against drive</span></div>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>bits per symbol <b data-o="bps">–</b></span><span>line rate (60 GBd, 2 pol.) <b data-o="rate">–</b></span><span>EVM <b data-o="evm">–</b></span><span>bit errors <b data-o="ber">–</b></span><span>noise only, theory <b data-o="bth">–</b></span><span>modulation loss <b data-o="loss">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Drive harder.</b> On 16QAM, raise the swing from 0.5 to 1.0 V<sub>π</sub>. The sine of the MZM squeezes the outer levels towards the inner ones, so the grid is no longer even, and the modulation loss falls from 5.5 to 2.0 dB, but the outer-to-inner field ratio drops from 2.7 to 2.0 instead of 3. Somewhere between lies the best trade.</li>
+    <li><b>Find the noise floor.</b> Lower the SNR until bit errors appear: QPSK survives to about 10 dB, 16QAM needs about 17 dB for the same error rate. Two more bits per symbol cost about 7 dB.</li>
+    <li><b>Spoil the 90°.</b> Set an I–Q phase error of 10° and then a phase noise of 5° rms at 20 dB SNR. 16QAM's outer corners smear first, because a rotation moves them furthest; QPSK hardly notices. Coherent DSP measures and removes both.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>Why is each MZM of an IQ modulator biased at null, where it transmits no light at all?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="At null the output field is proportional to sin(πV/2V_π): it passes through zero and changes sign with the drive, so positive and negative voltages give positive and negative fields, the two halves of each axis of the constellation.">So that the field, not the power, follows the drive, with both signs</button>
+      <button type="button" data-why="Biasing at null costs light: with no drive nothing comes out. It is done for the field's sign, not to save power.">To save optical power</button>
+      <button type="button" data-why="Quadrature is the bias of an intensity modulator, where the power is most linear in voltage. An IQ modulator needs the field, which is linear around null.">Because null is where the transfer is most linear in power</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdCoh'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  var M = 16, N = 3000;
+  var S = BD.bind(root, {
+    sw: { fmt: function (x) { return x.toFixed(2); } }, snr: { fmt: function (x) { return x.toFixed(1) + ' dB'; } },
+    qe: { fmt: function (x) { return x.toFixed(1) + '°'; } }, pn: { fmt: function (x) { return x.toFixed(1) + '°'; } }
+  }, function () { draw(); });
+  BD.seg(root, 'fmt', function (v) { M = parseInt(v, 10); draw(); });
+  // fixed random draws, so a slider move changes the picture only through the physics
+  var rnd = BD.rng(12345), SYM = [], G1 = [], G2 = [], G3 = [];
+  for (var i = 0; i < N; i++) { SYM.push(Math.floor(rnd() * 1e9)); var u = 1 - rnd(), v = rnd(), w = 1 - rnd(), z = rnd();
+    G1.push(Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v)); G2.push(Math.sqrt(-2 * Math.log(u)) * Math.sin(2 * Math.PI * v)); G3.push(Math.sqrt(-2 * Math.log(w)) * Math.cos(2 * Math.PI * z)); }
+  function erfc(x) { var t = 1 / (1 + 0.5 * Math.abs(x)), r = t * Math.exp(-x * x - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * 0.17087277))))))))); return x >= 0 ? r : 2 - r; }
+  function fmtBer(b) { return b <= 0 ? '0' : b < 1e-15 ? '< 1e-15' : b.toExponential(1); }
+  function draw() {
+    var L = M === 4 ? 2 : 4, lev = M === 4 ? [-1, 1] : [-1, -1 / 3, 1 / 3, 1], gray = M === 4 ? [0, 1] : [0, 1, 3, 2], bps = Math.log2(M);
+    var fld = function (l) { return Math.sin(Math.PI / 2 * S.sw * l); };                 // field of an MZM at null, drive l x swing x V_pi
+    var pts = lev.map(fld), qe = S.qe * Math.PI / 180, pn = S.pn * Math.PI / 180;
+    // ideal transmitted constellation (with the drive's compression), its mean energy, and the noise
+    var Es = 0; pts.forEach(function (a) { pts.forEach(function (b) { Es += a * a + b * b; }); }); Es /= L * L;
+    var sig = Math.sqrt(Es / Math.pow(10, S.snr / 10) / 2);
+    var rx = [], errs = 0, evm = 0;
+    for (var i = 0; i < N; i++) {
+      var iI = SYM[i] % L, iQ = Math.floor(SYM[i] / L) % L, I0 = pts[iI], Q0 = pts[iQ];
+      var I = I0 - Q0 * Math.sin(qe), Q = Q0 * Math.cos(qe);                            // Q arm at 90 deg + error
+      var ph = pn * G3[i], c = Math.cos(ph), s = Math.sin(ph), Ir = I * c - Q * s, Qr = I * s + Q * c;
+      Ir += sig * G1[i]; Qr += sig * G2[i];
+      rx.push([Ir, Qr]);
+      var dI = 0, dQ = 0, bI = 1e9, bQ = 1e9;                                            // decide each axis against the ideal levels
+      for (var k = 0; k < L; k++) { var eI = Math.abs(Ir - pts[k]), eQ = Math.abs(Qr - pts[k]); if (eI < bI) { bI = eI; dI = k; } if (eQ < bQ) { bQ = eQ; dQ = k; } }
+      var x = gray[dI] ^ gray[iI], y = gray[dQ] ^ gray[iQ]; while (x) { errs += x & 1; x >>= 1; } while (y) { errs += y & 1; y >>= 1; }
+      evm += Math.pow(Ir - I0, 2) + Math.pow(Qr - Q0, 2);
+    }
+    evm = Math.sqrt(evm / N / Es);
+    var snr = Math.pow(10, S.snr / 10), bth = M === 4 ? 0.5 * erfc(Math.sqrt(snr / 2)) : 0.375 * erfc(Math.sqrt(snr / 10));
+    // ---- the IQ modulator, top view (schematic), electrodes shaded by the drive swing, the Q arm's phase shifter labelled
+    (function () {
+      var d = BD.setup(q('[data-c="g"]')), g = d.g, W = d.w, H = d.h, cy = 26 + (H - 26) / 2, dy = Math.min(34, (H - 40) / 2.2), x0 = 10, x1 = W - 10;
+      var xs = x0 + 0.12 * (x1 - x0), xe = x1 - 0.12 * (x1 - x0), xm0 = xs + 0.14 * (xe - xs), xm1 = xe - 0.22 * (xe - xs), sub = dy * 0.36;
+      var path = function (sgn) { return [[x0, cy]].concat(BD.offsetPath([xs, cy], [xm0, cy + sgn * dy], 20), BD.offsetPath([xm1, cy + sgn * dy], [xe, cy], 20), [[x1, cy]]); };
+      [1, -1].forEach(function (sgn) {
+        var yc = cy + sgn * dy;
+        BD.wgr(g, [[xs, cy]].concat(BD.offsetPath([xs, cy], [xm0, yc], 20).slice(1)), 2.2, BD.GEO.si, 4);
+        BD.wgr(g, BD.offsetPath([xm1, yc], [xe, cy], 20), 2.2, BD.GEO.si, 4);
+        [1, -1].forEach(function (s2) { BD.wgr(g, [[xm0, yc]].concat(BD.offsetPath([xm0, yc], [xm0 + 18, yc + s2 * sub], 12).slice(1), [[xm1 - 18, yc + s2 * sub]], BD.offsetPath([xm1 - 18, yc + s2 * sub], [xm1, yc], 12).slice(1)), 2, BD.GEO.si, 3); });
+        var al = (0.2 + 0.7 * S.sw).toFixed(2);
+        g.fillStyle = 'rgba(224,184,90,' + al + ')'; g.fillRect(xm0 + 24, yc - sub - 7, xm1 - xm0 - 48, 4); g.fillRect(xm0 + 24, yc + sub + 3, xm1 - xm0 - 48, 4);
+        BD.label(g, sgn > 0 ? 'Q arm' : 'I arm', (xm0 + xm1) / 2, yc + 3, BD.C.white, 'center');   // canvas y grows down: sgn > 0 is the lower arm, the one with the 90° shifter
+      });
+      BD.wgr(g, [[x0, cy], [xs, cy]], 2.2, BD.GEO.si); BD.wgr(g, [[xe, cy], [x1, cy]], 2.2, BD.GEO.si);
+      var px = (xm1 + xe) / 2 - 8, py = cy - dy * 0.72;
+      g.fillStyle = 'rgba(224,138,58,.85)'; g.fillRect(px - 10, cy + dy * 0.55, 20, 6);
+      BD.label(g, (90 + S.qe).toFixed(0) + '°', px + 14, cy + dy * 0.55 + 7, BD.C.gold);
+      BD.label(g, 'laser', x0, cy - 6, BD.C.dim); BD.label(g, 'out', x1, cy - 6, BD.C.dim, 'right');
+      BD.label(g, 'electrodes: swing ' + S.sw.toFixed(2) + ' Vπ', (xm0 + xm1) / 2, cy + 3, BD.C.gold, 'center');
+    })();
+    // ---- constellation
+    (function () {
+      var d = BD.setup(q('[data-c="c"]')), g = d.g, W = d.w, H = d.h, R = 1.35, cx = W / 2, cyy = 26 + (H - 26) / 2, sc = Math.min(W - 20, H - 36) / (2 * R);
+      g.strokeStyle = BD.C.grid; g.beginPath(); g.moveTo(cx - R * sc, cyy); g.lineTo(cx + R * sc, cyy); g.moveTo(cx, cyy - R * sc); g.lineTo(cx, cyy + R * sc); g.stroke();
+      g.fillStyle = 'rgba(127,184,240,.55)';
+      rx.forEach(function (p) { var X = cx + p[0] * sc, Y = cyy - p[1] * sc; if (Math.abs(p[0]) < R && Math.abs(p[1]) < R) g.fillRect(X - 1, Y - 1, 2, 2); });
+      g.strokeStyle = BD.C.gold; g.lineWidth = 1.2;
+      pts.forEach(function (a) { pts.forEach(function (b) { g.beginPath(); g.arc(cx + a * sc, cyy - b * sc, 3.5, 0, 7); g.stroke(); }); }); g.lineWidth = 1;
+      BD.label(g, 'I', cx + R * sc - 8, cyy - 5, BD.C.dim); BD.label(g, 'Q', cx + 5, cyy - R * sc + 10, BD.C.dim);
+    })();
+    // ---- one MZM's field against drive: sin(pi V / 2 V_pi), with the drive levels marked
+    var dv = BD.setup(q('[data-c="t"]')), f = BD.frame(dv, { x: [-1, 1], y: [-1.05, 1.05], xt: [[-1, '−Vπ'], [0, '0'], [1, 'Vπ']], yt: [[-1, '−1'], [0, '0'], [1, '1']], xl: 'drive voltage', pad: { l: 30, b: 26 } });
+    var xs = [], ys = [], ps = []; for (var j = 0; j <= 120; j++) { var v = -1 + 2 * j / 120; xs.push(v); ys.push(Math.sin(Math.PI / 2 * v)); ps.push(Math.pow(Math.sin(Math.PI / 2 * v), 2)); }
+    BD.line(f, xs, ps, BD.C.dim, 1.1, [3, 3]); BD.line(f, xs, ys, BD.C.blue, 1.8);
+    lev.forEach(function (l) { BD.dot(f, S.sw * l, fld(l), BD.C.gold, 4); });
+    BD.label(dv.g, 'field', f.X(-0.95), f.Y(0.85), BD.C.blue); BD.label(dv.g, 'power', f.X(0.3), f.Y(0.2), BD.C.dim);
+    // ---- readouts and caption
+    var ber = errs / (N * bps), lossDb = -10 * Math.log10(Es / 2);                            // mean power over the full-swing maximum (2 for I and Q)
+    q('[data-o="bps"]').textContent = bps + ' (× 2 pol.)';
+    q('[data-o="rate"]').textContent = (60 * bps * 2).toFixed(0) + ' Gb/s';
+    q('[data-o="evm"]').textContent = (100 * evm).toFixed(1) + ' %';
+    q('[data-o="ber"]').textContent = errs ? errs + ' (BER ' + ber.toExponential(1) + ')' : '0 of ' + (N * bps);
+    q('[data-o="bth"]').textContent = fmtBer(bth);
+    q('[data-o="loss"]').textContent = lossDb.toFixed(1) + ' dB';
+    BD.pill(q('[data-o="pill"]'), errs ? 'errors' : 'clean', errs ? 'warn' : 'ok');
+    var c = 'Each MZM sits at null, so its field follows sin(πV/2V<sub>π</sub>): positive and negative drive give positive and negative field, and the two MZMs, 90° apart, write the I and Q coordinates of each symbol. ';
+    if (M === 16 && S.sw > 0.7) c += 'At this swing the sine compresses the outer levels: the grid is uneven, so for the same mean power the points sit closer together. ';
+    if (S.qe > 3) c += 'The I–Q phase error shears the grid into a parallelogram. ';
+    if (S.pn > 2) c += 'Phase noise smears the points along circles, worst at the corners. ';
+    c += '<i>Additive Gaussian noise at the set SNR, decisions on the ideal (compressed) levels, Gray coding; 3000 symbols, so error rates below about 10⁻⁴ show as zero. Real receivers equalise, recover the phase and correct I–Q imbalance in DSP.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

@@ -19,6 +19,7 @@ Wavelength-division multiplexing puts many channels on one waveguide, and polari
 - compare ring rows, MZI lattices, arrayed-waveguide and echelle gratings, and contra-directional couplers;
 - explain how polarisation splitters and rotators work;
 - describe polarisation-diversity receivers.
+- multiplex spatial modes with asymmetric directional couplers, and judge their fabrication sensitivity;
 
 </div>
 
@@ -114,6 +115,21 @@ Ring demultiplexer: four add-drop rings of about 7.15 µm radius (FSR 12.8 nm), 
 
 </div>
 
+## <span class="secnum">14.7</span>Mode-division multiplexing
+
+Wavelength and polarisation are two ways to share a waveguide. Its spatial modes are a third. A waveguide wide enough for several modes can carry an independent channel on each, provided the modes are put on and taken off without mixing. This is **mode-division multiplexing** (MDM) {% include cite.html keys="luo2014,li2019mm" %}.
+
+**The asymmetric directional coupler.** A directional coupler transfers power completely only between phase-matched modes ([Chapter 9]({% link chapters/09_couplers.md %})). Make one guide narrow and single-mode and the other wide, and the narrow guide's TE0 can be phase-matched to the wide guide's TE1. With the femwell sweep of [Chapter 6]({% link chapters/06_soi.md %}), TE0 of a 0.45 µm strip ($$n_\mathrm{eff}$$ = 2.354) matches TE1 of a 0.93 µm strip ([Figure 14.7](#fig-14-7)a). Light in the narrow guide's TE0 crosses into the bus as TE1. The bus's own TE0, with $$n_\mathrm{eff}$$ near 2.73, is far from any match and passes untouched. A coupler matched to TE2 adds a third channel, and a mirror-image coupler takes each mode off at the far end ([Figure 14.7](#fig-14-7)b).
+
+<figure id="fig-14-7">
+  <img src="{{ '/assets/figs/ch14_mdm.svg' | relative_url }}" style="width:620px" alt="a: effective index at 1550 nanometres of the TE0, TE1 and TE2 modes and the TM0 mode of 220 nanometre silicon strips against width from 0.25 to 1 micrometre; a horizontal line at the TE0 index of a 0.45 micrometre strip crosses the TE1 curve at 0.93 micrometres. b: schematic of a two-mode link: a narrow access waveguide couples onto a multimode bus as TE1 through an asymmetric directional coupler, the bus carries TE0 and TE1 together, and a mirror-image coupler takes TE1 off again">
+  <figcaption><span class="capnum">Figure 14.7.</span> <strong>Mode-division multiplexing with asymmetric couplers.</strong> (a) Effective indices of 220 nm silicon strips at 1550 nm, from the femwell sweep of Chapter 6: TE1 of a 0.93 µm strip has the index of TE0 in a 0.45 µm strip (dotted line), so a coupler between them transfers one into the other. (b) Schematic: the mux puts channel 2 onto the bus as TE1, beside channel 1 in TE0, and the demux takes it off again. Drawn by <code>figsrc/ch14_figs.py</code>.</figcaption>
+</figure>
+
+**Tolerances.** Phase matching between unlike guides is sensitive to fabrication. The two modes' indices change with width at different rates, 2.18 and 1.10 per micrometre here. So a 10 nm width error common to both guides detunes them by $$\Delta n \approx 0.011$$, comparable to the coupling across a typical gap. Tapered asymmetric couplers sweep through the phase-matching point along their length; like the adiabatic couplers of Section 9.5, they trade length for tolerance. Bends and crossings in the bus must be multimode designs too, such as Euler bends ([Chapter 8]({% link chapters/08_bends.md %})), because a sharp bend converts TE1 into TE0.
+
+**Where MDM helps.** On a chip, MDM multiplies a waveguide's capacity without more lasers. Each mode can carry its own set of WDM wavelengths, so the channels multiply as modes × wavelengths. Luo et al. showed this with ring-based mode multiplexers that select a mode and a wavelength together {% include cite.html keys="luo2014" %}. Off the chip, few-mode and multicore fibres are studied for the same reason.
+
 <div class="tbox tbox-tryit" markdown="1">
 <div class="tbox-title">Explore further</div>
 
@@ -123,7 +139,7 @@ Ring demultiplexer: four add-drop rings of about 7.15 µm radius (FSR 12.8 nm), 
 
 ## Reading
 
-{% include reflist.html keys="okamoto,chrostowski2015,bogaerts2012,itug694" %}
+{% include reflist.html keys="okamoto,chrostowski2015,bogaerts2012,itug694,luo2014,li2019mm" %}
 
 <div class="tbox tbox-takeaways" markdown="1">
 <div class="tbox-title">Key takeaways</div>
@@ -133,5 +149,10 @@ Ring demultiplexer: four add-drop rings of about 7.15 µm radius (FSR 12.8 nm), 
 - Higher-order rings and MZI lattices flatten the passband and sharpen the skirts; AWGs and echelles scale to many channels.
 - Every resonant demultiplexer needs heaters and locking loops against thermal drift.
 - Polarisation splitter-rotators and 2D grating couplers make silicon circuits work with fibre's arbitrary polarisation.
+- Mode-division multiplexing puts channels on the modes of a wide guide: a 0.45 µm strip's TE0 phase-matches TE1 of a 0.93 µm bus. The match is sensitive to width (Δn ≈ 0.011 for 10 nm), so tapered couplers and multimode bends are used.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

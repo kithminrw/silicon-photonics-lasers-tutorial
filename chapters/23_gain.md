@@ -150,3 +150,7 @@ Compressively strained AlGaInAs multiple quantum wells for the four lasers at 15
 - Recombination R = AN + BN² + CN³; Auger and carrier leakage make 1550 nm lasers temperature-sensitive.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

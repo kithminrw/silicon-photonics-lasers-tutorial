@@ -222,3 +222,7 @@ Gaussian beams turn up wherever light leaves a waveguide. A **grating coupler** 
 - Fibre couplers exist to build a large, Gaussian-like mode on the chip.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

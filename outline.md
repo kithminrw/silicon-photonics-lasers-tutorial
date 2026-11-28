@@ -70,7 +70,7 @@ Demos: Effective-index explorer; Full-vectorial 2D mode solver
 
 *What limits a waveguide's propagation loss, and how do you measure it?*
 
-7.1 Loss mechanisms and units · 7.2 Sidewall-roughness scattering · 7.3 Absorption · 7.4 Substrate leakage · 7.5 Dispersion · 7.6 Nonlinear effects · 7.7 Measuring loss
+7.1 Loss mechanisms and units · 7.2 Sidewall-roughness scattering · 7.3 Absorption · 7.4 Substrate leakage · 7.5 Dispersion · 7.6 Nonlinear effects · 7.7 Measuring loss · 7.8 Nonlinear devices: frequency conversion and microcombs
 
 Demos: Cutback simulator; Sidewall-roughness scattering
 
@@ -130,7 +130,7 @@ Demos: Bragg grating · Fabry–Pérot cavity
 
 *How do you separate four wavelengths with low crosstalk?*
 
-14.1 WDM grids and requirements · 14.2 Ring and MZI-lattice multiplexers · 14.3 Arrayed-waveguide and echelle gratings · 14.4 Crosstalk, flat-top responses and tuning · 14.5 Polarisation splitters and rotators · 14.6 Polarisation diversity
+14.1 WDM grids and requirements · 14.2 Ring and MZI-lattice multiplexers · 14.3 Arrayed-waveguide and echelle gratings · 14.4 Crosstalk, flat-top responses and tuning · 14.5 Polarisation splitters and rotators · 14.6 Polarisation diversity · 14.7 Mode-division multiplexing
 
 Demos: Four-ring demultiplexer
 
@@ -246,7 +246,7 @@ Demos: Vernier ring laser
 
 *Which integration approach for which volume and performance?*
 
-27.1 Why the light source is the hard part · 27.2 External and flip-chip lasers · 27.3 Heterogeneous integration · 27.4 Micro-transfer printing · 27.5 Monolithic growth · 27.6 Thermal and reliability · 27.7 Open laser-integration projects · 27.8 Directly modulated microring lasers · 27.9 Reliability: how lasers age and fail
+27.1 Why the light source is the hard part · 27.2 External and flip-chip lasers · 27.3 Heterogeneous integration · 27.4 Micro-transfer printing · 27.5 Monolithic growth · 27.6 Thermal and reliability · 27.7 Open laser-integration projects · 27.8 Directly modulated microring lasers · 27.9 Reliability: how lasers age and fail · 27.10 Isolators and non-reciprocity
 
 Demos: III–V/Si supermodes
 
@@ -340,7 +340,7 @@ Everything together: optical links and transceivers, and the sensing, LiDAR, qua
 
 38.1 Link architectures · 38.2 Power budget and penalties · 38.3 WDM transceivers · 38.4 Coherent transceivers · 38.5 Energy per bit · 38.6 Co-packaged optics · 38.7 The reference link, block by block · 38.8 NRZ or PAM4 · 38.9 Drivers and equalisation · 38.10 Clocking, jitter and the timing budget · 38.11 Optimising for energy
 
-Demos: Link budget
+Demos: Link budget · Coherent transmission
 
 ### [39. Beyond Datacom: Sensing, LiDAR, Quantum and Computing]({% link chapters/39_apps.md %})
 

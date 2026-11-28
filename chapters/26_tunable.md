@@ -148,3 +148,7 @@ Four λ/4-shifted DFB lasers at 400 GHz spacing, one per channel, with the ring 
 - Two rings give $$\mathrm{FSR}_V = \mathrm{FSR}_1\mathrm{FSR}_2/\lvert\Delta\mathrm{FSR}\rvert$$: 91 nm for 10 and 11 µm silicon rings, with a tuning gearing of 11.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

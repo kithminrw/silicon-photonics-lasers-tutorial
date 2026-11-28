@@ -273,3 +273,7 @@ Add what closes the loop: rings of 500 nm and 1 µm strip side by side, to separ
 - Compact models are valid only where they were fitted; measurements close the loop and keep the models honest; scripts, version control and recorded settings make it all reproducible.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

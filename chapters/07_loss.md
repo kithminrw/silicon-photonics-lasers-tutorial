@@ -19,6 +19,7 @@ A waveguide's job is to get light from A to B unchanged; this chapter is about e
 - estimate free-carrier absorption from doping and the leakage through a buried oxide;
 - describe dispersion and the nonlinear effects that matter in silicon at 1550 nm;
 - measure propagation loss with cutbacks, spirals and resonators, with an error bar.
+- explain phase matching, quasi-phase-matching by periodic poling, and how a microring makes a Kerr frequency comb;
 
 </div>
 
@@ -157,9 +158,36 @@ On your first chip, the cutback set is the reference everything else is measured
 
 </div>
 
+## <span class="secnum">7.8</span>Nonlinear devices: frequency conversion and microcombs
+
+The effects of Section 7.6 are a nuisance in a transmitter. Designed for, they make light at new frequencies. Two families matter on chips.
+
+**Second-order processes.** In materials without a centre of symmetry, such as lithium niobate, aluminium nitride, GaAs and BTO, the polarisation has a term in $$E^2$$ ($$\chi^{(2)}$$). Two photons at $$\omega$$ can merge into one at $$2\omega$$ (**second-harmonic generation**, SHG). Sum- and difference-frequency generation and optical parametric amplification work the same way. Silicon and silicon nitride are centrosymmetric and lack these processes ([Chapter 19]({% link chapters/19_eo.md %})). The difficulty is **phase matching**. The second harmonic made at each point adds in phase with what was made earlier only if $$n(2\omega) = n(\omega)$$, and dispersion forbids that. After a **coherence length** $$L_c = \lambda/[4(n_{2\omega} - n_\omega)]$$ the new light starts to cancel the old ([Figure 7.6](#fig-7-6)a). In bulk lithium niobate, for 1550 → 775 nm, $$L_c$$ is about 10 µm. **Quasi-phase-matching** flips the sign of the nonlinearity every coherence length by **periodic poling**: high-voltage pulses through patterned electrodes reverse the crystal's ferroelectric domains. The power then grows almost as if phase-matched, at $$(2/\pi)^2$$ of the ideal. In bulk the period would be about 21 µm. Thin-film LN waveguides add their own dispersion and need about 4 µm, but they confine the light so tightly that their efficiency rises by more than an order of magnitude: 2600 %/W/cm² was reported for SHG at 1550 nm {% include cite.html keys="wang2018ppln" %}.
+
+**Third-order processes.** The Kerr effect is present in every material. In **four-wave mixing**, two pump photons become a signal and an idler photon placed symmetrically about the pump, $$2\omega_p = \omega_s + \omega_i$$. Its phase matching depends on the waveguide's group-velocity dispersion. Gain near the pump needs **anomalous** dispersion, which in silicon nitride means films about 800 nm thick or more, a dispersion-engineering task like those of [Chapter 6]({% link chapters/06_soi.md %}). In a high-Q ring the mixing feeds itself. Above a threshold pump power, the ring oscillates on the resonances on either side of the pump, the new lines mix further, and a **microcomb** grows: a row of lines exactly one FSR apart. Tuned carefully into the resonance, the comb can lock into a **dissipative Kerr soliton**: a single pulse circulating in the ring with a smooth sech² spectrum ([Figure 7.6](#fig-7-6)b) {% include cite.html keys="gaeta2019,kippenberg2004" %}. The threshold scales as
+
+$$P_\mathrm{th} \propto \frac{n^2V_\mathrm{eff}}{n_2\,\lambda\,Q_L^2},$$
+
+up to a factor of order one that depends on the coupling, with $$V_\mathrm{eff}$$ the mode volume. The $$Q^2$$ is why ultra-low-loss silicon nitride ([Chapter 4]({% link chapters/04_platforms.md %})) is the microcomb platform. Silicon's two-photon absorption (Section 7.6) rules it out at 1550 nm.
+
+<figure id="fig-7-6">
+  <img src="{{ '/assets/figs/ch07_nonlinear.svg' | relative_url }}" style="width:620px" alt="a: second-harmonic power against length in units of the coherence length: phase matched growing as the square of length, not phase matched oscillating near zero, and quasi-phase-matched growing in steps close to two over pi squared of the phase-matched curve. b: an illustrative soliton microcomb spectrum: lines 0.8 nanometres apart under a smooth envelope falling from minus 20 dB, with the pump line near 0 dB">
+  <figcaption><span class="capnum">Figure 7.6.</span> <strong>Frequency conversion and microcombs.</strong> (a) Second-harmonic power along a waveguide (undepleted pump, arbitrary units). Without phase matching it grows for one coherence length and then cancels itself. Flipping the nonlinearity every \(L_c\) (periodic poling) makes it grow in steps that follow \((2/\pi)^2\) of the phase-matched curve (dashed). (b) An illustrative soliton microcomb: lines one FSR (100 GHz, 0.8 nm) apart under a sech² envelope, with the remaining pump on top. Drawn by <code>figsrc/ch07_figs.py</code>.</figcaption>
+</figure>
+
+<div class="tbox tbox-example" markdown="1">
+<div class="tbox-title">Worked Example 7.4 · Two nonlinear devices on a chip</div>
+
+- **Frequency doubling in thin-film LN.** With the reported 2600 %/W/cm² ($$\eta$$ = 26 W⁻¹ cm⁻²), an undepleted pump gives $$P_{2\omega} = \eta P_\omega^2L^2$$. For 10 mW in a 4 mm waveguide, $$P_{2\omega} = 26 \times 0.01^2 \times 0.4^2 = 0.42$$ mW, 4 % of the pump. At higher powers the pump depletes and the formula overestimates.
+- **A 100 GHz microcomb in SiN.** An FSR of 100 GHz with $$n_g \approx 2.1$$ needs a round trip of $$c/(n_g\,\mathrm{FSR}) = 1.43$$ mm, a ring of 227 µm radius. With a 1 µm² mode, $$n \approx 1.9$$ and $$n_2 = 2.5\times10^{-19}$$ m²/W (Section 7.6), the scaling gives $$n^2V_\mathrm{eff}/(n_2\lambda Q_L^2) \approx 13$$ mW at $$Q_L = 10^6$$ and 0.13 mW at $$10^7$$. Each tenfold improvement in Q lowers the threshold a hundredfold.
+
+</div>
+
+Such sources serve the rest of the tutorial. A microcomb is a dense-WDM light source with lines locked together (Section 26.7 of [Chapter 26]({% link chapters/26_tunable.md %})), and a broadband source for LiDAR and spectroscopy. Below threshold, four-wave mixing makes pairs of single photons, the source of many integrated quantum-photonic circuits ([Chapter 39]({% link chapters/39_apps.md %})).
+
 ## Reading
 
-{% include reflist.html keys="payne1994,soref1987,shi2012,chrostowski2015,blumenthal2018" %}
+{% include reflist.html keys="payne1994,soref1987,shi2012,chrostowski2015,blumenthal2018,wang2018ppln,gaeta2019,kippenberg2004" %}
 
 <div class="tbox tbox-takeaways" markdown="1">
 <div class="tbox-title">Key takeaways</div>
@@ -170,4 +198,9 @@ On your first chip, the cutback set is the reference everything else is measured
 - Silicon becomes nonlinear at tens to hundreds of milliwatts (Kerr, two-photon and free-carrier absorption); SiN does not absorb two photons at 1550 nm.
 - Measure loss by cutback with several lengths and an error bar, and confirm it with a ring.
 
+- Designed nonlinear devices make new frequencies: periodically poled thin-film LN doubles 1550 nm light (quasi-phase-matching, about 4 µm periods), and high-Q SiN rings turn one pump into a microcomb above a threshold that falls as 1/Q².
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

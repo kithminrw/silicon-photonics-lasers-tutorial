@@ -144,3 +144,7 @@ A material amplifies light when more of its emitters are in the upper state of a
 - Indirect-gap silicon emits poorly (B ≈ 10⁻¹⁴ against 10⁻¹⁰ cm³/s for InGaAsP), so lasers on silicon use III–V gain.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

@@ -160,3 +160,7 @@ Free simulations by others that pair well with this chapter {% include cite.html
 - Use Y-branches for compact 1 × 2 splits, MMIs or adiabatic couplers for broadband 2 × 2 splits.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

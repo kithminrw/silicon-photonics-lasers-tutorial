@@ -161,3 +161,7 @@ The building blocks stay the same, but the figure of merit changes. A sensor opt
 - Combs, microwave photonics, and visible and mid-infrared platforms extend the same building blocks.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

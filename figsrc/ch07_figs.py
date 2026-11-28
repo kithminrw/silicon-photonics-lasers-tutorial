@@ -312,7 +312,53 @@ def fig_tpa():
     save(fig, "ch07_tpa")
 
 
+# ------------------------------------------------------------------ Figure 7.6: frequency conversion and microcombs (Section 7.8)
+def fig_nonlinear():
+    """(a) Second-harmonic field growth along a waveguide: phase matched, not phase matched (coherence length L_c),
+    and quasi-phase-matched by flipping the nonlinear coefficient every L_c (periodic poling). Undepleted pump,
+    normalised so that the phase-matched power is z^2. (b) An illustrative soliton microcomb: lines one FSR
+    (100 GHz) apart under a sech^2 envelope, with the pump line on top."""
+    n_e1, n_e2 = 2.1379, 2.1748                    # bulk LiNbO3, extraordinary, at 1550 and 775 nm (approximate)
+    Lam_bulk = 1.55 / (2 * (n_e2 - n_e1))
+    print(f"Fig 7.6: bulk LN first-order QPM period for 1550 -> 775 nm: {Lam_bulk:.1f} um (coherence length {Lam_bulk / 2:.1f} um);"
+          " thin-film waveguides need about 4 um (Wang et al. 2018)")
+    Lc = 1.0                                        # lengths in units of the coherence length
+    z = np.linspace(0, 8 * Lc, 4001); dz = z[1] - z[0]
+    dk = np.pi / Lc
+    E_pm = z
+    E_np = np.abs(np.cumsum(np.exp(1j * dk * z)) * dz)
+    sign = np.where(np.floor(z / Lc) % 2 == 0, 1.0, -1.0)
+    E_qpm = np.abs(np.cumsum(sign * np.exp(1j * dk * z)) * dz)
+    fig, (a, b) = plt.subplots(1, 2, figsize=FULL, gridspec_kw=dict(width_ratios=[1, 1.15]))
+    a.plot(z, E_pm ** 2, color=C3, lw=1.4, label="phase matched")
+    a.plot(z, E_qpm ** 2, color=C1, lw=1.6, label="quasi-phase-matched (poled)")
+    a.plot(z, (2 / np.pi) ** 2 * z ** 2, color=C1, lw=0.8, ls=(0, (2, 2)))
+    a.plot(z, E_np ** 2, color=C2, lw=1.4, label="not phase matched")
+    for k in range(1, 8):
+        a.axvline(k * Lc, color=GRID, lw=0.6, zorder=0)
+    a.set_xlim(0, 8); a.set_ylim(0, 30)
+    a.text(7.9, (2 / np.pi) ** 2 * 64 + 1.0, "× (2/π)²", fontsize=6.4, color=C1, ha="right", va="bottom")
+    finish(a, "Length (coherence lengths $L_c$)", "Second-harmonic power (arb.)")
+    a.legend(loc="upper left", fontsize=6.4)
+    # (b) comb
+    f = np.arange(-30, 31)                          # line index, 100 GHz apart
+    env = 1 / np.cosh(f / 9.0) ** 2
+    P = 10 * np.log10(env) - 20
+    b.vlines(f * 0.8, -60, P, color=C1, lw=1.0)
+    b.vlines([0], -60, [-3], color=C4, lw=1.6)
+    b.plot(f * 0.8, P, color=C1, lw=0.6, ls=(0, (2, 2)))
+    b.annotate("pump", xy=(0, -3), xytext=(6, -2), fontsize=6.6, color=C4, arrowprops=dict(arrowstyle="-", color=C4, lw=0.6))
+    b.text(24, -6, "lines one FSR apart:\n100 GHz = 0.8 nm", fontsize=6.4, ha="right", va="top", color=INK)
+    b.set_xlim(-25, 25); b.set_ylim(-60, 2)
+    finish(b, "Frequency offset from the pump (nm)", "Line power (dB, arb.)")
+    tag(a, "a"); tag(b, "b"); fig.tight_layout(w_pad=2.0)
+    save(fig, "ch07_nonlinear")
+    i8 = np.searchsorted(z, 8 * Lc) - 1
+    print(f"  at 8 L_c: phase matched {E_pm[i8] ** 2:.1f}, QPM {E_qpm[i8] ** 2:.1f} (ratio {E_qpm[i8] ** 2 / E_pm[i8] ** 2:.3f}, (2/pi)^2 = {(2 / np.pi) ** 2:.3f}),"
+          f" not matched {E_np[i8] ** 2:.2f}")
+
+
 if __name__ == "__main__":
-    which = sys.argv[1:] or ["mechanisms", "scattering", "fca", "leakage", "tpa"]
+    which = sys.argv[1:] or ["mechanisms", "scattering", "fca", "leakage", "tpa", "nonlinear"]
     for w in which:
         globals()["fig_" + w]()

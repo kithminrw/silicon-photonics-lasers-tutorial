@@ -140,6 +140,8 @@ Experiment agrees. Xu et al. coupled a fibre array to silicon edge couplers thro
 
 {% include demos/faml.html %}
 
+[Lab 14]({% link labs/lab14_coupling.md %}) checks these overlaps on a grid, traces rays through the lens, and simulates a whole fibre array.
+
 **How they are made.** Facet-attached lenses are written by the same two-photon lithography as photonic wire bonds, in five steps ([Figure 17.5](#fig-17-5)):
 
 1. **A facet with room for a lens.** The edge couplers end at a smooth facet: etched deep into the substrate (a deep trench), or diced and polished ([Section 16.4]({% link chapters/16_edge.md %})). The trench also leaves space below the waveguide for the lens body and the widening beam. The same trenches let printed optical probes test edge couplers on the wafer before dicing {% include cite.html keys="trappen2020" %}.
@@ -228,3 +230,7 @@ Place every circuit's couplers on the 127 µm column of the fibre array, with a 
 - Co-packaged optics moves the photonics next to the switch chip; design-for-test and packaging templates should be followed from the first layout.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

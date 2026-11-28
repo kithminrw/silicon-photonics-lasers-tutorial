@@ -1,4 +1,4 @@
-"""Export generic laser, SOA and VCSEL layer stacks to glTF (.glb) for Section 24.9 ("Inside the chip").
+"""Export generic laser, SOA, VCSEL and silicon-chip layer stacks to glTF (.glb) for Sections 24.9 and 35.4.
 
 Unlike tools/export_3d.py, nothing here comes from a PDK: there is no open InP PDK with published layouts. Each model
 is a short, cropped piece of a device, built from boxes and extruded polygons with the generic, illustrative layer
@@ -14,6 +14,8 @@ stacks the chapters already use, so that the 3D views and the 2D figures agree:
           100 nm p-InGaAs) tapering to a 0.6 um tip, n contacts beside the mesa, proton-implanted mesa edges.
   soa     output end of an angled-waveguide SOA (Figure 28.1): a 2.5 um ridge at 8 degrees to the facet normal, an
           unpumped InP window region 12 um long where the wells stop, and an AR coating on the facet.
+  soi     the active SOI process of Figure 35.5 (Chapter 35): PN phase shifter, Ge photodiode, heater, grating
+          coupler, W contacts, two metal levels, cladding with a pad opening and a grating window.
   vcsel   oxide-aperture VCSEL of Figure 24.6, cut open: 34-pair n-DBR and 20-pair p-DBR (AlGaAs, n = 3.52 / 3.05 at
           850 nm, quarter-wave layers), a one-wavelength cavity with three 8 nm wells, a 30 nm AlAs layer oxidised
           to a 6 um aperture, a 20 um mesa and a ring contact.
@@ -69,6 +71,17 @@ MAT = {
     "cav":     ("AlGaAs cavity", (0.72, 0.66, 0.82, 1.0), 0.05, "one wavelength thick; the wells sit at its centre"),
     "alox":    ("aluminium oxide (oxidised AlAs)", (0.99, 0.98, 0.93, 1.0), 0.0, "insulating ring: funnels current and light into the aperture"),
     "alas":    ("AlAs aperture (unoxidised)", (0.35, 0.62, 0.86, 1.0), 0.05, "the 6 µm conducting disc left in the middle"),
+
+    "pdop":    ("p-doped silicon", (0.95, 0.66, 0.62, 1.0), 0.05, "the p side of the modulator's junction"),
+    "ndop":    ("n-doped silicon", (0.62, 0.74, 0.92, 1.0), 0.05, "the n side of the modulator's junction"),
+    "pp":      ("p++ silicon", (0.85, 0.36, 0.32, 1.0), 0.05, "heavily doped: a low-resistance path to the contacts"),
+    "nn":      ("n++ silicon", (0.30, 0.48, 0.80, 1.0), 0.05, "heavily doped: a low-resistance path to the contacts"),
+    "ge":      ("germanium", (0.45, 0.46, 0.50, 1.0), 0.1, "absorbs 1550 nm light: the photodiode"),
+    "tin":     ("TiN heater", (0.88, 0.54, 0.23, 1.0), 0.6, "a resistive film 1.9 µm above the waveguide: the thermo-optic phase shifter"),
+    "wplug":   ("tungsten contacts and vias", (0.72, 0.74, 0.78, 1.0), 0.8, "vertical plugs from silicon and germanium to the metal levels"),
+    "metal1":  ("metal 1", (0.93, 0.74, 0.36, 1.0), 0.85, "first interconnect level"),
+    "metal2":  ("metal 2 (pads)", (0.98, 0.82, 0.42, 1.0), 0.85, "second interconnect level, opened as bond pads"),
+    "clad":    ("oxide cladding", (0.55, 0.75, 0.95, 0.10), 0.0, "the deposited dielectrics, opened over the pad and the grating coupler"),
 }
 
 
@@ -319,9 +332,73 @@ def vcsel(seg=56):
         orbit="45deg 64deg 85%"))
 
 
+def soi():
+    """The active SOI process of Figure 35.5 (Chapter 35), the same cross-section extruded along y and given ends:
+    a PN rib phase shifter (90 nm slab, p++/p/n/n++), a vertical Ge photodiode (4 um x 0.5 um, 10 um long) on a
+    p-doped pad fed by a strip, a strip under a TiN heater 1.9 um above it, a shallow-etched grating coupler under an
+    oxide window, W contacts, two metal levels and a pad opening. Heights as in figsrc/ch35_figs.py."""
+    m = Model("soi")
+    T, SLAB = 0.22, 0.09
+    M1, M2, PAS = (2.6, 3.2), (4.0, 5.2), 5.9
+    X0, X1, Y0, Y1 = -0.4, 23.6, 0.0, 16.0
+    m.box(X0, X1, Y0, Y1, -3.0, -2.0, "sisub", 0)
+    m.box(X0, X1, Y0, Y1, -2.0, 0.0, "ox", 1)
+    # PN phase shifter, centred at x = 2.5
+    xc = 2.5
+    for xa, xb, mat in ((0.3, 1.3, "pp"), (1.3, xc, "pdop"), (xc, 3.7, "ndop"), (3.7, 4.7, "nn")):
+        m.box(xa, xb, Y0, Y1, 0, SLAB, mat, 2)
+    m.box(xc - 0.25, xc, Y0, Y1, SLAB, T, "pdop", 2); m.box(xc, xc + 0.25, Y0, Y1, SLAB, T, "ndop", 2)
+    # Ge photodiode on a p-doped pad, fed by a strip
+    xg = 9.75
+    m.box(9.5, 10.0, Y0, 3.0, 0, T, "si", 2)
+    m.box(7.2, 12.3, 3.0, 13.0, 0, T, "pdop", 2)
+    m.box(6.2, 7.2, 3.0, 13.0, 0, T, "pp", 2); m.box(12.3, 13.3, 3.0, 13.0, 0, T, "pp", 2)
+    m.box(xg - 1.9, xg + 1.9, 4.0, 12.0, T, T + 0.42, "ge", 3)
+    m.box(xg - 1.85, xg + 1.85, 4.0, 12.0, T + 0.42, T + 0.5, "nn", 3)
+    # strip waveguide under a TiN heater with contact pads at its ends
+    xh = 16.0
+    m.box(xh - 0.25, xh + 0.25, Y0, Y1, 0, T, "si", 2)
+    m.box(xh - 1.0, xh + 1.0, 2.5, 13.5, 1.9, 2.02, "tin", 4)
+    for ya, yb in ((1.0, 2.5), (13.5, 15.0)):
+        m.box(xh - 1.0, xh + 1.0, ya, yb, 1.9, 2.02, "tin", 4)
+    # shallow-etched grating coupler: 150 nm slab, 70 nm teeth on the 607 nm period of Chapter 15
+    m.box(19.4, 23.4, 2.0, 14.0, 0, 0.15, "si", 2)
+    x = 19.7
+    while x < 23.3:
+        m.box(x, x + 0.3035, 2.0, 14.0, 0.15, T, "si", 2); x += 0.607
+    m.box(17.0, 19.4, 7.75, 8.25, 0, T, "si", 2)
+    # W contacts to metal 1, in rows along y
+    def plugs(xm, z0, z1, ya=1.0, yb=15.0, step=2.0, w=0.22, zgrp=5):
+        y = ya
+        while y <= yb + 1e-9:
+            m.box(xm - w / 2, xm + w / 2, y - w / 2, y + w / 2, z0, z1, "wplug", zgrp); y += step
+    plugs(0.8, SLAB, M1[0]); plugs(4.2, SLAB, M1[0])
+    plugs(6.7, T, M1[0], 4.0, 12.0); plugs(12.8, T, M1[0], 4.0, 12.0); plugs(xg, T + 0.5, M1[0], 5.0, 11.0)
+    plugs(xh, 2.02, M1[0], 1.75, 1.75); plugs(xh, 2.02, M1[0], 14.25, 14.25)
+    # metal 1
+    for xa, xb, ya, yb in ((0.3, 1.3, Y0, Y1), (3.7, 4.7, Y0, Y1), (6.2, 7.2, 3.0, 13.0), (12.3, 13.3, 3.0, 13.0),
+                           (xg - 0.6, xg + 0.6, 4.5, 11.5), (xh - 0.8, xh + 0.8, 0.8, 2.7), (xh - 0.8, xh + 0.8, 13.3, 15.2)):
+        m.box(xa, xb, ya, yb, M1[0], M1[1], "metal1", 6)
+    # vias to metal 2 and metal 2 (a pad over the phase shifter, a line over the photodiode)
+    plugs(0.8, M1[1], M2[0], 3.0, 13.0, 2.0, 0.3, 7); plugs(xg, M1[1], M2[0], 6.0, 10.0, 2.0, 0.3, 7)
+    m.box(-0.2, 5.4, 2.0, 14.0, M2[0], M2[1], "metal2", 8)
+    m.box(8.2, 11.3, 4.0, 12.0, M2[0], M2[1], "metal2", 8)
+    # oxide cladding, opened over the pad and over the grating coupler
+    area = sbox(X0, Y0, X1, Y1)
+    window = sbox(19.0, Y0, X1, Y1)
+    padopen = sbox(0.5, 4.0, 4.3, 12.0)
+    m.prism(area, 0.0, 1.1, "clad", 9)
+    m.prism(area.difference(window), 1.1, M2[1], "clad", 9)
+    m.prism(area.difference(window).difference(padopen), M2[1], PAS, "clad", 9)
+    return m.export(0.9, dict(
+        title="Active silicon photonics chip (SOI)", short="silicon chip",
+        blurb="The process of Figure 35.5 in three dimensions: from left to right a PN rib phase shifter with its p, n and heavily doped contact strips, a germanium photodiode on a p-doped silicon pad fed by a strip waveguide, a strip under a TiN heater, and a shallow-etched grating coupler under an oxide window. Tungsten plugs rise to metal 1, vias to metal 2, and the cladding is opened over a bond pad.",
+        orbit="-28deg 62deg 80%"))
+
+
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
-    entries = [ridge(), bh(), hetero(), soa(), vcsel()]
+    entries = [ridge(), bh(), hetero(), soa(), vcsel(), soi()]
     for e in entries:
         e["credit"] = "Generic, illustrative stack drawn for this tutorial (not any company's process); thicknesses to scale, length and width cut short."
     (ROOT / "_data" / "stacks3d.json").write_text(json.dumps(entries, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")

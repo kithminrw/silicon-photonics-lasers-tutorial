@@ -37,6 +37,7 @@ DESC = {
     'lock': ('Ring locking', 'Keep a ring on its laser line with a heater and a feedback loop while the room temperature drifts.'),
     'pn': ('PN depletion phase shifter', 'Doping, bias and junction position against phase efficiency, loss and capacitance.'),
     'pockels': ('Pockels phase shifter', 'Electrode gap, field overlap and push–pull drive of thin-film lithium niobate and barium titanate shifters.'),
+    'coherent': ('Coherent transmission', 'Drive an IQ modulator, add noise, I–Q phase error and phase noise, and watch the QPSK or 16QAM constellation and its bit errors.'),
     'mzm': ('MZM and eye diagram', 'Drive a Mach–Zehnder modulator at speed and watch the eye open and close.'),
     'ringmod': ('Ring modulator', 'Detuning, drive and Q of a silicon ring modulator: extinction, loss, linewidth and modulation bandwidth.'),
     'pdbw': ('Photodiode bandwidth', 'Transit time, capacitance and responsivity of a germanium photodiode.'),

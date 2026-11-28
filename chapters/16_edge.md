@@ -205,3 +205,7 @@ Edge couplers for the transceiver of the reference link: a two-stage Si-to-SiN c
 - Edge couplers offer low loss, more than 100 nm of bandwidth and both polarisations; grating couplers offer wafer-scale testing and relaxed alignment.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

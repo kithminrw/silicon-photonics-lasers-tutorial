@@ -127,6 +127,33 @@ A coherent transmitter uses an **IQ modulator**, two nested Mach–Zehnder modul
   <figcaption><span class="capnum">Figure 38.3.</span> <strong>A dual-polarisation coherent transceiver.</strong> Transmitter: each IQ modulator is two MZMs biased at null, one shifted by 90°, so the four drive signals set the in-phase and quadrature fields of two polarisations, which a rotator and a polarisation beam combiner (PBC) join. Receiver: a polarisation splitter-rotator (PSR) separates the polarisations; a 90° hybrid mixes each with the local oscillator (LO), and balanced photodiode pairs (BPD) give the I and Q beat signals, which the DSP digitises and turns back into symbols, undoing dispersion, polarisation rotation and the phase drift between the two lasers. Schematic. Drawn by <code>figsrc/ch38_figs.py</code>.</figcaption>
 </figure>
 
+**The IQ modulator.** Each MZM of the IQ modulator is biased at null. Its output field is then proportional to $$\sin(\pi V/2V_\pi)$$ ([Chapter 20]({% link chapters/20_modulators.md %})), which passes through zero and changes sign with the drive. Positive and negative voltages give positive and negative fields: the two halves of one axis of the constellation. 16QAM needs four evenly spaced field levels on each axis, and the sine spaces them evenly only for a small swing. A small swing wastes light, though. At a peak swing of $$0.5V_\pi$$ the mean output is 5.5 dB below the modulator's maximum; at $$V_\pi$$ it is 2.0 dB below, but the outer levels are squeezed towards the inner ones. Drivers, DACs and DSP pre-distortion share that trade.
+
+**Detecting the field.** A photodiode measures power, not field. The 90° hybrid gives the receiver the field anyway by adding the signal $$S$$ to the local oscillator $$L$$ four ways: $$S + L$$, $$S - L$$, $$S + jL$$ and $$S - jL$$, each with a quarter of the power. Each balanced pair subtracts two of these powers. The large, constant $$\lvert L\rvert^2$$ cancels, along with the local oscillator's intensity noise, and only the beat term remains:
+
+<div class="tbox tbox-keyeq" markdown="1">
+<div class="tbox-title">Balanced outputs of a 90° hybrid</div>
+
+$$i_I = \mathcal{R}\sqrt{P_SP_\mathrm{LO}}\cos(\phi_S - \phi_\mathrm{LO}), \qquad i_Q = \mathcal{R}\sqrt{P_SP_\mathrm{LO}}\sin(\phi_S - \phi_\mathrm{LO})$$
+
+</div>
+
+The two currents are the real and imaginary parts of the signal field, measured against the local oscillator's phase. The local oscillator also amplifies. Take a signal of −20 dBm (10 µW), a local oscillator of +10 dBm (10 mW) and $$\mathcal{R}$$ = 1 A/W. Direct detection would give 10 µA. The beat gives $$\sqrt{10^{-5} \times 10^{-2}}$$ A = 316 µA, 32 times more current and 30 dB more electrical signal, with no optical amplifier. The noise of the TIA then hardly matters: a coherent receiver approaches the shot-noise limit set by the local oscillator itself {% include cite.html keys="kikuchi2016" %}.
+
+**What the DSP undoes.** Because the receiver recovers the complete field, it can undo in software what direct detection cannot touch {% include cite.html keys="savory2010" %}:
+
+- **chromatic dispersion**, a fixed all-pass filter of the fibre's length ([Chapter 2]({% link chapters/02_em.md %}));
+- **polarisation rotation** and polarisation-mode dispersion, with an adaptive 2 × 2 equaliser that unmixes the two polarisations;
+- the **frequency offset and phase drift** between the transmit laser and the local oscillator, by carrier recovery. That is why coherent links need lasers with narrow linewidths ([Chapter 25]({% link chapters/25_dynamics.md %})).
+- **I–Q imbalance and skew** of the modulator and the receiver.
+
+DP-16QAM carries 8 bits per symbol, 4 in each polarisation. The 400ZR agreement runs it at about 60 GBd, close to 480 Gb/s on the line, enough for 400 Gb/s Ethernet plus the overhead of a strong FEC. It is used over amplified links between data centres tens of kilometres apart {% include cite.html keys="oif400zr" %}. An IM-DD lane would need several times the bandwidth, and dispersion would limit its reach.
+
+**Try it.** Drive the IQ modulator harder or more gently, add noise, spoil the 90° between its arms and add phase noise. The constellation, the error count and the MZM's operating points follow.
+
+{% include demos/coherent.html %}
+
+
 ## <span class="secnum">38.5</span>Energy per bit
 
 The figure of merit of a short-reach link is its total energy per transmitted bit. For a WDM link it adds up as
@@ -290,12 +317,13 @@ Table 38.1 spends 3.65 pJ/bit. [Figure 38.7](#fig-38-7) asks what moves it.
 
 ## Reading
 
-{% include reflist.html keys="shekhar2024,chrostowski2015,sun2015,sackinger2005,palermo721" %}
+{% include reflist.html keys="shekhar2024,chrostowski2015,sun2015,sackinger2005,palermo721,kikuchi2016,savory2010" %}
 
 <div class="tbox tbox-takeaways" markdown="1">
 <div class="tbox-title">Key takeaways</div>
 
 - IM-DD rules short reaches; coherent links carry more per symbol over long distances with DSP.
+- A coherent receiver mixes the signal with a local oscillator in a 90° hybrid; balanced pairs give I and Q, ∝ √(P_S P_LO). The local oscillator's gain approaches the shot-noise limit, and DSP undoes dispersion, polarisation rotation and phase drift. DP-16QAM at about 60 GBd carries 400ZR.
 - Margin = launch power − losses − penalties − sensitivity; keep a few decibels in reserve.
 - Penalties are decibels of extra power at a fixed BER: the ring's 4 dB extinction costs 3.7 dB, RIN must stay near −140 dB/Hz or below (0.26 dB), and −130 dB/Hz would put a floor under the BER.
 - Parallel, CWDM and ring-based DWDM trade fibres, filters and control.
@@ -306,3 +334,7 @@ Table 38.1 spends 3.65 pJ/bit. [Figure 38.7](#fig-38-7) asks what moves it.
 - Energy per bit falls with better wall-plug efficiency, with less spare margin and with faster lanes, until dispersion or the electronics stop it.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

@@ -364,3 +364,7 @@ The chip of [Labs 7]({% link labs/lab07_layout.md %}) and [8]({% link labs/lab08
 ## Reading
 
 {% include reflist.html keys="calma1987,semip39,reich2003,klayout,klayoutapi,siepictools,ebeampdk,gdsfactory,ubcpdk,sax,bogaerts2018,orcutt2010,cherchi2013,sanchis2009,chrostowski2015" %}
+
+## Check yourself
+
+{% include quiz.html %}

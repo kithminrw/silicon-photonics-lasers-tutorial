@@ -211,3 +211,7 @@ Periodicity in two or three dimensions extends these ideas. A silicon slab perfo
 - Contra-directional couplers drop a band into a second waveguide; SWGs and photonic crystals extend periodicity to metamaterials and band gaps.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

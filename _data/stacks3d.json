@@ -429,5 +429,102 @@
    9.07
   ],
   "credit": "Generic, illustrative stack drawn for this tutorial (not any company's process); thicknesses to scale, length and width cut short."
+ },
+ {
+  "title": "Active silicon photonics chip (SOI)",
+  "short": "silicon chip",
+  "blurb": "The process of Figure 35.5 in three dimensions: from left to right a PN rib phase shifter with its p, n and heavily doped contact strips, a germanium photodiode on a p-doped silicon pad fed by a strip waveguide, a strip under a TiN heater, and a shallow-etched grating coupler under an oxide window. Tungsten plugs rise to metal 1, vias to metal 2, and the cladding is opened over a bond pad.",
+  "orbit": "-28deg 62deg 80%",
+  "slug": "soi",
+  "file": "stack-soi.glb",
+  "kb": 27,
+  "file_x": "stack-soi-x.glb",
+  "kb_x": 27,
+  "layers": [
+   {
+    "key": "sisub",
+    "label": "Si substrate (cut short)",
+    "role": "the silicon wafer",
+    "colour": "#9eb2cc"
+   },
+   {
+    "key": "ox",
+    "label": "oxide (BOX and fill)",
+    "role": "buried oxide and the fill around the waveguide",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "pp",
+    "label": "p++ silicon",
+    "role": "heavily doped: a low-resistance path to the contacts",
+    "colour": "#d85b51"
+   },
+   {
+    "key": "pdop",
+    "label": "p-doped silicon",
+    "role": "the p side of the modulator's junction",
+    "colour": "#f2a89e"
+   },
+   {
+    "key": "ndop",
+    "label": "n-doped silicon",
+    "role": "the n side of the modulator's junction",
+    "colour": "#9ebcea"
+   },
+   {
+    "key": "nn",
+    "label": "n++ silicon",
+    "role": "heavily doped: a low-resistance path to the contacts",
+    "colour": "#4c7acc"
+   },
+   {
+    "key": "si",
+    "label": "silicon waveguide",
+    "role": "carries the light outside the gain section",
+    "colour": "#7793c1"
+   },
+   {
+    "key": "clad",
+    "label": "oxide cladding",
+    "role": "the deposited dielectrics, opened over the pad and the grating coupler",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "ge",
+    "label": "germanium",
+    "role": "absorbs 1550 nm light: the photodiode",
+    "colour": "#72757f"
+   },
+   {
+    "key": "wplug",
+    "label": "tungsten contacts and vias",
+    "role": "vertical plugs from silicon and germanium to the metal levels",
+    "colour": "#b7bcc6"
+   },
+   {
+    "key": "tin",
+    "label": "TiN heater",
+    "role": "a resistive film 1.9 µm above the waveguide: the thermo-optic phase shifter",
+    "colour": "#e0893a"
+   },
+   {
+    "key": "metal1",
+    "label": "metal 1",
+    "role": "first interconnect level",
+    "colour": "#edbc5b"
+   },
+   {
+    "key": "metal2",
+    "label": "metal 2 (pads)",
+    "role": "second interconnect level, opened as bond pads",
+    "colour": "#f9d16b"
+   }
+  ],
+  "size_um": [
+   24.0,
+   16.0,
+   8.9
+  ],
+  "credit": "Generic, illustrative stack drawn for this tutorial (not any company's process); thicknesses to scale, length and width cut short."
  }
 ]

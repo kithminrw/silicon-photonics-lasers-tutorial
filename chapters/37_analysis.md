@@ -140,3 +140,7 @@ From one openEBL chip: the coupler envelope from the loopback; the propagation l
 - Wafer statistics separate bias, wafer-scale and within-die variation; the results become the next design's compact models.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

@@ -366,3 +366,7 @@ An independent estimate is a useful check even when it disagrees. [Chapter 8]({%
 ## Reading
 
 {% include reflist.html keys="lumericalproducts,lumericaldocs,pylumerical,synopsys2025,tidy3ddocs,tidy3dsite,liu2025,meep,meepdocs,farjadpour2006,mpb,femwell,sax,gdsfactory,gplugins,lalaukeraly2013,molesky2018,gustavsen1999,li1980,malitson1965,wilson2014" %}
+
+## Check yourself
+
+{% include quiz.html %}

@@ -192,3 +192,7 @@ Free simulations by others that pair well with this chapter:
 - Waveguide dispersion pushes the group index well above the effective index in high-contrast guides.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

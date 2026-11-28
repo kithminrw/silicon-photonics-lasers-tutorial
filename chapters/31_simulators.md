@@ -386,3 +386,7 @@ For the openEBL chip of [Chapter 30]({% link chapters/30_flow.md %}): the strip 
 - 2.5D FDTD folds the vertical direction into an effective index: good for wide guides and shallow etches, poor for narrow strips, coupling gaps and anything that leaves the plane.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

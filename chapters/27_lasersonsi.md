@@ -20,6 +20,7 @@ Silicon cannot lase efficiently, so the light source is brought in: bonded, prin
 - describe open laser-integration projects (the SiEPICfab Shuksan run, UBC ELEC 413);
 - explain how directly modulated microring lasers combine source, modulator and WDM, and what limits them;
 - explain how lasers age and fail, and estimate their life and failure rate from accelerated tests.
+- explain why silicon circuits cannot isolate (Lorentz reciprocity), how magneto-optic, time-modulated and nonlinear devices try, and how transceivers manage without isolators;
 
 </div>
 
@@ -118,6 +119,8 @@ Suppose a laser with $$Z_\mathrm{th} = 80$$ K/W is driven at 100 mA and 1.5 V an
   <img src="{{ '/assets/figs/ch27_thermal.svg' | relative_url }}" style="width:600px" alt="Left: cross-section to scale of the bonded laser of Table 27.1 on a 2 micrometre buried oxide: substrate, BOX, silicon waveguide, n-InP contact layer with n contacts on both sides, MQW and p-InP mesa with p contact. Orange arrows carry heat from the MQW region down towards the BOX, which blocks most of it, and sideways to the right-hand n contact, whose metal shunt runs through the BOX to the substrate. Right: output power against current from 0 to 600 milliamps for no self-heating, Z_th 40 K/W and Z_th 80 K/W; the 80 K/W curve passes the marked point 20 mW, plus 10.4 K at 100 mA, peaks near 78 mW at about 420 mA and rolls over.">
   <figcaption><span class="capnum">Figure 27.5.</span> <strong>Heat on the buried oxide.</strong> (a) Cross-section of the laser of Table 27.1 on a 2 µm BOX, to scale: heat from the MQW region spreads through the III–V but crosses the BOX poorly; a metal shunt through the BOX next to the mesa gives it a path to the substrate (heat flow schematic). (b) L–I curves from the self-heating equations above, for a laser with I<sub>th,0</sub> = 20 mA, V = 0.9 V + 6 Ω × I and a slope efficiency of 0.26 W/A, chosen so that at 100 mA and Z<sub>th</sub> = 80 K/W it emits the 20 mW of Worked Example 27.1 and runs 10.4 K hot (dot). At 80 K/W the output rolls over at 78 mW near 420 mA; a shunt that halves Z<sub>th</sub> keeps it rising. Diode parameters illustrative. Drawn by <code>figsrc/ch27_figs.py</code>.</figcaption>
 </figure>
+
+[Lab 15]({% link labs/lab15_heating.md %}) solves these equations step by step and finds what a hotter package or a thermal shunt does.
 
 Reliability follows temperature: III–V lasers age faster when hot, so the thermal impedance also sets how long a laser lives. [Section 27.9](#279reliability-how-lasers-age-and-fail) explains how lasers age and fail and how their life is measured, and its Worked Example 27.5 works out what the 80 K/W of this example costs in life.
 
@@ -299,9 +302,33 @@ Four flip-chipped DFB lasers, tested before assembly and butt-coupled to edge co
 
 </div>
 
+## <span class="secnum">27.10</span>Isolators and non-reciprocity
+
+Section 25.5 of [Chapter 25]({% link chapters/25_dynamics.md %}) showed that −40 to −30 dB of feedback can destabilise a laser, and that a grating coupler on the same chip reflects −20 to −15 dB. A fibre-pigtailed laser is protected by a bulk isolator in its package: a Faraday rotator between polarisers. On a chip, isolation is much harder.
+
+**Why a silicon circuit cannot isolate.** By **Lorentz reciprocity**, any linear, time-invariant structure of ordinary materials, with no magnetic bias, transmits from port A to port B exactly what it transmits from B to A: its scattering matrix is symmetric. Rings, gratings and tapers are all reciprocal. So are structures that seem one-way because they lose more light in one direction: once every port and mode is counted, the asymmetry disappears {% include cite.html keys="jalas2013" %}. Breaking reciprocity takes one of three things:
+
+- **A magnetic bias.** A magneto-optic garnet, such as cerium-substituted yttrium iron garnet bonded or deposited on the waveguide and magnetised across it, gives the mode a **non-reciprocal phase shift**: forward and backward light pick up different phases. In the MZI of [Figure 27.11](#fig-27-11) the two arms are magnetised in opposite directions. Forward light gains +π/4 in one arm and −π/4 in the other, and a reciprocal −π/2 brings the arms into phase. Backward, the non-reciprocal phases change sign, the arms meet in antiphase, and the light is sent away. In a ring, the same phase splits the resonance for the two directions. Garnet isolators on silicon have reached tens of decibels of isolation {% include cite.html keys="bi2011,shoji2014" %}. Their difficulties are integrating the garnet and a magnet, and polarisation: in planar waveguides the effect is usually strongest for TM.
+- **Time modulation.** A modulator driven as a travelling wave treats forward and backward light differently, shifting one in frequency or mode, and can isolate without a magnet {% include cite.html keys="yu2009" %}. The price is RF power and complexity.
+- **Nonlinearity.** A power-dependent device can pass strong light one way only. But a fundamental limit, dynamic reciprocity, stops it from blocking a weak backward signal while a strong forward one is present {% include cite.html keys="shi2015" %}.
+
+**Bandwidth.** The MZI isolator works only while its reciprocal phase is −π/2 (modulo 2π). A delay of first order holds 20 dB of isolation over 76 nm; a delay of order 20 holds it over only 2.9 nm ([Figure 27.11](#fig-27-11)b). The reciprocal phase is therefore made with as short a delay as possible. The non-reciprocal phase's own dispersion adds to the limit.
+
+<figure id="fig-27-11">
+  <img src="{{ '/assets/figs/ch27_isolator.svg' | relative_url }}" style="width:640px" alt="a: schematic of a Mach-Zehnder isolator: a Y-branch splits the input into two arms, each covered by a magneto-optic garnet magnetised in opposite directions, one arm with a reciprocal minus pi over two phase shifter, joined by a 2 by 2 coupler with an output and a monitor port. b: forward and backward transmission against wavelength from 1500 to 1600 nm for first-order and twentieth-order reciprocal delays: the forward light passes, and the backward light is suppressed by more than 20 dB over 76 nm for the first-order design but only 2.9 nm for the twentieth-order one">
+  <figcaption><span class="capnum">Figure 27.11.</span> <strong>A magneto-optic Mach–Zehnder isolator.</strong> (a) Schematic: garnet on both arms, magnetised in opposite directions, adds ±π/4 forward and ∓π/4 backward. With the reciprocal −π/2, the arms meet in phase going forward (light leaves through "out") and in antiphase going backward (light from "out" is radiated at the Y-branch). (b) Forward (solid) and backward (dashed) transmission for reciprocal delays of order 1 (\(\Delta L\) = 0.47 µm) and order 20 (12.5 µm), with \(n_g\) = 4.2 and a non-reciprocal phase taken as constant: 20 dB of isolation over 76 nm against 2.9 nm. Drawn by <code>figsrc/ch27_figs.py</code>.</figcaption>
+</figure>
+
+**Living without isolators.** Most silicon transceivers today have no on-chip isolator. Instead they:
+
+- use lasers that tolerate more feedback, such as quantum-dot lasers, with their small α-factor and strongly damped dynamics ([Chapter 23]({% link chapters/23_gain.md %}), [Chapter 25]({% link chapters/25_dynamics.md %}));
+- keep reflections down with angled, AR-coated facets and low-reflection couplers ([Chapter 15]({% link chapters/15_gc.md %}), [Chapter 16]({% link chapters/16_edge.md %}));
+- keep the laser off the chip, behind a packaged isolator (Section 27.2);
+- or make the feedback useful, as self-injection locking does (Section 26.6 of [Chapter 26]({% link chapters/26_tunable.md %})).
+
 ## Reading
 
-{% include reflist.html keys="liang2010,komljenovic2016,zhou2015,shuksan,elec413,palermo721l12,fukuda1991,ueda1996,buffolo2021,gr468,nistreliability" %}
+{% include reflist.html keys="liang2010,komljenovic2016,zhou2015,shuksan,elec413,palermo721l12,fukuda1991,ueda1996,buffolo2021,gr468,nistreliability,jalas2013,bi2011,shoji2014,yu2009,shi2015" %}
 
 <div class="tbox tbox-takeaways" markdown="1">
 <div class="tbox-title">Key takeaways</div>
@@ -318,5 +345,10 @@ Four flip-chipped DFB lasers, tested before assembly and butt-coupled to edge co
 - Arrhenius acceleration from 85 °C to 40 °C is 6.4, 10.3 and 26.0 for 0.4, 0.5 and 0.7 eV, so a 5000 h test stands for 3.7 to 14.8 years; zero failures in 25 lasers × 2000 h bounds the random rate only to 700–1,800 FIT (60 % confidence).
 - Under power control ageing shows as a rising current; extrapolating it to an end-of-life limit gives a lognormal life and its FIT rate year by year (2.1 FIT at 10 years, 53 FIT at 20 years in the example).
 - Quantum dots tolerate threading dislocations far better than quantum wells (some 8,200 dots per dislocation at 7.3 × 10⁶ cm⁻²); misfit dislocations near the dots now limit their life. Bonded lasers have no III–V facet, but the BOX's heat costs life: 80 K/W instead of 20 K/W more than halves it in the example.
+- Reciprocity forbids isolation in linear, unbiased structures. Magneto-optic garnets give a non-reciprocal phase (an MZI isolator), time modulation and nonlinearity are alternatives with limits, and most silicon transceivers instead use feedback-tolerant lasers and low reflections.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

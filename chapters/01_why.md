@@ -237,3 +237,7 @@ A few conventions hold throughout. Wavelengths are in vacuum unless stated other
 - The reference link (4 × 50 Gb/s, 2 km, BER < 10⁻¹², ≤ 5 pJ/bit) and a first openEBL-style chip run through the rest of the tutorial.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

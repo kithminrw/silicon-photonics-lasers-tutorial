@@ -308,3 +308,27 @@ ol.references li::before { color: $graphite; font-weight: 700; }
   .status-outline { background: #141b28; color: #b6c1d3; border-color: #243149; }
   .tabcaption { color: #a4afc2; }
 }
+
+/* ---- Printing and "save as PDF" (button in the footer): text, figures and tables only; interactive parts become a note */
+.print-btn{font:inherit;font-size:.8rem;border:1px solid #c9d2e0;background:transparent;color:inherit;border-radius:30px;padding:3px 12px;cursor:pointer;margin:.4rem 0;}
+@media print {
+  .side-bar, .main-header, .search, .aux-nav, .breadcrumb-nav, .prev-next, .print-btn, .site-footer, #back-to-top { display: none !important; }
+  html, body { background: #fff !important; color: #000 !important; }
+  .main { margin-left: 0 !important; max-width: none !important; }
+  .main-content-wrap, .main-content { padding: 0 !important; max-width: none !important; }
+  body { font-size: 10.5pt; }
+  h2, h3 { break-after: avoid; }
+  figure, img, table, .tbox, .bd-check { break-inside: avoid; }
+  a { color: #000 !important; }
+  .bd:not(.bd-quiz) { background: none !important; box-shadow: none !important; border: 1px dashed #888; padding: 6px 10px !important; }
+  .bd:not(.bd-quiz)::before { display: none !important; }
+  .bd:not(.bd-quiz) > *:not(.bd-head) { display: none !important; }
+  .bd:not(.bd-quiz)::after { content: "Interactive demo: use it in the online version of this page."; display: block; font-size: 9pt; color: #333; }
+  .bd .bd-head { color: #333 !important; }
+  .bd-quiz { background: none !important; box-shadow: none !important; color: #000 !important; padding: 0 !important; }
+  .bd-quiz::before { display: none !important; }
+  .bd-quiz .bd-check, .bd-quiz .bd-check-opts button { color: #000 !important; background: none !important; border-color: #999 !important; }
+  .bd-quiz .bd-check-h, .bd-quiz .bd-head { color: #333 !important; }
+  model-viewer, .d3-view, .st-views, .d3-legend .d3-reset { display: none !important; }
+  .main-content figure.d3-card { border: 1px solid #ccc; break-inside: avoid; }
+}

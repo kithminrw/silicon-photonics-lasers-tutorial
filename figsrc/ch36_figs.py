@@ -7,6 +7,7 @@ ch36_dft       a design-for-test coupler row with the fibre array's footprint: l
 ch36_probe     DC needles and a GSG probe on an active device, with the instruments
 ch36_liv       laser test: setup, L-I-V with the extracted parameters, threshold against temperature (synthetic)
 ch36_rf        high-speed tests: frequency domain (lightwave component analyser) and time domain (eye, BER)
+ch36_lensedfa  a lensed fibre array at a row of edge couplers, and one channel's spot against its tolerance
 """
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -344,7 +345,59 @@ def fig_rf():
     save(fig, "ch36_rf")
 
 
+# ==================================================================== Figure 36.6: a lensed fibre array at edge couplers
+def fig_lensedfa():
+    """Top view, to scale, of four lensed fibres on a 127 um pitch facing four edge couplers at a facet, and a zoom on
+    one channel's spot against the 1 dB tolerance circle of 2.5 um modes (Table 36.1)."""
+    import math
+    P, WD, RT, LC = 127.0, 12.0, 7.0, 90.0          # pitch, working distance, tip radius, cone length (um)
+    fig = plt.figure(figsize=(6.3, 2.9))
+    ax = fig.add_axes([0.0, 0.0, 0.62, 1.0]); frameless(ax, (-170, 330), (-95, 505))
+    ys = [i * P for i in range(4)]
+    box(ax, -170, -95, 170, 600, "ox")
+    for y in ys:
+        wg_taper(ax, -170, -60, y, 4.0, 4.0, "si"); wg_taper(ax, -60, 0, y, 4.0, 1.2, "si")
+    ax.plot([-160, -160], [ys[0], ys[3]], color=MUTED, lw=0.7, ls=(0, (3, 2)))
+    for y in (ys[0], ys[3]):
+        ax.plot([-170, -160], [y, y], color=MUTED, lw=0.7, ls=(0, (3, 2)))
+    label(ax, -152, (ys[1] + ys[2]) / 2, "loopback joins\nthe outer pair", fs=FS_SMALL, ha="left")
+    ax.plot([0, 0], [-95, 505], color=INK, lw=0.9)
+    label(ax, -85, 485, "chip", fs=FS)
+    for y in ys:
+        xt = WD                                                   # apex of the lensed tip
+        th = np.linspace(np.pi / 2, 3 * np.pi / 2, 30)
+        tip = np.c_[xt + RT + RT * np.cos(th), y + RT * np.sin(th)]
+        body = [(xt + RT, y - RT), (xt + RT + LC, y - 62.5), (330, y - 62.5), (330, y + 62.5), (xt + RT + LC, y + 62.5), (xt + RT, y + RT)]
+        poly(ax, np.vstack([body, tip[::-1]]), "glass", ec=MUTED, lw=0.5, z=3)
+        box(ax, xt + RT + LC * 0.6, y - 4.1, 330 - xt - RT - LC * 0.6, 8.2, "core", z=4)
+        poly(ax, [(0, y - 1.25), (xt, y - RT * 0.8), (xt, y + RT * 0.8), (0, y + 1.25)], AMBER, alpha=0.7, z=5)
+    dim(ax, (240, ys[0]), (240, ys[1]), "127 µm", bg="white")
+    label(ax, 30, ys[3] + 88, f"working distance ≈ {WD:.0f} µm", fs=FS_SMALL, ha="left")
+    arrow(ax, (28, ys[3] + 80), (WD + 1, ys[3] + 10), col=INK, lw=0.6, ms=5)
+    label(ax, 255, 485, "lensed fibre array", fs=FS)
+    callout(ax, (-30, ys[2]), (-150, ys[2] + 48), "edge coupler (inverse taper)", ha="left")
+    scalebar(ax, 190, -78, 100, "100 µm")
+    panel(ax, "a", 0.0, 1.0)
+    # (b) one channel's spot on its coupler, to scale in micrometres
+    b = fig.add_axes([0.64, 0.08, 0.35, 0.84]); frameless(b, (-3.2, 3.2), (-3.2, 3.6))
+    w = 1.25
+    b.add_patch(Circle((0, 0), w, fc=MAT["si"], ec=BLUE, lw=1.0, alpha=0.5, zorder=2))
+    b.add_patch(Circle((0, 0), 0.60, fc="none", ec=RED, lw=1.0, ls=(0, (3, 2)), zorder=4))
+    d = (0.45, 0.25)
+    b.add_patch(Circle(d, w, fc="none", ec=AMBER, lw=1.2, zorder=5))
+    arrow(b, (0, 0), d, col=INK, lw=0.8, ms=6)
+    label(b, 0, 3.2, "one channel at the facet", fs=FS)
+    callout(b, (-w * 0.71, -w * 0.71), (-3.1, -2.4), "coupler mode, 2.5 µm", ha="left", col=BLUE)
+    callout(b, (d[0] + w * 0.75, d[1] + w * 0.6), (0.9, 2.5), "fibre spot", ha="left", col=AMBER)
+    callout(b, (0.42, -0.43), (0.7, -1.9), "1 dB circle, ±0.60 µm", ha="left", col=RED)
+    scalebar(b, 1.7, -2.95, 1.0, "1 µm")
+    panel(b, "b", 0.0, 1.0)
+    save(fig, "ch36_lensedfa")
+    print(f"Fig 36.6: pitch {P} um, working distance {WD} um, tip radius {RT} um; 1 dB offset of 2.5 um modes "
+          f"{math.sqrt(0.115 * 2 * w * w):.2f} um; drawn offset {math.hypot(*d):.2f} um")
+
+
 if __name__ == "__main__":
-    which = sys.argv[1:] or ["setup", "dft", "probe", "liv", "rf"]
+    which = sys.argv[1:] or ["setup", "dft", "probe", "liv", "rf", "lensedfa"]
     for k in which:
         globals()["fig_" + k]()

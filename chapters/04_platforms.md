@@ -188,3 +188,7 @@ Silicon photonics in 220 nm SOI, with germanium photodetectors, carrier-depletio
 - This tutorial uses only open PDKs: SiEPIC EBeam, CORNERSTONE, Luxtelligence and VTT.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

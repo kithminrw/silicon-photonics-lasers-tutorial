@@ -6,7 +6,7 @@ permalink: /demos/
 
 # Interactive Demos
 
-All 50 demos of the tutorial on one page. Each runs in your browser with no installation, computes its pictures and numbers from a small model of the device, and reproduces the chapter's own numbers at its default settings. The link takes you to the demo inside its chapter, where the text explains what it shows.
+All 51 demos of the tutorial on one page. Each runs in your browser with no installation, computes its pictures and numbers from a small model of the device, and reproduces the chapter's own numbers at its default settings. The link takes you to the demo inside its chapter, where the text explains what it shows.
 {: .chapterlead }
 
 ## Part I · Foundations
@@ -175,6 +175,7 @@ All 50 demos of the tutorial on one page. Each runs in your browser with no inst
 
 ### [38. Optical Links and Transceivers]({{ '/part-9/ch38/' | relative_url }})
 
+- [Coherent transmission]({{ '/part-9/ch38/' | relative_url }}#bdCoh): Drive an IQ modulator, add noise, I–Q phase error and phase noise, and watch the QPSK or 16QAM constellation and its bit errors.
 - [Link budget]({{ '/part-9/ch38/' | relative_url }}#bdLink): Close the reference link's power budget with its penalties and margin.
 
 ### [39. Beyond Datacom: Sensing, LiDAR, Quantum and Computing]({{ '/part-9/ch39/' | relative_url }})

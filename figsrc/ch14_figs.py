@@ -8,7 +8,7 @@ Reference link (Chapter 1, Table 1.3): four channels on the 400 GHz ITU grid, 19
 demultiplexer of Worked Example 14.1: n_g = 4.18, FSR = 4 x 3.2 nm = 12.8 nm, so L = 44.9 um (R = 7.15 um), and
 FWHM 0.64 nm (Q_L ~ 2400) for -20 dB at the neighbouring channel (Lorentzian estimate).
 """
-import os, sys; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import os, sys, json; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from figstyle import *
 from geomstyle import *
 
@@ -320,6 +320,73 @@ def fig_diversity():
     save(fig, "ch14_diversity")
 
 
+# ------------------------------------------------------------------ Figure 14.7: mode-division multiplexing (Section 14.7)
+def fig_mdm():
+    """(a) n_eff of the TE0, TE1 and TE2 modes and TM0 of 220 nm strips against width, from the femwell sweep of
+    Chapter 6 (figsrc/ch06_sweep.json), and the width at which TE1 of a wide guide matches TE0 of a 0.45 um guide.
+    (b) Schematic top view of a two-mode link: an asymmetric directional coupler puts TE0 of the narrow guide onto
+    TE1 of the bus, and a mirror-image coupler takes it off again."""
+    d = json.load(open(os.path.join(HERE, "ch06_sweep.json")))
+    W = np.array(d["widths"])
+    te = []
+    for modes in d["neff1550"]:
+        te.append(sorted([n for n, f in modes if f > 0.5], reverse=True))
+    tm0 = np.array([max([n for n, f in modes if f <= 0.5] or [np.nan]) for modes in d["neff1550"]])
+    def mode(k):
+        return np.array([t[k] if len(t) > k else np.nan for t in te])
+    te0, te1, te2 = mode(0), mode(1), mode(2)
+    n_target = np.interp(0.45, W, te0)
+    ok = ~np.isnan(te1)
+    w_pm = np.interp(n_target, te1[ok], W[ok])
+    s0 = (np.interp(0.475, W, te0) - np.interp(0.425, W, te0)) / 0.05
+    s1 = (np.interp(w_pm + 0.025, W[ok], te1[ok]) - np.interp(w_pm - 0.025, W[ok], te1[ok])) / 0.05
+    print(f"Fig 14.7: TE0 at 0.45 um: n_eff {n_target:.4f}; TE1 matches at w = {w_pm:.3f} um; slopes dn/dw TE0 {s0:.2f}, TE1 {s1:.2f} /um;"
+          f" a common 10 nm width error mismatches by {abs(s0 - s1) * 0.01:.4f}")
+    fig, (a, b) = plt.subplots(1, 2, figsize=FULL, gridspec_kw=dict(width_ratios=[1, 1.1]))
+    a.plot(W, te0, color=C1, label="TE0"); a.plot(W, te1, color=C2, label="TE1"); a.plot(W, te2, color=C3, label="TE2")
+    a.plot(W, tm0, color=MUTED, lw=1.0, ls=(0, (3, 2)), label="TM0")
+    a.axhline(n_target, color=INK, lw=0.6, ls=":")
+    a.plot([0.45], [n_target], "o", color=C1, ms=4); a.plot([w_pm], [n_target], "o", color=C2, ms=4)
+    a.annotate(f"TE1 at {w_pm:.2f} µm\nmatches TE0 at 0.45 µm", xy=(w_pm, n_target), xytext=(0.52, 2.62), fontsize=6.4,
+               arrowprops=dict(arrowstyle="-", color=MUTED, lw=0.6))
+    a.set_xlim(0.25, 1.0); a.set_ylim(1.4, 2.8)
+    finish(a, "Strip width (µm), 220 nm Si", "Effective index at 1550 nm")
+    a.legend(loc="lower right", fontsize=6.4)
+    frameless(b, (0, 100), (0, 60), equal=False)
+    yb = 22
+    b.add_patch(Rectangle((4, yb - 2.2), 92, 4.4, fc=MAT["si"], ec="none"))
+    for x0, dirn in ((14, 1), (86, -1)):
+        xs = np.linspace(0, 1, 40)
+        if dirn > 0:
+            b.plot(4 + 10 * xs, 42 - 0 * xs, color=MAT["si"], lw=2.0)
+            b.plot(14 + 8 * xs, 42 - 12 * (1 - np.cos(np.pi * xs)) / 2, color=MAT["si"], lw=2.0)
+            b.plot([22, 36], [30, 30], color=MAT["si"], lw=2.0)
+            b.plot(36 + 8 * xs, 30 + 12 * (1 - np.cos(np.pi * xs)) / 2, color=MAT["si"], lw=2.0)
+        else:
+            b.plot(56 + 8 * xs, 42 - 12 * (1 - np.cos(np.pi * xs)) / 2, color=MAT["si"], lw=2.0)
+            b.plot([64, 78], [30, 30], color=MAT["si"], lw=2.0)
+            b.plot(78 + 8 * xs, 30 + 12 * (1 - np.cos(np.pi * xs)) / 2, color=MAT["si"], lw=2.0)
+            b.plot(86 + 10 * xs, 42 + 0 * xs, color=MAT["si"], lw=2.0)
+    b.add_patch(Rectangle((22, 26.5), 14, 3.5, fc="none", ec=AMBER, lw=0.8, ls=(0, (2, 2))))
+    b.add_patch(Rectangle((64, 26.5), 14, 3.5, fc="none", ec=AMBER, lw=0.8, ls=(0, (2, 2))))
+    label(b, 29, 36, "mux:\nTE0 → TE1", fs=FS_SMALL, col=AMBER); label(b, 71, 36, "demux:\nTE1 → TE0", fs=FS_SMALL, col=AMBER)
+    label(b, 50, yb - 7, f"multimode bus, {w_pm:.2f} µm: TE0 and TE1 together", fs=FS_SMALL)
+    label(b, 4, 46, "channel 2 (TE0)", fs=FS_SMALL, ha="left"); label(b, 96, 46, "channel 2 out", fs=FS_SMALL, ha="right")
+    label(b, 4, yb + 6, "channel 1 (TE0)", fs=FS_SMALL, ha="left"); label(b, 96, yb + 6, "channel 1 out", fs=FS_SMALL, ha="right")
+    for xc, k in ((50, 0), (50, 1)):
+        yy = np.linspace(-1, 1, 50)
+        prof = np.cos(np.pi * yy / 2) if k == 0 else np.sin(np.pi * yy)
+        b.plot(xc - 14 + 10 * k * 2 + 4 * prof, yb + 2.0 * yy, color=C1 if k == 0 else C2, lw=1.0)
+    label(b, 40, yb - 3.5, "TE0", fs=5.8, col=C1); label(b, 60, yb - 3.5, "TE1", fs=5.8, col=C2)
+    note(b, "schematic", "lower right"); panel(b, "b", 0.0, 1.0)
+    tag(a, "a"); fig.tight_layout(w_pad=1.5)
+    save(fig, "ch14_mdm")
+
+
 if __name__ == "__main__":
-    numbers()
-    fig_grids(); fig_demux(); fig_awg_echelle(); fig_flattop(); fig_psr(); fig_diversity()
+    import sys as _s
+    if len(_s.argv) > 1:
+        for _n in _s.argv[1:]: globals()['fig_' + _n]()
+    else:
+        numbers()
+        fig_grids(); fig_demux(); fig_awg_echelle(); fig_flattop(); fig_psr(); fig_diversity(); fig_mdm()

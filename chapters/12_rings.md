@@ -175,3 +175,7 @@ Include all-pass rings of 10 µm radius with gaps of 200, 250 and 300 nm, and an
 - One through-port spectrum cannot tell under- from over-coupling; use several gaps or an add-drop ring.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

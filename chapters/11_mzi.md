@@ -156,3 +156,7 @@ Free simulations by others that pair well with this chapter {% include cite.html
 - Unbalanced MZIs measure the group index on a chip: $$n_g = \lambda^2/(\mathrm{FSR}\,\Delta L)$$.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

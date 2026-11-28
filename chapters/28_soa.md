@@ -161,3 +161,7 @@ No SOA: the budget of [Chapter 1]({% link chapters/01_why.md %}) closes with abo
 - EDFAs are slower, quieter and polarisation-independent; SOAs are small, electrically pumped and integrable.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

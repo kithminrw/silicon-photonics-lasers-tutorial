@@ -108,7 +108,7 @@ For the Chapter 24 laser at 6.5 mW per facet, $$n_{sp} = 1.8$$ and $$\alpha = 4$
 
 ## <span class="secnum">25.5</span>Optical feedback
 
-Light reflected back into a laser, from a fibre connector, a grating coupler or a chip facet, interferes with the lasing field. Depending on its strength and delay, it can narrow the line slightly, cause mode hopping, or drive the laser into **coherence collapse** ([Figure 25.5](#fig-25-5)), where the linewidth explodes to gigahertz and the RIN rises by tens of decibels. Collapse can begin at feedback levels of about −40 to −30 dB for typical lasers. Fibre-coupled lasers use **optical isolators**, which pass light one way only through the Faraday effect in magnetic garnets; on silicon there is no practical integrated isolator yet. Lasers on chip must therefore tolerate their own reflections: low-reflection couplers ([Chapter 15]({% link chapters/15_gc.md %})), angled facets, quantum-dot gain with its small α-factor, or a deliberately strong, controlled feedback that dominates the stray reflections.
+Light reflected back into a laser, from a fibre connector, a grating coupler or a chip facet, interferes with the lasing field. Depending on its strength and delay, it can narrow the line slightly, cause mode hopping, or drive the laser into **coherence collapse** ([Figure 25.5](#fig-25-5)), where the linewidth explodes to gigahertz and the RIN rises by tens of decibels. Collapse can begin at feedback levels of about −40 to −30 dB for typical lasers. Fibre-coupled lasers use **optical isolators**, which pass light one way only through the Faraday effect in magnetic garnets (Section 27.10 of [Chapter 27]({% link chapters/27_lasersonsi.md %}) explains why isolators are hard to put on a chip); on silicon there is no practical integrated isolator yet. Lasers on chip must therefore tolerate their own reflections: low-reflection couplers ([Chapter 15]({% link chapters/15_gc.md %})), angled facets, quantum-dot gain with its small α-factor, or a deliberately strong, controlled feedback that dominates the stray reflections.
 
 <figure id="fig-25-5">
   <img src="{{ '/assets/figs/ch25_feedback.svg' | relative_url }}" style="width:620px" alt="A laser sending light to a reflector that returns a fraction of it, and a scale of the fed-back fraction from minus 90 to 0 decibels divided into five regimes: phase-dependent narrowing or broadening, mode hopping, a narrow stable window, coherence collapse from about minus 40 decibels, and stable external-cavity operation above about minus 10 decibels">
@@ -320,3 +320,7 @@ The reference link does not modulate its lasers directly: four continuous-wave l
 - VCSELs serve multimode links up to a few hundred metres, DMLs the O band, EMLs and MZMs longer or faster links. At 1550 nm and a 1 dB penalty, the example DML reaches 15 km at 10 Gb/s and 2 km at 25 Gb/s, an EML with $$\alpha_\mathrm{EAM} = +0.5$$ 40 and 6 km, a chirp-free modulator 58 and 9 km; in the O band the same DML loses 0.1 dB over 2 km. Drivers for 50 Ω loads and coolers dominate the energy of EMLs and MZMs; a VCSEL's laser spends 0.4 pJ/bit at 25 Gb/s.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}

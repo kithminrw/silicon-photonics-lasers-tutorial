@@ -136,3 +136,7 @@ Draw the chip in KLayout with SiEPIC-Tools (or generate it with gdsfactory and u
 - Verify with DRC, connectivity, design-for-test and layout-extracted simulation; openEBL takes designs and returns data through GitHub.
 
 </div>
+
+## Check yourself
+
+{% include quiz.html %}
