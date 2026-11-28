@@ -113,7 +113,7 @@ def fig_dfb():
     label(ax, 300, 5.8, "p-InP", fs=FS)
     label(ax, 300, 7.75, "p contact", fs=FS_SMALL)
     label(ax, 100, -0.35, "n contact", fs=FS_SMALL)
-    callout(ax, (330, 4.75), (352, 5.35), "grating (InGaAsP), period Λ", fs=FS_SMALL)
+    callout(ax, (40, 4.75), (12, 5.6), "grating (InGaAsP), period Λ", fs=FS_SMALL, ha="left")
     arrow(ax, (L / 2, 5.95), (L / 2, 4.95), col=RED, lw=0.9, ms=7)
     label(ax, L / 2, 6.25, "λ/4 shift", fs=FS, col=RED, bold=True)
     label(ax, -1.6, 7.75, "AR", fs=FS_SMALL, col=VIOLET, bold=True)
@@ -222,7 +222,7 @@ def fig_dbr():
         ax.plot([xx, xx], [-0.2, 7.5], color=MUTED, lw=0.6, ls=(0, (2, 2)))
     label(ax, 300, 1.3, "n-InP", fs=FS); label(ax, 200, 5.45, "p-InP", fs=FS)
     callout(ax, (120, 3.75), (140, 2.35), "MQW (gain)", fs=FS_SMALL)
-    callout(ax, (x1 + 70, 3.2), (x1 + 80, 1.7), "passive waveguide (no gain)", fs=FS_SMALL)
+    callout(ax, (x1 + 70, 3.2), (x1 + 75, 1.6), "passive waveguide\n(no gain)", fs=FS_SMALL, ha="center")
     callout(ax, (x2 + 100, 3.7), (x2 + 60, 5.45), "Bragg grating", fs=FS_SMALL)
     label(ax, -2, -0.75, "cleaved facet", fs=FS_SMALL, ha="left", col=MUTED)
     arrow(ax, (-4, 3.6), (-62, 3.6), col=RED, lw=1.6, ms=9)
@@ -245,7 +245,8 @@ def fig_dbr():
     b.plot(x, lb, color=C2, lw=1.2, ls=(0, (4, 2)), label="mirror peak", zorder=2)
     b.plot(x, las, color=C1, lw=1.6, label="lasing, DBR current only", zorder=3)
     b.set_xlim(0, 10); b.set_ylim(-4.8, 0.6)
-    b.text(9.6, -0.15, "cavity modes", ha="right", va="center", fontsize=6.5, color=MUTED)
+    b.text(9.6, -0.15, "cavity modes", ha="right", va="center", fontsize=6.5, color=MUTED,
+           bbox=dict(boxstyle="square,pad=0.1", fc="white", ec="none", alpha=0.85), zorder=4)
     b.legend(loc="lower left", frameon=True, facecolor="white", edgecolor="none", framealpha=1)
     finish(b, "DBR index change −Δn (10$^{-3}$)", "Wavelength change (nm)")
     tag(b, "b")
@@ -327,7 +328,8 @@ def fig_ecl():
     label(ax, -7, -12.8, "AR", fs=FS_SMALL, col=VIOLET, bold=True)
     label(ax, -24, -8.0, "gain waveguide", fs=FS_SMALL, col=INK)
     # edge coupler (inverse taper) from the chip facet, angled to meet the refracted beam
-    ex, ey = bezier((-2, -1.6), (4, -1.6 + 6 * np.tan(np.radians(14))), (8, yb), (16, yb))
+    ye = ys[-1] + (-2 - xb) * np.tan(np.radians(14))              # where that beam meets the silicon chip edge
+    ex, ey = bezier((-2, ye), (4, ye + 6 * np.tan(np.radians(14))), (8, yb), (16, yb))
     ribbon_var(ax, ex, ey, np.linspace(0.25, W, len(ex)), "si")
     wg_straight(ax, 16, x1 + R1 + 8, yb, W, "si")
     box(ax, 22, yb - 2.0, 28, 4.0, "tin", alpha=0.55, z=1)
@@ -526,5 +528,123 @@ def fig_multi():
     save(fig, "ch26_multi")
 
 
+# ====================================================================== mode-locked laser (Section 26.8)
+C_LIGHT = 2.998e8
+MLL_LAM, MLL_NG, MLL_F, MLL_BW = 1310.0, 3.5, 20e9, 4.0    # nm, group index, repetition rate (Hz), locked bandwidth (nm FWHM)
+
+
+def comb_field(f_rep, bw_nm, lam_nm=MLL_LAM, gdd_ps2=0.0, random_phase=False, seed=3, nfft=8192):
+    """One round trip of the intensity of a comb of lines f_rep apart under a Gaussian power envelope of FWHM bw_nm
+    (the model of the mll demo). Returns t (ps), I(t) over its mean, line offsets (GHz), line powers, envelope FWHM (Hz)."""
+    dnu = C_LIGHT * bw_nm * 1e-9 / (lam_nm * 1e-9) ** 2
+    K = int(np.ceil(2.5 * dnu / f_rep))   # amplitude envelope down to 2e-4
+    k = np.arange(-K, K + 1); nu = k * f_rep
+    P = np.exp(-4 * np.log(2) * (nu / dnu) ** 2)
+    ph = (np.random.default_rng(seed).uniform(0, 2 * np.pi, k.size) if random_phase
+          else 0.5 * gdd_ps2 * 1e-24 * (2 * np.pi * nu) ** 2)
+    spec = np.zeros(nfft, complex); spec[k % nfft] = np.sqrt(P) * np.exp(1j * ph)
+    I = np.abs(np.fft.ifft(spec) * nfft) ** 2; I /= I.mean()
+    return np.arange(nfft) / nfft / f_rep * 1e12, I, nu / 1e9, P, dnu
+
+
+def fwhm(t, I):
+    i = int(np.argmax(I)); I = np.roll(I, I.size // 2 - i); h = I.max() / 2; c = I.size // 2
+    lo = c
+    while I[lo] > h: lo -= 1
+    hi = c
+    while I[hi] > h: hi += 1
+    dt = t[1] - t[0]
+    xl = lo + (h - I[lo]) / (I[lo + 1] - I[lo]); xh = hi - 1 + (I[hi - 1] - h) / (I[hi - 1] - I[hi])
+    return (xh - xl) * dt
+
+
+def gain_window(T=50.0, tau_g=300.0, tau_a=3.0, g0=2.4, q0=0.6, loss=0.35, ea=3.5, eg=0.4, tp=1.5):
+    """Periodic steady state of a saturable gain g and a saturable absorber q (round-trip values) under a train of
+    Gaussian pulses of FWHM tp (ps) and energy ea, eg in units of the absorber's and the gain's saturation energies:
+    dq/dt = (q0 - q)/tau_a - q P/E_a, dg/dt = (g0 - g)/tau_g - g P/E_g (illustrative parameters)."""
+    dt = 0.01; t = np.arange(-T / 2, T / 2, dt); s = tp / 2.3548
+    P = np.exp(-t ** 2 / (2 * s * s)); P /= P.sum() * dt
+    g, q = 0.8, q0
+    for _ in range(40):
+        G, Q = np.empty_like(t), np.empty_like(t)
+        for i in range(t.size):
+            G[i], Q[i] = g, q
+            g += dt * ((g0 - g) / tau_g - g * P[i] * eg)
+            q += dt * ((q0 - q) / tau_a - q * P[i] * ea)
+    return t, G, Q, loss, P
+
+
+def fig_mll():
+    f, bw = MLL_F, MLL_BW
+    L = C_LIGHT / (2 * MLL_NG * f)
+    dl = (MLL_LAM * 1e-9) ** 2 * f / C_LIGHT * 1e12            # line spacing, pm
+    t, I, nu, P, dnu = comb_field(f, bw)
+    tau = fwhm(t, I)
+    _, Ir, _, _, _ = comb_field(f, bw, random_phase=True)
+    print(f"mll: L = {L*1e3:.3f} mm for {f/1e9:.0f} GHz at n_g = {MLL_NG}; line spacing {dl:.1f} pm; "
+          f"envelope {dnu/1e9:.0f} GHz FWHM = {dnu/f:.1f} lines; pulse {tau:.3f} ps; TBP {tau*1e-12*dnu:.3f}; "
+          f"peak/mean locked {I.max():.1f} (0.94/(f tau) = {0.939/(f*tau*1e-12):.1f}), random {Ir.max():.1f}")
+    print(f"mll: 64 lines x 32 GBd x 2 bit = {64*32*2/1000:.3f} Tbit/s")
+    tw, G, Q, loss, Pw = gain_window()
+    net = G - Q - loss
+    win = tw[net > 0]
+    print(f"mll gain window: g before {G[0]:.3f}, q before {Q[0]:.3f}, net before {net[0]:+.3f}, "
+          f"window {win.min():.2f} to {win.max():.2f} ps ({win.max()-win.min():.2f} ps)")
+
+    fig = plt.figure(figsize=(6.3, 4.5))
+    # (a) the two-section laser, side view
+    a = fig.add_axes([0.0, 0.58, 0.56, 0.40]); frameless(a, (-6, 112), (-14, 30))
+    box(a, 0, -10, 100, 8, "inp"); box(a, 0, -2, 100, 2.2, "q"); box(a, 0, 0.2, 100, 7, "inp")
+    box(a, 1, 7.2, 84, 1.6, "metal"); box(a, 88, 7.2, 11, 1.6, "metal")
+    a.plot([86.5, 86.5], [7.2, 10.5], color=MUTED, lw=0.6, ls=(0, (2, 2)))
+    label(a, 43, 13.5, "gain section: forward current I", fs=FS_SMALL)
+    label(a, 94, 17.5, "saturable\nabsorber:\nreverse bias V", fs=FS_SMALL)
+    label(a, 22, -6, "n-InP", fs=FS_SMALL, col=MUTED); label(a, 20, 4, "p-InP", fs=FS_SMALL, col=MUTED)
+    label(a, 8, -0.9, "active region", fs=FS_SMALL - 0.4, col="white", ha="left")
+    xs = np.linspace(55, 75, 200); a.fill_between(xs, -0.9, -0.9 + 1.0 + 5.5 * np.exp(-((xs - 65) / 3.0) ** 2),
+                                                  color=RED, alpha=0.55, lw=0, zorder=4)
+    arrow(a, (70, 3.5), (80, 3.5), col=RED, lw=1.1, ms=7)
+    label(a, 72, -6, "one pulse circulating", fs=FS_SMALL, col=RED)
+    for xf in (0, 100): a.plot([xf, xf], [-10, 7.2], color=INK, lw=1.2)
+    label(a, 0, -12.8, "cleaved facet", fs=FS_SMALL - 0.3, col=MUTED); label(a, 100, -12.8, "cleaved facet", fs=FS_SMALL - 0.3, col=MUTED)
+    for k in range(3):
+        xx = 103 + 3.2 * k; a.fill_between([xx, xx + 0.8], [-1.0, -1.0], [4.0, 4.0], color=RED, lw=0)
+    label(a, 107, -5.5, "pulse\ntrain", fs=FS_SMALL, col=RED)
+    dim(a, (0, 25.5), (100, 25.5), "L: one round trip, 2L, takes 1/f$_{rep}$", fs=FS_SMALL)
+    panel(a, "a", x=0.0, y=1.02); label(a, 50, -12.8, "not to scale", fs=6.0, col=MUTED, italic=True)
+    # (b) the net-gain window
+    b = fig.add_axes([0.66, 0.62, 0.32, 0.33])
+    m = (tw > -6) & (tw < 16)
+    b.fill_between(tw[m], 0, Pw[m] / Pw.max() * 0.45, color=MUTED, alpha=0.25, lw=0, label="pulse")
+    b.plot(tw[m], G[m], color=C1, lw=1.4, label="gain")
+    b.plot(tw[m], Q[m] + loss, color=C4, lw=1.4, label="absorber + cavity loss")
+    b.fill_between(tw[m], G[m], Q[m] + loss, where=net[m] > 0, color=AMBER, alpha=0.45, lw=0)
+    b.annotate("", xy=(0.6, 0.62), xytext=(5.0, 0.42), arrowprops=dict(arrowstyle="-|>", color=AMBER, lw=0.8, mutation_scale=7))
+    b.text(5.3, 0.42, "net gain\nonly here", fontsize=6.3, color=AMBER, va="center")
+    b.set_xlim(-6, 16); b.set_ylim(0, 1.1); b.set_yticks([0, 0.5, 1.0])
+    finish(b, "Time (ps)", "Round-trip gain, loss"); b.legend(loc="lower right", fontsize=6.0, handlelength=1.4)
+    tag(b, "b")
+    # (c) the comb, (d) locked against random phases
+    c = fig.add_axes([0.07, 0.09, 0.27, 0.36])
+    lam = MLL_LAM - (MLL_LAM * 1e-9) ** 2 * nu * 1e9 / C_LIGHT * 1e9
+    for x, p in zip(lam, P):
+        c.plot([x, x], [0, p], color=C3, lw=0.7)
+    c.set_xlim(MLL_LAM - 4.5, MLL_LAM + 4.5); c.set_ylim(0, 1.15); c.set_yticks([0, 0.5, 1])
+    c.text(MLL_LAM, 1.12, f"{dl:.0f} pm apart", ha="center", va="top", fontsize=6.3, color=INK)
+    finish(c, "Wavelength (nm)", "Line power"); tag(c, "c")
+    d = fig.add_axes([0.45, 0.09, 0.53, 0.36])
+    T = 1e12 / f
+    tt = np.concatenate([t - T, t, t + T]); II = np.tile(np.roll(I, I.size // 2), 3); IR = np.tile(Ir, 3)
+    d.plot(tt - T / 2, IR, color=MUTED, lw=0.6, label=f"random phases: noise (peak {Ir.max():.0f}× mean)")
+    d.plot(tt - T / 2, II, color=C4, lw=1.1, label=f"locked phases: {tau:.2f} ps pulses (peak {I.max():.0f}× mean)")
+    d.set_xlim(-T * 1.25, T * 1.25); d.set_ylim(0, I.max() * 1.3)
+    finish(d, "Time (ps)", "Power / mean"); d.legend(loc="upper left", fontsize=6.0, ncol=1)
+    tag(d, "d")
+    save(fig, "ch26_mll")
+
+
 if __name__ == "__main__":
-    fig_dfb(); fig_dfb_spectra(); fig_dbr(); fig_ecl(); fig_vernier(); fig_sil(); fig_multi()
+    ALL = {"dfb": fig_dfb, "dfb_spectra": fig_dfb_spectra, "dbr": fig_dbr, "ecl": fig_ecl, "vernier": fig_vernier,
+           "sil": fig_sil, "multi": fig_multi, "mll": fig_mll}
+    for name in (sys.argv[1:] or list(ALL)):
+        ALL[name]()

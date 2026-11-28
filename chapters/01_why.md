@@ -196,7 +196,7 @@ The fibre couplers usually dominate a short link's budget: two grating couplers 
 | Link margin | ≥ 3 dB after all penalties | Ch 38 |
 | Energy | ≤ 5 pJ/bit for the whole link, including laser wall-plug power, drivers, receivers and heaters | Ch 38 |
 
-The 400 GHz spacing (about 3.2 nm) is wide enough that ring filters whose free spectral range spans four channel spacings (12.8 nm), more than the 9.6 nm from the first channel to the last, separate them cleanly, and it leaves room for the thermal drift that the heaters must correct. At about 75 pm/K, a 50 K temperature change moves a silicon ring by 3.7 nm, more than one channel spacing: thermal control is not optional. [Figure 1.5](#fig-1-5) places the four channels in the C band.
+The 400 GHz spacing (about 3.2 nm) is wide enough that ring filters whose free spectral range spans four channel spacings (12.8 nm), more than the 9.6 nm from the first channel to the last, separate them cleanly, and it leaves room for the thermal drift that the heaters must correct. At about 75 pm/K, a 50 K temperature change moves a silicon ring by 3.75 nm, more than one channel spacing: thermal control is not optional. [Figure 1.5](#fig-1-5) places the four channels in the C band.
 
 <figure id="fig-1-5">
   <img src="{{ '/assets/figs/ch01_bands.svg' | relative_url }}" style="width:640px" alt="The O, E, S, C, L and U telecom bands from 1260 to 1675 nm, with a frequency axis from about 238 to 179 THz above, and a zoom on the C band showing the four reference-link channels at 193.9, 193.5, 193.1 and 192.7 THz, 3.2 nm or 400 GHz apart">
@@ -237,6 +237,60 @@ A few conventions hold throughout. Wavelengths are in vacuum unless stated other
 - The reference link (4 × 50 Gb/s, 2 km, BER < 10⁻¹², ≤ 5 pJ/bit) and a first openEBL-style chip run through the rest of the tutorial.
 
 </div>
+
+## Problems
+
+1. **Edge couplers instead of gratings.** Repeat Worked Example 1.1 with two changes: the laser puts 6 mW into the waveguide, and edge couplers with 1.5 dB of loss each replace the two 3 dB grating couplers. Find the received power in dBm and in milliwatts, and the margin against the −12 dBm the receiver needs.
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    The laser power is $$10\log_{10}(6\ \mathrm{mW}/1\ \mathrm{mW}) = 7.78$$ dBm. The losses are now $$3 + 0.8 + 1.5 + 1.4 + 1.5 + 1.5 = 9.7$$ dB, so
+
+    $$P_\mathrm{rx} = 7.78 - 9.7 = -1.92\ \mathrm{dBm} = 10^{-0.192}\ \mathrm{mW} = 0.64\ \mathrm{mW}.$$
+
+    The margin is $$-1.92 - (-12) = 10.1$$ dB. With 2.2 dB less laser power, the link still ends with 0.8 dB more margin than Worked Example 1.1, because the couplers save 3 dB: in a short link, the couplers are where decibels are won.
+
+    </details>
+
+2. **Extinction ratio and OMA.** The receiver of Worked Example 1.1 sees an average power of −2.7 dBm. Find $$P_1$$, $$P_0$$ and the OMA for an extinction ratio of 4 dB and of 7 dB at that average power. By how many decibels does the higher extinction ratio raise the OMA?
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    The average power is $$\bar P = 10^{-0.27}\ \mathrm{mW} = 0.537$$ mW. From $$P_1 = rP_0$$ and $$P_1 + P_0 = 2\bar P$$, $$P_0 = 2\bar P/(r + 1)$$ and $$P_1 = 2\bar P\,r/(r + 1)$$.
+
+    For 4 dB, $$r = 10^{0.4} = 2.51$$, so $$P_1 = 0.768$$ mW, $$P_0 = 0.306$$ mW and $$\mathrm{OMA} = 0.462$$ mW (−3.35 dBm). For 7 dB, $$r = 10^{0.7} = 5.01$$, so $$P_1 = 0.895$$ mW, $$P_0 = 0.179$$ mW and $$\mathrm{OMA} = 0.717$$ mW (−1.45 dBm). The ratio is $$0.717/0.462 = 1.55$$, or 1.9 dB.
+
+    At the same average power, 3 dB more extinction buys 1.9 dB of the signal that the receiver actually detects, as much as a better coupler would.
+
+    </details>
+
+3. **Spending the margin on the laser.** Suppose the penalties that Worked Example 1.1 lists (extinction ratio, crosstalk, temperature drift, ageing) add up to 3.0 dB. Keeping the example's 12.7 dB of losses and the −12 dBm sensitivity, choose the smallest laser power that still leaves the 3 dB margin of Table 1.3. What is that laser's energy per bit at 50 Gb/s and 15 % wall-plug efficiency, and how does it compare with the +10 dBm laser?
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    The laser must cover the sensitivity, the losses, the penalties and the margin:
+
+    $$P_\mathrm{laser} = -12 + 12.7 + 3.0 + 3.0 = 6.7\ \mathrm{dBm} = 10^{0.67}\ \mathrm{mW} = 4.68\ \mathrm{mW}.$$
+
+    At 15 % wall-plug efficiency it draws $$4.68/0.15 = 31.2$$ mW, which at 50 Gb/s is $$31.2\ \mathrm{mW}/(50\ \mathrm{Gb/s}) = 0.62$$ pJ/bit. The +10 dBm laser draws 66.7 mW, or 1.33 pJ/bit. Giving back the 3.3 dB of surplus margin cuts the laser's energy per bit by more than half, to about an eighth of the 5 pJ/bit budget for the whole link.
+
+    </details>
+
+4. **Where the OMA formula comes from.** Starting from the definitions $$\bar P = (P_1 + P_0)/2$$ and $$r = P_1/P_0$$, derive $$\mathrm{OMA} = 2\bar P(r - 1)/(r + 1)$$. Which extinction ratio, in dB, makes the OMA equal to the average power, and what does the OMA approach for a perfect modulator?
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    Substituting $$P_1 = rP_0$$ into $$P_1 + P_0 = 2\bar P$$ gives $$P_0 = 2\bar P/(r + 1)$$ and $$P_1 = 2\bar P\,r/(r + 1)$$. Their difference is
+
+    $$\mathrm{OMA} = P_1 - P_0 = 2\bar P\,\frac{r - 1}{r + 1}.$$
+
+    The OMA equals $$\bar P$$ when $$(r - 1)/(r + 1) = 1/2$$, that is for $$r = 3$$, or $$10\log_{10}3 = 4.77$$ dB. As $$r \to \infty$$, $$P_0 \to 0$$, all the power sits in the ones and the OMA approaches $$2\bar P$$. The 4 dB target of Table 1.3 sits just below $$r = 3$$, so its OMA ($$0.86\bar P$$) is less than the average power, and each further decibel of extinction helps less than the one before.
+
+    </details>
 
 ## Check yourself
 

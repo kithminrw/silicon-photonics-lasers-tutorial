@@ -17,7 +17,8 @@ The same building blocks make biosensors, beam steerers, quantum processors and 
 - explain evanescent-field biosensing with rings, and compute sensitivity and limit of detection;
 - describe optical phased arrays and FMCW LiDAR;
 - outline integrated quantum photonics: sources, circuits and detectors;
-- outline photonic computing with interferometer meshes;
+- outline photonic computing with programmable MZI meshes, and how errors limit them;
+- compare on-chip spectrometers, and use the Sagnac effect to size a chip gyroscope;
 - name the microwave-photonic, visible and mid-infrared applications and platforms.
 
 </div>
@@ -115,6 +116,14 @@ A mesh of $$N(N-1)/2$$ MZIs, each with two phase shifters, plus $$N$$ phase shif
   <figcaption><span class="capnum">Figure 39.5.</span> <strong>An MZI mesh for linear algebra.</strong> (a) The unit cell: two 50:50 couplers around an internal phase θ, which sets the split between bar and cross, and an external phase φ: together any 2 × 2 unitary. (b) A rectangular mesh for N = 6: 15 cells and 6 output phase shifters, 36 phases in all, as many as the real parameters of a 6 × 6 unitary. Light entering as the vector x leaves as y = Ux in one pass. Schematic. Drawn by <code>figsrc/ch39_figs.py</code>.</figcaption>
 </figure>
 
+**Programming a mesh.** Reck and colleagues showed that any unitary matrix can be factored into a sequence of 2 × 2 transformations, one per MZI, arranged as a triangle {% include cite.html keys="reck1994" %}. Clements and colleagues rearranged the same MZIs into the rectangle of [Figure 39.5b](#fig-39-5). There every path crosses the same number of cells, N, instead of anywhere from 1 to 2N − 3, so the paths lose equal amounts of light and the mesh is half as deep {% include cite.html keys="clements2016" %}. Programming the mesh means computing each MZI's two phases from the target matrix and setting its heaters. Wired as hexagons or squares instead of a one-way rectangle, the same cells become general programmable circuits, configured in software as filters, switches or delay lines {% include cite.html keys="bogaerts2020" %}.
+
+**Errors.** Every phase shifter is set with some error, and every coupler splits a little off 50:50. The errors add up along each path, so at the same component quality a large mesh builds its matrix less faithfully than a small one. An imperfect coupler also limits how completely an MZI can switch: splitting 45:55, it can no longer send all its light to one output. Meshes are therefore calibrated after fabrication, or set up by self-configuring algorithms that use only measurements at their outputs and so correct for coupler errors within a range {% include cite.html keys="miller2015" %}. A programmable silicon MZI processor of this kind has performed the matrix multiplications of a small neural network that recognised vowels {% include cite.html keys="shen2017" %}.
+
+**Try it.** Build a 4 × 4, 6 × 6 or 8 × 8 matrix, then add phase and splitter errors and compare what the mesh builds with what it was set for.
+
+{% include demos/mesh.html %}
+
 ## <span class="secnum">39.5</span>Microwave photonics and frequency combs
 
 Light can carry and process radio-frequency signals. Ring filters ([Chapter 12]({% link chapters/12_rings.md %})) tunable over gigahertz, true-time delays for phased-array antennas, and low-noise optoelectronic oscillators are all built from the same blocks. **Kerr frequency combs** in high-Q silicon-nitride rings convert a continuous laser into hundreds of equally spaced lines by four-wave mixing ([Figure 39.6](#fig-39-6)). They are sources for dense WDM ([Chapter 26]({% link chapters/26_tunable.md %})), for spectroscopy, for optical clocks and for low-noise microwave generation from the comb spacing.
@@ -124,7 +133,65 @@ Light can carry and process radio-frequency signals. Ring filters ([Chapter 12](
   <figcaption><span class="capnum">Figure 39.6.</span> <strong>A Kerr microcomb.</strong> (a) A continuous-wave pump coupled into a high-Q silicon-nitride ring creates, by four-wave mixing, new lines on the ring's resonances, spaced by its free spectral range. (b) The spectrum of a soliton comb: equally spaced lines under a sech² envelope around the pump. Schematic, without scales. Drawn by <code>figsrc/ch39_figs.py</code>.</figcaption>
 </figure>
 
-## <span class="secnum">39.6</span>Visible and mid-infrared photonics
+## <span class="secnum">39.6</span>On-chip spectrometers
+
+A spectrometer measures how a light's power is spread over wavelength. On a chip it trades resolution, bandwidth, footprint and throughput against each other {% include cite.html keys="yang2021spec" %}. There are three families:
+
+- **dispersive**: an arrayed-waveguide or echelle grating ([Chapter 14]({% link chapters/14_wdm.md %})) sends each wavelength to its own output. Its resolution improves with the spread of path lengths across it, so a fine resolution needs a large device.
+- **Fourier-transform**: an array of MZIs with delays 0, ΔL, 2ΔL, … samples the interferogram of the input at many path differences at once, without moving parts, and the spectrum is its Fourier transform ([Figure 39.7](#fig-39-7)) {% include cite.html keys="florjanczyk2007" %}. Coiling the delays into silicon spirals, 32 MZIs have resolved 40 pm over a 0.75 nm range in 12 mm² {% include cite.html keys="velasco2013" %}.
+- **computational**: a disordered or multimode structure scrambles the light into a speckle pattern that differs from one wavelength to the next. A calibration matrix maps spectra to patterns, and inverting it recovers an unknown spectrum. A disordered silicon structure a few tens of micrometres across resolved 0.75 nm near 1500 nm this way {% include cite.html keys="redding2013" %}.
+
+<div class="tbox tbox-keyeq" markdown="1">
+<div class="tbox-title">Fourier-transform spectrometer of N MZIs with delay step ΔL</div>
+
+$$\delta\lambda \approx \frac{\lambda^2}{N\,n_g\,\Delta L}, \qquad \text{bandwidth} \approx \frac{N}{2}\,\delta\lambda$$
+
+</div>
+
+The resolution is set by the longest delay, about $$N\Delta L$$; the group index appears because it sets how fast each MZI's phase changes with wavelength. N samples give N/2 independent channels, so the bandwidth grows only with the number of MZIs.
+
+<div class="tbox tbox-example" markdown="1">
+<div class="tbox-title">Worked Example 39.3 · A 45 pm Fourier-transform spectrometer</div>
+
+Thirty-two MZIs on silicon wires ($$n_g = 4.2$$) with a delay step of 0.40 mm have a longest delay of 12.4 mm and a resolution of $$(1.55\ \mu\mathrm{m})^2/(32 \times 4.2 \times 0.40\ \mathrm{mm}) = 45$$ pm. Their 32 samples give 16 channels, a band of 0.72 nm. Light outside the band folds back into it, so a filter in front must remove it. Twice the bandwidth at the same resolution needs twice as many MZIs.
+
+</div>
+
+<figure id="fig-39-7">
+  <img src="{{ '/assets/figs/ch39_spectrometer.svg' | relative_url }}" style="width:640px" alt="(a) Schematic of a Fourier-transform spectrometer: light splits among 32 MZIs, MZI k having one arm longer by k delay steps, drawn as loops that grow with k, each followed by a photodiode. (b) The output difference of each MZI against its number, an oscillating interferogram starting at 1. (c) The input spectrum, two narrow lines 100 picometres apart and a broader band, and the spectrum recovered from the 32 samples: the two lines resolved but broadened to about 45 picometres, the broad band matched.">
+  <figcaption><span class="capnum">Figure 39.7.</span> <strong>A Fourier-transform spectrometer.</strong> (a) Light splits among 32 MZIs; MZI k has one arm longer by k·ΔL, and detectors read its outputs (schematic). (b) The difference between the two outputs of each MZI for the input of (c): the interferogram, sampled at path differences n<sub>g</sub>kΔL, with ΔL = 0.40 mm and n<sub>g</sub> = 4.2 (Worked Example 39.3). (c) The input spectrum (two lines 100 pm apart and a broader band, illustrative) and the spectrum recovered from the 32 samples by a cosine transform with a Hann window. The lines are resolved but broadened to the instrument's 45 pm resolution; the 0.72 nm shown is the band the 32 samples cover without aliasing. Drawn by <code>figsrc/ch39_figs.py</code>.</figcaption>
+</figure>
+
+## <span class="secnum">39.7</span>Optical gyroscopes
+
+Light sent both ways around a rotating loop takes slightly longer in one direction than in the other. This **Sagnac effect** shifts the phase of one direction against the other by
+
+<div class="tbox tbox-keyeq" markdown="1">
+<div class="tbox-title">Sagnac phase of an N-turn loop</div>
+
+$$\Delta\phi = \frac{8\pi N A\,\Omega}{\lambda c}$$
+
+</div>
+
+for N turns enclosing an area A, rotating at Ω, at the vacuum wavelength λ; the waveguide's index drops out. Fibre-optic gyroscopes wind about a kilometre of fibre into a coil and help navigate aircraft and ships. On a chip, area is scarce: a spiral of length ℓ at a mean radius r encloses $$NA = \ell r/2$$, because each turn, $$2\pi r$$ long, encloses $$\pi r^2$$ ([Figure 39.8](#fig-39-8)).
+
+<div class="tbox tbox-example" markdown="1">
+<div class="tbox-title">Worked Example 39.4 · Feeling the Earth turn</div>
+
+The Earth turns at 15°/h, $$7.29\times10^{-5}$$ rad/s. A spiral 1 m long at a mean radius of 2.5 mm gives $$\Delta\phi = 4\pi\ell r\Omega/(\lambda c) = 4.9\times10^{-9}$$ rad at 1550 nm. A 1 km fibre coil of 4 cm radius gives $$7.9\times10^{-5}$$ rad, 16,000 times more.
+
+</div>
+
+A longer spiral collects more phase but loses more light. The detected power falls as $$e^{-\alpha\ell}$$, and the shot-noise-limited phase noise grows as $$1/\sqrt{P}$$, so the signal-to-noise ratio grows as $$\ell e^{-\alpha\ell/2}$$, which peaks at $$\ell = 2/\alpha$$, a loss of 8.7 dB. Chip gyroscopes therefore need the lowest-loss waveguides: at 0.1 dB/cm the best spiral is 0.87 m long, at 0.01 dB/cm 8.7 m ([Figure 39.8b](#fig-39-8)). Backscattering, the Kerr effect and thermal drift limit real devices further. Reciprocity helps against drift: a passive silicon network whose two paths share their thermal fluctuations and fabrication errors detected phase shifts about 30 times smaller than earlier integrated gyroscopes {% include cite.html keys="khial2018" %}.
+
+**Resonant and laser gyroscopes.** A ring turns the Sagnac effect into a frequency splitting between its clockwise and anticlockwise resonances, $$\Delta\nu = 4A\Omega/(n_g\lambda P)$$ for an area A and a perimeter P, or $$D\Omega/(n_g\lambda)$$ for a circle of diameter D. For D = 18 mm and $$n_g$$ = 1.5 at 1550 nm, the Earth's rotation splits the resonances by only 0.56 Hz. Brillouin lasers in high-Q rings lase both ways with sub-hertz linewidths, and their beat note measures that splitting: a chip-scale ring laser gyroscope of this kind has measured the Earth's rotation {% include cite.html keys="lai2020" %}.
+
+<figure id="fig-39-8">
+  <img src="{{ '/assets/figs/ch39_gyro.svg' | relative_url }}" style="width:640px" alt="(a) Schematic of a chip gyroscope: a spiral waveguide of four turns with light circulating clockwise and anticlockwise; its outer end and, crossing under the turns on a second layer, its inner end lead to a 2 by 2 coupler with a laser and a detector. (b) Log-log plot of the smallest rotation rate resolved in one second against spiral length for waveguide losses of 1, 0.1 and 0.01 dB per centimetre: each curve falls with length, reaches a minimum at 9 centimetres, 0.87 metres and 8.7 metres, then rises; only the 0.01 dB per centimetre curve reaches the Earth's rotation rate of 15 degrees per hour.">
+  <figcaption><span class="capnum">Figure 39.8.</span> <strong>A chip gyroscope and its limit.</strong> (a) A 2 × 2 coupler sends light both ways around an N-turn spiral, whose inner end crosses under the turns on a second waveguide layer (dashed, between two interlayer transitions); rotation at Ω delays one direction against the other, and the detector reads the phase difference (schematic). (b) The smallest rotation rate such a gyroscope resolves in 1 s, limited by shot noise, for a spiral at a mean radius of 2.5 mm with 1 mW launched, against its length, for three waveguide losses. The Sagnac phase grows with length while the detected power falls, so each loss has a best length, 2/α (dots), where the spiral loses 8.7 dB: 9 cm, 0.87 m and 8.7 m. Only the 0.01 dB/cm spiral reaches the Earth's rotation rate. Ideal detector; backscattering, the Kerr effect, polarisation and drift, which limit real devices, are left out. Drawn by <code>figsrc/ch39_figs.py</code>.</figcaption>
+</figure>
+
+## <span class="secnum">39.8</span>Visible and mid-infrared photonics
 
 Silicon absorbs below 1.1 µm and its oxide absorbs beyond about 3.5 µm, so other wavelengths need other platforms ([Chapter 4]({% link chapters/04_platforms.md %})):
 
@@ -136,7 +203,7 @@ The physics of this tutorial carries over unchanged; only the materials, dimensi
 <div class="tbox tbox-insight" markdown="1">
 <div class="tbox-title">Answer to the design question</div>
 
-The building blocks stay the same, but the figure of merit changes. A sensor optimises the fraction of field in the analyte and the stability of a resonance against temperature. A beam steerer needs dense, low-crosstalk emitters and many fast phase shifters. A quantum processor needs the lowest possible loss and single-photon detection. A computer needs precision, efficient conversions and calibration of large meshes. The design methods, the physics, the open tools and the test-and-analysis loop of this tutorial apply to all of them.
+The building blocks stay the same, but the figure of merit changes. A sensor optimises the fraction of field in the analyte and the stability of a resonance against temperature. A beam steerer needs dense, low-crosstalk emitters and many fast phase shifters. A quantum processor needs the lowest possible loss and single-photon detection. A computer needs precision, efficient conversions and calibration of large meshes. A spectrometer trades resolution against footprint, and a gyroscope needs enclosed area and the lowest loss. The design methods, the physics, the open tools and the test-and-analysis loop of this tutorial apply to all of them.
 
 </div>
 
@@ -149,7 +216,7 @@ The building blocks stay the same, but the figure of merit changes. A sensor opt
 
 ## Reading
 
-{% include reflist.html keys="shekhar2024,chrostowski2015,bogaerts2012" %}
+{% include reflist.html keys="shekhar2024,chrostowski2015,bogaerts2012,bogaerts2020,clements2016,yang2021spec" %}
 
 <div class="tbox tbox-takeaways" markdown="1">
 <div class="tbox-title">Key takeaways</div>
@@ -158,6 +225,9 @@ The building blocks stay the same, but the figure of merit changes. A sensor opt
 - Optical phased arrays steer with phase steps; pitches above λ/2 bring grating lobes.
 - FMCW LiDAR: resolution c/(2B), beat frequency 2RB/(cT), and a laser coherent over the round trip.
 - Quantum photonics needs pair sources, MZI meshes, single-photon detectors and very low loss; photonic computing uses meshes for matrix multiplication.
+- A rectangular mesh of N(N−1)/2 MZIs builds any N × N unitary; phase and splitter errors add up along its N columns, so large meshes need calibration.
+- Fourier-transform spectrometers: δλ ≈ λ²/(N n_g ΔL) and N/2 channels; 32 MZIs with 0.40 mm steps resolve 45 pm over 0.72 nm.
+- Sagnac phase 8πNAΩ/(λc): chip gyroscopes lack area, and loss sets the best spiral length, 2/α.
 - Combs, microwave photonics, and visible and mid-infrared platforms extend the same building blocks.
 
 </div>

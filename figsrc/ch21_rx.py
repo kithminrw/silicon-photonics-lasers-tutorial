@@ -378,10 +378,10 @@ def fig_chain(d):
     ax.add_patch(Rectangle((xt + 0.15, y + 0.87), 0.75, 0.26, fill=True, fc="white", ec=INK, lw=lw))
     ax.text(xt + 0.52, y + 1.27, f"R$_F$ = {d['RF']:.0f} Ω", ha="center", fontsize=7)
     ax.text(xt + 0.52, y + 1.68, "TIA", ha="center", fontweight="bold", fontsize=8)
-    ax.add_patch(Rectangle((xt - 0.12, y - 1.55), 1.29, 0.5, fill=False, ec=MUTED, lw=1, ls="--"))
+    ax.add_patch(Rectangle((xt - 0.38, y - 1.55), 1.81, 0.5, fill=False, ec=MUTED, lw=1, ls="--"))   # wide enough for its label
     ax.text(xt + 0.52, y - 1.3, "DC cancel", ha="center", va="center", fontsize=6.5, color=MUTED)
-    ax.plot([xt + 1.35, xt + 1.35, xt + 1.17], [y, y - 1.3, y - 1.3], color=MUTED, lw=1, ls="--")
-    ax.plot([xt - 0.12, xt - 0.3, xt - 0.3], [y - 1.3, y - 1.3, y], color=MUTED, lw=1, ls="--")
+    ax.plot([xt + 1.35, xt + 1.35], [y, y - 1.05], color=MUTED, lw=1, ls="--")                  # from the output into the box
+    ax.plot([xt - 0.3, xt - 0.3], [y - 1.05, y], color=MUTED, lw=1, ls="--")                    # and back to the input
     xl = 8.05                                  # post-amplifier
     ax.plot([xt + 1.05, xl], [y, y], color=INK, lw=lw)
     for i in range(N_LA):
@@ -501,7 +501,7 @@ def fig_bwopt(sweep_f):
     ax.annotate("Example 21.3", (dx["f3"] / BR, dx["sens"]), xytext=(8, -12), textcoords="offset points", fontsize=7, color=C2)
     ax.set_xlim(0.3, 1.3); ax.set_ylim(-15.5, -8)
     finish(ax, "Receiver bandwidth / bit rate", "Sensitivity at $10^{-12}$ (dBm)")
-    ax.legend(loc="upper right", fontsize=6.4)
+    ax.legend(loc="lower right", fontsize=6.4)                # the empty corner; at upper right the curve crossed it
     savefig(fig, "ch21_bwopt")
 
 

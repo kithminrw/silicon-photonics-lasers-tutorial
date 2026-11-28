@@ -132,7 +132,8 @@ def fig_response():
     a.axhline(-3, color=MUTED, lw=0.6, ls=":")
     a.set_xlim(0, 60); a.set_ylim(-12, 10)
     finish(a, "Modulation frequency (GHz)", "Response (dB)")
-    a.legend(fontsize=6.4, loc="lower left", title="laser blue of resonance by", title_fontsize=6.4)
+    a.legend(fontsize=6.4, loc="lower left", title="laser blue of resonance by", title_fontsize=6.4,
+             frameon=True, facecolor="white", edgecolor="none", framealpha=0.85)     # the curves pass behind it
     tag(a, "a")
 
     xs = np.linspace(0.02, 1.4, 140)
@@ -314,7 +315,7 @@ def fig_pam4():
     for tt in t_tg: ax.axhline(tt, color=C1, lw=0.5, ls="--", xmin=0.94)
     ax.set_xlim(-0.05, VPP + 0.05)
     finish(ax, "Drive voltage within the 2 Vpp swing (V, more reverse bias to the right)", "Transmission")
-    ax.legend(fontsize=6.4, loc="upper left")
+    ax.legend(fontsize=6.4, loc="upper left", bbox_to_anchor=(0.06, 1.0))      # clear of the level ticks at the left edge
     savefig(fig, "ch20_pam4")
     eyes = np.diff(t_eq) if t_eq[-1] > t_eq[0] else -np.diff(t_eq)
     ideal = (t_eq.max() - t_eq.min()) / 3

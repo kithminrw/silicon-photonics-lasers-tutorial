@@ -223,6 +223,60 @@ Gaussian beams turn up wherever light leaves a waveguide. A **grating coupler** 
 
 </div>
 
+## Problems
+
+1. **A lensed-fibre spot.** A lensed fibre focuses 1550 nm light in air to a waist $$w_0 = 1.25$$ µm. Find its Rayleigh range and divergence half-angle, and its beam radius, wavefront radius and Gouy phase 10 µm beyond the waist. If an edge coupler with the same mode size sits 2 µm from the waist instead of at it, what fraction of the power couples?
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    The Rayleigh range is $$z_R = \pi w_0^2/\lambda_0 = \pi(1.25)^2/1.55 = 3.17$$ µm and the divergence $$\theta_0 = \lambda_0/(\pi w_0) = 1.55/(\pi\times1.25) = 0.395$$ rad, or 22.6°. At $$z = 10$$ µm,
+
+    $$w = 1.25\sqrt{1 + (10/3.17)^2} = 4.14\ \mu\mathrm{m}, \qquad R = 10\left[1 + (3.17/10)^2\right] = 11.0\ \mu\mathrm{m}, \qquad \zeta = \arctan(10/3.17) = 1.26\ \mathrm{rad}.$$
+
+    Two equal modes 2 µm apart couple $$\eta = 1/\left[1 + (2/6.33)^2\right] = 0.91$$, a loss of 0.41 dB. A spot this small diverges near the limit of the paraxial picture (20–30°), and the chip facet must sit within a couple of micrometres of its waist.
+
+    </details>
+
+2. **A high-NA fibre.** A high-NA fibre has a core radius $$a = 1.5$$ µm and NA = 0.35. Find its cut-off wavelength and its V-number at 1550 nm, then use Marcuse's formula for its mode radius and MFD. How well does it butt-couple to a 1.5 µm on-chip spot, compared with standard fibre (Worked Example 3.4)?
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    The cut-off is $$\lambda_c = 2\pi a\,\mathrm{NA}/2.405 = 2\pi\times1.5\times0.35/2.405 = 1.37$$ µm, so the fibre is single-mode at 1550 nm, where $$V = 2\pi\times1.5\times0.35/1.55 = 2.13$$. Marcuse's formula gives
+
+    $$\frac{w}{a} = 0.65 + \frac{1.619}{2.13^{3/2}} + \frac{2.879}{2.13^6} = 0.65 + 0.522 + 0.031 = 1.20,$$
+
+    so $$w = 1.80$$ µm and the MFD is 3.6 µm. The size-mismatch factor to a 1.5 µm spot is $$\eta = [2\times1.80\times1.5/(1.80^2 + 1.5^2)]^2 = 0.97$$, a loss of 0.15 dB, against 5.5 dB for standard fibre. A fibre with a small mode does the mode matching for the chip; the mismatch then moves to the joint between this fibre and standard fibre.
+
+    </details>
+
+3. **Matching a laser spot to a fibre.** With the 1.5 µm spot of Worked Example 3.2 ($$z_R = 4.6$$ µm) and the same lens ($$f = 100$$ µm), choose the source-to-lens distance $$d_1$$ that makes the image waist equal to the fibre's 5.2 µm, and find where the fibre must sit. Compare $$d_2$$ with what ray optics predicts.
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    The magnification must be $$M = 5.2/1.5 = 3.467$$. From $$M = f/\sqrt{(d_1 - f)^2 + z_R^2}$$,
+
+    $$(d_1 - f)^2 = \left(\frac{f}{M}\right)^2 - z_R^2 = 28.85^2 - 4.6^2 = 811\ \mu\mathrm{m}^2, \qquad d_1 = 100 + 28.5 = 128.5\ \mu\mathrm{m}.$$
+
+    The other root, $$d_1 = 71.5$$ µm, puts the source inside the focal length and gives only a virtual waist in front of the lens. Then $$d_2 = f + (d_1 - f)f^2/[(d_1 - f)^2 + z_R^2] = 100 + 28.48\times100^2/832 = 442$$ µm, against $$1/(1/f - 1/d_1) = 451$$ µm from ray optics. Moving the source 1.5 µm closer to the lens than in Worked Example 3.2 moves the image waist 16 µm further away: the image side is the forgiving one, because the fibre mode's Rayleigh range is 55 µm.
+
+    </details>
+
+4. **The alignment trade-off.** For two equal Gaussian modes of radius $$w$$, use the offset and tilt factors of the coupling equation to find the lateral offset $$d_\mathrm{1dB}$$ and the tilt $$\theta_\mathrm{1dB}$$ that each cost 1 dB. Show that their product does not depend on $$w$$, and evaluate it at 1550 nm in air. What does this mean for an edge coupler that expands its mode?
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    With $$w_1 = w_2 = w$$ the offset factor is $$\exp(-d^2/w^2)$$ and the tilt factor $$\exp(-\pi^2n^2\theta^2w^2/\lambda_0^2)$$. A 1 dB loss is a factor $$10^{-0.1} = e^{-0.230}$$, so
+
+    $$d_\mathrm{1dB} = 0.480\,w, \qquad \theta_\mathrm{1dB} = 0.480\,\frac{\lambda_0}{\pi nw}, \qquad d_\mathrm{1dB}\,\theta_\mathrm{1dB} = 0.230\,\frac{\lambda_0}{\pi n}.$$
+
+    At 1550 nm in air the product is 0.114 µm·rad. For standard fibre ($$w = 5.2$$ µm) it splits into 2.5 µm and 0.045 rad (2.6°), as in Worked Example 3.4; for a 1.5 µm spot, into 0.72 µm and 0.158 rad (9.0°). Expanding a mode relaxes the lateral tolerance and tightens the angular one in proportion, because diffraction fixes the product, just as it fixes $$w_0\theta_0 = \lambda_0/\pi n$$.
+
+    </details>
+
 ## Check yourself
 
 {% include quiz.html %}

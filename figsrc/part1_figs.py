@@ -41,7 +41,7 @@ def fig_dispersion():
         ax.set_xlim(0.4, 2.0)
     a.set_ylim(1.3, 3.8); b.set_ylim(1.3, 4.6)
     a.text(1.315, 3.72, "1310", fontsize=6.5, color=MUTED); a.text(1.555, 3.72, "1550", fontsize=6.5, color=MUTED)
-    finish(a, "Wavelength (µm)", "Refractive index $n$", legend=True, loc="center right")
+    finish(a, "Wavelength (µm)", "Refractive index $n$", legend=True, loc="upper left")
     finish(b, "Wavelength (µm)", "Material group index $n_g$")
     tag(a, "a"); tag(b, "b")
     fig.tight_layout(w_pad=2.5)
@@ -69,13 +69,14 @@ def fig_overlap():
         a.plot(d, 10 * np.log10(eta_offset(5.2, w2, d)), color=col, label=lab)
     a.axhline(-1, color=MUTED, lw=0.7, ls="--")
     a.set_ylim(-12, 0.5); a.set_xlim(0, 8)
-    finish(a, "Lateral offset $d$ (µm)", "Coupling (dB)", legend=True, loc="lower left")
+    finish(a, "Lateral offset $d$ (µm)", "Coupling (dB)")
+    a.legend(loc="lower left", fontsize=6.3, handlelength=1.2, labelspacing=0.25, borderaxespad=0.2)   # under the red curve
     r = np.logspace(-1, 1, 300)
     b.semilogx(r, 10 * np.log10(eta_size(1.0, r)), color=C1)
     for rr in (0.5, 2.0):
         b.plot(rr, 10 * np.log10(eta_size(1, rr)), "o", color=C2, ms=4)
         b.annotate(f"{10*np.log10(eta_size(1, rr)):.2f} dB", (rr, 10 * np.log10(eta_size(1, rr))), textcoords="offset points",
-                   xytext=(6, -10 if rr > 1 else -10), fontsize=7, color=INK)
+                   xytext=(7, 2) if rr > 1 else (6, -10), fontsize=7, color=INK)
     b.set_ylim(-14, 0.5)
     finish(b, "Waist ratio $w_2/w_1$", "Coupling (dB)")
     tag(a, "a"); tag(b, "b")
@@ -111,7 +112,10 @@ def fig_windows():
         ax.barh(y, x1 - l0, left=l0, height=0.55, color=col, alpha=0.8 if not ge else 0.35, edgecolor="none")
         if not l1:
             ax.annotate("", xy=(2.75, y), xytext=(2.55, y), arrowprops=dict(arrowstyle="->", color=col, lw=1.2))
-        ax.text(l0 - 0.03, y, f"{1000*l0:.0f} nm", ha="right", va="center", fontsize=6.5, color=MUTED)
+        if l0 < 0.2:     # no room left of the bar (it would run into the tick label): write it inside the bar
+            ax.text(l0 + 0.03, y, f"{1000*l0:.0f} nm", ha="left", va="center", fontsize=6.5, color=INK)
+        else:
+            ax.text(l0 - 0.03, y, f"{1000*l0:.0f} nm", ha="right", va="center", fontsize=6.5, color=MUTED)
     ax.text(1.62, 0, "direct-gap edge: absorbs in the C band", fontsize=6.5, va="center", color=INK)
     for lb, nm in [(1.31, "O"), (1.55, "C")]:
         ax.axvline(lb, color=RED, lw=0.8, ls="--")

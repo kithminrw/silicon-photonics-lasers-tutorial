@@ -132,7 +132,7 @@ def fig_arrays():
     aa = np.radians(np.linspace(90 - TH, 90, 20))
     a1.plot(xe + 135 * np.cos(aa), GAP + 135 * np.sin(aa), color=INK, lw=0.8, zorder=5)
     label(a1, xe - 6, GAP + 160, f"fibres at {TH:.0f}°", fs=FS_SMALL, ha="center")
-    a1.plot([GCX, GCX], [0, GAP + 2], color=MUTED, lw=0.6, ls=(0, (2, 2)), zorder=5)
+    a1.plot([xe, xe], [0, GAP], color=MUTED, lw=0.6, ls=(0, (2, 2)), zorder=5)          # the same normal, continued into the air gap
     label(a1, GCX - 12, GAP / 2, f"{th_air:.1f}°\nin air", fs=FS_SMALL, ha="right")
     callout(a1, (P0[0] + 120, GAP), (120, 18), "end face polished\nparallel to the chip", ha="center")
     label(a1, -135, 222, "V-groove\nchip", fs=FS_SMALL, ha="left")
@@ -156,7 +156,11 @@ def fig_arrays():
     d = np.array([math.sin(math.radians(TH)), -1.0 * math.cos(math.radians(TH))])
     x_gc = XT + Y * math.tan(math.radians(TH)) * 1.0
     arrow(a2, (-170, Y), (-60, Y), col=AMBER, lw=1.6, ms=9)
-    poly(a2, [(XT - 8, Y), (XT + 8, Y), (x_gc + 8, 0), (x_gc - 8, 0)], AMBER, alpha=0.5, z=3)
+    def on_face(xb):                            # where the beam edge through (xb + XT - x_gc, Y) and (xb, 0) meets the face
+        k = (XT - x_gc) / Y                     # dx/dy of the beam edges
+        y = Y + (XT - (xb + (XT - x_gc)) ) / (k + 1 / math.tan(p))
+        return (xb + k * y, y)
+    poly(a2, [on_face(x_gc - 8), on_face(x_gc + 8), (x_gc + 8, 0), (x_gc - 8, 0)], AMBER, alpha=0.5, z=3)   # starts on the mirror
     a2.plot([XT, XT], [Y, Y - 70], color=MUTED, lw=0.6, ls=(0, (2, 2)), zorder=5)
     callout(a2, (face_x(Y + 20), Y + 20), (70, 175), f"end polished at {phi_pol:.0f}°:\ntotal internal reflection\n(incidence {inc:.0f}° > {crit:.1f}°)", ha="center")
     label(a2, XT - 10, 30, f"{TH:.0f}° from\nvertical", fs=FS_SMALL, ha="right")
@@ -199,9 +203,9 @@ def fig_pwb():
     box(a2, 64, 13, 34, 24, "glass", ec=MUTED, lw=0.5); box(a2, 64, 23.6, 34, 2.8, "core", z=2)
     poly(a2, np.c_[64 - 5.5 * np.cos(th), 25 + 8 * np.sin(th)], "polymer", z=3, ec=VIOLET, lw=0.6)
     # beam: diverging from the laser facet, collimated by its lens, refocused by the fibre's lens
-    a2.fill_between([28, 31.5], [24.6, 18.0], [25.4, 32.0], color=AMBER, alpha=0.45, lw=0, zorder=2)
-    a2.fill_between([31.5, 60.5], [18.0, 18.0], [32.0, 32.0], color=AMBER, alpha=0.45, lw=0, zorder=2)
-    a2.fill_between([60.5, 66], [18.0, 24.4], [32.0, 25.6], color=AMBER, alpha=0.45, lw=0, zorder=2)
+    # (the beam inside the lenses is hidden by them, so the collimated part runs from one flat lens face to the other)
+    a2.fill_between([28, 64], [18.0, 18.0], [32.0, 32.0], color=AMBER, alpha=0.45, lw=0, zorder=2)
+    a2.fill_between([64, 66], [18.0 + 6.4 * 3.5 / 5.5, 24.4], [32.0 - 6.4 * 3.5 / 5.5, 25.6], color=AMBER, alpha=0.45, lw=0, zorder=2)
     label(a2, 14, 30.5, "laser", fs=FS_SMALL)
     label(a2, 82, 31.5, "fibre", fs=FS_SMALL)
     callout(a2, (31, 30), (24, 47), "printed lens\non the laser facet", ha="center")
@@ -346,7 +350,7 @@ def fig_faml():
     axs[1].text(F["lensed"]["th"] - 0.3, -1.35, f"{F['lensed']['th']:.1f}°", color=C2, fontsize=6.6, ha="right", va="top")
     axs[2].text(F["lensed"]["g"] / 1.3, -1.35, f"{F['lensed']['g']:.1f} µm", color=C2, fontsize=6.6, ha="right", va="top")
     axs[2].text(F["faml"]["g"] / 1.25, -1.35, f"{F['faml']['g']:.0f} µm", color=C1, fontsize=6.6, ha="right", va="top")
-    axs[0].legend(loc="lower left", fontsize=6.3, handlelength=1.4)
+    axs[0].legend(loc="lower left", fontsize=6.3, handlelength=1.4, bbox_to_anchor=(0.16, 0.0))     # clear of the steep lensed curve
     for a_, s in zip(axs, "bcd"): tag(a_, s)
     save(fig, "ch17_faml")
     print(f"Fig 17.4: chip lens {Lc:.1f} um (zR {pc['zr']:.2f} um in polymer, wavefront R {pc['R']:.1f} um, apex radius {pc['rs']:.1f} um,"
@@ -505,16 +509,19 @@ def fig_cpo():
     eng = [(64, 59), (64, 29), (49, 44), (79, 44)]
     for (x, y) in eng:
         block(a2, x, y, 8 if x in (49, 79) else 12, 12 if x in (49, 79) else 8, "", fc="#F7E7C6", ec=AMBER, lw=0.8, z=4)
-    a2.plot([56, 60], [44, 44], color=ELEC, lw=1.4, zorder=5)
+    a2.plot([53, 56], [44, 44], color=ELEC, lw=1.4, zorder=5)                                 # engine to ASIC
     label(a2, 64, 67.5, "optical engines (PIC + driver)", fs=FS_SMALL)
     # fibres from engines to the front panel, and laser feeds from the external laser modules
     for (x, y), yf in zip(eng, (70, 20, 46, 58)):
-        a2.plot([x - 2, 30, 8], [y, yf, yf], color=OPT, lw=1.0, zorder=3)
+        if x == 79:                             # right engine: through the gap above the ASIC, not across it
+            a2.plot([77, 73.5, 54, 30, 8], [47, 53.5, 53.5, yf, yf], color=OPT, lw=1.0, zorder=3)
+        else:
+            a2.plot([x - 2, 30, 8], [y, yf, yf], color=OPT, lw=1.0, zorder=3)
     for yl in (12, 76):
         block(a2, 12, yl, 12, 8, "laser", fc="#F2D4CF", ec=RED, lw=0.8, fs=FS_SMALL)
         a2.plot([18, 40, 58], [yl, yl, 44 + (yl - 44) * 0.45], color=OPT, lw=0.9, ls=(0, (3, 2)), zorder=3)
     label(a2, 25, 88, "lasers in front-panel modules, fed in by fibre", fs=FS_SMALL, ha="left")
-    callout(a2, (57, 44), (50, 90 - 82), "electrical: millimetres", col=ELEC, ha="center")
+    callout(a2, (54.5, 44), (50, 90 - 82), "electrical: millimetres", col=ELEC, ha="center")
     panel(a2, "b", 0.0, 1.0)
     note(a2, "schematic", "lower right")
     save(fig, "ch17_cpo")
@@ -565,7 +572,7 @@ def fig_layout():
     label(a1, 225, y4 + 52, "MZI", fs=FS_SMALL, col=MUTED)
     # test labels at each circuit's input coupler
     for y, txt in ((ys[1], "opt_in_TE_1550_ring1"), (ys[4], "opt_in_TE_1550_mzi1")):
-        label(a1, -128, y + 36, txt, fs=6.0, ha="left", col=RED)
+        label(a1, -128, y + 36, txt, fs=6.0, ha="left", col=RED, bg="white")
     label(a1, -95, 1030, "all couplers face the same way;\na test label at each input", fs=FS_SMALL, ha="left", va="top")
     dim(a1, (75, ys[6]), (75, ys[7]), "", fs=FS_SMALL)
     label(a1, 83, (ys[6] + ys[7]) / 2, "127 µm", fs=FS_SMALL, ha="left")

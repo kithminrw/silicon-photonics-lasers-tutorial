@@ -96,7 +96,7 @@ def fig_chirp():
     b.plot(tn, chirp / 1e9, color=C4, lw=1.2, label="frequency shift Δν(t)")
     b.plot(tn, adiab / 1e9, color=INK, lw=1.0, ls="--", label=r"adiabatic part $\frac{\alpha}{4\pi}\kappa P$")
     b.axhline(0, color=MUTED, lw=0.5)
-    b.set_ylim(-12, 16)
+    b.set_ylim(-13.5, 16)                              # room under the trace for the legend
     ad0 = ALPHA / (4 * np.pi) * eps * G * TP * P_["eta"] * (I0 - ITH) / (QE * V) / TP
     ad1 = ALPHA / (4 * np.pi) * eps * G * TP * P_["eta"] * (I1 - ITH) / (QE * V) / TP
     b.text(3.55, 3.6, f"adiabatic: {ad1/1e9:.1f} GHz on a 1,\n{ad0/1e9:.1f} GHz on a 0", fontsize=6.4, color=INK, ha="center", va="bottom")

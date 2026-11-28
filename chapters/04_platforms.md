@@ -85,7 +85,7 @@ Silicon photonics is available through many foundries and MPW services, among th
 
 Silicon nitride (Si₃N₄) deposited by low-pressure chemical vapour deposition (LPCVD) has an index of about 2.0 and a bandgap of about 5 eV, so it is transparent from the visible to the mid-infrared and has neither two-photon absorption nor free-carrier absorption at telecom wavelengths {% include cite.html keys="blumenthal2018" %}. Its moderate index contrast with silica brings two benefits: sidewall roughness scatters less light, so propagation losses can be orders of magnitude below silicon's, and the modes are larger and less sensitive to fabrication. Very thin, weakly confining films (under 100 nm) reach losses below 0.1 dB/m at the cost of millimetre bends; thick films (around 800 nm) give tight confinement and the anomalous dispersion needed for frequency combs.
 
-Silicon nitride also handles high optical powers and has a thermo-optic coefficient about seven times smaller than silicon's, which makes passive filters more stable. What it lacks is any fast modulation, detection or gain of its own. It is therefore used for low-loss routing, filters, delay lines, high-Q resonators for narrow-linewidth lasers ([Chapter 26]({% link chapters/26_tunable.md %})), visible-light photonics for biophotonics and quantum technologies, and as a second layer in silicon platforms. Dedicated SiN foundries include LioniX and Ligentec, and CORNERSTONE and several silicon foundries offer SiN layers.
+Silicon nitride also handles high optical powers and has a thermo-optic coefficient about seven times smaller than silicon's, which makes passive filters more stable. What it lacks is any fast modulation, detection or gain of its own. It is therefore used for low-loss routing, filters, delay lines, high-Q resonators for narrow-linewidth lasers ([Chapter 26]({% link chapters/26_tunable.md %})), visible-light photonics for biophotonics and quantum technologies, and as a second layer in silicon platforms. Dedicated SiN foundries include LioniX and Ligentec; CORNERSTONE and several silicon foundries offer SiN layers, and Applied Nanotools runs SiN multi-project wafers.
 
 ## <span class="secnum">4.5</span>Thin-film lithium niobate
 
@@ -188,6 +188,44 @@ Silicon photonics in 220 nm SOI, with germanium photodetectors, carrier-depletio
 - This tutorial uses only open PDKs: SiEPIC EBeam, CORNERSTONE, Luxtelligence and VTT.
 
 </div>
+
+## Problems
+
+1. **Transparency edges.** Use $$\lambda_g = 1.24/E_g$$ and the bandgaps of Table 4.2 to find the absorption edges of silicon, indium phosphide, barium titanate and silicon nitride. Which of these could guide light at 850 nm, the multimode-fibre wavelength of Table 1.1, without absorbing it, and which could detect it?
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    The edges are $$1.24/1.12 = 1.11$$ µm for silicon, $$1.24/1.34 = 0.925$$ µm for InP, $$1.24/3.2 = 0.39$$ µm for BTO and $$1.24/5 = 0.25$$ µm for silicon nitride. An 850 nm photon carries $$1.24/0.85 = 1.46$$ eV, more than the gaps of silicon and InP, so both absorb it and either could detect it. BTO and silicon nitride, with edges far shorter than 850 nm, guide it. A platform for short wavelengths has to be built from wide-gap materials, and silicon, the waveguide at 1550 nm, becomes the detector there.
+
+    </details>
+
+2. **Mode size from the numerical aperture.** Figure 4.3 shows that the smallest possible mode width scales as $$\lambda/\mathrm{NA}$$, with $$\mathrm{NA} = \sqrt{n_1^2 - n_2^2}$$, and is 0.32 µm for silicon in oxide at 1550 nm. With the indices of Table 4.2, predict the minimum widths for silicon nitride and lithium niobate (extraordinary) in oxide, and for an InGaAsP core whose index is 0.2 above InP's. Check them against Figure 4.3a.
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    The numerical apertures are $$\sqrt{3.48^2 - 1.44^2} = 3.17$$ for silicon, $$\sqrt{2.0^2 - 1.44^2} = 1.39$$ for silicon nitride, $$\sqrt{2.14^2 - 1.44^2} = 1.58$$ for lithium niobate and $$\sqrt{3.37^2 - 3.17^2} = 1.14$$ for InGaAsP in InP. Scaling silicon's 0.32 µm by $$3.17/\mathrm{NA}$$ gives 0.73 µm for silicon nitride, 0.64 µm for lithium niobate and 0.89 µm for InGaAsP. Figure 4.3a reads 0.73, 0.64 and 0.90 µm (its InGaAsP contrast is slightly smaller). All four follow $$W_\mathrm{min} \approx 0.65\,\lambda/\mathrm{NA}$$. InGaAsP has almost silicon's index, yet its mode is nearly three times wider: what sets the mode size is the contrast with the cladding, not the index of the core.
+
+    </details>
+
+3. **Choosing alloys on an InP chip.** An InP chip for the reference link needs an active InGaAsP layer that emits at 1550 nm and a passive InGaAsP waveguide core that is transparent there. Choose the bandgap of the active layer, and the smallest bandgap of the passive core if its absorption edge must lie at least 250 nm short of 1550 nm. Check that both lie below the gap of the InP cladding.
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    The active layer needs $$E_g = 1.24/1.55 = 0.80$$ eV, the same as germanium's direct gap. The passive core needs $$\lambda_g \le 1.55 - 0.25 = 1.30$$ µm, so $$E_g \ge 1.24/1.30 = 0.95$$ eV. Both lie below InP's 1.34 eV (edge 0.925 µm), so the InP cladding is transparent to the light in either layer. A passive core chosen this way absorbs O-band light, so an InP chip is designed for one band: an O-band chip would need its passive edge near 1.06 µm, a gap of 1.17 eV.
+
+    </details>
+
+4. **Why centrosymmetric crystals have no Pockels effect.** Write the index change in an applied field $$E$$ as $$\Delta n = aE + bE^2$$. Use the symmetry of a crystal with a centre of inversion to show that $$a = 0$$. What does this mean for silicon, and for LiNbO₃, BaTiO₃ and InP?
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    Inversion through the centre maps the crystal onto itself but reverses the applied field, $$E \to -E$$. Because the crystal is unchanged, its index must change by the same amount for $$E$$ and for $$-E$$: $$aE + bE^2 = -aE + bE^2$$, so $$a = 0$$. Only even powers of the field survive, the quadratic (Kerr) term among them. Silicon's crystal is centrosymmetric, so it has no Pockels effect, and its modulators move free carriers instead, which changes the absorption as well as the index. LiNbO₃, BaTiO₃ and the III–V crystals lack a centre of inversion, so $$a \ne 0$$: crystal symmetry decides which platforms can offer Pockels modulators before any engineering starts.
+
+    </details>
 
 ## Check yourself
 

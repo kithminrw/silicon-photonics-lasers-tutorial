@@ -13,24 +13,26 @@ Acronyms and terms used in the tutorial, with the chapter where each is introduc
 | Term | Meaning | Chapter |
 |---|---|---|
 | 90° hybrid | An optical mixer (often an MMI) that adds signal and local oscillator in four phases for coherent detection | [38]({% link chapters/38_links.md %}) |
-| BCB | Benzocyclobutene: a low-permittivity polymer used to planarise laser ridges and to bond III–V dies | [17]({% link chapters/17_fiberarrays.md %}), [24]({% link chapters/24_fp.md %}) |
-| BH | Buried heterostructure: a laser whose etched active mesa is buried again in regrown InP | [24]({% link chapters/24_fp.md %}) |
-| Deep trench | An etch through the cladding, BOX and into the substrate that leaves a smooth facet for edge couplers | [16]({% link chapters/16_edge.md %}), [17]({% link chapters/17_fiberarrays.md %}) |
-| DP-16QAM | Dual-polarisation 16-level quadrature amplitude modulation: 8 bits per symbol | [38]({% link chapters/38_links.md %}) |
 | α-factor | Linewidth-enhancement factor: the ratio of index to gain change with carrier density in a semiconductor laser | [25]({% link chapters/25_dynamics.md %}) |
 | APD | Avalanche photodiode: a photodiode with internal gain by impact ionisation | [21]({% link chapters/21_pd.md %}) |
 | ASE | Amplified spontaneous emission: the noise added by an optical amplifier | [28]({% link chapters/28_soa.md %}) |
+| Astigmatism | A beam whose waists in the two transverse directions lie in different planes, so no single plane focuses both; common in edge couplers and gain-guided lasers | [16]({% link chapters/16_edge.md %}), [24]({% link chapters/24_fp.md %}) |
 | AWG | Arrayed-waveguide grating: a dispersive multiplexer | [14]({% link chapters/14_wdm.md %}) |
+| BCB | Benzocyclobutene: a low-permittivity polymer used to planarise laser ridges and to bond III–V dies | [17]({% link chapters/17_fiberarrays.md %}), [24]({% link chapters/24_fp.md %}) |
 | BER | Bit-error ratio | [21]({% link chapters/21_pd.md %}) |
+| BH | Buried heterostructure: a laser whose etched active mesa is buried again in regrown InP | [24]({% link chapters/24_fp.md %}) |
 | BOX | Buried oxide: the SiO₂ layer under the silicon film of an SOI wafer | [4]({% link chapters/04_platforms.md %}) |
 | BTO | Barium titanate (BaTiO₃): a Pockels material integrated on silicon | [4]({% link chapters/04_platforms.md %}) |
 | C band, O band | Telecom bands near 1530–1565 nm and 1260–1360 nm | [1]({% link chapters/01_why.md %}) |
 | CMOS | Complementary metal–oxide–semiconductor: the process technology of microelectronics | [1]({% link chapters/01_why.md %}) |
+| Corner (process corner) | A combination of the extreme values of the process variables, used to bound a design's response | [29]({% link chapters/29_design.md %}) |
 | CPO | Co-packaged optics: photonics in the same package as a switch or processor | [17]({% link chapters/17_fiberarrays.md %}), [38]({% link chapters/38_links.md %}) |
 | CWDM, DWDM | Coarse (20 nm) and dense (ITU grid) wavelength-division multiplexing | [14]({% link chapters/14_wdm.md %}) |
 | DBR, DFB | Distributed Bragg reflector and distributed-feedback lasers | [26]({% link chapters/26_tunable.md %}) |
+| Deep trench | An etch through the cladding, BOX and into the substrate that leaves a smooth facet for edge couplers | [16]({% link chapters/16_edge.md %}), [17]({% link chapters/17_fiberarrays.md %}) |
 | DFM, DFT | Design for manufacturing; design for test | [35]({% link chapters/35_fab.md %}), [17]({% link chapters/17_fiberarrays.md %}) |
 | DML | Directly modulated laser: the drive current modulates the light | [25]({% link chapters/25_dynamics.md %}) |
+| DP-16QAM | Dual-polarisation 16-level quadrature amplitude modulation: 8 bits per symbol | [38]({% link chapters/38_links.md %}) |
 | DRC | Design-rule check | [34]({% link chapters/34_verification.md %}) |
 | DUV | Deep-ultraviolet (248 and 193 nm) projection lithography | [35]({% link chapters/35_fab.md %}) |
 | EAM, EML | Electro-absorption modulator; electro-absorption modulated laser | [20]({% link chapters/20_modulators.md %}), [25]({% link chapters/25_dynamics.md %}) |
@@ -47,6 +49,7 @@ Acronyms and terms used in the tutorial, with the chapter where each is introduc
 | FMCW | Frequency-modulated continuous-wave ranging (LiDAR) | [39]({% link chapters/39_apps.md %}) |
 | FP cavity | Fabry–Pérot cavity: a standing-wave resonator between two mirrors | [13]({% link chapters/13_bragg.md %}), [24]({% link chapters/24_fp.md %}) |
 | FSR | Free spectral range | [11]({% link chapters/11_mzi.md %}), [12]({% link chapters/12_rings.md %}) |
+| FTS | Fourier-transform spectrometer: measures an interferogram at many path differences and Fourier-transforms it into a spectrum | [39]({% link chapters/39_apps.md %}) |
 | FWHM | Full width at half maximum | [12]({% link chapters/12_rings.md %}) |
 | GC | Grating coupler | [15]({% link chapters/15_gc.md %}) |
 | GDS (GDSII), OASIS | The standard file formats for layouts | [33]({% link chapters/33_layout.md %}) |
@@ -64,16 +67,19 @@ Acronyms and terms used in the tutorial, with the chapter where each is introduc
 | MFD | Mode-field diameter (1/e² intensity) | [3]({% link chapters/03_gaussian.md %}) |
 | Microcomb | A frequency comb generated by four-wave mixing in a high-Q microring; a dissipative Kerr soliton gives a smooth spectrum | [7]({% link chapters/07_loss.md %}), [26]({% link chapters/26_tunable.md %}) |
 | MMI | Multimode-interference coupler | [10]({% link chapters/10_mmi.md %}) |
+| Mode locking | Locking the phases of a laser's longitudinal modes so that they add up to a train of short pulses | [26]({% link chapters/26_tunable.md %}) |
 | MOVPE | Metal-organic vapour-phase epitaxy: the growth method of III–V laser wafers | [24]({% link chapters/24_fp.md %}) |
 | MPW | Multi-project wafer run | [35]({% link chapters/35_fab.md %}) |
 | MQW | Multiple quantum wells | [23]({% link chapters/23_gain.md %}) |
 | MTTF | Mean time to failure | [27]({% link chapters/27_lasersonsi.md %}) |
+| MZI mesh | A grid of MZIs whose phases are set, in software, to realise a matrix or a circuit: programmable photonics | [39]({% link chapters/39_apps.md %}) |
 | MZI, MZM | Mach–Zehnder interferometer and modulator | [11]({% link chapters/11_mzi.md %}), [20]({% link chapters/20_modulators.md %}) |
-| NRPS | Non-reciprocal phase shift: different phases for forward and backward light, from a magneto-optic material | [27]({% link chapters/27_lasersonsi.md %}) |
 | n<sub>eff</sub>, n<sub>g</sub> | Effective index (phase) and group index (energy, envelope) | [5]({% link chapters/05_slab.md %}), [6]({% link chapters/06_soi.md %}) |
+| NRPS | Non-reciprocal phase shift: different phases for forward and backward light, from a magneto-optic material | [27]({% link chapters/27_lasersonsi.md %}) |
 | NRZ, PAM4 | Two-level and four-level intensity modulation | [20]({% link chapters/20_modulators.md %}) |
 | OMA | Optical modulation amplitude | [1]({% link chapters/01_why.md %}) |
 | OPA | Optical phased array | [39]({% link chapters/39_apps.md %}) |
+| Oxide aperture | The unoxidised centre of an AlAs layer in a VCSEL, which funnels the current and guides the light | [24]({% link chapters/24_fp.md %}) |
 | PCell | Parameterised cell: a layout cell drawn by code from its parameters | [33]({% link chapters/33_layout.md %}) |
 | PDK | Process design kit | [30]({% link chapters/30_flow.md %}) |
 | Penetration depth | How far light reaches into a Bragg mirror; it adds to a cavity's effective length | [13]({% link chapters/13_bragg.md %}) |
@@ -85,6 +91,9 @@ Acronyms and terms used in the tutorial, with the chapter where each is introduc
 | QPM | Quasi-phase-matching: flipping the nonlinearity every coherence length (periodic poling) so a conversion keeps growing | [7]({% link chapters/07_loss.md %}) |
 | RIN | Relative intensity noise | [25]({% link chapters/25_dynamics.md %}) |
 | RIU | Refractive-index unit (sensor sensitivity in nm/RIU) | [39]({% link chapters/39_apps.md %}) |
+| Sagnac effect | The phase or frequency difference between light sent both ways round a rotating loop: the principle of optical gyroscopes | [39]({% link chapters/39_apps.md %}) |
+| Saturable absorber | A section that absorbs weak light but bleaches under a strong pulse; it locks a laser's modes passively | [26]({% link chapters/26_tunable.md %}) |
+| SCOW | Slab-coupled optical waveguide: a large-mode, low-confinement waveguide for high-power amplifiers | [24]({% link chapters/24_fp.md %}) |
 | SMF-28 | The standard single-mode telecom fibre (mode-field diameter 10.4 µm at 1550 nm) | [3]({% link chapters/03_gaussian.md %}) |
 | SMSR | Side-mode suppression ratio | [26]({% link chapters/26_tunable.md %}) |
 | SOA, RSOA | Semiconductor optical amplifier; reflective SOA (gain chip of an external-cavity laser) | [28]({% link chapters/28_soa.md %}), [26]({% link chapters/26_tunable.md %}) |
@@ -93,8 +102,9 @@ Acronyms and terms used in the tutorial, with the chapter where each is introduc
 | TE, TM | Transverse-electric and transverse-magnetic modes | [5]({% link chapters/05_slab.md %}) |
 | TFLN | Thin-film lithium niobate | [4]({% link chapters/04_platforms.md %}) |
 | TIA | Transimpedance amplifier | [21]({% link chapters/21_pd.md %}) |
+| Time–bandwidth product | Pulse width times spectral width; 0.44 for a Gaussian pulse without chirp | [26]({% link chapters/26_tunable.md %}) |
 | Two-photon lithography | 3D printing in a photoresist by a focused femtosecond laser, which hardens it only at the focus | [17]({% link chapters/17_fiberarrays.md %}) |
 | UHNA fibre | Ultra-high numerical aperture fibre, with a small mode (3–4 µm) | [16]({% link chapters/16_edge.md %}) |
-| VCSEL | Vertical-cavity surface-emitting laser | [24]({% link chapters/24_fp.md %}), [25]({% link chapters/25_dynamics.md %}) |
 | V<sub>π</sub>L | Voltage–length product of a phase shifter | [19]({% link chapters/19_eo.md %}) |
+| VCSEL | Vertical-cavity surface-emitting laser | [24]({% link chapters/24_fp.md %}), [25]({% link chapters/25_dynamics.md %}) |
 | WDM | Wavelength-division multiplexing | [14]({% link chapters/14_wdm.md %}) |

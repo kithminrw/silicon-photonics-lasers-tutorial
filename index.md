@@ -56,8 +56,8 @@ Every chapter has one or more demos that run in the browser with no installation
 
 ## About
 
-The tutorial has learned from the teaching material of the field, above all Chrostowski and Hochberg's *Silicon Photonics Design* and the UBC edX course built around it, the SiEPIC openEBL design–fabrication–test cycle, the AIM Photonics Academy courses and the open PDKs of SiEPIC and gdsfactory. It cites these works and links to them, but its text, figures and code are its own. Every source is on the [References]({% link references.md %}) page.
+The tutorial has learned from the teaching material of the field, above all Chrostowski and Hochberg's *Silicon Photonics Design* and the UBC edX course built around it, the SiEPIC openEBL design–fabrication–test cycle and the open PDKs of SiEPIC and gdsfactory. It cites these works and links to them, but its text, figures and code are its own. Every source is on the [References]({% link references.md %}) page.
 
 **How this tutorial is made.** Its text, figures, demos and labs were written and drawn for it with the help of AI tools; nothing is copied from elsewhere ([Preface]({% link preface.md %})). This draft may still contain mistakes, and any mistake will be corrected as soon as it is pointed out.
 
-This is a living draft (v0.1, November 2026): all nine parts (Chapters 1–39) are written, with fifty-two interactive demos, fifteen hands-on labs and the 3D gallery.
+This is a living draft (v0.1, November 2026): all nine parts (Chapters 1–39) are written, with fifty-five interactive demos, seventeen hands-on labs and the 3D gallery.

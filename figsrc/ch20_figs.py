@@ -94,9 +94,9 @@ def fig_mzm():
     ax.plot([5.3, 5.3], [-1.85, -2.2], color=ELEC, lw=0.9, zorder=4)
     for k, hw in enumerate((0.3, 0.2, 0.1)):
         ax.plot([5.3 - hw, 5.3 + hw], [-2.2 - 0.17 * k] * 2, color=ELEC, lw=0.9, zorder=4)
-    xt = 14.6; zz = np.linspace(-1.0, 1.0, 9)
-    ax.plot([14.0, xt, xt], [1.47, 1.47, 1.0], color=ELEC, lw=0.9); ax.plot(xt + 0.18 * np.array([0, 1, -1, 1, -1, 1, -1, 1, 0]), zz[::-1], color=ELEC, lw=0.9)
-    ax.plot([xt, xt, 14.0], [-1.0, -1.47, -1.47], color=ELEC, lw=0.9)
+    xt = 14.6; zz = np.linspace(-0.55, 0.55, 7)          # resistor between the arms; straight leads cross the arms
+    ax.plot([14.0, xt, xt], [1.47, 1.47, 0.55], color=ELEC, lw=0.9); ax.plot(xt + 0.18 * np.array([0, 1, -1, 1, -1, 1, 0]), zz[::-1], color=ELEC, lw=0.9)
+    ax.plot([xt, xt, 14.0], [-0.55, -1.47, -1.47], color=ELEC, lw=0.9)
     ax.text(xt + 0.35, 0.0, "50 Ω", ha="left", va="center", fontsize=7, color=ELEC)
     # heater for the bias point
     box(ax, 15.0, -ya - 0.17, 0.9, 0.34, "tin", z=4)

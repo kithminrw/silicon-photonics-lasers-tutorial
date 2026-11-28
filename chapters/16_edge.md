@@ -158,6 +158,24 @@ The fibre is chosen to match the spot the chip can make:
 - **Cleaved SMF-28** needs a 10 µm spot on the chip, which only multi-stage or suspended couplers provide, but it then tolerates a few micrometres of offset.
 - **Fibre arrays** at 127 µm pitch serve many edge couplers at once, and V-grooves etched into the chip itself can hold fibres passively aligned to the couplers.
 
+**Elliptical and astigmatic beams.** The light leaving an edge coupler, or an edge-emitting laser ([Section 24.9]({% link chapters/24_fp.md %}#fig-24-14)), is rarely a round Gaussian with its waist on the facet. It is usually **elliptical**: its width in the plane of the chip and its height across it differ, so the two directions spread at different angles, the narrower one faster. It can also be **astigmatic**: the two directions have their waists, the points the beam seems to come from, in different planes, a distance Δz apart ([Figure 16.7](#fig-16-7)a). This happens when the field at the facet has a curved phase front in one direction but not in the other: a taper that ends before the facet, a mode still expanding when it reaches it, or a laser whose sideways guiding comes from its gain profile.
+
+The cost is that no single plane focuses both directions. A fibre or a lens set on one waist sees the other one defocused, and in that direction the overlap falls to
+
+<div class="tbox tbox-keyeq" markdown="1">
+<div class="tbox-title">Coupling with one direction defocused by Δz</div>
+
+$$\eta_\mathrm{1D} = \left[1 + \left(\frac{\Delta z}{2z_R}\right)^2\right]^{-1/2}, \qquad z_R = \frac{\pi w_0^2}{\lambda}$$
+
+</div>
+
+with $$z_R$$ the Rayleigh range in that direction ([Chapter 3]({% link chapters/03_gaussian.md %})). Small spots suffer most, because their Rayleigh ranges are short: 5 µm of astigmatism costs 1.05 dB with a 2.5 µm spot, the size of a lensed fibre's, but 0.08 dB with a 5 µm spot and nothing measurable with SMF-28's 10.4 µm mode ([Figure 16.7](#fig-16-7)b). Cylindrical or anamorphic lenses, or the free-form printed lenses of [Section 17.5]({% link chapters/17_fiberarrays.md %}), can correct the two directions separately.
+
+<figure id="fig-16-7">
+  <img src="{{ '/assets/figs/ch16_astig.svg' | relative_url }}" style="width:680px" alt="(a) Top and side views of a beam leaving an edge coupler: in the top view its width grows from a 3.0 micrometre waist that lies 4 micrometres inside the chip, drawn dashed; in the side view its height grows from a 2.4 micrometre waist on the facet; the distance between the two waists is marked delta z. (b) Coupling loss against astigmatism from 0 to 15 micrometres for spots of 2.5, 5 and 10.4 micrometres: about 1 decibel at 5 micrometres for the smallest, under 0.1 decibel for the 5 micrometre spot and almost nothing for 10.4 micrometres.">
+  <figcaption><span class="capnum">Figure 16.7.</span> <strong>An elliptical, astigmatic beam from an edge coupler.</strong> (a) The beam's width in the chip plane (top) and its height across the chip (bottom) against the distance from the facet, at 1/e² of the peak, for an illustrative beam: the width grows from a 3.0 µm waist that lies 4 µm inside the chip (dashed: where the beam seems to come from), the height from a 2.4 µm waist on the facet. The beam is elliptical, because its waists differ, and astigmatic, because they sit Δz = 4 µm apart. (b) The coupling loss when a matched Gaussian is focused on one waist and the other direction is Δz out of focus: 1.05 dB at Δz = 5 µm for a 2.5 µm spot, 0.08 dB for a 5 µm spot and under 0.01 dB for SMF-28's 10.4 µm mode. Gaussian beams at 1550 nm. Drawn by <code>figsrc/ch16_figs.py</code>.</figcaption>
+</figure>
+
 ## <span class="secnum">16.6</span>Edge against grating couplers
 
 **Table 16.2. Edge and grating couplers compared.** Typical values; see Chapters 15–17 {% include cite.html keys="marchetti2019" %}.
@@ -183,6 +201,15 @@ Edge couplers for the transceiver of the reference link: a two-stage Si-to-SiN c
 
 </div>
 
+## In 3D
+
+An inverse-taper edge coupler at a polished facet, with the expanding beam. Drag to turn it, scroll to zoom, click a layer in the legend to hide it (shift-click to show it alone), and switch to the exploded view or to 3× height to see the thin layers. It is a generic concept drawn with this chapter's dimensions, not a device from a PDK; real PDK devices are in the [PDK devices in 3D]({% link devices-3d.md %}) gallery.
+
+{% include stack3d-assets.html %}
+<div class="d3-grid">
+{% include stack3d.html slug="edge" %}
+</div>
+
 <div class="tbox tbox-tryit" markdown="1">
 <div class="tbox-title">Explore further</div>
 
@@ -195,7 +222,10 @@ Edge couplers for the transceiver of the reference link: a two-stage Si-to-SiN c
 {% include reflist.html keys="marchetti2019,almeida2003,shoji2002,cheben2015,chrostowski2015" %}
 
 <div class="tbox tbox-takeaways" markdown="1">
-<div class="tbox-title">Key takeaways</div>
+<div class="tbox-title">Key takeaways
+- Beams from edge couplers and edge-emitting lasers are elliptical, and astigmatic when their two waists lie in different planes; the defocused direction couples as $$[1 + (\Delta z/2z_R)^2]^{-1/2}$$, which matters most for small spots.
+
+</div>
 
 - Butt-coupling a 500 × 220 nm strip to SMF-28 loses about 20 dB: the mode must be expanded first.
 - An inverse taper pushes the mode into the cladding. For TE, a 180 nm tip gives a 2.9 µm spot (92 % to a lensed fibre), 160 nm a 4.8 µm spot (UHNA fibre), and 140 nm about 10 µm.

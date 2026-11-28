@@ -341,7 +341,7 @@ def fig_devices():
     label(a, -16.6, ybot / 2, "n-DBR\n34 pairs", fs=FS_SMALL, ha="right")
     label(a, -12.6, (yo + ytop) / 2, "p-DBR\n20 pairs", fs=FS_SMALL, ha="right")
     callout(a, (9.5, yo + 0.2), (16.6, 10.6), "oxide\naperture", fs=FS_SMALL, ha="left")
-    callout(a, (14.0, ycav + 0.25), (16.6, 6.2), "cavity,\n3 QWs", fs=FS_SMALL, ha="left")
+    callout(a, (11.0, ycav + 0.25), (16.6, 6.2), "cavity,\n3 QWs", fs=FS_SMALL, ha="left")
     callout(a, (10.0, ytop + 0.5), (14.0, ytop + 4.6), "ring contact", fs=FS_SMALL, ha="left")
     arrow(a, (0, ytop + 0.7), (0, ytop + 8.5), col=RED, lw=1.6, ms=9)
     label(a, 1.0, ytop + 6.8, "850 nm", fs=FS_SMALL, col=RED, ha="left")
@@ -437,7 +437,8 @@ def fig_devices():
         d.plot([xe + 35 - wdt, xe + 35 + wdt], [-122 - 5 * k] * 2, color=INK, lw=0.7)
     label(d, xe + 46, -90, "50 Ω", fs=FS_SMALL, ha="left")
     arrow(d, (xe + 4, 0), (xe + 55, 0), col=RED, lw=1.4, ms=8)
-    dim(d, (-25, -W / 2), (-25, W / 2), f"{W:.0f} µm")
+    dim(d, (-25, -W / 2), (-25, W / 2), "")
+    label(d, -25, 0, f"{W:.0f} µm", fs=FS_SMALL, rot=90, bg="white")         # vertical, clear of the chip edge
     dim(d, (0, -150), (xe, -150), f"{xe:.0f} µm")
     _title(d, "d", "EML, top view", x=0.0)
 

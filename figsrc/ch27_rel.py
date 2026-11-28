@@ -247,7 +247,6 @@ def fig_sites():
     box(c, -6.0, 0, 12.0, 1.0, "gaas")
     for k in range(9):
         box(c, -3.0, 1.0 + k * 0.32, 6.0, 0.16, "#C8CED8"); box(c, -3.0, 1.16 + k * 0.32, 6.0, 0.16, "#E6E9EF")
-    box(c, -6.0, 1.0, 3.0, 0.4, "gaas")
     box(c, -3.0, 3.88, 6.0, 0.6, "#D8DCE3")
     for yq in (4.07, 4.18, 4.29):
         c.plot([-3.0, 3.0], [yq, yq], color=MAT["mqw"], lw=0.7, zorder=3)

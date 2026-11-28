@@ -275,7 +275,7 @@ def fig_tpa():
         Nc = 0.7e-9 * I**2 * tau / (2 * hv)
         a.loglog(P * 1e3, 4.343 * sig * Nc, ls, color=C4, label=f"FCA from TPA, τ = {tau*1e9:g} ns")
     a.axhspan(1, 3, color=GRID, alpha=0.8, lw=0)
-    a.text(1.3, 1.6, "linear loss of a Si strip, 1–3 dB/cm", fontsize=6.5, color=MUTED, va="center")
+    a.text(1.3, 3.3, "linear loss of a Si strip, 1–3 dB/cm", fontsize=6.5, color=MUTED, va="bottom")   # above the band, clear of the FCA line
     i = np.argmin(np.abs(P - 0.1))
     print(f"[tpa] 100 mW: I = {I[i]:.2e} W/cm^2, alpha_TPA = {0.7e-9*I[i]:.3f} /cm = {4.343*0.7e-9*I[i]:.2f} dB/cm; "
           f"1 W: {4.343*0.7e-9*I[-1]:.1f} dB/cm")
@@ -339,7 +339,7 @@ def fig_nonlinear():
     a.set_xlim(0, 8); a.set_ylim(0, 30)
     a.text(7.9, (2 / np.pi) ** 2 * 64 + 1.0, "× (2/π)²", fontsize=6.4, color=C1, ha="right", va="bottom")
     finish(a, "Length (coherence lengths $L_c$)", "Second-harmonic power (arb.)")
-    a.legend(loc="upper left", fontsize=6.4)
+    a.legend(loc="upper left", fontsize=6.4, handlelength=1.2, handletextpad=0.5, borderaxespad=0.3)   # clear of the phase-matched curve
     # (b) comb
     f = np.arange(-30, 31)                          # line index, 100 GHz apart
     env = 1 / np.cosh(f / 9.0) ** 2

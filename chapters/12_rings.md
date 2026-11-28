@@ -153,6 +153,15 @@ Include all-pass rings of 10 µm radius with gaps of 200, 250 and 300 nm, and an
 
 </div>
 
+## In 3D
+
+An add-drop ring with its two buses and a heater. Drag to turn it, scroll to zoom, click a layer in the legend to hide it (shift-click to show it alone), and switch to the exploded view or to 3× height to see the thin layers. It is a generic concept drawn with this chapter's dimensions, not a device from a PDK; real PDK devices are in the [PDK devices in 3D]({% link devices-3d.md %}) gallery.
+
+{% include stack3d-assets.html %}
+<div class="d3-grid">
+{% include stack3d.html slug="ring" %}
+</div>
+
 <div class="tbox tbox-tryit" markdown="1">
 <div class="tbox-title">Explore further</div>
 

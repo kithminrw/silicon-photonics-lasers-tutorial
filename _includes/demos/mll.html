@@ -1,0 +1,161 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdMll" role="group" aria-label="Interactive demo: a mode-locked laser, its comb of cavity modes and its pulse train">
+  <div class="bd-head"><span>// try it · mode-locked laser: lock the phases of the cavity modes and they add up to one pulse per round trip</span>
+    <span class="bd-controls" style="margin:0"><span class="bd-seg" role="group" aria-label="Phases of the modes"><button type="button" data-ph="lock" aria-pressed="true">locked</button><button type="button" data-ph="rand" aria-pressed="false">random</button></span>
+      <span class="bd-seg" role="group" aria-label="Time view"><button type="button" data-view="train" aria-pressed="true">pulse train</button><button type="button" data-view="pulse" aria-pressed="false">one pulse</button></span>
+      <button type="button" class="bd-btn" data-act="new">new random phases</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>cavity length L <b data-v="L"></b></span><input type="range" data-k="L" min="0.5" max="8" step="0.02" value="2.14" aria-label="cavity length"></label>
+    <label class="bd-sl"><span>locked bandwidth (FWHM) <b data-v="bw"></b></span><input type="range" data-k="bw" min="0.3" max="12" step="0.1" value="4" aria-label="locked bandwidth"></label>
+    <label class="bd-sl"><span>chirp (group-delay dispersion) <b data-v="gdd"></b></span><input type="range" data-k="gdd" min="0" max="2" step="0.02" value="0" aria-label="chirp"></label>
+  </div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">spectrum: the cavity modes under the locked bandwidth</span></div>
+    <div class="bd-scope tall"><canvas data-c="t" aria-hidden="true"></canvas><span class="bd-tag" data-o="ttag">output power against time</span></div>
+  </div>
+  <div class="bd-scope short"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: the laser to scale along its length, and its light at one instant</span></div>
+  <div class="bd-read" aria-live="polite"><span>repetition rate <b data-o="f">–</b></span><span>line spacing <b data-o="dl">–</b></span><span>lines in the FWHM <b data-o="n">–</b></span><span>pulse width <b data-o="tau">–</b></span><span>time–bandwidth <b data-o="tbp">–</b></span><span>peak / mean <b data-o="pm">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Four things to try</p><ol>
+    <li><b>Unlock the phases.</b> Press random: the spectrum does not change at all, but the 0.63 ps pulses dissolve into noise, and the peak falls from 74 times the mean power to only a few times (press new random phases to see it vary). A spectrum analyser cannot tell the two lasers apart.</li>
+    <li><b>Widen the bandwidth.</b> Take it from 4 to 8 nm: the pulses shorten from 0.63 to 0.32 ps and the time–bandwidth product stays at 0.44, the limit for a Gaussian pulse.</li>
+    <li><b>Lengthen the cavity.</b> Double it to 4.28 mm: the pulses come at 10 GHz instead of 20, twice as many lines fit in the same 4 nm, and the pulse keeps its width, so its peak doubles to 149 times the mean.</li>
+    <li><b>Add chirp.</b> At 0.5 ps² the pulse spreads to 2.3 ps, with a time–bandwidth product of 1.6. Real semiconductor mode-locked lasers emit chirped pulses; a dispersive element outside the laser can compress them again.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>A mode-locked laser is made twice as long, with the same locked bandwidth. What happens to its pulses?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="The round trip takes twice as long, so the pulses come half as often; the width is set by the bandwidth, which has not changed, so the same average power goes into pulses half as frequent and twice as high.">They come half as often, as short as before and twice as high relative to the mean</button>
+      <button type="button" data-why="The pulse width is set by the locked bandwidth, about 0.44 divided by it for a Gaussian pulse. A longer cavity puts more lines into the same bandwidth; it does not stretch the pulse.">They become twice as long</button>
+      <button type="button" data-why="One pulse circulates, and it leaves once per round trip. A longer cavity makes the round trip longer, so the repetition rate c/(2 n_g L) falls.">They come twice as often</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdMll'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  var CL = 2.998e8, LAM = 1310e-9, NG = 3.5, SA = 0.1;   // O-band quantum-dot laser: group index 3.5; absorber 10 % of the length (illustrative)
+  var ph = 'lock', view = 'train', seed = 7, R = null;
+  var S = BD.bind(root, { L: { fmt: function (x) { return x.toFixed(2) + ' mm'; } }, bw: { fmt: function (x) { return x.toFixed(1) + ' nm'; } },
+                          gdd: { fmt: function (x) { return x.toFixed(2) + ' ps²'; } } }, function () { calc(); draw(); });
+  BD.seg(root, 'ph', function (v) { ph = v; calc(); draw(); });
+  BD.seg(root, 'view', function (v) { view = v; draw(); });
+  q('[data-act="new"]').addEventListener('click', function () { seed = (seed * 16807) % 2147483647; if (ph === 'rand') { calc(); draw(); } });
+  function calc() {
+    var f = CL / (2 * NG * S.L * 1e-3), dnu = CL * S.bw * 1e-9 / (LAM * LAM), K = Math.ceil(2.5 * dnu / f), n = 4096;
+    while (n < 16 * (2 * K + 1)) n *= 2;
+    var re = new Float64Array(n), im = new Float64Array(n), pw = [], rnd = BD.rng(seed), k;
+    for (k = -K; k <= K; k++) {
+      var nu = k * f, p = Math.exp(-4 * Math.LN2 * Math.pow(nu / dnu, 2)), a = Math.sqrt(p);
+      var phi = ph === 'rand' ? 2 * Math.PI * rnd() : 0.5 * S.gdd * 1e-24 * Math.pow(2 * Math.PI * nu, 2);
+      var j = ((k % n) + n) % n; re[j] = a * Math.cos(phi); im[j] = a * Math.sin(phi); pw.push([nu, p]);
+    }
+    BD.fft(re, im);
+    var I = new Float64Array(n), sum = 0, mx = 0, imax = 0;
+    for (k = 0; k < n; k++) { I[k] = re[k] * re[k] + im[k] * im[k]; sum += I[k]; }
+    for (k = 0; k < n; k++) { I[k] /= sum / n; if (I[k] > mx) { mx = I[k]; imax = k; } }
+    var T = 1 / f, dt = T / n, tau = NaN;
+    if (ph === 'lock') {   // FWHM, walking out from the peak (circularly), interpolated
+      var h = mx / 2, at = function (i) { return I[((i % n) + n) % n]; }, lo = 0, hi = 0;
+      while (at(imax - lo) > h && lo < n / 2) lo++;
+      while (at(imax + hi) > h && hi < n / 2) hi++;
+      if (lo < n / 2 && hi < n / 2) {
+        var xl = lo - 1 + (at(imax - lo + 1) - h) / (at(imax - lo + 1) - at(imax - lo)), xh = hi - 1 + (at(imax + hi - 1) - h) / (at(imax + hi - 1) - at(imax + hi));
+        tau = (xl + xh) * dt;   // xl, xh: distances in samples from the peak to each half-power point
+      }
+    }
+    R = { f: f, T: T, dnu: dnu, n: n, I: I, mx: mx, imax: imax, pw: pw, tau: tau, dt: dt, tau0: 2 * Math.LN2 / (Math.PI * dnu) };
+  }
+  function fmtT(s) { return s < 1e-12 ? (s * 1e15).toFixed(0) + ' fs' : s < 1e-9 ? (s * 1e12).toFixed(s < 1e-11 ? 2 : 1) + ' ps' : (s * 1e9).toFixed(2) + ' ns'; }
+  function draw() {
+    if (!R) calc();
+    var dlam = LAM * LAM * R.f / CL;   // m
+    // ---- spectrum
+    (function () {
+      var d = BD.setup(q('[data-c="s"]')), span = Math.max(1.0, 1.4 * S.bw);
+      var fr = BD.frame(d, { x: [-span, span], y: [0, 1.18], pad: { l: 30, b: 22 }, xt: [[-span, '−' + span.toFixed(1)], [0, '1310 nm'], [span, '+' + span.toFixed(1) + ' nm']], yt: [[0, '0'], [1, '1']] });
+      var pxPer = (fr.X(1) - fr.X(0)) * dlam * 1e9, g = d.g;
+      if (pxPer >= 2.2) {
+        g.strokeStyle = BD.C.teal; g.lineWidth = Math.min(2, Math.max(1, pxPer / 3));
+        R.pw.forEach(function (e) { var x = -LAM * LAM * e[0] / CL * 1e9; if (Math.abs(x) > span) return; g.beginPath(); g.moveTo(fr.X(x), fr.Y(0)); g.lineTo(fr.X(x), fr.Y(e[1])); g.stroke(); });
+        g.lineWidth = 1;
+      } else {
+        g.fillStyle = 'rgba(127,208,184,.45)'; g.beginPath(); g.moveTo(fr.X(-span), fr.Y(0));
+        for (var i = 0; i <= 200; i++) { var x = -span + 2 * span * i / 200; g.lineTo(fr.X(x), fr.Y(Math.exp(-4 * Math.LN2 * Math.pow(x / S.bw, 2)))); }
+        g.lineTo(fr.X(span), fr.Y(0)); g.fill();
+        BD.label(g, 'lines ' + (dlam * 1e12).toFixed(0) + ' pm apart: too dense to draw one by one', fr.X(0), fr.Y(1.1), BD.C.dim, 'center');
+      }
+      if (ph === 'lock' && S.gdd > 0) BD.label(g, 'chirp: spectral phase ∝ offset²', fr.X(-span) + 4, fr.Y(1.1) + 12, BD.C.gold);
+    })();
+    // ---- time
+    (function () {
+      var tl = view === 'pulse' && ph === 'lock' && S.gdd > 0 ? 0.939 / (R.f * R.tau0) : 0;   // peak of the unchirped pulse, drawn for comparison
+      var d = BD.setup(q('[data-c="t"]')), g = d.g, n = R.n, I = R.I, T = R.T, ymax = Math.max(8, R.mx, tl) * 1.15;
+      var w0, w1, unit = 1e12;
+      if (view === 'train') { w0 = -1.25 * T; w1 = 1.25 * T; }
+      else { var half = 4 * (isFinite(R.tau) ? R.tau : 6 * R.tau0); half = Math.min(half, T / 2); w0 = -half; w1 = half; }
+      var fr = BD.frame(d, { x: [w0 * unit, w1 * unit], y: [0, ymax], pad: { l: 34, b: 22 },
+        xt: [[w0 * unit, (w0 * unit).toPrecision(2)], [0, '0'], [w1 * unit, '+' + (w1 * unit).toPrecision(2) + ' ps']], yt: [[0, '0'], [Math.round(ymax / 2), String(Math.round(ymax / 2))]] });
+      var x0 = fr.p.l, x1 = d.w - fr.p.r, cols = Math.max(1, Math.round(x1 - x0)), ts = (w1 - w0) / cols;
+      fr.clipIn(); g.strokeStyle = ph === 'lock' ? BD.C.red : BD.C.blue; g.lineWidth = 1.3; g.beginPath();
+      for (var c = 0; c <= cols; c++) {   // the largest sample in each pixel column, so a narrow pulse is never lost between pixels
+        var ta = w0 + c * ts, tb = ta + ts, ia = Math.floor(ta / R.dt), ib = Math.max(ia, Math.floor(tb / R.dt)), m = 0;
+        for (var i = ia; i <= ib; i++) { var v = I[(((i + R.imax) % n) + n) % n]; if (v > m) m = v; }
+        var y = fr.Y(Math.min(m, ymax * 1.02)); if (c) g.lineTo(x0 + c, y); else g.moveTo(x0, y);
+      }
+      g.stroke(); g.lineWidth = 1;
+      if (tl) {   // the transform-limited pulse for comparison
+        var xs = [], ys = [], pk = tl;
+        for (var k = 0; k <= 300; k++) { var t = w0 + (w1 - w0) * k / 300; xs.push(t * unit); ys.push(pk * Math.exp(-4 * Math.LN2 * Math.pow(t / R.tau0, 2))); }
+        BD.line(fr, xs, ys, BD.C.dim, 1.1, [4, 3]);
+        BD.label(g, 'dashed: the same spectrum without chirp', x0 + 4, fr.p.t + 12, BD.C.dim);
+      }
+      fr.clipOut();
+      BD.hline(fr, 1, BD.C.dim, [3, 3], 'mean power');
+      q('[data-o="ttag"]').textContent = view === 'train' ? 'output power over 2.5 round trips (relative to the mean)' : 'one pulse, zoomed (relative to the mean)';
+    })();
+    // ---- geometry: side view to scale along the cavity, the light inside it at one instant
+    (function () {
+      var d = BD.setup(q('[data-c="g"]')), g = d.g, sc = (d.w - 90) / 8.2, Lp = S.L * sc, x0 = 16, yA = d.h - 34, Hc = Math.max(14, yA - 6 - 54);   // sc: px per mm
+      g.fillStyle = BD.GEO.ox; g.fillRect(x0, yA - 2, Lp, 16);   // n-InP (drawn in the cladding colour)
+      g.fillStyle = 'rgba(224,184,90,.6)'; g.fillRect(x0, yA - 6, Lp, 4);   // active region
+      g.fillStyle = 'rgba(160,200,240,.22)'; g.fillRect(x0, yA - 6 - 10, Lp, 10);   // p-InP
+      var la = Math.max(5, SA * Lp); g.fillStyle = BD.GEO.metal;
+      g.fillRect(x0 + 1, yA - 19, Lp - la - 4, 3); g.fillRect(x0 + Lp - la, yA - 19, la - 1, 3);
+      g.strokeStyle = BD.C.white; g.lineWidth = 1.5; g.beginPath(); g.moveTo(x0, yA - 20); g.lineTo(x0, yA + 14); g.moveTo(x0 + Lp, yA - 20); g.lineTo(x0 + Lp, yA + 14); g.stroke(); g.lineWidth = 1;
+      // fold one round trip of the output onto the cavity: forward pass then backward pass, summed at each position
+      var nb = Math.max(2, Math.round(Lp)), acc = new Float64Array(nb), cnt = new Float64Array(nb), n = R.n, I = R.I, mx = 0;
+      for (var i = 0; i < n; i++) { var u = i / n, z = u < 0.5 ? 2 * u : 2 - 2 * u, b = Math.min(nb - 1, Math.floor(z * nb)); acc[b] = Math.max(acc[b], I[(i + R.imax + Math.round(0.35 * n)) % n]); cnt[b]++; }
+      for (i = 0; i < nb; i++) if (acc[i] > mx) mx = acc[i];
+      g.fillStyle = 'rgba(240,138,106,.85)'; g.beginPath(); g.moveTo(x0, yA - 6);
+      for (i = 0; i < nb; i++) g.lineTo(x0 + i + 0.5, yA - 6 - Hc * acc[i] / mx);
+      g.lineTo(x0 + Lp, yA - 6); g.fill();
+      BD.dim(g, x0, yA + 20, x0 + Lp, yA + 20, '', BD.C.gold);
+      BD.label(g, 'L = ' + S.L.toFixed(2) + ' mm', x0 + Lp + 8, yA + 23, BD.C.gold);
+      var txt = ph === 'lock' && isFinite(R.tau) ? 'the pulse is c·τ/n_g = ' + (CL * R.tau / NG * 1e6).toFixed(0) + ' µm long in the cavity' : 'random phases: light all along the cavity';
+      BD.label(g, 'contacts: gain, then absorber (last ' + Math.round(100 * SA) + ' %)', 10, 32, BD.C.dim);
+      BD.label(g, txt, 10, 44, BD.C.white);
+      g.strokeStyle = BD.C.white; g.lineWidth = 1.5; g.beginPath(); g.moveTo(d.w - 8 - sc, 58); g.lineTo(d.w - 8, 58); g.moveTo(d.w - 8 - sc, 55); g.lineTo(d.w - 8 - sc, 61); g.moveTo(d.w - 8, 55); g.lineTo(d.w - 8, 61); g.stroke(); g.lineWidth = 1;
+      BD.label(g, '1 mm', d.w - 8 - sc / 2, 53, BD.C.white, 'center');
+    })();
+    var lines = R.dnu / R.f;
+    q('[data-o="f"]').textContent = (R.f / 1e9).toFixed(1) + ' GHz';
+    q('[data-o="dl"]').textContent = (dlam * 1e12).toFixed(0) + ' pm';
+    q('[data-o="n"]').textContent = lines.toFixed(0);
+    q('[data-o="tau"]').textContent = ph === 'lock' ? (isFinite(R.tau) ? fmtT(R.tau) : '> half a round trip') : 'no pulse';
+    q('[data-o="tbp"]').textContent = ph === 'lock' && isFinite(R.tau) ? (R.tau * R.dnu).toFixed(2) : '–';
+    q('[data-o="pm"]').textContent = R.mx.toFixed(R.mx < 10 ? 1 : 0);
+    var pill = q('[data-o="pill"]');
+    if (ph === 'rand') BD.pill(pill, 'not locked: noise', 'bad');
+    else if (isFinite(R.tau) && R.tau * R.dnu < 0.47) BD.pill(pill, 'transform-limited', 'ok');
+    else BD.pill(pill, 'chirped', 'warn');
+    var c = 'A cavity of length L has modes c/(2n<sub>g</sub>L) = ' + (R.f / 1e9).toFixed(1) + ' GHz apart (' + (dlam * 1e12).toFixed(0) + ' pm at 1310 nm), and about ' + lines.toFixed(0) + ' of them sit within the locked bandwidth. ';
+    if (ph === 'lock') c += 'With their phases locked they add up in step once per round trip: one pulse circulates, and the output is a train of pulses every ' + fmtT(R.T) + ', ' + (isFinite(R.tau) ? fmtT(R.tau) + ' wide, ' : '') + 'with a peak ' + R.mx.toFixed(0) + ' times the mean power. The transform limit for this spectrum is ' + fmtT(R.tau0) + ' (0.44 divided by the bandwidth). ';
+    else c += 'With random phases the same lines add up to noise: the power fluctuates around its mean, with peaks only a few times higher, and no pulse. ';
+    c += 'In a passively mode-locked laser a reverse-biased absorber section locks the phases (Figure 26.8b). <i>Gaussian spectrum and quadratic spectral phase; the gain dynamics, noise and timing jitter are left out.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  calc(); BD.observe(root, draw);
+})();
+</script>

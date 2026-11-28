@@ -52,7 +52,7 @@ Symmetry decides a lot. A centred input is even, so it has zero overlap with eve
 
 <figure id="fig-10-2">
   <img src="{{ '/assets/figs/ch10_junction.svg' | relative_url }}" style="width:600px" alt="Left: profiles across a 6 micrometre multimode section of a centred input, an input offset by one sixth of the effective width, and the first five modes of the section. Right: bar chart of the power coupled into each mode, showing that the centred input excites only even modes and the offset input misses modes 2, 5, 8 and 11">
-  <figcaption><span class="capnum">Figure 10.2.</span> <strong>Which modes an abrupt junction excites.</strong> (a) The mode of a 1.5 µm access guide, centred and offset by \(W_e/6 = 1.01\) µm, and the first five modes \(\phi_\nu\) of the 6 µm section (shaded) of Worked Example 10.1. (b) Power coupled into each mode: the centred input puts 43, 32, 17 and 6 % into \(\nu\) = 0, 2, 4 and 6 and nothing into the odd modes; the offset input excites odd modes too, but not \(\nu\) = 2, 5, 8 and 11, which is what makes paired interference (Section 10.3) possible. Lateral effective-index model at 1550 nm: slab index 2.85 in oxide 1.444, field normal to the walls (\(\sigma = 1\)), 19 guided modes. Drawn by <code>figsrc/ch10_figs.py</code>.</figcaption>
+  <figcaption><span class="capnum">Figure 10.2.</span> <strong>Which modes an abrupt junction excites.</strong> (a) The mode of a 1.5 µm access guide, centred and offset by \(W_e/6 = 1.01\) µm, and the first five modes \(\phi_\nu\) of the 6 µm section (shaded) of Worked Example 10.1. (b) Power coupled into each mode: the centred input puts 41, 31.5, 18 and 7 % into \(\nu\) = 0, 2, 4 and 6 and nothing into the odd modes; the offset input excites odd modes too, but not \(\nu\) = 2, 5, 8 and 11, which is what makes paired interference (Section 10.3) possible. Lateral effective-index model at 1550 nm: slab index 2.85 in oxide 1.444, field normal to the walls (\(\sigma = 1\)), 19 guided modes. Drawn by <code>figsrc/ch10_figs.py</code>.</figcaption>
 </figure>
 
 ## <span class="secnum">10.3</span>Self-imaging in a multimode waveguide
@@ -96,7 +96,7 @@ Take a 6 µm wide multimode section in 220 nm silicon at 1550 nm (TE), with $$n_
 
 $$L_\pi = \frac{4 \times 2.85 \times 6.052^2}{3 \times 1.55} = 89.8\ \mu\mathrm{m}.$$
 
-A centred input gives two images at $$3L_\pi/8 = 33.7$$ µm, at $$\pm W_e/4 = \pm1.51$$ µm from the centre, where the two output waveguides start. A 2 × 2 MMI by general interference needs $$3L_\pi/2 = 135$$ µm; by paired interference, with inputs at $$\pm W_e/6$$, $$L_\pi/2 = 45$$ µm ([Figure 10.4](#fig-10-4)). Taking $$\sigma = 0$$ by mistake would give $$W_e = 6.20$$ µm and a 1 × 2 MMI 35.4 µm long, 1.7 µm too long, which costs 0.85–1 dB ([Lab 3]({% link labs/lab03_couplers.md %})).
+A centred input gives two images at $$3L_\pi/8 = 33.7$$ µm, at $$\pm W_e/4 = \pm1.51$$ µm from the centre, where the two output waveguides start. A 2 × 2 MMI by general interference needs $$3L_\pi/2 = 135$$ µm; by paired interference, with inputs at $$\pm W_e/6$$, $$L_\pi/2 = 45$$ µm ([Figure 10.4](#fig-10-4)). Taking $$\sigma = 0$$ by mistake would give $$W_e = 6.20$$ µm and a 1 × 2 MMI 35.4 µm long, 1.7 µm too long, which costs about 1 dB ([Lab 3]({% link labs/lab03_couplers.md %})).
 
 </div>
 
@@ -112,8 +112,8 @@ Three practical points shape a real MMI:
 - **Bandwidth.** $$L_\pi$$ is inversely proportional to wavelength, so the images drift as the wavelength changes; short MMIs (small $$W$$, symmetric interference) are the most broadband ([Figure 10.5](#fig-10-5)). Excess losses of a few tenths of a dB and imbalances of a few per cent over tens of nanometres are typical of good designs.
 
 <figure id="fig-10-5">
-  <img src="{{ '/assets/figs/ch10_mmi_perf.svg' | relative_url }}" style="width:600px" alt="Left: excess loss against wavelength from 1500 to 1600 nm of a 1 by 2 MMI, a paired 2 by 2 and a general 2 by 2, the last rising to about 2 dB at the band edges. Right: excess loss of the 1 by 2 MMI against its length, lowest at 32.8 micrometres, 0.2 dB at 33.7 and 0.85 dB at 35.35 micrometres">
-  <figcaption><span class="capnum">Figure 10.5.</span> <strong>Bandwidth and length tolerance.</strong> (a) Excess loss of the three MMIs of Figure 10.4, each cut at the length that is best at 1550 nm in the modal calculation (32.8, 43.7 and 132.3 µm, 2–3 % shorter than the formula lengths, as in Lab 3): the 1 × 2 loses at most 0.26 dB from 1500 to 1600 nm and the paired 2 × 2 at most 0.4 dB, while the long general-interference 2 × 2 reaches 1.9 dB. (b) Excess loss of the 1 × 2 against its length: 0.09 dB at the best length, 0.20 dB at \(3L_\pi/8\) = 33.7 µm and 0.85 dB at the 35.35 µm that \(\sigma = 0\) would give. Eigenmode expansion with the exact lateral modes (slab index 2.85 in oxide, \(\sigma = 1\)), 1.5 µm access guides, no reflections. Drawn by <code>figsrc/ch10_figs.py</code>.</figcaption>
+  <img src="{{ '/assets/figs/ch10_mmi_perf.svg' | relative_url }}" style="width:600px" alt="Left: excess loss against wavelength from 1500 to 1600 nm of a 1 by 2 MMI, a paired 2 by 2 and a general 2 by 2, the last rising to about 2 dB at the band edges. Right: excess loss of the 1 by 2 MMI against its length, lowest at 32.8 micrometres, 0.2 dB at 33.7 and 0.98 dB at 35.35 micrometres">
+  <figcaption><span class="capnum">Figure 10.5.</span> <strong>Bandwidth and length tolerance.</strong> (a) Excess loss of the three MMIs of Figure 10.4, each cut at the length that is best at 1550 nm in the modal calculation (32.8, 43.8 and 132.4 µm, 2–3 % shorter than the formula lengths, as in Lab 3): the 1 × 2 loses at most 0.28 dB from 1500 to 1600 nm and the paired 2 × 2 at most 0.4 dB, while the long general-interference 2 × 2 reaches 1.9 dB. (b) Excess loss of the 1 × 2 against its length: 0.08 dB at the best length, 0.20 dB at \(3L_\pi/8\) = 33.7 µm and 0.98 dB at the 35.35 µm that \(\sigma = 0\) would give. Eigenmode expansion with the exact lateral modes (slab index 2.85 in oxide, \(\sigma = 1\)), 1.5 µm access guides, no reflections. Drawn by <code>figsrc/ch10_figs.py</code>.</figcaption>
 </figure>
 
 ## <span class="secnum">10.5</span>Comparing splitters
@@ -133,6 +133,15 @@ Three practical points shape a real MMI:
 
 For a 1 × 2 split on your first chip, the PDK's Y-branch is the safe choice: small, broadband and measured. For a 2 × 2 coupler that must work across the four channels of the reference link, an MMI or an adiabatic coupler beats a directional coupler, whose split ratio drifts by about 0.35 % per nanometre, a few per cent across the four channels ([Chapter 9]({% link chapters/09_couplers.md %})).
 
+</div>
+
+## In 3D
+
+The 1 × 2 MMI of Worked Example 10.1, cut at the 32.8 µm length of Figure 10.5. Drag to turn it, scroll to zoom, click a layer in the legend to hide it (shift-click to show it alone), and switch to the exploded view or to 3× height to see the thin layers. It is a generic concept drawn with this chapter's dimensions, not a device from a PDK; real PDK devices are in the [PDK devices in 3D]({% link devices-3d.md %}) gallery.
+
+{% include stack3d-assets.html %}
+<div class="d3-grid">
+{% include stack3d.html slug="mmi" %}
 </div>
 
 <div class="tbox tbox-tryit" markdown="1">

@@ -9,6 +9,8 @@ permalink: /devices-3d/
 Real devices from open process design kits, extruded from their layouts so you can turn them over and see what the masks make.
 {: .chapterlead }
 
+Generic concept models of the devices, not from any PDK and drawn with each chapter's dimensions, close the device chapters in their "In 3D" sections: waveguides, couplers, MMIs, MZIs, rings, gratings, grating and edge couplers, microlenses, heaters, PN and lithium-niobate phase shifters, modulators, photodiodes, lasers and SOAs.
+
 <link rel="stylesheet" href="{{ '/assets/css/devices3d.css' | relative_url }}">
 <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.0.0/dist/model-viewer.min.js"></script>
 

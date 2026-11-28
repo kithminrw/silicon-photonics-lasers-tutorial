@@ -18,7 +18,8 @@ Telecom, LiDAR and sensing need one clean wavelength, often tunable, and grating
 - explain DBR lasers, tuning sections and mode hops;
 - design external-cavity lasers with silicon and SiN ring filters;
 - use the Vernier effect to extend the tuning range;
-- explain self-injection locking and multi-wavelength sources for WDM.
+- explain self-injection locking and multi-wavelength sources for WDM;
+- explain mode locking: the repetition rate, the pulse width and the saturable absorber.
 
 </div>
 
@@ -118,7 +119,7 @@ Feed a semiconductor laser with light reflected back from a very high-Q resonato
 A WDM transceiver needs several wavelengths:
 
 - **laser arrays**: separate DFB lasers, one per channel, bonded or flip-chipped, each with its own temperature and current;
-- **comb sources**: one laser producing many equally spaced lines. Mode-locked quantum-dot lasers, and Kerr combs generated in SiN microrings by four-wave mixing, give tens of lines on a fixed grid, which a demultiplexer separates.
+- **comb sources**: one laser producing many equally spaced lines. Mode-locked quantum-dot lasers (Section 26.8), and Kerr combs generated in SiN microrings by four-wave mixing, give tens of lines on a fixed grid, which a demultiplexer separates.
 
 Combs are attractive for dense WDM because the lines move together, so one control loop tracks them all; the price is lower power per line ([Figure 26.7](#fig-26-7)).
 
@@ -134,9 +135,58 @@ Four λ/4-shifted DFB lasers at 400 GHz spacing, one per channel, with the ring 
 
 </div>
 
+## <span class="secnum">26.8</span>Mode-locked lasers
+
+A Fabry–Pérot laser runs on many longitudinal modes at once, $$c/(2n_gL)$$ apart ([Chapter 24]({% link chapters/24_fp.md %})). Normally their phases wander independently, and their sum is a noisy but continuous output. Lock the phases to one another and the modes add up in step once per round trip: a single short pulse circulates in the cavity, and part of it leaves through a facet every time it comes round ([Figure 26.8](#fig-26-8)). Such a **mode-locked laser** is the time-domain view of the comb source of Section 26.7: a train of pulses at the repetition rate $$f_\mathrm{rep}$$ is a comb of lines $$f_\mathrm{rep}$$ apart {% include cite.html keys="haus2000" %}.
+
+<div class="tbox tbox-keyeq" markdown="1">
+<div class="tbox-title">Pulse train of a mode-locked laser</div>
+
+$$f_\mathrm{rep} = \frac{c}{2n_gL}, \qquad \tau \geq \frac{0.44}{\Delta\nu}, \qquad \frac{P_\mathrm{peak}}{P_\mathrm{mean}} \approx \frac{0.94}{f_\mathrm{rep}\,\tau}$$
+
+</div>
+
+Here $$\Delta\nu$$ is the locked bandwidth, $$\tau$$ the pulse's full width at half maximum, and the numbers are those of a Gaussian pulse. The cavity sets the repetition rate; the bandwidth sets the pulse width. More locked modes give shorter pulses, not a different repetition rate. The 0.44 is the time–bandwidth product of a pulse without chirp, called **transform-limited**. A chirped pulse, whose frequency changes from its front to its back, is longer for the same spectrum.
+
+**How the phases lock.** There are three ways:
+
+- **active**: the gain or the loss is modulated at exactly the round-trip frequency. Light that passes at the moment of lowest loss is favoured, which pulls the modes into step. This needs an RF source at $$f_\mathrm{rep}$$.
+- **passive**: a short section of the waveguide is reverse biased into a **saturable absorber**, which absorbs weak light but bleaches when a pulse's leading edge arrives. The absorber saturates more easily than the gain section and recovers within picoseconds, while the gain recovers over hundreds of picoseconds. Together they open a window of net gain only around the pulse ([Figure 26.8b](#fig-26-8)), so continuous light loses and the pulse wins. No RF source is needed, so this is the usual choice on a chip.
+- **hybrid**: a passive laser with a weak RF signal on its absorber, which steadies the timing of the pulses.
+
+A **colliding-pulse** laser puts the absorber in the middle of the cavity, where two counter-propagating pulses meet, and doubles the repetition rate.
+
+<figure id="fig-26-8">
+  <img src="{{ '/assets/figs/ch26_mll.svg' | relative_url }}" style="width:640px" alt="(a) Side view of a two-section laser between cleaved facets: a long gain section under forward current and a short saturable absorber under reverse bias share one active waveguide; one pulse circulates and a train of pulses leaves. (b) Round-trip gain and loss against time through one pulse: the loss drops below the gain only for about 3 picoseconds around the pulse, shaded as the net-gain window. (c) A comb of lines 114 picometres apart under a Gaussian envelope 4 nanometres wide at 1310 nanometres. (d) Output power against time: with locked phases, 0.63 picosecond pulses every 50 picoseconds at 74 times the mean power; with random phases, noise a few times the mean.">
+  <figcaption><span class="capnum">Figure 26.8.</span> <strong>A passively mode-locked laser.</strong> (a) A long gain section under forward current and a short saturable absorber under reverse bias share one waveguide between cleaved facets; one pulse circulates and leaves once per round trip (not to scale). (b) The net-gain window: round-trip gain and loss through one 1.5 ps pulse (grey) in the steady state of a model with a saturable gain and a saturable absorber. The absorber saturates more easily (pulse energy 3.5 times its saturation energy, against 0.4 for the gain) and recovers faster (3 ps against 300 ps), so the gain beats the loss only for 2.9 ps around the pulse (shaded); before and after it the net gain is negative, which keeps any light outside the pulse from growing. Illustrative parameters. (c) The comb of Worked Example 26.2: lines 114 pm apart under a Gaussian envelope 4 nm wide at 1310 nm. (d) The same lines with locked phases give 0.63 ps pulses every 50 ps, peaking at 74 times the mean power; with random phases they give noise, with peaks about 5 times the mean. Drawn by <code>figsrc/ch26_figs.py</code>.</figcaption>
+</figure>
+
+**Quantum dots and silicon.** Quantum-dot gain suits passive mode locking. The dots' spread of sizes gives a broad gain spectrum ([Chapter 23]({% link chapters/23_gain.md %})), their absorbers recover quickly, and their small α-factor keeps the pulses clean ([Chapter 25]({% link chapters/25_dynamics.md %})). Mode-locked lasers have been built with the integration schemes of [Chapter 27]({% link chapters/27_lasersonsi.md %}). Heterogeneous III–V/silicon lasers with on-chip mirrors have given pulses as short as 900 fs {% include cite.html keys="davenport2018" %}. A 20 GHz quantum-dot laser grown directly on silicon supplied 64 comb lines, each carrying 32 GBd PAM4, for 4.1 Tbit/s in total {% include cite.html keys="liu2019mll" %}. Two more numbers describe such a laser: its **timing jitter**, the random wander of the pulses from a perfect clock (82.7 fs, integrated from 4 to 80 MHz, in that laser), and the **RF linewidth** of the beat note at $$f_\mathrm{rep}$$.
+
+<div class="tbox tbox-example" markdown="1">
+<div class="tbox-title">Worked Example 26.2 · A 20 GHz comb at 1310 nm</div>
+
+With $$n_g = 3.5$$, a 20 GHz repetition rate needs $$L = c/(2n_gf_\mathrm{rep}) = 2.14$$ mm. The lines are $$\lambda^2 f_\mathrm{rep}/c = 114$$ pm apart. A locked bandwidth of 4 nm is 699 GHz, about 35 lines within its FWHM. Without chirp it gives Gaussian pulses $$0.44/699\ \mathrm{GHz} = 0.63$$ ps wide, peaking at $$0.94/(20\ \mathrm{GHz} \times 0.63\ \mathrm{ps}) = 74$$ times the mean power. As a WDM source, 64 lines at 32 GBd PAM4 (two bits per symbol) carry $$64 \times 64\ \mathrm{Gbit/s} = 4.1$$ Tbit/s. The power is shared, though: a laser emitting 20 mW leaves about 0.3 mW per line, before the demultiplexer's loss.
+
+</div>
+
+**Try it.** Lock and unlock the modes, then change the cavity length, the locked bandwidth and the chirp.
+
+{% include demos/mll.html %}
+
+## In 3D
+
+The two lasers of this chapter: the III–V/silicon external-cavity laser of Figure 26.4 with its Vernier rings, and a buried-heterostructure DFB laser with its grating above the wells. Drag to turn them, scroll to zoom, click a layer in the legend to hide it (shift-click to show it alone), and switch to the exploded view or to 3× height to see the thin layers. They are generic concepts drawn with this chapter's dimensions, not devices from a PDK; real PDK devices are in the [PDK devices in 3D]({% link devices-3d.md %}) gallery.
+
+{% include stack3d-assets.html %}
+<div class="d3-grid">
+{% include stack3d.html slug="ecl" %}
+{% include stack3d.html slug="bh" %}
+</div>
+
 ## Reading
 
-{% include reflist.html keys="coldren,komljenovic2016,xiang2021" %}
+{% include reflist.html keys="coldren,komljenovic2016,xiang2021,haus2000,davenport2018" %}
 
 <div class="tbox tbox-takeaways" markdown="1">
 <div class="tbox-title">Key takeaways</div>
@@ -146,6 +196,7 @@ Four λ/4-shifted DFB lasers at 400 GHz spacing, one per channel, with the ring 
 - DBR lasers tune with current or heat in the mirror and phase sections, with mode hops unless the phase is controlled.
 - External-cavity lasers combine III–V gain with low-loss Si or SiN filters for wide tuning and narrow lines.
 - Two rings give $$\mathrm{FSR}_V = \mathrm{FSR}_1\mathrm{FSR}_2/\lvert\Delta\mathrm{FSR}\rvert$$: 91 nm for 10 and 11 µm silicon rings, with a tuning gearing of 11.
+- Locked modes add up to pulses at $$f_\mathrm{rep} = c/(2n_gL)$$, about $$0.44/\Delta\nu$$ wide; a saturable absorber locks them passively, and the pulse train is a comb.
 
 </div>
 

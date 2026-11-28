@@ -140,7 +140,7 @@ def fig_architecture():
     y_rx = 12
     ax.add_patch(Polygon([[7, y_rx - 1.6], [11, y_rx - 1.6], [12, y_rx + 1.6], [6, y_rx + 1.6]], fc=BLUE, ec="none", alpha=0.8))
     note(9, y_rx + 3.2, "GC −3 dB\n−1.2 dBm", fs=5.6)
-    ax.plot([12, 40], [y_rx, y_rx], color=OPT, lw=2.0, solid_capstyle="butt")
+    ax.plot([8.5, 40], [y_rx, y_rx], color=OPT, lw=2.0, solid_capstyle="butt")       # starts inside the coupler, as on the TX side
     ax.add_patch(Circle((22, y_rx - 3.4), 2.8, fc="none", ec=RED, lw=1.8))
     ax.plot([16, 28], [y_rx - 6.8, y_rx - 6.8], color=OPT, lw=1.6)
     note(22, y_rx + 2.6, "drop ring −1.5 dB", fs=5.6)
@@ -177,7 +177,10 @@ def fig_ber():
         qq = q_of_ber(ber)
         a.plot([0, qq, qq], [ber, ber, 1e-18], color=col, lw=0.7, ls=":")
         a.text(qq - 0.15, ber / 30, f"Q = {qq:.2f}", fontsize=6.8, color=col, ha="right", va="top")
-        a.text(0.15, ber * 4, lab, fontsize=6.8, color=col, va="bottom")
+        if ber > 1e-6:      # KP4: right of the curve, above its line (on the left the curve runs through the label)
+            a.text(qq + 0.25, ber * 3, lab, fontsize=6.8, color=col, va="bottom")
+        else:
+            a.text(0.15, ber * 4, lab, fontsize=6.8, color=col, va="bottom")
     a.set_xlim(0, 9); a.set_ylim(1e-18, 1)
     finish(a, "Q factor", "Bit-error ratio")
     tag(a, "a")
@@ -196,12 +199,17 @@ def fig_ber():
     s0, s1, s2 = sens["no extinction penalty"], sens["4 dB ER (reference)"], sens["+ RIN −135 dB/Hz"]
     for xa, xb, yy, txt in ((s0, s1, 3e-14, f"{s1 - s0:.1f} dB"), (s1, s2, 2.5e-11, f"{s2 - s1:.1f} dB")):
         b.annotate("", (xb, yy), (xa, yy), arrowprops=dict(arrowstyle="-|>", color=INK, lw=0.8, mutation_scale=7))
-        b.text((xa + xb) / 2, yy * (0.08 if yy < 1e-12 else 6), txt, fontsize=6.8, ha="center", color=INK)
+        if yy < 1e-12:
+            b.text((xa + xb) / 2, yy * 0.08, txt, fontsize=6.8, ha="center", color=INK)
+        else:               # the 0.9 dB gap is narrower than its label: put it beside the arrowhead, clear of the curves
+            b.text(xb + 0.3, yy, txt, fontsize=6.8, ha="left", va="center", color=INK)
     b.axvline(P_RX, color=TEAL, lw=0.8, ls="--")
     b.text(P_RX - 0.25, 2e-2, "received\n−2.7 dBm", fontsize=6.6, color=TEAL, ha="right")
     b.set_xlim(-18, -1); b.set_ylim(1e-18, 1)
     finish(b, "Average received power (dBm)", "Bit-error ratio")
-    b.legend(loc="lower right", fontsize=6.6)
+    # legend in the empty space above the RIN −130 curve and left of the received-power line
+    b.legend(loc="upper right", bbox_to_anchor=((-2.95 + 18) / 17, (-4.35 + 18) / 18), fontsize=6.2, handlelength=1.5,
+             borderaxespad=0.0, borderpad=0.2, labelspacing=0.35, handletextpad=0.5)
     tag(b, "b")
     savefig(fig, "ch38_ber")
     print("Fig 38.2: Q(1e-12) %.3f, Q(1e-15) %.3f, Q(KP4) %.3f" % (q_of_ber(1e-12), q_of_ber(1e-15), q_of_ber(BER_KP4)))
@@ -448,7 +456,7 @@ def fig_energy():
     b.text(83, 5.5, "NRZ at 1550 nm:\n2 km exceeds the\ndispersion tolerance", fontsize=6.4, color=INK, ha="center", va="top")
     i50 = np.argmin(abs(rates - 50e9))
     b.plot([50], [base[i50]], "o", color=INK, ms=3.5)
-    b.annotate(f"{base[i50]:.1f} pJ/bit", (50, base[i50]), xytext=(-4, 8), textcoords="offset points", fontsize=6.6, ha="right")
+    b.annotate(f"{base[i50]:.1f} pJ/bit", (50, base[i50]), xytext=(5, 7), textcoords="offset points", fontsize=6.6, ha="left")   # above the band, not on its edge
     b.set_xlim(10, 100); b.set_ylim(0, 8)
     h, l = b.get_legend_handles_labels()
     b.legend(h[::-1], l[::-1], fontsize=6.2, loc="upper right", bbox_to_anchor=(1.0, 1.02))

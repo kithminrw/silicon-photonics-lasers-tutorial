@@ -1,0 +1,158 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdMesh" role="group" aria-label="Interactive demo: a programmable MZI mesh, its phase and splitter errors, and the fidelity of the matrix it builds">
+  <div class="bd-head"><span>// try it · programmable mesh: set every MZI for a target matrix, then add the errors a real chip has</span>
+    <span class="bd-controls" style="margin:0"><span class="bd-seg" role="group" aria-label="Mesh size"><button type="button" data-n="4" aria-pressed="true">4 × 4</button><button type="button" data-n="6" aria-pressed="false">6 × 6</button><button type="button" data-n="8" aria-pressed="false">8 × 8</button></span>
+      <button type="button" class="bd-btn" data-act="target">new target</button><button type="button" class="bd-btn" data-act="err">new chip</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>phase error σ (each phase shifter) <b data-v="pe"></b></span><input type="range" data-k="pe" min="0" max="0.5" step="0.005" value="0.05" aria-label="phase error"></label>
+    <label class="bd-sl"><span>splitter error σ (each 50:50 coupler) <b data-v="ce"></b></span><input type="range" data-k="ce" min="0" max="10" step="0.1" value="0" aria-label="splitter error"></label>
+    <label class="bd-sl"><span>light enters input <b data-v="in"></b></span><input type="range" data-k="in" min="1" max="8" step="1" value="1" aria-label="input port"></label>
+  </div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: the mesh, top view, light from one input</span></div>
+    <div class="bd-scope tall"><canvas data-c="m" aria-hidden="true"></canvas><span class="bd-tag">power from each input to each output: target and built</span></div>
+  </div>
+  <div class="bd-read" aria-live="polite"><span>MZIs <b data-o="nm">–</b></span><span>phases set <b data-o="np">–</b></span><span>fidelity <b data-o="f">–</b></span><span>worst power error <b data-o="w">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Grow the mesh.</b> Set the phase error to 0.1 rad, switch from 4 × 4 to 8 × 8 and press new chip a few times. The light now crosses twice as many MZIs: averaged over many chips the fidelity falls from about 97 % to 93 %, and the worst entry's error more than doubles, from about 5 to 11 points of power. One chip can be luckier than the average: the spread between chips is as large as the trend.</li>
+    <li><b>Add splitter errors.</b> Set the phase error to 0 and the splitter error to 5 %: each coupler splits 45:55 or so instead of 50:50, and the MZIs can no longer reach full bar or full cross. Press new target a few times: the fidelity depends on the target, because matrices that need full switching suffer most. On average it is about 99.3 % for a 4 × 4 mesh and 97 % for an 8 × 8.</li>
+    <li><b>Make another chip.</b> Press new chip: the same σ gives a different set of errors, and a different fidelity. Large meshes are calibrated one by one after fabrication, or set up by self-configuring algorithms that correct for their own errors.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>At the same phase error, why does an 8 × 8 mesh build its matrix less faithfully than a 4 × 4, on average?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="An N × N rectangular mesh has N(N−1)/2 MZIs and N columns: light crosses N of them, and every phase shifter on its way adds its own error, so the errors add up over 64 parameters instead of 16.">The light passes more MZIs, and every phase shifter on its way adds an error</button>
+      <button type="button" data-why="Each MZI is the same in both meshes; what changes is how many of them light passes through, and how many phases must all be right.">Each MZI in a larger mesh is less precise</button>
+      <button type="button" data-why="The model here is lossless; even without loss, the errors of more phase shifters accumulate along each path.">Larger meshes lose more light, and loss is what lowers the fidelity</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdMesh'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  var N = 4, seedT = 3, seedE = 11, mz = [], TG = null, ER = null;
+  var S = BD.bind(root, { pe: { fmt: function (x) { return x.toFixed(3) + ' rad'; } }, ce: { fmt: function (x) { return x.toFixed(1) + ' %'; } },
+                          in: { fmt: function (x) { return String(Math.min(x, N)); } } }, function () { draw(); });
+  BD.seg(root, 'n', function (v) { N = +v; build(); draw(); });
+  q('[data-act="target"]').addEventListener('click', function () { seedT = (seedT * 48271) % 2147483647; target(); draw(); });
+  q('[data-act="err"]').addEventListener('click', function () { seedE = (seedE * 48271) % 2147483647; errors(); draw(); });
+  function gauss(r) { var u = Math.max(1e-12, r()), v = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+  function build() {   // the rectangular (Clements) arrangement: N columns, column c holds MZIs on waveguides (m, m+1) with m ≡ c (mod 2)
+    mz = []; for (var c = 0; c < N; c++) for (var m = c % 2; m + 1 < N; m += 2) mz.push({ c: c, m: m });
+    target(); errors();
+  }
+  function target() {   // random settings: the split of each MZI uniform in power, every phase uniform
+    var r = BD.rng(seedT + 97 * N); TG = { th: [], ph: [], al: [] };
+    mz.forEach(function () { TG.th.push(2 * Math.acos(Math.sqrt(r()))); TG.ph.push(2 * Math.PI * r()); });
+    for (var k = 0; k < N; k++) TG.al.push(2 * Math.PI * r());
+  }
+  function errors() {   // one chip: a fixed set of unit errors, scaled by the sliders
+    var r = BD.rng(seedE + 13 * N); ER = { th: [], ph: [], al: [], d1: [], d2: [] };
+    mz.forEach(function () { ER.th.push(gauss(r)); ER.ph.push(gauss(r)); ER.d1.push(gauss(r)); ER.d2.push(gauss(r)); });
+    for (var k = 0; k < N; k++) ER.al.push(gauss(r));
+  }
+  // apply one MZI to rows m, m+1 of a set of column vectors (re, im: arrays of N rows × nc columns)
+  function mzi(re, im, nc, m, th, ph, d1, d2) {
+    var c1 = Math.cos(Math.PI / 4 + d1), s1 = Math.sin(Math.PI / 4 + d1), c2 = Math.cos(Math.PI / 4 + d2), s2 = Math.sin(Math.PI / 4 + d2);
+    var ep = [Math.cos(ph), Math.sin(ph)], et = [Math.cos(th), Math.sin(th)];
+    for (var j = 0; j < nc; j++) {
+      var i0 = m * nc + j, i1 = (m + 1) * nc + j, ar = re[i0], ai = im[i0], br = re[i1], bi = im[i1], t;
+      t = ar * ep[0] - ai * ep[1]; ai = ar * ep[1] + ai * ep[0]; ar = t;                       // external phase on the upper arm
+      var xr = c1 * ar - s1 * bi, xi = c1 * ai + s1 * br, yr = c1 * br - s1 * ai, yi = c1 * bi + s1 * ar;   // coupler: [c, js; js, c]
+      t = xr * et[0] - xi * et[1]; xi = xr * et[1] + xi * et[0]; xr = t;                       // internal phase on the upper arm
+      re[i0] = c2 * xr - s2 * yi; im[i0] = c2 * xi + s2 * yr; re[i1] = c2 * yr - s2 * xi; im[i1] = c2 * yi + s2 * xr;
+    }
+  }
+  function phases(k, err) {   // settings of MZI k, with or without this chip's errors
+    var pe = err ? S.pe : 0, dc = err ? Math.asin(Math.min(1, 2 * S.ce / 100)) / 2 : 0;
+    return [TG.th[k] + pe * ER.th[k], TG.ph[k] + pe * ER.ph[k], dc * ER.d1[k], dc * ER.d2[k]];
+  }
+  function matrix(err) {   // U: N × N, built by applying the mesh to the identity, then the output phases
+    var re = new Float64Array(N * N), im = new Float64Array(N * N), k, j;
+    for (k = 0; k < N; k++) re[k * N + k] = 1;
+    mz.forEach(function (z, i) { var p = phases(i, err); mzi(re, im, N, z.m, p[0], p[1], p[2], p[3]); });
+    for (k = 0; k < N; k++) { var a = TG.al[k] + (err ? S.pe * ER.al[k] : 0), c = Math.cos(a), s = Math.sin(a);
+      for (j = 0; j < N; j++) { var r0 = re[k * N + j], i0 = im[k * N + j]; re[k * N + j] = r0 * c - i0 * s; im[k * N + j] = r0 * s + i0 * c; } }
+    return { re: re, im: im };
+  }
+  function draw() {
+    var inp = Math.min(S.in, N) - 1;
+    q('[data-v="in"]').textContent = String(inp + 1);
+    var Ut = matrix(false), U = matrix(true), tr = 0, ti = 0, worst = 0, k;
+    for (k = 0; k < N * N; k++) { tr += Ut.re[k] * U.re[k] + Ut.im[k] * U.im[k]; ti += Ut.re[k] * U.im[k] - Ut.im[k] * U.re[k];
+      worst = Math.max(worst, Math.abs(U.re[k] * U.re[k] + U.im[k] * U.im[k] - Ut.re[k] * Ut.re[k] - Ut.im[k] * Ut.im[k])); }
+    var F = (tr * tr + ti * ti) / (N * N);   // |Tr(Ut† U)|² / N² for unitary matrices
+    // ---- geometry: continuous waveguides, MZI cells (two couplers, two arms, a heater shaded by the split), and the light
+    (function () {
+      var d = BD.setup(q('[data-c="g"]')), g = d.g, x0 = 34, x1 = d.w - 58, dx = (x1 - x0) / (N + 0.5);
+      var dy = Math.min(40, (d.h - 80) / (N - 1)), y0 = 54 + ((d.h - 80) - dy * (N - 1)) / 2;
+      var Y = function (m) { return y0 + m * dy; }, cx = function (c) { return x0 + (c + 0.5) * dx; }, hw = Math.min(dx * 0.42, 40);
+      // light: propagate the input vector column by column through the built mesh; pw[c] = powers after c columns
+      var re = new Float64Array(N), im = new Float64Array(N), pw = [], c;
+      var col0 = []; for (k = 0; k < N; k++) col0.push(k === inp ? 1 : 0); pw.push(col0); re[inp] = 1;
+      for (c = 0; c < N; c++) {
+        mz.forEach(function (z, i) { if (z.c !== c) return; var p = phases(i, true); mzi(re, im, 1, z.m, p[0], p[1], p[2], p[3]); });
+        var cp = []; for (k = 0; k < N; k++) cp.push(re[k] * re[k] + im[k] * im[k]); pw.push(cp);
+      }
+      for (k = 0; k < N; k++) {   // each waveguide is one straight line across the whole mesh; the glow changes at each column
+        for (c = 0; c <= N; c++) {
+          var xa = c === 0 ? x0 - 18 : cx(c - 1), xb = c === N ? x1 + 6 : cx(c);
+          BD.glow(g, [[xa, Y(k)], [xb, Y(k)]], pw[c][k], 0);
+        }
+        BD.wgr(g, [[x0 - 18, Y(k)], [x1 + 6, Y(k)]], 2, BD.GEO.si, 0);
+      }
+      mz.forEach(function (z, i) {   // an MZI cell drawn over the two waveguides it joins: every line meets another
+        var xc = cx(z.c), ya = Y(z.m), yb = Y(z.m + 1), cross = Math.pow(Math.cos(TG.th[i] / 2), 2);
+        g.fillStyle = '#121a28'; g.strokeStyle = 'rgba(170,205,240,.35)'; g.lineWidth = 1;
+        g.beginPath(); g.rect(xc - hw, ya - 8, 2 * hw, yb - ya + 16); g.fill(); g.stroke();
+        g.strokeStyle = BD.GEO.si; g.lineWidth = 2; g.lineCap = 'round'; g.beginPath();
+        [[-1, -0.78], [-0.42, 0.42], [0.78, 1]].forEach(function (sgm) {   // straight pieces on both rows: in, the two arms, out
+          [ya, yb].forEach(function (yy) { g.moveTo(xc + sgm[0] * hw, yy); g.lineTo(xc + sgm[1] * hw, yy); });
+        });
+        [[-0.78, -0.42], [0.42, 0.78]].forEach(function (cpl) {   // the two 2 x 2 couplers, drawn as cross-overs
+          g.moveTo(xc + cpl[0] * hw, ya); g.lineTo(xc + cpl[1] * hw, yb); g.moveTo(xc + cpl[0] * hw, yb); g.lineTo(xc + cpl[1] * hw, ya);
+        });
+        g.stroke(); g.lineCap = 'butt'; g.lineWidth = 1;
+        g.fillStyle = 'rgba(224,138,58,' + (0.25 + 0.7 * cross).toFixed(2) + ')'; g.fillRect(xc - 0.3 * hw, ya - 6, 0.6 * hw, 4);   // θ heater
+      });
+      for (k = 0; k < N; k++) {   // output phase shifters, port labels and the output powers: target (tick), built (bar)
+        g.fillStyle = 'rgba(224,138,58,.6)'; g.fillRect(x1 - 12, Y(k) - 6, 10, 4);
+        BD.label(g, String(k + 1), x0 - 22, Y(k) + 3, k === inp ? BD.C.gold : BD.C.dim, 'right');
+        var pt = Ut.re[k * N + inp] * Ut.re[k * N + inp] + Ut.im[k * N + inp] * Ut.im[k * N + inp], pb = pw[N][k], bw = 40;
+        g.fillStyle = 'rgba(240,138,106,.75)'; g.fillRect(x1 + 12, Y(k) - 3, bw * pb, 6);
+        g.strokeStyle = BD.C.white; g.strokeRect(x1 + 12 + bw * pt - 0.5, Y(k) - 5, 1, 10);
+      }
+      BD.label(g, 'in', x0 - 22, y0 - 14, BD.C.dim, 'right'); BD.label(g, 'out: built (bar), target (tick)', d.w - 4, y0 - 14, BD.C.dim, 'right');
+      BD.label(g, 'heater shade: cross power', x0 - 18, d.h - 6, BD.C.dim);
+    })();
+    // ---- the matrices
+    (function () {
+      var d = BD.setup(q('[data-c="m"]')), g = d.g, top = 44, side = Math.min((d.w - 54) / 2, d.h - top - 22), cs = side / N, xs = [24, 24 + side + 18];
+      [[Ut, 'target'], [U, 'built']].forEach(function (A, a) {
+        BD.label(g, A[1], xs[a] + side / 2, top - 8, a ? BD.C.red : BD.C.white, 'center');
+        for (var i = 0; i < N; i++) for (var j = 0; j < N; j++) {
+          var p = A[0].re[i * N + j] * A[0].re[i * N + j] + A[0].im[i * N + j] * A[0].im[i * N + j];
+          g.fillStyle = 'rgba(240,184,90,' + (0.06 + 0.9 * Math.sqrt(p)).toFixed(3) + ')'; g.fillRect(xs[a] + j * cs + 1, top + i * cs + 1, cs - 2, cs - 2);
+          if (N <= 4) BD.label(g, Math.round(100 * p) + '', xs[a] + (j + 0.5) * cs, top + (i + 0.5) * cs + 3, p > 0.45 ? '#0e1420' : BD.C.white, 'center');
+          if (j === inp && i === 0) { g.strokeStyle = BD.C.gold; g.strokeRect(xs[a] + j * cs + 0.5, top + 0.5, cs - 1, side - 1); }
+        }
+      });
+      BD.label(g, 'inputs →, outputs ↓' + (N <= 4 ? ', power in %' : ''), xs[0], top + side + 14, BD.C.dim);
+    })();
+    var nph = 2 * mz.length + N;
+    q('[data-o="nm"]').textContent = String(mz.length);
+    q('[data-o="np"]').textContent = String(nph);
+    q('[data-o="f"]').textContent = (100 * F).toFixed(F > 0.999 ? 2 : 1) + ' %';
+    q('[data-o="w"]').textContent = (100 * worst).toFixed(1) + ' points';
+    var pill = q('[data-o="pill"]');
+    if (F > 0.99) BD.pill(pill, 'fidelity above 99 %', 'ok'); else if (F > 0.95) BD.pill(pill, 'usable, but errors show', 'warn'); else BD.pill(pill, 'not the target matrix', 'bad');
+    var c = 'A rectangular mesh of N(N−1)/2 = ' + mz.length + ' MZIs, each with an internal phase (its split) and an external phase, plus ' + N + ' output phases, has ' + nph + ' settings: as many as the real parameters of an ' + N + ' × ' + N + ' unitary matrix, so it can build any of them. ';
+    c += 'Light entering input ' + (inp + 1) + ' crosses ' + N + ' columns of MZIs on its way out. With a phase error of ' + S.pe.toFixed(3) + ' rad on every shifter' + (S.ce > 0 ? ' and splitters off 50:50 by ' + S.ce.toFixed(1) + ' % of the power' : '') + ', the built matrix matches the target with a fidelity of ' + (100 * F).toFixed(1) + ' % (|Tr(U<sub>t</sub><sup>†</sup>U)|²/N²); the worst entry is off by ' + (100 * worst).toFixed(1) + ' percentage points of power. ';
+    c += '<i>Lossless model with random target settings and Gaussian errors; real meshes also have loss, crosstalk between heaters and drift.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  build(); BD.observe(root, draw);
+})();
+</script>

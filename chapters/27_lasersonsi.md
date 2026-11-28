@@ -66,7 +66,7 @@ The light must move between the III–V gain region above and the silicon wavegu
 | 1.00 µm | 3.236 | 25 % | 60 % |
 | 1.50 µm | 3.273 | 14 % | 78 % |
 
-The transfer happens over a narrow range of widths, around 0.85 µm, where the light is shared equally ([Figure 27.2](#fig-27-2)). A taper that sweeps the silicon width slowly through this range, over tens to a couple of hundred micrometres, carries the light across with little loss. The designer can also choose an intermediate width under the gain section to set the modal gain, trading gain (Γ in the MQW region) against the silicon's control of the mode, for example for a laser whose feedback comes from a silicon Bragg grating or rings.
+[Figure 24.12]({% link chapters/24_fp.md %}#fig-24-12) draws this stack to scale at the facet, with its contacts, its current paths and the modes over 0.5 and 1.0 µm of silicon. The transfer happens over a narrow range of widths, around 0.85 µm, where the light is shared equally ([Figure 27.2](#fig-27-2)). A taper that sweeps the silicon width slowly through this range, over tens to a couple of hundred micrometres, carries the light across with little loss. The designer can also choose an intermediate width under the gain section to set the modal gain, trading gain (Γ in the MQW region) against the silicon's control of the mode, for example for a laser whose feedback comes from a silicon Bragg grating or rings.
 
 <figure id="fig-27-2">
   <img src="{{ '/assets/figs/ch27_hetero.svg' | relative_url }}" style="width:600px" alt="Top: side view along a heterogeneous laser: silicon substrate, buried oxide and a silicon waveguide with Bragg mirrors at both ends; a bonded III-V gain section in the middle. A red band showing the light runs in the silicon at both ends and rises into the MQW region under the gain section through two taper regions; the silicon is 1.5 micrometres wide at the ends and 0.4 to 0.5 micrometres under the gain. Bottom: computed intensity of the fundamental supermode against height and silicon width from 0.5 to 1.5 micrometres: at narrow widths it sits in the MQW layer, at wide widths in the silicon, crossing near 0.85 micrometres; labels give MQW 53 per cent and Si 2 per cent at 0.5, 37 and 37 per cent at the crossing, and 14 and 78 per cent at 1.5 micrometres.">
@@ -329,6 +329,16 @@ Section 25.5 of [Chapter 25]({% link chapters/25_dynamics.md %}) showed that −
 - keep reflections down with angled, AR-coated facets and low-reflection couplers ([Chapter 15]({% link chapters/15_gc.md %}), [Chapter 16]({% link chapters/16_edge.md %}));
 - keep the laser off the chip, behind a packaged isolator (Section 27.2);
 - or make the feedback useful, as self-injection locking does (Section 26.6 of [Chapter 26]({% link chapters/26_tunable.md %})).
+
+## In 3D
+
+Two ways to put the laser on the chip: a heterogeneous III–V-on-silicon laser (Section 27.3), and a laser flip-chip bonded into an etched pocket (Section 27.2). Drag to turn them, scroll to zoom, click a layer in the legend to hide it (shift-click to show it alone), and switch to the exploded view or to 3× height to see the thin layers. They are generic concepts drawn with this chapter's dimensions, not devices from a PDK; real PDK devices are in the [PDK devices in 3D]({% link devices-3d.md %}) gallery.
+
+{% include stack3d-assets.html %}
+<div class="d3-grid">
+{% include stack3d.html slug="hetero" %}
+{% include stack3d.html slug="flipchip" %}
+</div>
 
 ## Reading
 

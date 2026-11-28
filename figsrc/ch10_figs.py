@@ -40,7 +40,7 @@ def modes1d(nprof, lam):
     D = (np.diag(main) + np.diag(eh, 1) + np.diag(eh, -1)) / DX ** 2
     s = np.sqrt(e)
     w, V = np.linalg.eigh(s[:, None] * D * s[None, :] + np.diag(k0 ** 2 * e))
-    H = V / s[:, None]
+    H = V * s[:, None]                                          # eigenvectors of S D S + k0^2 E are S^-1 H, so H = S V
     ne = np.sqrt(np.maximum(w, 0)) / k0
     o = np.argsort(-ne); ne, H = ne[o], H[:, o]
     g = ne > NC + 1e-6
@@ -113,12 +113,13 @@ def fig_ybranch():
     for k, mode in enumerate(("split", "comb")):
         ax = fig.add_axes([0.0, 0.515 - 0.5 * k, 1.0, 0.475]); frameless(ax, (-1.2, 36.5), (-2.45 * VS, 2.75 * VS), equal=True)
         box(ax, -1.2, -1.7 * VS, zend + 1.2, 3.4 * VS, "ox", z=0)
-        wg_straight(ax, -1.2, zin, 0, 0.5 * VS)
-        wg_taper(ax, zin, zt, 0, 0.5 * VS, 1.2 * VS)
+        sk = dict(ec=MAT["si"], lw=0.3)      # a hairline of the guide's own colour hides the seams between pieces
+        wg_straight(ax, -1.2, zin, 0, 0.5 * VS, **sk)
+        wg_taper(ax, zin, zt, 0, 0.5 * VS, 1.2 * VS, **sk)
         for sg in (1, -1):
             xs, ys = sbend_xy(zt, sg * 0.35, zs - zt, sg * (sep / 2 - 0.35))
-            ribbon(ax, xs, ys * VS, 0.5 * VS, "si")
-            wg_straight(ax, zs, zend, sg * sep / 2 * VS, 0.5 * VS)
+            ribbon(ax, xs, ys * VS, 0.5 * VS, "si", **sk)
+            wg_straight(ax, zs, zend, sg * sep / 2 * VS, 0.5 * VS, **sk)
 
         def prof(zc, f, col, amp, ls="-"):
             """a mode profile drawn across the guide at z = zc, its amplitude along z (peak = amp um)"""
@@ -261,19 +262,20 @@ def fig_selfimaging(m):
 # ---------------------------------------------------------------------------------------------- 10.4 geometries to scale
 def mmi_device(ax, y0, L, ins, outs, Lt=10.0, Lw=4.0, wa=WA, w=0.5, Ls=12.0, pitch=None):
     """Top view of an MMI with tapered access guides; ins/outs are port offsets (um) from the centre line."""
-    box(ax, 0, y0 - W / 2, L, W, "si", z=2)
+    sk = dict(ec=MAT["si"], lw=0.3)          # a hairline of the guide's own colour hides the seams between pieces
+    box(ax, 0, y0 - W / 2, L, W, "si", z=2, **sk)
     for side, ports in ((-1, ins), (1, outs)):
         for p in ports:
             xa = 0 if side < 0 else L
-            wg_taper(ax, xa, xa + side * Lt, y0 + p, wa, w)
+            wg_taper(ax, xa, xa + side * Lt, y0 + p, wa, w, **sk)
             xb = xa + side * Lt
             if pitch and len(ports) > 1:
                 tgt = np.sign(p) * pitch / 2
                 xs, ys = sbend_xy(0, 0, Ls, tgt - p)
-                ribbon(ax, xb + side * xs, y0 + p + ys, w, "si")
-                wg_straight(ax, xb + side * Ls, xb + side * (Ls + Lw), y0 + tgt, w)
+                ribbon(ax, xb + side * xs, y0 + p + ys, w, "si", **sk)
+                wg_straight(ax, xb + side * Ls, xb + side * (Ls + Lw), y0 + tgt, w, **sk)
             else:
-                wg_straight(ax, xb, xb + side * (Ls + Lw), y0 + p, w)
+                wg_straight(ax, xb, xb + side * (Ls + Lw), y0 + p, w, **sk)
 
 
 def fig_mmi_geom():
@@ -293,9 +295,10 @@ def fig_mmi_geom():
     y0 = rows[0][1]; L = rows[0][2]
     dim(ax, (L + 33.5, y0 - W / 2), (L + 33.5, y0 + W / 2), "", fs=6.3)
     label(ax, L + 35, y0, f"W = {W:.0f} µm", ha="left", fs=6.5)
-    label(ax, L + 2, y0 + We / 4 + 1.3, f"±{We/4:.2f} µm", ha="left", fs=6.0, col=MUTED)
-    label(ax, rows[1][2] + 2, rows[1][1] + We / 6 + 1.6, f"±{We/6:.2f} µm", ha="left", fs=6.0, col=MUTED)
-    label(ax, rows[2][2] + 2, rows[2][1] + XG + 1.6, f"±{XG:.1f} µm", ha="left", fs=6.0, col=MUTED)
+    # port offsets, written above the output guides (not over them)
+    label(ax, L + 3, y0 + W / 2 + 0.9, f"±{We/4:.2f} µm", ha="left", fs=6.0, col=MUTED)
+    label(ax, rows[1][2] + 3, rows[1][1] + W / 2 + 0.9, f"±{We/6:.2f} µm", ha="left", fs=6.0, col=MUTED)
+    label(ax, rows[2][2] + 3, rows[2][1] + W / 2 + 0.9, f"±{XG:.1f} µm", ha="left", fs=6.0, col=MUTED)
     scalebar(ax, 130, -27.5, 20, "20 µm")
     note(ax, "to scale; access tapers 1.5 → 0.5 µm over 10 µm", loc="upper right")
     save(fig, "ch10_mmi_geom")
@@ -348,7 +351,7 @@ def fig_mmi_perf():
     el = np.array([-10 * np.log10(m.ports(0.0, [We / 4, -We / 4], L).sum()) for L in Ls])
     b.plot(Ls, el, color=C1)
     L12, L12s0 = 3 * Lp / 8, 3 * Lpi_of(sigma=0) / 8
-    pts = [(best[0], f"best: {best[0]:.1f} µm", C1, (-0.5, 0.55), "right"),
+    pts = [(best[0], f"best: {best[0]:.1f} µm", C1, (0.0, 0.48), "center"),       # in the valley, clear of the curve
            (L12, f"3$L_\\pi$/8 = {L12:.1f} µm", C1, (1.0, -0.02), "left"),
            (L12s0, f"σ = 0 by mistake: {L12s0:.2f} µm", C2, (-0.4, 0.9), "right")]
     for Lm, txt, col, (dx, dy), ha in pts:

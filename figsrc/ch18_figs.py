@@ -117,12 +117,13 @@ def fig_circuit():
     ax.plot([1.2, 8.6], [yt, yt], color=INK, lw=1.0); ax.plot([1.2, 8.6], [yb, yb], color=INK, lw=1.0)
     # current source P
     ax.add_patch(Circle((1.2, (yt + yb) / 2), 0.62, fc="white", ec=INK, lw=1.0, zorder=3))
+    ax.plot([1.2, 1.2], [yt, (yt + yb) / 2 + 0.62], color=INK, lw=1.0); ax.plot([1.2, 1.2], [(yt + yb) / 2 - 0.62, yb], color=INK, lw=1.0)   # wired to both rails
     arrow(ax, (1.2, (yt + yb) / 2 - 0.4), (1.2, (yt + yb) / 2 + 0.42), col=INK, lw=0.9, ms=6, z=4)
     ax.text(0.45, (yt + yb) / 2, "$P$", ha="right", va="center", fontsize=8.5, color=RED)
     # resistor R_th (zig-zag)
     xr = 4.4; zz_y = np.linspace(yt - 1.0, yb + 1.0, 9); zz_x = xr + 0.32 * np.array([0, 1, -1, 1, -1, 1, -1, 1, 0])
     ax.plot([xr, xr], [yt, yt - 1.0], color=INK, lw=1.0); ax.plot(zz_x, zz_y, color=INK, lw=1.0); ax.plot([xr, xr], [yb + 1.0, yb], color=INK, lw=1.0)
-    ax.text(xr + 0.55, (yt + yb) / 2, "$R_\\mathrm{th} = 1/G'L$", ha="left", va="center", fontsize=7.5)
+    ax.text(xr + 0.55, (yt + yb) / 2, "$R_\\mathrm{th} = 1/G\u2032L$", ha="left", va="center", fontsize=7.5)   # U+2032: a real prime in the SVG (not cmsy10's '0')
     # capacitor C_th
     xc = 7.6; ym = (yt + yb) / 2
     ax.plot([xc, xc], [yt, ym + 0.18], color=INK, lw=1.0); ax.plot([xc, xc], [ym - 0.18, yb], color=INK, lw=1.0)
@@ -176,11 +177,6 @@ def fig_maps():
         if cfg == "trench": air |= (np.abs(X) > 3.0) & (Y > -2.0) & (Y < 2.3)
         if cfg == "undercut": air |= (Y < -2.0)
         mm = np.ma.masked_where(air, m)
-        ax.imshow(mm, extent=(x[0], x[-1], y[0], y[-1]), origin="lower", cmap=HEAT_CMAP, vmin=0, vmax=vmax,
-                  interpolation="bilinear", zorder=1, aspect="auto")
-        lv = [0.25 * dTwg, 0.5 * dTwg, dTwg, 1.5 * dTwg]
-        cs = ax.contour(X, Y, mm, levels=lv, colors=INK, linewidths=0.45, zorder=3)
-        ax.clabel(cs, fmt=lambda v: f"{v:.0f} K" if v >= 10 else f"{v:.1f} K", fontsize=5.8, inline_spacing=2)
         # heat flow: streamlines of -grad T in the solid. Air is treated as insulating: its grid values are replaced by
         # the nearest solid ones, so the coarse gradient has no flux into a trench or the cavity.
         mf = m.copy()
@@ -191,6 +187,14 @@ def fig_maps():
             for side in (1, -1):
                 cols = np.where(side * x > 3.0)[0]; edge = np.argmin(abs(x - side * 2.8))
                 mf[np.ix_(rows, cols)] = mf[rows, edge][:, None]
+        # the map is drawn from mf so that it reaches the trench walls and the cavity roof (a masked array left a white
+        # strip there); the air itself is covered by the white trench and cavity boxes drawn below
+        ax.imshow(mf, extent=(x[0], x[-1], y[0], y[-1]), origin="lower", cmap=HEAT_CMAP, vmin=0, vmax=vmax,
+                  interpolation="bilinear", zorder=1, aspect="auto")
+        lv = [0.25 * dTwg, 0.5 * dTwg, dTwg, 1.5 * dTwg]
+        cs = ax.contour(X, Y, mm, levels=lv, colors=INK, linewidths=0.45, zorder=3)
+        for t in ax.clabel(cs, fmt=lambda v: f"{v:.0f} K" if v >= 10 else f"{v:.1f} K", fontsize=5.8, inline_spacing=2):
+            t.set_zorder(6); t.set_bbox(dict(boxstyle="round,pad=0.12", fc="white", ec="none", alpha=0.7))   # readable over streamlines and outlines
         gy, gx = np.gradient(mf, y, x)
         U, V = np.ma.masked_where(air, -gx), np.ma.masked_where(air, -gy)
         seeds = [(xx, 1.86) for xx in ((-0.9, -0.45, 0.45, 0.9) if cfg == "undercut" else (-0.9, -0.45, 0.0, 0.45, 0.9))]
@@ -211,7 +215,7 @@ def fig_maps():
         Ppi = case("metal", cfg)["P_pi_mW"]
         fig.text(0.815, top - 0.02, title, fontsize=7.6, fontweight="bold", color=INK, va="top")
         fig.text(0.815, top - 0.075, f"P$_\\pi$ = {Ppi:.1f} mW", fontsize=7, color=INK, va="top")
-        panel(ax, "abc"[names.index((cfg, title))], x=-0.0, y=1.02)
+        panel(ax, "abc"[names.index((cfg, title))], x=-0.0, y=1.08)          # above the top surface line
         print(f"[18.3] {cfg}: P_pi {Ppi:.2f} mW, waveguide {dTwg:.1f} K at P_pi over {L*1e6:.0f} um, hottest point {ax_max(m, air):.1f} K, "
               f"substrate top (x=0) {np.interp(-2.0, y, m[:, np.argmin(abs(x))]):.1f} K")
     # shared scale bar and colour key
@@ -269,14 +273,14 @@ def fig_lock():
     yo = 5.9                                          # optical row
     block(ax, 1.3, yo - 0.95, 2.0, 0.8, "laser", fc="#FBEFEC", ec=OPT)
     ax.plot([2.3, 11.5], [yo - 0.95, yo - 0.95], color=OPT, lw=1.6)                         # bus
-    ax.add_patch(Circle((6.0, yo - 0.1), 0.62, fc="none", ec=OPT, lw=1.6, zorder=3))         # ring
-    ax.add_patch(Wedge((6.0, yo - 0.1), 0.85, 200, 340, width=0.14, fc=MAT["tin"], ec="none", zorder=4))
+    ax.add_patch(Circle((6.0, yo - 0.1), 0.75, fc="none", ec=OPT, lw=1.6, zorder=3))         # ring, close to both buses
+    ax.add_patch(Wedge((6.0, yo - 0.1), 0.83, 200, 340, width=0.16, fc=MAT["tin"], ec="none", alpha=0.6, zorder=4))   # heater over the ring
     ax.text(6.0, yo - 0.1, "ring", ha="center", va="center", fontsize=6.5, color=OPT)
     ax.plot([4.4, 9.0], [yo + 0.75, yo + 0.75], color=OPT, lw=1.6)                            # drop bus
     arrow(ax, (9.0, yo + 0.75), (10.4, yo + 0.75), col=OPT, lw=1.6, ms=8)
     ax.text(8.2, yo + 0.95, "drop", ha="center", va="bottom", fontsize=6.8, color=OPT)
     ax.text(11.4, yo - 0.8, "through →", ha="right", va="bottom", fontsize=6.8, color=OPT)
-    callout(ax, (6.75, yo - 0.85), (7.6, yo - 0.25), "heater", ha="left")
+    callout(ax, (6.55, yo - 0.62), (7.6, yo - 0.25), "heater", ha="left")
     block(ax, 11.1, yo + 0.75, 1.4, 0.8, "PD", fc="#EEF3FB", ec=ELEC)
     ye = 2.4                                          # electrical row
     block(ax, 13.6, yo + 0.75, 1.5, 0.8, "TIA", fc="#EEF3FB", ec=ELEC)

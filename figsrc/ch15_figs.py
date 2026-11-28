@@ -81,9 +81,10 @@ def fig_xsection():
     arrow(ax, (zt + 1.0 * t_air, TOP + 1.0), (zt + 3.6 * t_air, TOP + 3.6), col=AMBER, lw=1.6, ms=10)
     # down-going light, its reflection from the substrate (17 %) and what is lost
     zd = 2.6
-    arrow(ax, (zd, -0.12), (zd + 1.8 * t_ox, -BOX + 0.06), col=AMBER, lw=1.3, ms=8)
-    arrow(ax, (zd + 0.9, -BOX + 0.06), (zd + 0.9 + 1.8 * t_ox, -0.12), col=AMBER, lw=1.1, ms=7, ls=(0, (3, 2)))
-    arrow(ax, (zd + 0.25, -BOX - 0.06), (zd + 0.25 + 0.75 * t_ox, -BOX - 0.8), col=AMBER, lw=1.1, ms=7)
+    Pd = (zd + (BOX - 0.12) * t_ox, -BOX)              # where the downward ray meets the substrate: reflected and lost parts start here
+    arrow(ax, (zd, -0.12), Pd, col=AMBER, lw=1.3, ms=8)
+    arrow(ax, Pd, (Pd[0] + (BOX - 0.12) * t_ox, -0.12), col=AMBER, lw=1.1, ms=7, ls=(0, (3, 2)))
+    arrow(ax, Pd, (Pd[0] + 0.8 * t_ox, -BOX - 0.8), col=AMBER, lw=1.1, ms=7)
     label(ax, zd + 1.7, -1.0, "17 % reflected back up", fs=FS_SMALL, ha="left")
     label(ax, zd + 1.7, -2.45, "the rest is lost in the substrate", fs=FS_SMALL, ha="left")
     label(ax, zd - 0.5, -1.0, "emitted\ndown", fs=FS_SMALL, ha="right")
@@ -161,11 +162,11 @@ def _kpanel(ax, K, title_lab, vertical=False):
     if vertical:
         arrow(ax, (kz, 0.30), (kz - K, 0.30), col=RED, lw=1.2, ms=8, z=5, ls=(0, (4, 2)))
         label(ax, N_EFF / 2 + 0.25, 0.17, "−K", fs=FS_SMALL, col=RED, va="bottom")
-        label(ax, -N_EFF / 2, 0.36, "−K again", fs=FS_SMALL, col=RED, va="bottom")
+        label(ax, -2.05, 0.36, "−K again", fs=FS_SMALL, col=RED, va="bottom")        # outside the circle
         ax.plot([-N_EFF], [0], "o", ms=4.5, color=RED, zorder=6)
         callout(ax, (-N_EFF, -0.05), (-3.0, -1.0), "β − 2K = −β:\nthe backward\nguided mode\n(second-order\nBragg reflection)", ha="left")
     else:
-        label(ax, N_EFF / 2 + 0.6, 0.31, f"−K = −λ/Λ = −{K:.3f}", fs=FS_SMALL, col=RED, va="bottom")
+        label(ax, 3.1, 0.93, f"−K = −λ/Λ = −{K:.3f}", fs=FS_SMALL, col=RED, ha="right")    # clear of the circle
     # radiated waves where kz meets the circles
     ax.plot([kz, kz], [yl[0] + 0.05, yl[1] - 0.12], color=INK, lw=0.6, ls=(0, (2, 2)), zorder=3)
     up, dn = math.sqrt(N_OX ** 2 - kz ** 2), -math.sqrt(N_OX ** 2 - kz ** 2)
@@ -175,10 +176,10 @@ def _kpanel(ax, K, title_lab, vertical=False):
         ua = math.sqrt(1 - kz ** 2)
         arrow(ax, (0, 0), (kz, ua), col=INK, lw=1.0, ms=7, z=6)
         callout(ax, (kz + 0.02, up - 0.05), (0.75, 1.62), f"oxide cladding: {TH_OX:.1f}°", ha="left")
-        callout(ax, (kz * 0.75, ua * 0.75), (-0.45, 1.2), "air: 8°", ha="right")
-        label(ax, -0.18, 0.40, "air, n = 1", fs=FS_SMALL, col=MUTED, ha="right", va="bottom")
+        callout(ax, (kz * 0.75, ua * 0.75), (-0.18, 1.2), "air: 8°", ha="right")          # labels inside the circles
+        label(ax, -0.06, 0.12, "air, n = 1", fs=FS_SMALL, col=MUTED, ha="right", va="bottom")
         callout(ax, (kz + 0.02, dn + 0.05), (0.75, -1.55), "into the BOX", ha="left")
-        label(ax, kz + 0.05, yl[1] - 0.05, f"$k_z/k_0$ = {kz:.3f} = sin 8°", fs=FS_SMALL, ha="left", va="top")
+        label(ax, kz + 0.1, yl[1] - 0.05, f"$k_z/k_0$ = {kz:.3f} = sin 8°", fs=FS_SMALL, ha="left", va="top")
     else:
         callout(ax, (0.02, up - 0.1), (0.6, 1.62), "straight up (θ = 0)", ha="left")
         callout(ax, (0.02, dn + 0.1), (0.6, -1.55), "straight down", ha="left")
@@ -223,12 +224,16 @@ def fig_directionality():
     # emitted up and down, reflected, transmitted
     arrow(ad, (2.6, 5.35), (2.95, 7.4), col=AMBER, lw=1.5, ms=9)
     label(ad, 2.5, 6.6, "1", fs=FS, ha="right", col=AMBER)
-    arrow(ad, (3.4, 5.05), (4.0, 1.68), col=AMBER, lw=1.5, ms=9)
+    # the downward ray, its reflection and the transmitted part all meet at one point P on the BOX/substrate interface
+    s = 0.6 / 3.37                                                  # dx/dy of the rays
+    P = (3.4 + s * (5.05 - 1.6), 1.6)
+    arrow(ad, (3.4, 5.05), P, col=AMBER, lw=1.5, ms=9)
     label(ad, 3.45, 3.1, "1", fs=FS, ha="right", col=AMBER)
-    arrow(ad, (4.3, 1.68), (4.9, 5.05), col=AMBER, lw=1.2, ms=8, ls=(0, (3, 2)))
-    arrow(ad, (4.95, 5.35), (5.3, 7.4), col=AMBER, lw=1.2, ms=8, ls=(0, (3, 2)))
-    label(ad, 5.0, 3.15, "$r\\,e^{j\\varphi}$", fs=FS, ha="left", col=AMBER)
-    arrow(ad, (4.15, 1.5), (4.45, 0.15), col=AMBER, lw=1.0, ms=7)
+    arrow(ad, P, (P[0] + s * (5.05 - 1.6), 5.05), col=AMBER, lw=1.2, ms=8, ls=(0, (3, 2)))
+    xg = P[0] + s * (5.35 - 1.6)                                    # the same ray above the sheet
+    arrow(ad, (xg, 5.35), (xg + 0.35, 7.4), col=AMBER, lw=1.2, ms=8, ls=(0, (3, 2)))
+    label(ad, 4.75, 3.15, "$r\\,e^{j\\varphi}$", fs=FS, ha="left", col=AMBER)
+    arrow(ad, P, (P[0] + s * (1.6 - 0.15), 0.15), col=AMBER, lw=1.0, ms=7)
     label(ad, 4.65, 0.75, "lost: $1-r^2$ of the\ndownward power", fs=FS_SMALL, ha="left")
     label(ad, 4.0, 8.05, "up: $1 + r\\,e^{j\\varphi}$", fs=FS, ha="center", col=INK)
     label(ad, 8.1, 1.6 + 0.22, f"r = {R_SUB:.2f}", fs=FS_SMALL, ha="left", va="bottom")
@@ -304,7 +309,7 @@ def fig_overlap():
         a1.plot(z, p, color=col, lw=1.6, label=f"{lab}, 1/α = {inv:.1f} µm")
     a1.axvline(0, color=INK, lw=0.6)
     a1.text(-0.6, 0.2, "grating starts", fontsize=6.5, color=INK, va="center", ha="right", rotation=90)
-    a1.text(1.0, 0.395, f"peak {2 / cases[0][0]:.2f}", fontsize=6.3, color=C4, va="top", ha="left")
+    a1.text(1.6, 0.395, f"peak {2 / cases[0][0]:.2f}", fontsize=6.3, color=C4, va="top", ha="left")
     a1.set_xlim(-6, 32); a1.set_ylim(0, 0.40)
     a1.set_yticks([0, 0.1, 0.2, 0.3, 0.4])
     a1.legend(loc="upper right", fontsize=6.4, handlelength=1.5)
@@ -475,10 +480,10 @@ def fig_topviews():
     wg_taper(aa, 0, TAPER, yA, 0.5, 12.0)
     box(aa, TAPER, yA - 6, 20, 12, ETCHED, z=2)
     aa.add_patch(Circle((TAPER + 3.8, yA), 5.2, fc="none", ec=RED, lw=0.8, ls=(0, (2, 1.5)), zorder=4))
-    label(aa, TAPER / 2, yA + 4.5, f"straight grating: linear taper, {TAPER:.0f} µm (illustrative), then a 12 × 20 µm grating", fs=FS_SMALL)
+    label(aa, TAPER / 2, yA + 8.0, f"straight grating: linear taper, {TAPER:.0f} µm (illustrative), then a 12 × 20 µm grating", fs=FS_SMALL)   # above the taper
     lines = focusing_lines()
     rmax = lines[-1][2][len(lines[-1][2]) // 2] + 1.0
-    wg_straight(aa, -10, 0, yB, 0.5)
+    wg_straight(aa, -10, 0.25 / np.tan(np.radians(22)), yB, 0.5)      # runs into the sector until the two widths match
     th = np.radians(np.linspace(-22, 22, 60))
     poly(aa, np.vstack([[0, yB]], ) if False else np.vstack([[[0, yB]], np.c_[rmax * np.cos(th), yB + rmax * np.sin(th)]]), "si", z=2)
     aa.add_patch(Circle((18.0, yB), 5.2, fc="none", ec=RED, lw=0.8, ls=(0, (2, 1.5)), zorder=4))
@@ -487,7 +492,7 @@ def fig_topviews():
     panel(aa, "a", 0.0, 1.0)
     # (b) focusing grating, to scale
     ab = fig.add_axes([0.0, 0.0, 0.5, 0.66]); frameless(ab, (-7, 36), (-17, 17))
-    wg_straight(ab, -7, 0.0, 0, 0.5)
+    wg_straight(ab, -7, 0.25 / np.tan(np.radians(22)), 0, 0.5)        # runs into the sector until the two widths match (no notch)
     th = np.radians(np.linspace(-22, 22, 120))
     poly(ab, np.vstack([[[0, 0]], np.c_[rmax * np.cos(th), rmax * np.sin(th)]]), "si", z=2)
     for phi, r0, r1 in lines:

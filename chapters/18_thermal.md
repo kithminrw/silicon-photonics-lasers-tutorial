@@ -161,6 +161,15 @@ TiN heaters over every ring (the budget above assumes plain TiN; deep trenches w
 
 </div>
 
+## In 3D
+
+The trenched heater of Table 18.1, cut to a 30 µm length. Hide the cladding to see the TiN strip 1.7 µm above the rib, and look down the trenches either side: they cut through the cladding, the slab and the buried oxide, so the heat can leave only through the narrow ridge of oxide under the waveguide. Drag to turn it, scroll to zoom, click a layer in the legend to hide it (shift-click to show it alone), and switch to the exploded view or to 3× height to see the thin layers. It is a generic concept drawn with this chapter's dimensions, not a device from a PDK; real PDK devices are in the [PDK devices in 3D]({% link devices-3d.md %}) gallery.
+
+{% include stack3d-assets.html %}
+<div class="d3-grid">
+{% include stack3d.html slug="heater" %}
+</div>
+
 <div class="tbox tbox-tryit" markdown="1">
 <div class="tbox-title">Explore further</div>
 

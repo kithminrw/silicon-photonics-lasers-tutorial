@@ -189,6 +189,15 @@ Periodicity in two or three dimensions extends these ideas. A silicon slab perfo
   <figcaption><span class="capnum">Figure 13.8.</span> <strong>Photonic-crystal waveguide and cavity.</strong> Top views to scale of a silicon slab with a triangular lattice of air holes (illustrative: lattice constant 400 nm, hole radius 120 nm). (a) A missing row of holes is a line-defect waveguide (W1): light in the band gap cannot leave it sideways. (b) Three missing holes make an L3 cavity, with a mode volume of about a cubic wavelength. Drawn by <code>figsrc/ch13_figs.py</code>.</figcaption>
 </figure>
 
+## In 3D
+
+A quarter-wave-shifted sidewall Bragg grating; zoom in to see the 50 nm teeth. Drag to turn it, scroll to zoom, click a layer in the legend to hide it (shift-click to show it alone), and switch to the exploded view or to 3× height to see the thin layers. It is a generic concept drawn with this chapter's dimensions, not a device from a PDK; real PDK devices are in the [PDK devices in 3D]({% link devices-3d.md %}) gallery.
+
+{% include stack3d-assets.html %}
+<div class="d3-grid">
+{% include stack3d.html slug="bragg" %}
+</div>
+
 <div class="tbox tbox-tryit" markdown="1">
 <div class="tbox-title">Explore further</div>
 

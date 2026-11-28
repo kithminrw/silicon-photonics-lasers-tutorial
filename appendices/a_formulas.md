@@ -75,6 +75,7 @@ The key equations of the tutorial on one page, in the notation used throughout, 
 | 1 dB lateral offset of two Gaussian modes | $$d_\mathrm{1dB} = \sqrt{0.115\,(w_1^2 + w_2^2)}$$ | [17]({% link chapters/17_fiberarrays.md %}) |
 | Facet-lens length (waist $$w_0$$ to $$W$$) | $$L = z_R\sqrt{(W/w_0)^2 - 1}, \quad z_R = \pi n w_0^2/\lambda$$ | [17]({% link chapters/17_fiberarrays.md %}) |
 | Expanded-beam 1 dB tolerances | $$d = 0.48\,W, \quad \theta = 0.153\,\lambda/W, \quad g = 1.02\,\pi W^2/\lambda$$ | [17]({% link chapters/17_fiberarrays.md %}), [36]({% link chapters/36_testing.md %}) |
+| Astigmatism (one direction defocused by Δz) | $$\eta_\mathrm{1D} = [1 + (\Delta z/2z_R)^2]^{-1/2}$$ | [16]({% link chapters/16_edge.md %}), [24]({% link chapters/24_fp.md %}) |
 
 ## Active devices
 
@@ -113,6 +114,9 @@ The key equations of the tutorial on one page, in the notation used throughout, 
 | Self-heating | $$\Delta T = Z_\mathrm{th}(IV - P_\mathrm{out})$$ | [27]({% link chapters/27_lasersonsi.md %}) |
 | SOA small-signal gain | $$G_0 = e^{(\Gamma g_0 - \alpha_i)L}$$ | [28]({% link chapters/28_soa.md %}) |
 | Amplifier noise figure | $$F = 2n_{sp}(G - 1)/G \ge 2\ (3\ \mathrm{dB})$$ | [28]({% link chapters/28_soa.md %}) |
+| SOA saturation power | $$P_\mathrm{sat} = h\nu A/(\Gamma a\tau)$$: grows with the mode area $$A/\Gamma$$ | [28]({% link chapters/28_soa.md %}), [24]({% link chapters/24_fp.md %}) |
+| VCSEL oxide aperture (effective index) | $$\Delta n_\mathrm{eff}/n_\mathrm{eff} = \Delta\lambda/\lambda$$ (resonance shift under the oxide) | [24]({% link chapters/24_fp.md %}) |
+| Mode-locked pulse train | $$f_\mathrm{rep} = c/(2n_gL), \quad \tau \ge 0.44/\Delta\nu, \quad P_\mathrm{peak}/P_\mathrm{mean} \approx 0.94/(f_\mathrm{rep}\tau)$$ | [26]({% link chapters/26_tunable.md %}) |
 
 ## Systems
 
@@ -123,3 +127,7 @@ The key equations of the tutorial on one page, in the notation used throughout, 
 | Ring sensor | $$S = (\lambda/n_g)\,\partial n_\mathrm{eff}/\partial n_c, \quad \mathrm{LOD} = 3\sigma_\lambda/S$$ | [39]({% link chapters/39_apps.md %}) |
 | Phased-array steering | $$\sin\theta = \Delta\phi\,\lambda/(2\pi d)$$ | [39]({% link chapters/39_apps.md %}) |
 | FMCW ranging | $$f_b = 2RB/(cT), \quad \Delta R = c/(2B)$$ | [39]({% link chapters/39_apps.md %}) |
+| Yield from N simulated dies | standard error $$\sqrt{Y(1 - Y)/N}$$ | [29]({% link chapters/29_design.md %}) |
+| MZI mesh (rectangular) | $$N(N - 1)/2$$ MZIs and $$N$$ output phases: $$N^2$$ settings for any $$N\times N$$ unitary | [39]({% link chapters/39_apps.md %}) |
+| Fourier-transform spectrometer | $$\delta\lambda \approx \lambda^2/(N n_g\Delta L)$$, about $$N/2$$ channels | [39]({% link chapters/39_apps.md %}) |
+| Sagnac effect | $$\Delta\phi = 8\pi NA\Omega/(\lambda c)$$; in a ring, $$\Delta\nu = 4A\Omega/(n_g\lambda P)$$ | [39]({% link chapters/39_apps.md %}) |

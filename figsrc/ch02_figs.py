@@ -181,7 +181,8 @@ def fig_tir():
             label(a, x0 + 1.45, -0.42, f"field decays as\n$e^{{-\\gamma x}}$, 1/γ = {d_mode:.0f} nm", fs=6.4, ha="left", va="center")
         t = np.linspace(np.pi / 2, np.pi / 2 + th, 30)
         a.plot(x0 + 0.5 * np.cos(t), 0.5 * np.sin(t), color=INK, lw=0.6)
-        label(a, x0 - 0.2, 0.75, f"{thd:.1f}°" if k else "15°", fs=6.5, ha="right" if k else "center")
+        lx = x0 - 0.2 if k == 2 else x0 - 0.75 * np.tan(th) - 0.14       # clear of the incident ray
+        label(a, lx, 0.75, f"{thd:.1f}°" if k else "15°", fs=6.5, ha="right")
         label(a, x0, 1.62, txt, fs=6.6, va="bottom")
     label(a, 0.0, -1.48, f"Si above ($n$ = {N_SI}), SiO$_2$ below ($n$ = {N_OX})", fs=6.6, ha="left", col=MUTED)
     note(a, "rays not to scale; evanescent shading stretched", loc="lower right")

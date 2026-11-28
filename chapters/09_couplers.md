@@ -134,6 +134,15 @@ The −j is not a convention to memorise but a consequence of energy conservatio
   <figcaption><span class="capnum">Figure 9.5.</span> <strong>Why the cross term carries −j.</strong> (a) The ports and the matrix of a 2 × 2 coupler: each output is the through field \(t\) of one input plus the cross field \(-j\kappa\) of the other. (b) Two equal inputs with a relative phase, into a 50/50 coupler: with \(-j\kappa\) the total output power is 1 for every phase; with a real cross term \(+\kappa\) it would swing between 0 and 2, creating and destroying power. Only the quadrature phase conserves energy. Drawn by <code>figsrc/ch09_figs.py</code>.</figcaption>
 </figure>
 
+## In 3D
+
+The directional coupler of this chapter: two strips brought 200 nm apart by S-bends. Drag to turn it, scroll to zoom, click a layer in the legend to hide it (shift-click to show it alone), and switch to the exploded view or to 3× height to see the thin layers. It is a generic concept drawn with this chapter's dimensions, not a device from a PDK; real PDK devices are in the [PDK devices in 3D]({% link devices-3d.md %}) gallery.
+
+{% include stack3d-assets.html %}
+<div class="d3-grid">
+{% include stack3d.html slug="dc" %}
+</div>
+
 <div class="tbox tbox-tryit" markdown="1">
 <div class="tbox-title">Explore further</div>
 

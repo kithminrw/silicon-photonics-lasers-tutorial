@@ -140,9 +140,13 @@ def fig_band():
     fig, (a1, a2) = plt.subplots(1, 2, figsize=FULL, sharey=True, gridspec_kw=dict(width_ratios=[1.5, 1]))
     for k, col, lab in ((KPDK, C1, "κ = 140 mm$^{-1}$"), (K0, C2, "κ = 12.6 mm$^{-1}$")):
         q = d ** 2 - k ** 2
-        re = np.where(q > 0, np.sqrt(np.abs(q)), np.nan); im = np.where(q < 0, np.sqrt(np.abs(q)), np.nan)
-        a1.plot(re / 1e3, l * 1e9, color=col, lw=1.6, label=lab); a1.plot(-re / 1e3, l * 1e9, color=col, lw=1.6)
-        a2.plot(im / 1e3, l * 1e9, color=col, lw=1.6)
+        # add the exact band edges (q = 0) to the plotted points, so the two branches meet at K = pi/Lambda and the
+        # decay-rate loop closes on Im K = 0 instead of stopping one sample short of the edge
+        s_ = np.where(np.diff(np.sign(q)) != 0)[0]
+        lp = np.insert(l, s_ + 1, l[s_] - q[s_] * (l[s_ + 1] - l[s_]) / (q[s_ + 1] - q[s_])); qp = np.insert(q, s_ + 1, 0.0)
+        re = np.where(qp >= 0, np.sqrt(np.abs(qp)), np.nan); im = np.where(qp <= 0, np.sqrt(np.abs(qp)), np.nan)
+        a1.plot(re / 1e3, lp * 1e9, color=col, lw=1.6, label=lab); a1.plot(-re / 1e3, lp * 1e9, color=col, lw=1.6)
+        a2.plot(im / 1e3, lp * 1e9, color=col, lw=1.6)
         inside = l[q < 0]
         gap = (inside.max() - inside.min()) * 1e9
         print(f"band gap for kappa {k/1e3:.1f}/mm: {inside.min()*1e9:.2f}-{inside.max()*1e9:.2f} nm, width {gap:.2f} nm (formula {LAM**2*k/(np.pi*NG)*1e9:.2f})")
@@ -253,7 +257,7 @@ def fig_fp():
     F95 = finesse_exact(0.95); hw = 0.5 / F95
     a1.annotate("", xy=(1, 1.08), xytext=(0, 1.08), arrowprops=dict(arrowstyle="<|-|>", color=INK, lw=0.7, mutation_scale=6))
     a1.text(0.5, 1.12, "FSR", fontsize=6.6, ha="center", va="bottom", color=INK)
-    a1.annotate(f"FWHM = FSR / F", xy=(hw, 0.5), xytext=(0.18, 0.62), fontsize=6.6, color=C1, ha="left",
+    a1.annotate(f"FWHM =\nFSR / F", xy=(hw, 0.5), xytext=(0.17, 0.6), fontsize=6.6, color=C1, ha="left", va="center",
                 arrowprops=dict(arrowstyle="-", color=C1, lw=0.6))
     a1.set_xlim(-1.3, 1.3); a1.set_ylim(0, 1.62); a1.set_yticks([0, 0.25, 0.5, 0.75, 1.0])
     a1.set_xticks([-1, -0.5, 0, 0.5, 1])
@@ -433,7 +437,7 @@ def fig_phc():
             arrow(ax, (-0.2, 0), ((ncol - 1) * a + 0.4, 0), col=RED, lw=1.1, ms=8)
             label(ax, (ncol - 1) * a / 2, 0.13, "guided along the missing row", fs=6.6, col=RED)
             dim(ax, (0, -(nrow + 0.75) * h + 0.02), (a, -(nrow + 0.75) * h + 0.02), "")
-            label(ax, a + 0.08, -(nrow + 0.75) * h + 0.02, "$a$ = 400 nm", fs=6.6, ha="left")
+            label(ax, a + 0.08, -(nrow + 0.6) * h - 0.02, "$a$ = 400 nm", fs=6.6, ha="left", va="top")   # below the slab edge
         else:
             ax.add_patch(Ellipse((6 * a, 0), 3.2 * a, 0.9 * h, fc=RED, alpha=0.18, lw=0, zorder=2))
             callout(ax, (6 * a, 0.12), (6 * a + 0.9, (nrow + 1.15) * h), "three holes removed: a cavity", fs=6.6, col=RED, lc=RED)

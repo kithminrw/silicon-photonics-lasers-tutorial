@@ -133,6 +133,15 @@ Include two or three unbalanced MZIs between grating couplers, with $$\Delta L$$
 
 </div>
 
+## In 3D
+
+An unbalanced MZI with a delay arm and a heater on the other arm, the filter and switch of this chapter. Drag to turn it, scroll to zoom, click a layer in the legend to hide it (shift-click to show it alone), and switch to the exploded view or to 3× height to see the thin layers. It is a generic concept drawn with this chapter's dimensions, not a device from a PDK; real PDK devices are in the [PDK devices in 3D]({% link devices-3d.md %}) gallery.
+
+{% include stack3d-assets.html %}
+<div class="d3-grid">
+{% include stack3d.html slug="mzi" %}
+</div>
+
 <div class="tbox tbox-tryit" markdown="1">
 <div class="tbox-title">Explore further</div>
 

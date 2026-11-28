@@ -100,11 +100,12 @@ def fig_tidy3d():
     label(ax, 5.02, 4.6, "the vendor's servers (needs an account)", fs=6.8, bold=True, ha="left")
 
     def card(x, y, w, title, sub, fc):
+        two = "\n" in sub                      # a two-line subtitle sits a little lower
         block(ax, x, y, w, 0.66, fc=fc, lw=0.8)
-        label(ax, x, y + 0.13, title, fs=6.6, bold=True)
-        label(ax, x, y - 0.15, sub, fs=5.5, col=MUTED)
-    card(2.52, 3.9, 3.75, "build a td.Simulation", "structures, sources, monitors, grid_spec, boundary_spec, symmetry", PROD_FC)
-    card(2.52, 2.95, 3.75, "validate and look", "checks run as each object is made; plot, num_cells, num_time_steps", PROD_FC)
+        label(ax, x, y + (0.17 if two else 0.13), title, fs=6.6, bold=True)
+        label(ax, x, y - (0.12 if two else 0.15), sub, fs=5.5, col=MUTED)
+    card(2.52, 3.9, 3.75, "build a td.Simulation", "structures, sources, monitors,\ngrid_spec, boundary_spec, symmetry", PROD_FC)
+    card(2.52, 2.95, 3.75, "validate and look", "checks run as each object is made;\nplot, num_cells, num_time_steps", PROD_FC)
     card(2.52, 2.0, 3.75, "local mode solver (optional)", "ModeSolver(...).solve() runs here: no account, no credits", "white")
     card(2.52, 1.05, 3.75, "post-process and plot", "results as labelled arrays (xarray)", PROD_FC)
     arrow(ax, (2.52, 3.56), (2.52, 3.29), lw=0.8, ms=6)
@@ -311,7 +312,7 @@ def fig_region():
     pml(ax, gx, gy, DOM["x"], DOM["y"])
     box(ax, gx[0], -R - W / 2, 0.01 - gx[0], W, "si", z=3)
     wg_arc(ax, 0, 0, R, W, -90, 0, "si", z=3)
-    box(ax, R - W / 2, 0, W, gy[-1], "si", z=3)
+    box(ax, R - W / 2, -0.01, W, gy[-1] + 0.01, "si", z=3)       # overlaps the bend by 0.01 um: no seam
     ax.plot([-1.0, -1.0], [-R - 1.0, -R + 1.0], color=RED, lw=1.6, zorder=6)
     ax.plot([-0.5, -0.5], [-R - 1.0, -R + 1.0], color=BLUE, lw=1.3, zorder=6)
     ax.plot([R - 1.0, R + 1.0], [1.0, 1.0], color=BLUE, lw=1.3, zorder=6)
@@ -327,7 +328,7 @@ def fig_region():
     scalebar(ax, gx[-1] - 1.05, gy[0] - 0.55, 1.0, "1 µm")
     panel(ax, "a", 0.0, 1.0)
     ylo, yhi = gy[0], -0.4
-    ax2 = fig.add_axes([0.61, 0.22, 0.39, 0.66]); frameless(ax2, (ylo - 0.05, yhi + 0.05), (gz[0] - 0.05, gz[-1] + 0.05))
+    ax2 = fig.add_axes([0.61, 0.22, 0.39, 0.66]); frameless(ax2, (ylo - 0.05, yhi), (gz[0] - 0.05, gz[-1] + 0.05))   # a cut at yhi
     box(ax2, ylo, gz[0], yhi - ylo, gz[-1] - gz[0], "ox", z=0)
     gyc = gy[gy <= yhi]
     pml(ax2, np.r_[gyc, yhi], gz, (DOM["y"][0], yhi + 1), DOM["z"])
@@ -357,7 +358,7 @@ def fig_cost():
         axs[1].text(upd[k] + 0.25, yy[k], f"{upd[k]:.1f}×10$^9$ ({s_['steps']:.0f} steps)", va="center", fontsize=6.3, color=INK)
     axs[0].set_yticks(yy); axs[0].set_yticklabels(ylab, fontsize=6.4)
     axs[0].set_xlim(0, cells.max() * 1.85); axs[1].set_xlim(0, upd.max() * 1.8)
-    finish(axs[0], xlabel="cells computed: PML excluded, mirror plane used (millions)")
+    finish(axs[0], xlabel="cells computed: PML excluded,\nmirror plane used (millions)")
     finish(axs[1], xlabel="cell updates for 250 fs (×10$^9$)")
     for ax in axs:
         ax.grid(axis="y", visible=False)

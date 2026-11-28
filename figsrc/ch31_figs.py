@@ -238,7 +238,7 @@ def fig_eme():
     label(a, 22.4, 2.25 * sc, "3 µm", fs=6.0)
     label(a, 10, -2.6 * sc, "sections of constant width; each interface → an S-matrix from mode overlaps", fs=6.0, bg="white", z=8)
     label(a, 10, 2.5 * sc, "local TE0 profiles (red)", fs=6.0, col=RED, bg="white", z=8)
-    a.text(24.5, -2.9 * sc, "length 20 µm, 8 sections drawn; width × 1.6", fontsize=5.6, color=MUTED, style="italic", ha="right", va="bottom")
+    a.text(24.5, -2.9 * sc, "length 20 µm,\n8 sections drawn;\nwidth × 1.6", fontsize=5.6, color=MUTED, style="italic", ha="right", va="bottom")
     panel(a, "a", 0.0, 1.02)
     # (b) power against taper length
     b = fig.add_axes([0.08, 0.09, 0.40, 0.34])
@@ -537,7 +537,7 @@ def fig_subpixel():
         a.plot(xa[m], ya[m] + y0, color=RED, lw=1.2, zorder=3)
         label(a, 3.5, y0 + 4.35, t, fs=5.9)
     label(a, 0.55, 0.45, "Si", fs=6.2, bold=True, z=5); label(a, 6.4, 3.5, "SiO$_2$", fs=6.2, bold=True, z=5)
-    panel(a, "a", 0.0, 1.0)
+    panel(a, "a", 0.0, 1.075)
     for k, (pol, title) in enumerate([("TE", "TE0, $E$ along the film"), ("TM", "TM0, $E$ across the film")]):
         ax = fig.add_axes([0.36 + 0.33 * k, 0.17, 0.29, 0.70])
         ex = d[pol]["n_exact"]
@@ -643,17 +643,17 @@ def fig_varfdtd():
     a = fig.add_axes([0.0, 0.04, 0.45, 0.9])
     frameless(a, (0, 10), (0, 7.4), equal=False)
     # cross-section of a rib
-    box(a, 0.3, 2.2, 4.6, 0.9, "ox", z=0); box(a, 0.3, 3.9, 4.6, 0.8, "oxtop", z=0)
-    box(a, 0.3, 3.1, 4.6, 0.32, "si", z=1); box(a, 1.9, 3.1, 1.4, 0.8, "si", z=1)
-    label(a, 2.6, 5.05, "cross-section of a rib", fs=6.2, bold=True)
+    box(a, 0.3, 2.2, 3.6, 0.9, "ox", z=0); box(a, 0.3, 3.42, 3.6, 1.28, "oxtop", z=0)
+    box(a, 0.3, 3.1, 3.6, 0.32, "si", z=1); box(a, 1.4, 3.1, 1.4, 0.8, "si", z=1)
+    label(a, 2.1, 5.05, "cross-section of a rib", fs=6.2, bold=True)
     zz = np.linspace(2.2, 4.7, 100)
-    for xc, tt, col in [(2.6, 0.8, RED), (0.95, 0.32, C2)]:
+    for xc, tt, col in [(2.1, 0.8, RED), (0.75, 0.32, C2)]:
         prof = np.exp(-((zz - (3.1 + tt / 2)) / (0.25 + tt / 2)) ** 2)
         a.plot(xc + 0.55 * prof, zz, color=col, lw=1.0, zorder=4)
-    label(a, 2.6, 1.85, f"slab I: 220 nm → $n_\\mathrm{{I}}$ = {nI:.3f}", fs=5.9, col=RED)
-    label(a, 2.6, 1.45, f"slab II: {1000 * s:.0f} nm → $n_\\mathrm{{II}}$ = {nII:.3f}", fs=5.9, col=C2)
-    arrow(a, (5.1, 3.5), (5.9, 3.5), col=INK, lw=1.0, ms=7)
-    label(a, 5.5, 3.85, "solve each\nvertical slab", fs=5.8)
+    label(a, 2.1, 1.85, f"slab I: 220 nm → $n_\\mathrm{{I}}$ = {nI:.3f}", fs=5.9, col=RED)
+    label(a, 2.1, 1.45, f"slab II: {1000 * s:.0f} nm → $n_\\mathrm{{II}}$ = {nII:.3f}", fs=5.9, col=C2)
+    arrow(a, (4.15, 3.5), (5.85, 3.5), col=INK, lw=1.0, ms=7)
+    label(a, 4.97, 3.85, "solve each\nvertical slab", fs=5.8)
     # top view as an effective-index map (a ring and a bus guide)
     box(a, 6.0, 0.6, 3.9, 5.2, C2, z=0, alpha=0.45)
     a.add_patch(plt.matplotlib.patches.Annulus((7.95, 3.9), 1.35, 0.42, fc=RED, ec="none", alpha=0.75, zorder=1))

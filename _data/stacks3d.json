@@ -526,5 +526,1121 @@
    8.9
   ],
   "credit": "Generic, illustrative stack drawn for this tutorial (not any company's process); thicknesses to scale, length and width cut short."
+ },
+ {
+  "title": "Thermo-optic phase shifter with deep trenches",
+  "short": "TiN heater",
+  "blurb": "The heater of Table 18.1: a TiN strip 2 µm wide, 1.7 µm above a 500 × 220 nm rib with a 90 nm slab, in 2.3 µm of oxide on a 2 µm BOX. Deep trenches 3 µm either side cut through the cladding, the slab and the BOX, so the heat must go down to the substrate through the narrow ridge of oxide under the waveguide: 16 mW per π instead of 26 mW, but a slower response (Section 18.4). Vias and metal pads at both ends carry the current.",
+  "orbit": "-58deg 62deg 80%",
+  "slug": "heater",
+  "file": "stack-heater.glb",
+  "kb": 12,
+  "file_x": "stack-heater-x.glb",
+  "kb_x": 12,
+  "layers": [
+   {
+    "key": "sisub",
+    "label": "Si substrate (cut short)",
+    "role": "the silicon wafer",
+    "colour": "#9eb2cc"
+   },
+   {
+    "key": "box",
+    "label": "buried oxide, 2 µm",
+    "role": "insulates the waveguide from the substrate, thermally too",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "si",
+    "label": "silicon waveguide",
+    "role": "carries the light outside the gain section",
+    "colour": "#7793c1"
+   },
+   {
+    "key": "cladx",
+    "label": "oxide cladding, 2.3 µm",
+    "role": "deposited oxide; the trenches cut through it and the BOX",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "tin18",
+    "label": "TiN heater",
+    "role": "a resistive film 2 µm wide, 1.7 µm above the waveguide (Table 18.1)",
+    "colour": "#e0893a"
+   },
+   {
+    "key": "wplug",
+    "label": "tungsten contacts and vias",
+    "role": "vertical plugs from silicon and germanium to the metal levels",
+    "colour": "#b7bcc6"
+   },
+   {
+    "key": "metal1",
+    "label": "metal 1",
+    "role": "first interconnect level",
+    "colour": "#edbc5b"
+   }
+  ],
+  "size_um": [
+   18.0,
+   30.0,
+   6.12
+  ],
+  "credit": "Generic, illustrative stack drawn for this tutorial (not any company's process); thicknesses to scale, length and width cut short."
+ },
+ {
+  "title": "Depletion-mode PN phase shifter",
+  "short": "PN phase shifter",
+  "blurb": "The lateral junction of Worked Example 19.1 in a 500 × 220 nm rib with a 90 nm slab: p and n halves doped 5 × 10¹⁷ cm⁻³ meet in the middle of the rib, where a depletion region 69 nm wide at 0 V (pale) widens to 123 nm at 2 V reverse bias and changes the index the light sees. Heavily doped strips from 1.2 µm carry the current to rows of tungsten plugs and two metal electrodes, kept away from the mode to add little loss.",
+  "orbit": "-58deg 62deg 80%",
+  "slug": "pn",
+  "file": "stack-pn.glb",
+  "kb": 15,
+  "file_x": "stack-pn-x.glb",
+  "kb_x": 15,
+  "layers": [
+   {
+    "key": "sisub",
+    "label": "Si substrate (cut short)",
+    "role": "the silicon wafer",
+    "colour": "#9eb2cc"
+   },
+   {
+    "key": "box",
+    "label": "buried oxide, 2 µm",
+    "role": "insulates the waveguide from the substrate, thermally too",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "pp",
+    "label": "p++ silicon",
+    "role": "heavily doped: a low-resistance path to the contacts",
+    "colour": "#d85b51"
+   },
+   {
+    "key": "pdop",
+    "label": "p-doped silicon",
+    "role": "the p side of the modulator's junction",
+    "colour": "#f2a89e"
+   },
+   {
+    "key": "dep",
+    "label": "depletion region",
+    "role": "69 nm wide at 0 V, 123 nm at 2 V: where the carriers are swept out",
+    "colour": "#f7f7e5"
+   },
+   {
+    "key": "ndop",
+    "label": "n-doped silicon",
+    "role": "the n side of the modulator's junction",
+    "colour": "#9ebcea"
+   },
+   {
+    "key": "nn",
+    "label": "n++ silicon",
+    "role": "heavily doped: a low-resistance path to the contacts",
+    "colour": "#4c7acc"
+   },
+   {
+    "key": "cladx",
+    "label": "oxide cladding, 2.3 µm",
+    "role": "deposited oxide; the trenches cut through it and the BOX",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "wplug",
+    "label": "tungsten contacts and vias",
+    "role": "vertical plugs from silicon and germanium to the metal levels",
+    "colour": "#b7bcc6"
+   },
+   {
+    "key": "metal1",
+    "label": "metal 1",
+    "role": "first interconnect level",
+    "colour": "#edbc5b"
+   }
+  ],
+  "size_um": [
+   7.2,
+   20.0,
+   6.4
+  ],
+  "credit": "Generic, illustrative stack drawn for this tutorial (not any company's process); thicknesses to scale, length and width cut short."
+ },
+ {
+  "title": "Vertical germanium photodiode",
+  "short": "Ge photodiode",
+  "blurb": "The PIN of Worked Example 21.1: a strip waveguide tapers onto a p-doped silicon pad, and on it sits germanium 3.8 µm wide, 0.5 µm thick and 15 µm long, undoped except for an n++ cap. The light leaks up into the germanium along its length and is absorbed (89.5 % in 15 µm, Figure 21.1c); the field across its thickness sweeps the carriers to the n++ cap above and to the p++ silicon strips at the sides, which tungsten plugs connect to metal 1.",
+  "orbit": "-50deg 62deg 80%",
+  "slug": "ge",
+  "file": "stack-ge.glb",
+  "kb": 18,
+  "file_x": "stack-ge-x.glb",
+  "kb_x": 18,
+  "layers": [
+   {
+    "key": "sisub",
+    "label": "Si substrate (cut short)",
+    "role": "the silicon wafer",
+    "colour": "#9eb2cc"
+   },
+   {
+    "key": "box",
+    "label": "buried oxide, 2 µm",
+    "role": "insulates the waveguide from the substrate, thermally too",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "si",
+    "label": "silicon waveguide",
+    "role": "carries the light outside the gain section",
+    "colour": "#7793c1"
+   },
+   {
+    "key": "pdop",
+    "label": "p-doped silicon",
+    "role": "the p side of the modulator's junction",
+    "colour": "#f2a89e"
+   },
+   {
+    "key": "pp",
+    "label": "p++ silicon",
+    "role": "heavily doped: a low-resistance path to the contacts",
+    "colour": "#d85b51"
+   },
+   {
+    "key": "cladx",
+    "label": "oxide cladding, 2.3 µm",
+    "role": "deposited oxide; the trenches cut through it and the BOX",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "gei",
+    "label": "germanium, undoped",
+    "role": "absorbs 1550 nm light; the field across it collects the carriers",
+    "colour": "#72757f"
+   },
+   {
+    "key": "nge",
+    "label": "n++ germanium cap",
+    "role": "the top contact of the vertical PIN",
+    "colour": "#4c7acc"
+   },
+   {
+    "key": "wplug",
+    "label": "tungsten contacts and vias",
+    "role": "vertical plugs from silicon and germanium to the metal levels",
+    "colour": "#b7bcc6"
+   },
+   {
+    "key": "metal1",
+    "label": "metal 1",
+    "role": "first interconnect level",
+    "colour": "#edbc5b"
+   }
+  ],
+  "size_um": [
+   9.2,
+   24.0,
+   6.4
+  ],
+  "credit": "Generic, illustrative stack drawn for this tutorial (not any company's process); thicknesses to scale, length and width cut short."
+ },
+ {
+  "slug": "waveguides",
+  "title": "Three channel waveguides",
+  "short": "waveguides",
+  "blurb": "Left to right: a 500 × 220 nm silicon strip, a 500 nm silicon rib on a 90 nm slab, and a 1.2 × 0.4 µm silicon-nitride strip, all on a 2 µm buried oxide under oxide cladding. Hide the cladding to compare them; stretch the height to see the slab. The strip confines the light most, the rib leaves a slab for electrical contacts, and the nitride guide spreads its mode furthest and loses least.",
+  "orbit": "-35deg 62deg 80%",
+  "file": "stack-waveguides.glb",
+  "kb": 8,
+  "file_x": "stack-waveguides-x.glb",
+  "kb_x": 8,
+  "layers": [
+   {
+    "key": "sisub",
+    "label": "Si substrate (cut short)",
+    "role": "the silicon wafer",
+    "colour": "#9eb2cc"
+   },
+   {
+    "key": "box",
+    "label": "buried oxide, 2 µm",
+    "role": "insulates the waveguide from the substrate, thermally too",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "siwg",
+    "label": "silicon (220 nm)",
+    "role": "the silicon layer: waveguides, couplers, rings and gratings",
+    "colour": "#283d6b"
+   },
+   {
+    "key": "sinwg",
+    "label": "silicon nitride waveguide",
+    "role": "low-loss core: 1.2 × 0.4 µm",
+    "colour": "#e5b260"
+   },
+   {
+    "key": "cladd",
+    "label": "oxide cladding",
+    "role": "deposited oxide around and above the waveguides",
+    "colour": "#8cbff2"
+   }
+  ],
+  "size_um": [
+   15.0,
+   12.0,
+   5.2
+  ],
+  "credit": "Generic, illustrative device drawn for this tutorial, not from any PDK; thicknesses to scale, lengths cut short."
+ },
+ {
+  "slug": "routing",
+  "title": "Routing: a crossing, a bend and a taper",
+  "short": "bend, taper, crossing",
+  "blurb": "Silicon strips 500 nm wide. In the middle, a crossing: each guide widens to 1.2 µm through linear expanders, so its mode narrows less where the other guide cuts through it. To the right, a 90° bend of 5 µm radius; to the left, a linear taper from 0.5 to 2 µm into a multimode guide, long enough to be adiabatic (Section 8.3).",
+  "orbit": "-20deg 58deg 85%",
+  "file": "stack-routing.glb",
+  "kb": 29,
+  "file_x": "stack-routing-x.glb",
+  "kb_x": 29,
+  "layers": [
+   {
+    "key": "sisub",
+    "label": "Si substrate (cut short)",
+    "role": "the silicon wafer",
+    "colour": "#9eb2cc"
+   },
+   {
+    "key": "box",
+    "label": "buried oxide, 2 µm",
+    "role": "insulates the waveguide from the substrate, thermally too",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "siwg",
+    "label": "silicon (220 nm)",
+    "role": "the silicon layer: waveguides, couplers, rings and gratings",
+    "colour": "#283d6b"
+   },
+   {
+    "key": "cladd",
+    "label": "oxide cladding",
+    "role": "deposited oxide around and above the waveguides",
+    "colour": "#8cbff2"
+   }
+  ],
+  "size_um": [
+   32.0,
+   24.0,
+   5.2
+  ],
+  "credit": "Generic, illustrative device drawn for this tutorial, not from any PDK; thicknesses to scale, lengths cut short."
+ },
+ {
+  "slug": "dc",
+  "title": "Directional coupler",
+  "short": "directional coupler",
+  "blurb": "Two 500 nm strips brought within 200 nm of each other by raised-cosine S-bends, side by side for 10 µm. In the gap their evanescent fields overlap, and power beats from one guide to the other with the cross-over length of Chapter 9; the S-bends start and stop the coupling smoothly. Zoom in on the gap: it is narrower than a waveguide.",
+  "orbit": "-25deg 60deg 85%",
+  "file": "stack-dc.glb",
+  "kb": 71,
+  "file_x": "stack-dc-x.glb",
+  "kb_x": 71,
+  "layers": [
+   {
+    "key": "sisub",
+    "label": "Si substrate (cut short)",
+    "role": "the silicon wafer",
+    "colour": "#9eb2cc"
+   },
+   {
+    "key": "box",
+    "label": "buried oxide, 2 µm",
+    "role": "insulates the waveguide from the substrate, thermally too",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "siwg",
+    "label": "silicon (220 nm)",
+    "role": "the silicon layer: waveguides, couplers, rings and gratings",
+    "colour": "#283d6b"
+   },
+   {
+    "key": "cladd",
+    "label": "oxide cladding",
+    "role": "deposited oxide around and above the waveguides",
+    "colour": "#8cbff2"
+   }
+  ],
+  "size_um": [
+   36.0,
+   9.0,
+   5.2
+  ],
+  "credit": "Generic, illustrative device drawn for this tutorial, not from any PDK; thicknesses to scale, lengths cut short."
+ },
+ {
+  "slug": "mmi",
+  "title": "1 × 2 multimode-interference splitter",
+  "short": "1 × 2 MMI",
+  "blurb": "A 6 µm wide multimode section, 32.8 µm long: the best length of Figure 10.5. A tapered 1.5 µm access guide launches the light at the centre; the modes of the wide section beat, and two images of the input form at ±1.51 µm from the centre at the far end, where two tapered outputs collect them and S-bends separate them.",
+  "orbit": "-25deg 60deg 85%",
+  "file": "stack-mmi.glb",
+  "kb": 40,
+  "file_x": "stack-mmi-x.glb",
+  "kb_x": 40,
+  "layers": [
+   {
+    "key": "sisub",
+    "label": "Si substrate (cut short)",
+    "role": "the silicon wafer",
+    "colour": "#9eb2cc"
+   },
+   {
+    "key": "box",
+    "label": "buried oxide, 2 µm",
+    "role": "insulates the waveguide from the substrate, thermally too",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "siwg",
+    "label": "silicon (220 nm)",
+    "role": "the silicon layer: waveguides, couplers, rings and gratings",
+    "colour": "#283d6b"
+   },
+   {
+    "key": "cladd",
+    "label": "oxide cladding",
+    "role": "deposited oxide around and above the waveguides",
+    "colour": "#8cbff2"
+   }
+  ],
+  "size_um": [
+   68.8,
+   12.0,
+   5.2
+  ],
+  "credit": "Generic, illustrative device drawn for this tutorial, not from any PDK; thicknesses to scale, lengths cut short."
+ },
+ {
+  "slug": "mzi",
+  "title": "Unbalanced Mach–Zehnder interferometer with a heater",
+  "short": "MZI",
+  "blurb": "A Y-branch splits the light into two arms that a second Y-branch recombines. The lower arm takes a detour, the path difference ΔL that makes the transmission a periodic filter with a free spectral range λ²/(n_g ΔL); the upper arm carries a TiN heater 1.7 µm above it, with pads and vias at its ends, that slides the fringes (Chapter 11). Arm lengths are cut short.",
+  "orbit": "-25deg 58deg 85%",
+  "file": "stack-mzi.glb",
+  "kb": 97,
+  "file_x": "stack-mzi-x.glb",
+  "kb_x": 97,
+  "layers": [
+   {
+    "key": "sisub",
+    "label": "Si substrate (cut short)",
+    "role": "the silicon wafer",
+    "colour": "#9eb2cc"
+   },
+   {
+    "key": "box",
+    "label": "buried oxide, 2 µm",
+    "role": "insulates the waveguide from the substrate, thermally too",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "siwg",
+    "label": "silicon (220 nm)",
+    "role": "the silicon layer: waveguides, couplers, rings and gratings",
+    "colour": "#283d6b"
+   },
+   {
+    "key": "cladd",
+    "label": "oxide cladding",
+    "role": "deposited oxide around and above the waveguides",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "tin18",
+    "label": "TiN heater",
+    "role": "a resistive film 2 µm wide, 1.7 µm above the waveguide (Table 18.1)",
+    "colour": "#e0893a"
+   },
+   {
+    "key": "wplug",
+    "label": "tungsten contacts and vias",
+    "role": "vertical plugs from silicon and germanium to the metal levels",
+    "colour": "#b7bcc6"
+   },
+   {
+    "key": "metal1",
+    "label": "metal 1",
+    "role": "first interconnect level",
+    "colour": "#edbc5b"
+   }
+  ],
+  "size_um": [
+   64.0,
+   29.0,
+   5.8
+  ],
+  "credit": "Generic, illustrative device drawn for this tutorial, not from any PDK; thicknesses to scale, lengths cut short."
+ },
+ {
+  "slug": "ring",
+  "title": "Add-drop ring resonator with a heater",
+  "short": "add-drop ring",
+  "blurb": "A 10 µm radius ring between two bus waveguides, each 200 nm away. Light at a resonance builds up in the ring and leaves through the drop port; the rest passes the through port (Chapter 12). A TiN heater follows the ring 1.7 µm above it and tunes the resonance at about 0.1 nm per mW; its leads run to pads on the right.",
+  "orbit": "-20deg 58deg 85%",
+  "file": "stack-ring.glb",
+  "kb": 132,
+  "file_x": "stack-ring-x.glb",
+  "kb_x": 132,
+  "layers": [
+   {
+    "key": "sisub",
+    "label": "Si substrate (cut short)",
+    "role": "the silicon wafer",
+    "colour": "#9eb2cc"
+   },
+   {
+    "key": "box",
+    "label": "buried oxide, 2 µm",
+    "role": "insulates the waveguide from the substrate, thermally too",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "siwg",
+    "label": "silicon (220 nm)",
+    "role": "the silicon layer: waveguides, couplers, rings and gratings",
+    "colour": "#283d6b"
+   },
+   {
+    "key": "cladd",
+    "label": "oxide cladding",
+    "role": "deposited oxide around and above the waveguides",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "tin18",
+    "label": "TiN heater",
+    "role": "a resistive film 2 µm wide, 1.7 µm above the waveguide (Table 18.1)",
+    "colour": "#e0893a"
+   },
+   {
+    "key": "wplug",
+    "label": "tungsten contacts and vias",
+    "role": "vertical plugs from silicon and germanium to the metal levels",
+    "colour": "#b7bcc6"
+   },
+   {
+    "key": "metal1",
+    "label": "metal 1",
+    "role": "first interconnect level",
+    "colour": "#edbc5b"
+   }
+  ],
+  "size_um": [
+   36.0,
+   28.0,
+   5.8
+  ],
+  "credit": "Generic, illustrative device drawn for this tutorial, not from any PDK; thicknesses to scale, lengths cut short."
+ },
+ {
+  "slug": "bragg",
+  "title": "Quarter-wave-shifted Bragg grating",
+  "short": "Bragg grating",
+  "blurb": "A 500 nm strip whose width alternates by 50 nm every half period of 317 nm, which reflects a band around 1550 nm (Chapter 13). In the middle one wide tooth is half a period long instead of a quarter: the quarter-wave shift that opens a single transmission peak in the stop band. Only 48 periods are drawn; real gratings have hundreds. Zoom in to see the teeth.",
+  "orbit": "-25deg 60deg 80%",
+  "file": "stack-bragg.glb",
+  "kb": 59,
+  "file_x": "stack-bragg-x.glb",
+  "kb_x": 59,
+  "layers": [
+   {
+    "key": "sisub",
+    "label": "Si substrate (cut short)",
+    "role": "the silicon wafer",
+    "colour": "#9eb2cc"
+   },
+   {
+    "key": "box",
+    "label": "buried oxide, 2 µm",
+    "role": "insulates the waveguide from the substrate, thermally too",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "siwg",
+    "label": "silicon (220 nm)",
+    "role": "the silicon layer: waveguides, couplers, rings and gratings",
+    "colour": "#283d6b"
+   },
+   {
+    "key": "cladd",
+    "label": "oxide cladding",
+    "role": "deposited oxide around and above the waveguides",
+    "colour": "#8cbff2"
+   }
+  ],
+  "size_um": [
+   27.4,
+   6.0,
+   5.2
+  ],
+  "credit": "Generic, illustrative device drawn for this tutorial, not from any PDK; thicknesses to scale, lengths cut short."
+ },
+ {
+  "slug": "gc",
+  "title": "Focusing grating coupler",
+  "short": "grating coupler",
+  "blurb": "A 500 nm waveguide opens into a fan whose curved teeth, etched 70 nm into the silicon with a 607 nm period, focus as well as diffract: the compact focusing coupler of Chapter 15. The light leaves upwards about 8° from the vertical into a beam the size of a fibre mode (10.4 µm, red), where a fibre would sit.",
+  "orbit": "-30deg 62deg 90%",
+  "file": "stack-gc.glb",
+  "kb": 170,
+  "file_x": "stack-gc-x.glb",
+  "kb_x": 170,
+  "layers": [
+   {
+    "key": "sisub",
+    "label": "Si substrate (cut short)",
+    "role": "the silicon wafer",
+    "colour": "#9eb2cc"
+   },
+   {
+    "key": "box",
+    "label": "buried oxide, 2 µm",
+    "role": "insulates the waveguide from the substrate, thermally too",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "beam",
+    "label": "light beam (illustrative)",
+    "role": "where the light goes; drawn, not computed",
+    "colour": "#ff5b38"
+   },
+   {
+    "key": "siwg",
+    "label": "silicon (220 nm)",
+    "role": "the silicon layer: waveguides, couplers, rings and gratings",
+    "colour": "#283d6b"
+   },
+   {
+    "key": "cladd",
+    "label": "oxide cladding",
+    "role": "deposited oxide around and above the waveguides",
+    "colour": "#8cbff2"
+   }
+  ],
+  "size_um": [
+   37.3,
+   22.0,
+   29.69
+  ],
+  "credit": "Generic, illustrative device drawn for this tutorial, not from any PDK; thicknesses to scale, lengths cut short."
+ },
+ {
+  "slug": "edge",
+  "title": "Inverse-taper edge coupler",
+  "short": "edge coupler",
+  "blurb": "The silicon strip narrows from 500 to 180 nm towards the polished facet. Too narrow to hold the light, it lets the mode spread into the oxide around it, until at the facet it is a few micrometres across and matches a lensed fibre or a fibre array; the beam (red) leaves the facet and spreads (Chapter 16). The taper, a few hundred micrometres long in practice, is cut short.",
+  "orbit": "-55deg 65deg 85%",
+  "file": "stack-edge.glb",
+  "kb": 8,
+  "file_x": "stack-edge-x.glb",
+  "kb_x": 8,
+  "layers": [
+   {
+    "key": "beam",
+    "label": "light beam (illustrative)",
+    "role": "where the light goes; drawn, not computed",
+    "colour": "#ff5b38"
+   },
+   {
+    "key": "sisub",
+    "label": "Si substrate (cut short)",
+    "role": "the silicon wafer",
+    "colour": "#9eb2cc"
+   },
+   {
+    "key": "box",
+    "label": "buried oxide, 2 µm",
+    "role": "insulates the waveguide from the substrate, thermally too",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "siwg",
+    "label": "silicon (220 nm)",
+    "role": "the silicon layer: waveguides, couplers, rings and gratings",
+    "colour": "#283d6b"
+   },
+   {
+    "key": "cladd",
+    "label": "oxide cladding",
+    "role": "deposited oxide around and above the waveguides",
+    "colour": "#8cbff2"
+   }
+  ],
+  "size_um": [
+   46.0,
+   16.0,
+   9.0
+  ],
+  "credit": "Generic, illustrative device drawn for this tutorial, not from any PDK; thicknesses to scale, lengths cut short."
+ },
+ {
+  "slug": "faml",
+  "title": "Facet-attached microlenses",
+  "short": "FaML",
+  "blurb": "A lens printed on the chip's facet expands the edge coupler's few-micrometre mode into a beam about 25 µm wide; a second lens printed on the end of the fibre (or on each fibre of an array) catches it and focuses it into the 8.2 µm core. The wide beam between them makes the alignment far more tolerant than butt coupling (Section 17.5). Lens shapes and the 120 µm gap are illustrative; the fibre is cut short.",
+  "orbit": "-40deg 70deg 100%",
+  "file": "stack-faml.glb",
+  "kb": 95,
+  "file_x": "stack-faml-x.glb",
+  "kb_x": 95,
+  "layers": [
+   {
+    "key": "sisub",
+    "label": "Si substrate (cut short)",
+    "role": "the silicon wafer",
+    "colour": "#9eb2cc"
+   },
+   {
+    "key": "fclad",
+    "label": "fibre cladding",
+    "role": "125 µm of silica, cut short",
+    "colour": "#cce5f9"
+   },
+   {
+    "key": "lens",
+    "label": "printed microlens",
+    "role": "two-photon-printed polymer lens, shaped to expand and collimate the beam",
+    "colour": "#b799f2"
+   },
+   {
+    "key": "beam",
+    "label": "light beam (illustrative)",
+    "role": "where the light goes; drawn, not computed",
+    "colour": "#ff5b38"
+   },
+   {
+    "key": "fcore",
+    "label": "fibre core",
+    "role": "8.2 µm germanium-doped core",
+    "colour": "#f9c666"
+   },
+   {
+    "key": "box",
+    "label": "buried oxide, 2 µm",
+    "role": "insulates the waveguide from the substrate, thermally too",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "siwg",
+    "label": "silicon (220 nm)",
+    "role": "the silicon layer: waveguides, couplers, rings and gratings",
+    "colour": "#283d6b"
+   },
+   {
+    "key": "cladd",
+    "label": "oxide cladding",
+    "role": "deposited oxide around and above the waveguides",
+    "colour": "#8cbff2"
+   }
+  ],
+  "size_um": [
+   310.2,
+   150.0,
+   132.61
+  ],
+  "credit": "Generic, illustrative device drawn for this tutorial, not from any PDK; thicknesses to scale, lengths cut short."
+ },
+ {
+  "slug": "tfln",
+  "title": "Thin-film lithium niobate phase shifter",
+  "short": "TFLN phase shifter",
+  "blurb": "A ridge etched 300 nm into a 600 nm x-cut lithium-niobate film on oxide, with gold electrodes on the slab 2.75 µm either side. The voltage between them puts a field across the ridge, and the Pockels effect changes its index in proportion: a pure phase shift, with no loss added and no carriers to slow it down (Sections 19.3 and 20.5).",
+  "orbit": "-30deg 62deg 80%",
+  "file": "stack-tfln.glb",
+  "kb": 4,
+  "file_x": "stack-tfln-x.glb",
+  "kb_x": 4,
+  "layers": [
+   {
+    "key": "sisub",
+    "label": "Si substrate (cut short)",
+    "role": "the silicon wafer",
+    "colour": "#9eb2cc"
+   },
+   {
+    "key": "box",
+    "label": "buried oxide, 2 µm",
+    "role": "insulates the waveguide from the substrate, thermally too",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "ln",
+    "label": "lithium niobate film",
+    "role": "x-cut, 600 nm: the Pockels effect changes its index",
+    "colour": "#ed93a8"
+   },
+   {
+    "key": "gold",
+    "label": "gold electrodes",
+    "role": "carry the drive voltage; their field crosses the waveguide",
+    "colour": "#f9cc54"
+   }
+  ],
+  "size_um": [
+   24.0,
+   30.0,
+   4.1
+  ],
+  "credit": "Generic, illustrative device drawn for this tutorial, not from any PDK; thicknesses to scale, lengths cut short."
+ },
+ {
+  "slug": "mzm",
+  "title": "Silicon travelling-wave Mach–Zehnder modulator",
+  "short": "travelling-wave MZM",
+  "blurb": "A 40 µm piece of the two arms of a depletion-mode MZM (Chapter 20). Each arm is the PN rib of Figure 19.2, its p side towards a ground electrode and its n side towards the signal electrode in the middle, which drives both arms at once in push-pull. The ground–signal–ground lines on metal 2 form a transmission line that carries the drive along with the light. Hide the cladding and the metal to see the junctions.",
+  "orbit": "-30deg 60deg 85%",
+  "file": "stack-mzm.glb",
+  "kb": 41,
+  "file_x": "stack-mzm-x.glb",
+  "kb_x": 41,
+  "layers": [
+   {
+    "key": "sisub",
+    "label": "Si substrate (cut short)",
+    "role": "the silicon wafer",
+    "colour": "#9eb2cc"
+   },
+   {
+    "key": "box",
+    "label": "buried oxide, 2 µm",
+    "role": "insulates the waveguide from the substrate, thermally too",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "pp",
+    "label": "p++ silicon",
+    "role": "heavily doped: a low-resistance path to the contacts",
+    "colour": "#d85b51"
+   },
+   {
+    "key": "pdop",
+    "label": "p-doped silicon",
+    "role": "the p side of the modulator's junction",
+    "colour": "#f2a89e"
+   },
+   {
+    "key": "ndop",
+    "label": "n-doped silicon",
+    "role": "the n side of the modulator's junction",
+    "colour": "#9ebcea"
+   },
+   {
+    "key": "nn",
+    "label": "n++ silicon",
+    "role": "heavily doped: a low-resistance path to the contacts",
+    "colour": "#4c7acc"
+   },
+   {
+    "key": "cladd",
+    "label": "oxide cladding",
+    "role": "deposited oxide around and above the waveguides",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "wplug",
+    "label": "tungsten contacts and vias",
+    "role": "vertical plugs from silicon and germanium to the metal levels",
+    "colour": "#b7bcc6"
+   },
+   {
+    "key": "metal1",
+    "label": "metal 1",
+    "role": "first interconnect level",
+    "colour": "#edbc5b"
+   },
+   {
+    "key": "metal2",
+    "label": "metal 2 (pads)",
+    "role": "second interconnect level, opened as bond pads",
+    "colour": "#f9d16b"
+   }
+  ],
+  "size_um": [
+   30.0,
+   40.0,
+   8.2
+  ],
+  "credit": "Generic, illustrative device drawn for this tutorial, not from any PDK; thicknesses to scale, lengths cut short."
+ },
+ {
+  "slug": "ringmod",
+  "title": "Depletion ring modulator",
+  "short": "ring modulator",
+  "blurb": "The 7.2 µm ring of Worked Example 20.2, 200 nm from its bus. Over 80 % of its circumference a lateral junction runs along the ring: p on the inside, n on the outside, with heavily doped strips and rows of plugs further out. Reverse bias widens the depletion region, shifts the resonance and switches the light at the through port. Near the bus the ring is left undoped. The p contact rises through a via to metal 2.",
+  "orbit": "-25deg 58deg 85%",
+  "file": "stack-ringmod.glb",
+  "kb": 186,
+  "file_x": "stack-ringmod-x.glb",
+  "kb_x": 186,
+  "layers": [
+   {
+    "key": "sisub",
+    "label": "Si substrate (cut short)",
+    "role": "the silicon wafer",
+    "colour": "#9eb2cc"
+   },
+   {
+    "key": "box",
+    "label": "buried oxide, 2 µm",
+    "role": "insulates the waveguide from the substrate, thermally too",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "siwg",
+    "label": "silicon (220 nm)",
+    "role": "the silicon layer: waveguides, couplers, rings and gratings",
+    "colour": "#283d6b"
+   },
+   {
+    "key": "pp",
+    "label": "p++ silicon",
+    "role": "heavily doped: a low-resistance path to the contacts",
+    "colour": "#d85b51"
+   },
+   {
+    "key": "pdop",
+    "label": "p-doped silicon",
+    "role": "the p side of the modulator's junction",
+    "colour": "#f2a89e"
+   },
+   {
+    "key": "ndop",
+    "label": "n-doped silicon",
+    "role": "the n side of the modulator's junction",
+    "colour": "#9ebcea"
+   },
+   {
+    "key": "nn",
+    "label": "n++ silicon",
+    "role": "heavily doped: a low-resistance path to the contacts",
+    "colour": "#4c7acc"
+   },
+   {
+    "key": "cladd",
+    "label": "oxide cladding",
+    "role": "deposited oxide around and above the waveguides",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "wplug",
+    "label": "tungsten contacts and vias",
+    "role": "vertical plugs from silicon and germanium to the metal levels",
+    "colour": "#b7bcc6"
+   },
+   {
+    "key": "metal1",
+    "label": "metal 1",
+    "role": "first interconnect level",
+    "colour": "#edbc5b"
+   },
+   {
+    "key": "metal2",
+    "label": "metal 2 (pads)",
+    "role": "second interconnect level, opened as bond pads",
+    "colour": "#f9d16b"
+   }
+  ],
+  "size_um": [
+   24.0,
+   21.0,
+   7.0
+  ],
+  "credit": "Generic, illustrative device drawn for this tutorial, not from any PDK; thicknesses to scale, lengths cut short."
+ },
+ {
+  "slug": "ecl",
+  "title": "III–V/silicon external-cavity laser",
+  "short": "external-cavity laser",
+  "blurb": "The laser of Figure 26.4. A reflective SOA (left, cut short; its angled facet is drawn straight) is butt-coupled to an inverse-taper edge coupler. On the silicon, the light passes a phase heater, drops through ring 1 (R = 10 µm) into a guide that leads to ring 2 (R = 11 µm), and reaches a loop mirror that sends it back. The two rings pass light only where their resonances coincide, the Vernier effect of Section 26.5; heaters on the rings, each with its leads and pads, choose the wavelength.",
+  "orbit": "-15deg 55deg 95%",
+  "file": "stack-ecl.glb",
+  "kb": 326,
+  "file_x": "stack-ecl-x.glb",
+  "kb_x": 326,
+  "layers": [
+   {
+    "key": "inp",
+    "label": "InP chip body",
+    "role": "the laser or amplifier chip, cut short",
+    "colour": "#a8badb"
+   },
+   {
+    "key": "sisub",
+    "label": "Si substrate (cut short)",
+    "role": "the silicon wafer",
+    "colour": "#9eb2cc"
+   },
+   {
+    "key": "box",
+    "label": "buried oxide, 2 µm",
+    "role": "insulates the waveguide from the substrate, thermally too",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "act",
+    "label": "active region (quantum wells)",
+    "role": "the gain: carriers recombine here and amplify the light",
+    "colour": "#d81e19"
+   },
+   {
+    "key": "siwg",
+    "label": "silicon (220 nm)",
+    "role": "the silicon layer: waveguides, couplers, rings and gratings",
+    "colour": "#283d6b"
+   },
+   {
+    "key": "cladd",
+    "label": "oxide cladding",
+    "role": "deposited oxide around and above the waveguides",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "pinp",
+    "label": "p-InP cladding",
+    "role": "confines the light from above and carries the holes",
+    "colour": "#edbca3"
+   },
+   {
+    "key": "cap",
+    "label": "p++ InGaAs contact layer",
+    "role": "narrow gap and heavy doping: a low-resistance contact",
+    "colour": "#51332d"
+   },
+   {
+    "key": "tin18",
+    "label": "TiN heater",
+    "role": "a resistive film 2 µm wide, 1.7 µm above the waveguide (Table 18.1)",
+    "colour": "#e0893a"
+   },
+   {
+    "key": "wplug",
+    "label": "tungsten contacts and vias",
+    "role": "vertical plugs from silicon and germanium to the metal levels",
+    "colour": "#b7bcc6"
+   },
+   {
+    "key": "pmetal",
+    "label": "p contact, Ti/Pt/Au",
+    "role": "injects holes; ohmic on the p++ InGaAs",
+    "colour": "#f2c154"
+   },
+   {
+    "key": "metal1",
+    "label": "metal 1",
+    "role": "first interconnect level",
+    "colour": "#edbc5b"
+   }
+  ],
+  "size_um": [
+   130.0,
+   69.8,
+   8.8
+  ],
+  "credit": "Generic, illustrative device drawn for this tutorial, not from any PDK; thicknesses to scale, lengths cut short."
+ },
+ {
+  "slug": "flipchip",
+  "title": "Flip-chip laser in a silicon pocket",
+  "short": "flip-chip laser",
+  "blurb": "A pocket is etched through the cladding and the buried oxide into the substrate, and a laser chip is bonded into it upside down on AuSn solder, its active stripe at the height of the silicon waveguide, whose end faces the laser's facet across a gap of half a micrometre (Section 27.2). The pocket depth and the solder thickness set the vertical alignment; the bonder sets the lateral one. The laser, really a few hundred micrometres long, is cut short.",
+  "orbit": "-40deg 62deg 90%",
+  "file": "stack-flipchip.glb",
+  "kb": 14,
+  "file_x": "stack-flipchip-x.glb",
+  "kb_x": 14,
+  "layers": [
+   {
+    "key": "sisub",
+    "label": "Si substrate (cut short)",
+    "role": "the silicon wafer",
+    "colour": "#9eb2cc"
+   },
+   {
+    "key": "cap",
+    "label": "p++ InGaAs contact layer",
+    "role": "narrow gap and heavy doping: a low-resistance contact",
+    "colour": "#51332d"
+   },
+   {
+    "key": "pinp",
+    "label": "p-InP cladding",
+    "role": "confines the light from above and carries the holes",
+    "colour": "#edbca3"
+   },
+   {
+    "key": "box",
+    "label": "buried oxide, 2 µm",
+    "role": "insulates the waveguide from the substrate, thermally too",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "siwg",
+    "label": "silicon (220 nm)",
+    "role": "the silicon layer: waveguides, couplers, rings and gratings",
+    "colour": "#283d6b"
+   },
+   {
+    "key": "cladd",
+    "label": "oxide cladding",
+    "role": "deposited oxide around and above the waveguides",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "act",
+    "label": "active region (quantum wells)",
+    "role": "the gain: carriers recombine here and amplify the light",
+    "colour": "#d81e19"
+   },
+   {
+    "key": "inp",
+    "label": "InP chip body",
+    "role": "the laser or amplifier chip, cut short",
+    "colour": "#a8badb"
+   },
+   {
+    "key": "bondpad",
+    "label": "gold bond pads",
+    "role": "on the pocket floor: carry the current to the laser",
+    "colour": "#f9cc54"
+   },
+   {
+    "key": "solder",
+    "label": "AuSn solder",
+    "role": "melts to bond the laser chip and carry its current",
+    "colour": "#c6c6d1"
+   },
+   {
+    "key": "pmetal",
+    "label": "p contact, Ti/Pt/Au",
+    "role": "injects holes; ohmic on the p++ InGaAs",
+    "colour": "#f2c154"
+   },
+   {
+    "key": "nmetal",
+    "label": "n contact, AuGe/Ni/Au",
+    "role": "injects electrons",
+    "colour": "#dbb25b"
+   }
+  ],
+  "size_um": [
+   56.0,
+   32.0,
+   20.3
+  ],
+  "credit": "Generic, illustrative device drawn for this tutorial, not from any PDK; thicknesses to scale, lengths cut short."
  }
 ]

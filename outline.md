@@ -238,9 +238,9 @@ Demos: Modulation response, RIN and linewidth
 
 *How do two rings select one lasing mode over a 40 nm range?*
 
-26.1 Why single-frequency · 26.2 DFB lasers · 26.3 DBR lasers and tuning · 26.4 External-cavity lasers on Si and SiN · 26.5 The Vernier effect · 26.6 Self-injection locking · 26.7 Multi-wavelength sources
+26.1 Why single-frequency · 26.2 DFB lasers · 26.3 DBR lasers and tuning · 26.4 External-cavity lasers on Si and SiN · 26.5 The Vernier effect · 26.6 Self-injection locking · 26.7 Multi-wavelength sources · 26.8 Mode-locked lasers
 
-Demos: Vernier ring laser
+Demos: Vernier ring laser · Mode-locked laser
 
 ### [27. Lasers on Silicon]({% link chapters/27_lasersonsi.md %})
 
@@ -267,6 +267,8 @@ From a specification to a verified layout: design principles, how the simulators
 *How do you get from a system specification to a design that works on most of the dies, with the least simulation?*
 
 29.1 From specification to component targets · 29.2 Architecture and margins · 29.3 Choosing the level of model · 29.4 Simulations are experiments · 29.5 Corners, Monte Carlo and yield · 29.6 Optimisation and inverse design · 29.7 Compact models and their validity · 29.8 Closing the loop with measurement · 29.9 Reproducible simulation · 29.10 Design for manufacturing and for test
+
+Demos: Corners or Monte Carlo
 
 ### [30. Design Flow and Open PDKs]({% link chapters/30_flow.md %})
 
@@ -346,10 +348,10 @@ Demos: Link budget · Coherent transmission
 
 *What changes when the chip is a sensor, a beam steerer or a processor instead of a transceiver?*
 
-39.1 Biosensing with evanescent fields · 39.2 LiDAR and optical phased arrays · 39.3 Quantum photonics · 39.4 Photonic computing · 39.5 Microwave photonics and frequency combs · 39.6 Visible and mid-infrared photonics
+39.1 Biosensing with evanescent fields · 39.2 LiDAR and optical phased arrays · 39.3 Quantum photonics · 39.4 Photonic computing · 39.5 Microwave photonics and frequency combs · 39.6 On-chip spectrometers · 39.7 Optical gyroscopes · 39.8 Visible and mid-infrared photonics
 
-Demos: Ring biosensor · Optical phased array
+Demos: Ring biosensor · Optical phased array · Programmable MZI mesh
 
 ## Hands-On Labs
 
-Twelve labs in three tracks, using free tools only: simulate (mode solvers, FDTD, circuit models), make (lay out, verify and submit an openEBL chip, then analyse its measurements), and lasers and links (rate equations, a Vernier laser, the reference-link budget). See [the labs page]({% link labs.md %}).
+Seventeen labs in three tracks, using free tools only: simulate (mode solvers, FDTD, circuit models), make (lay out, verify and submit an openEBL chip, then analyse its measurements), and lasers and links (rate equations, a Vernier laser, the reference-link budget), plus five that cross the tracks (Fabry–Pérot fringes, coupling, laser heating, ring-modulator drive, SOAs). See [the labs page]({% link labs.md %}).

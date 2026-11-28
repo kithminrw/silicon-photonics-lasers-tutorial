@@ -169,6 +169,10 @@ Sensitivities reveal tolerant designs. A lithography bias does not change the wi
   <figcaption><span class="capnum">Figure 29.6.</span> <strong>Monte Carlo histograms with their specification limits</strong>, 20 001 dies on the synthetic wafers of Worked Example 35.1 (thickness and width bowls of 6 nm from centre to edge, a random width scatter of σ = 1.5 nm). (a) The coupling of all four demultiplexer rings, from the femwell model of \(L_x\) over width bias, thickness and channel: centred in the window (blue), every coupler passes; designed for 14.5 % (amber), none meets −20 dB of crosstalk. (b) The fabrication shift of the ring resonance, \(0.6\,\Delta W + 1.4\,\Delta t\) nm: with each ring held on its own channel, a heater range of 12.75 nm (3.75 nm of drift plus 9.0 nm for the spread) covers the dies in the shaded band, and those one FSR (12.8 nm) away, which use the ring's next resonance (lighter band, dotted edge): 87 % of the dies. Drawn by <code>figsrc/ch29_figs.py</code>.</figcaption>
 </figure>
 
+**Try it.** Move the design coupling, change the three process spreads, and compare the corners with the Monte Carlo yield and its error bar.
+
+{% include demos/yield.html %}
+
 <div class="tbox tbox-example" markdown="1">
 <div class="tbox-title">Worked Example 29.3 · How much heater range do the demultiplexer rings need?</div>
 

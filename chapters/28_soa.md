@@ -49,7 +49,7 @@ $$\frac{\mathrm{d}P}{\mathrm{d}z} = \left(\frac{\Gamma g_0}{1 + P/P_\mathrm{sat}
 
 </div>
 
-At low power the gain is exponential in the length. As the signal grows, stimulated emission consumes carriers faster than the current replaces them, and the local gain falls ([Chapter 22]({% link chapters/22_emission.md %})). The saturation power $$P_\mathrm{sat} = h\nu A/(\Gamma a\tau)$$, with $$A$$ the active region's cross-section (so that $$A/\Gamma$$ is the mode's area), is larger for a big mode area, a short carrier lifetime $$\tau$$ and a low differential gain $$a$$. The amplifier's usable output is quoted as the **output power at which the gain has dropped by 3 dB** ([Figure 28.2](#fig-28-2)).
+At low power the gain is exponential in the length. As the signal grows, stimulated emission consumes carriers faster than the current replaces them, and the local gain falls ([Chapter 22]({% link chapters/22_emission.md %})). The saturation power $$P_\mathrm{sat} = h\nu A/(\Gamma a\tau)$$, with $$A$$ the active region's cross-section (so that $$A/\Gamma$$ is the mode's area), is larger for a big mode area, a short carrier lifetime $$\tau$$ and a low differential gain $$a$$. [Figure 24.13]({% link chapters/24_fp.md %}#fig-24-13) compares, at the same scale, an SOA made from the laser's stack with a slab-coupled design whose mode area, and so its saturation power, is ten times larger. The amplifier's usable output is quoted as the **output power at which the gain has dropped by 3 dB** ([Figure 28.2](#fig-28-2)).
 
 <div class="tbox tbox-example" markdown="1">
 <div class="tbox-title">Worked Example 28.1 · A 1 mm SOA</div>
@@ -63,7 +63,7 @@ With a small-signal modal gain $$\Gamma g_0 = 35$$ cm⁻¹, $$\alpha_i = 5$$ cm�
   <figcaption><span class="capnum">Figure 28.2.</span> <strong>Saturation for three lengths.</strong> The amplifier of Worked Example 28.1 (Γg<sub>0</sub> = 35 cm⁻¹, α<sub>i</sub> = 5 cm⁻¹, P<sub>sat</sub> = 12 mW), integrated along its length. (a) Gain against output power: 0.5, 1 and 2 mm give 6.5, 13.0 and 26.1 dB of small-signal gain but −3 dB output powers (dots) of 10.5, 8.7 and 8.3 dBm. (b) Output against input power: the 1 mm amplifier reaches its −3 dB point with −1.3 dBm in, the 2 mm one already with −14.7 dBm. Drawn by <code>figsrc/ch28_figs.py</code>.</figcaption>
 </figure>
 
-**Try it.** Change the input power, length, drive and saturation power; the top view shows the light growing and the gain saturating towards the output.
+**Try it.** Change the input power, length, drive and saturation power; the top view shows the light growing and the gain saturating towards the output. [Lab 17]({% link labs/lab17_soa.md %}) reproduces this section's numbers in Python and adds noise, patterning and a large-mode amplifier.
 
 {% include demos/soa.html %}
 
@@ -145,6 +145,15 @@ A 1 mm SOA gives about 13 dB of small-signal gain, a −3 dB output power near 9
 
 No SOA: the budget of [Chapter 1]({% link chapters/01_why.md %}) closes with about 9 dB of margin before penalties ([Chapter 21]({% link chapters/21_pd.md %})) and 5.9 dB after them ([Chapter 38]({% link chapters/38_links.md %}))). An SOA would be the first upgrade for a longer reach or more channels.
 
+</div>
+
+## In 3D
+
+The output end of an angled-waveguide SOA, with its AR coating and the window where the wells stop (Section 28.5); its cross-section is drawn to scale in Figure 24.13. Drag to turn it, scroll to zoom, click a layer in the legend to hide it (shift-click to show it alone), and switch to the exploded view or to 3× height to see the thin layers. It is a generic concept drawn with this chapter's dimensions, not a device from a PDK; real PDK devices are in the [PDK devices in 3D]({% link devices-3d.md %}) gallery.
+
+{% include stack3d-assets.html %}
+<div class="d3-grid">
+{% include stack3d.html slug="soa" %}
 </div>
 
 ## Reading

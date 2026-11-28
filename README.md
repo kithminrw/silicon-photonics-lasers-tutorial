@@ -7,7 +7,7 @@ across the **Si, SiN, thin-film LiNbO₃ (TFLN), BaTiO₃ (BTO) and InP** platfo
 
 **Read it online:** <https://www.kithminrw.com/silicon-photonics-lasers-tutorial/>
 
-> **Status: draft v0.1 (November 2026).** All nine parts and fifteen labs are written. Corrections are very welcome
+> **Status: draft v0.1 (November 2026).** All nine parts and seventeen labs are written. Corrections are very welcome
 > (see [Contributing](#contributing)).
 
 ## What makes it different
@@ -26,7 +26,9 @@ across the **Si, SiN, thin-film LiNbO₃ (TFLN), BaTiO₃ (BTO) and InP** platfo
   [demos page](https://www.kithminrw.com/silicon-photonics-lasers-tutorial/demos/).
 - **Real devices in 3D.** Devices from open process design kits (SiEPIC EBeam, CORNERSTONE, Luxtelligence
   TFLN) extruded from their layouts with their PDK layer stacks, which you can rotate, slice by layer
-  and stretch vertically, with credit to the people who designed them.
+  and stretch vertically, with credit to the people who designed them. Generic concept models of the
+  devices themselves (waveguides, couplers, rings, gratings, couplers to fibre, phase shifters, modulators,
+  photodiodes, lasers and SOAs) close the device chapters, in the same explorable viewer.
 - **One design–fabrication–test thread.** A first passive chip in 220 nm SOI, of the kind made in the
   SiEPIC openEBL runs, is laid out, submitted and analysed with free tools; a four-wavelength reference
   link (4 × 50 Gb/s over 2 km) ties the active devices and lasers together.
@@ -47,8 +49,9 @@ across the **Si, SiN, thin-film LiNbO₃ (TFLN), BaTiO₃ (BTO) and InP** platfo
 | VII. Design, simulation, layout | 29 Design principles and workflows · 30 Design flow and open PDKs · 31 How simulators work · 32 Simulation tools in practice · 33 KLayout and GDSII · 34 Verification and tape-out | **written** |
 | VIII. Fabrication, testing, data | 35 Fabrication · 36 Testing · 37 Data analysis | **written** |
 | IX. Systems | 38 Links and transceivers · 39 Sensing, LiDAR, quantum, computing | **written** |
-| Hands-on labs | 15 labs: simulate, make (openEBL), lasers and links, Fabry–Pérot fringes, coupling, laser heating | **written** |
+| Hands-on labs | 17 labs: simulate, make (openEBL), lasers and links, Fabry–Pérot fringes, coupling, laser heating, ring-modulator drive, SOAs | **written** |
 | PDK devices in 3D | 15 devices from three open PDKs | working |
+| Device concepts in 3D | 24 generic models at the ends of the device chapters and in Sections 24.9 and 35.4 | working |
 | Appendices | A formulas · B materials · C glossary · D open tools, PDKs, data · E reading and free simulations | in progress |
 
 ## Run it locally
@@ -85,6 +88,7 @@ assets/figs/                          figures (SVG)
 assets/models/*.glb                   3D models of open-PDK devices
 figsrc/                               Python scripts that draw the figures (style: figstyle.py)
 tools/export_3d.py                    exports PDK devices to glTF with gdsfactory
+tools/export_stacks.py, export_devices.py   generic device and layer-stack models (numpy, trimesh, shapely)
 _config.yml, _sass/, _includes/       site settings, "Wafer" colour theme, dark mode, KaTeX maths
 .github/workflows/pages.yml           builds and deploys the site on every push to main
 ```
@@ -120,6 +124,7 @@ python3.12 -m venv .venv && .venv/bin/pip install numpy matplotlib gdsfactory ub
 .venv/bin/python figsrc/part1_figs.py            # Part I figures -> assets/figs/
 .venv/bin/python tools/export_3d.py              # SiEPIC EBeam and CORNERSTONE models -> assets/models/
 python3 -I tools/export_stacks.py                # generic laser, SOA and VCSEL stacks of Section 24.9 (numpy, trimesh, shapely)
+python3 -I tools/export_devices.py               # generic passive and active device models for the chapters' "In 3D" sections
 ```
 
 The Luxtelligence TFLN models need that PDK in its own environment, because it pins its own gdsfactory
@@ -130,9 +135,8 @@ version: clone [Luxtelligence/lxt_pdk_gf](https://github.com/Luxtelligence/lxt_p
 
 The tutorial's organisation draws on the open teaching material of the field, in particular
 L. Chrostowski and M. Hochberg's *Silicon Photonics Design* (Cambridge University Press) and the UBCx
-edX course built around it, the SiEPIC openEBL design–fabrication–test program, the AIM Photonics
-Academy courses and the MIT Virtual Manufacturing Lab simulations, and the open PDKs and tools of the
-SiEPIC and gdsfactory communities. These are cited and linked, not reproduced; the full list is on the
+edX course built around it, the SiEPIC openEBL design–fabrication–test program, the MIT Virtual
+Manufacturing Lab simulations, and the open PDKs and tools of the SiEPIC and gdsfactory communities. These are cited and linked, not reproduced; the full list is on the
 [References](https://www.kithminrw.com/silicon-photonics-lasers-tutorial/references/) page.
 
 The 3D models are derived from:

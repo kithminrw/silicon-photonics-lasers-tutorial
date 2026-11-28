@@ -18,8 +18,8 @@ A waveguide's job is to get light from A to B unchanged; this chapter is about e
 - explain how scattering loss scales with roughness, width and polarisation;
 - estimate free-carrier absorption from doping and the leakage through a buried oxide;
 - describe dispersion and the nonlinear effects that matter in silicon at 1550 nm;
-- measure propagation loss with cutbacks, spirals and resonators, with an error bar.
-- explain phase matching, quasi-phase-matching by periodic poling, and how a microring makes a Kerr frequency comb;
+- measure propagation loss with cutbacks, spirals and resonators, with an error bar;
+- explain phase matching, quasi-phase-matching by periodic poling, and how a microring makes a Kerr frequency comb.
 
 </div>
 
@@ -197,9 +197,55 @@ Such sources serve the rest of the tutorial. A microcomb is a dense-WDM light so
 - Substrate leakage falls as $$e^{-2\gamma t_\mathrm{BOX}}$$: 7 dB per 100 nm of BOX for TE at 1550 nm, only 3.6 dB for TM.
 - Silicon becomes nonlinear at tens to hundreds of milliwatts (Kerr, two-photon and free-carrier absorption); SiN does not absorb two photons at 1550 nm.
 - Measure loss by cutback with several lengths and an error bar, and confirm it with a ring.
-
 - Designed nonlinear devices make new frequencies: periodically poled thin-film LN doubles 1550 nm light (quasi-phase-matching, about 4 µm periods), and high-Q SiN rings turn one pump into a microcomb above a threshold that falls as 1/Q².
+
 </div>
+
+## Problems
+
+1. **Loss of a depletion phase shifter.** In a rib phase shifter, 30 % of the mode overlaps a p region with $$5\times10^{17}\ \mathrm{cm^{-3}}$$ holes and 30 % overlaps an n region with $$5\times10^{17}\ \mathrm{cm^{-3}}$$ electrons; ignore the depletion region. Find the free-carrier loss in dB/cm and over a 3 mm phase shifter. What fraction of the mode may overlap a $$10^{20}\ \mathrm{cm^{-3}}$$ p-type contact if that contact is to add no more than 0.1 dB/cm?
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    The holes absorb $$6.0\times10^{-18}\times5\times10^{17} = 3.0\ \mathrm{cm^{-1}}$$ and the electrons $$8.5\times10^{-18}\times5\times10^{17} = 4.25\ \mathrm{cm^{-1}}$$. Weighted by the overlaps, $$\alpha = 0.3\times3.0 + 0.3\times4.25 = 2.18\ \mathrm{cm^{-1}}$$, or $$4.343\times2.18 = 9.4$$ dB/cm, and 2.8 dB over 3 mm. The contact absorbs $$6.0\times10^{-18}\times10^{20} = 600\ \mathrm{cm^{-1}}$$, or 2600 dB/cm, so its overlap must stay below $$0.1/2600 = 3.8\times10^{-5}$$. The doped core costs almost 3 dB by design, while the contacts must sit where less than four parts in $$10^5$$ of the mode's power remain, which is why they are kept well away from it.
+
+    </details>
+
+2. **A cutback measurement.** Five waveguides between identical grating couplers are 0, 0.5, 1.0, 1.5 and 2.0 cm long and have insertion losses IL of 10.3, 11.6, 12.3, 13.6 and 14.4 dB. Fit a straight line by least squares to find the propagation loss with its standard error, and the loss of one coupler. What intrinsic Q should a ring made of the same waveguide show at 1550 nm ($$n_g = 4.18$$)?
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    The mean length is 1.0 cm and the mean loss 12.44 dB. The sums are $$\sum(L - \bar L)^2 = 2.5\ \mathrm{cm^2}$$ and $$\sum(L - \bar L)(\mathrm{IL} - \overline{\mathrm{IL}}) = 5.10\ \mathrm{dB\,cm}$$, so the slope is $$5.10/2.5 = 2.04$$ dB/cm and the intercept $$12.44 - 2.04\times1.0 = 10.40$$ dB, or 5.2 dB per coupler. The residuals are −0.10, +0.18, −0.14, +0.14 and −0.08 dB; their variance is $$s^2 = 0.088/(5 - 2) = 0.029\ \mathrm{dB^2}$$, and the slope's standard error $$\sqrt{s^2/2.5} = 0.11$$ dB/cm. The loss is therefore $$2.04 \pm 0.11$$ dB/cm, or $$\alpha = 2.04/4.343 = 0.47\ \mathrm{cm^{-1}}$$, and a ring should show
+
+    $$Q_i = \frac{2\pi n_g}{\lambda\alpha} = \frac{2\pi\times4.18}{1.55\times10^{-4}\ \mathrm{cm}\times0.47\ \mathrm{cm^{-1}}} = 3.6\times10^5.$$
+
+    A coupler-to-coupler scatter of about 0.15 dB leaves a 5 % uncertainty even over a 2 cm span; a ring with an intrinsic Q near $$3.6\times10^5$$ would confirm the number independently.
+
+    </details>
+
+3. **How thick a buried oxide for TM?** The one-dimensional model of Figure 7.4 gives 25 dB/cm of substrate leakage for the strip's TM mode through 1 µm of BOX, falling by 3.6 dB for every further 100 nm (Worked Example 7.2). Choose the BOX thickness that brings the TM leakage below 0.01 dB/cm. How does the answer change if you start from femwell's 12 dB/cm at 1 µm instead?
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    The leakage must fall by a factor $$25/0.01 = 2500$$, or $$10\log_{10}2500 = 34.0$$ dB. At 3.6 dB per 100 nm that takes 0.94 µm more oxide, so $$t_\mathrm{BOX} \approx 1.94$$ µm; $$e^{2\gamma\Delta t} = 2500$$ with $$\gamma = 4.2\ \mu\mathrm{m}^{-1}$$ gives the same within rounding. Choose 2 µm, where the model gives 0.006 dB/cm. From femwell's 12 dB/cm the factor is 1200, or 30.8 dB, which takes 0.86 µm, so 1.86 µm would do. The standard 2 µm BOX is just enough for the 500 nm strip's TM mode; a narrower strip or a longer wavelength, with a smaller $$\gamma$$, needs the 3 µm of Worked Example 7.2.
+
+    </details>
+
+4. **The coherence length.** In second-harmonic generation the pump at wavelength $$\lambda$$ has wavenumber $$k_\omega = 2\pi n_\omega/\lambda$$ and the harmonic $$k_{2\omega} = 2\pi n_{2\omega}/(\lambda/2)$$. Show that the harmonic made along the guide adds in phase over a length $$L_c = \lambda/[4(n_{2\omega} - n_\omega)]$$. Then use the numbers of Section 7.8, a coherence length of about 10 µm in bulk lithium niobate and a 4 µm poling period in thin film, to find the index mismatch in each case.
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    The pump drives a polarisation at $$2\omega$$ that varies as $$e^{-j2k_\omega z}$$, while the harmonic it radiates travels as $$e^{-jk_{2\omega}z}$$. Their relative phase grows as $$\Delta k\,z$$, with
+
+    $$\Delta k = k_{2\omega} - 2k_\omega = \frac{4\pi}{\lambda}\left(n_{2\omega} - n_\omega\right).$$
+
+    New light adds to the old while $$\Delta k\,z < \pi$$, so $$L_c = \pi/\Delta k = \lambda/[4(n_{2\omega} - n_\omega)]$$. In bulk, $$L_c \approx 10$$ µm gives $$n_{2\omega} - n_\omega = 1.55/(4\times10) = 0.039$$. In thin film, poling flips the sign every coherence length, so a 4 µm period means $$L_c = 2$$ µm and an effective-index mismatch of $$1.55/(4\times2) = 0.19$$. The waveguide adds its own dispersion to the material's, so the mismatch is five times larger and the poling period five times shorter.
+
+    </details>
 
 ## Check yourself
 

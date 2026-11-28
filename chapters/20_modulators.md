@@ -116,7 +116,7 @@ The target is an extinction of at least 4 dB with a 2 Vpp drive and at most 3 dB
 
 </div>
 
-**Try it.** Find a junction efficiency, intrinsic and loaded Q, and laser detuning that meet the reference-link target, and see what it costs in bandwidth.
+**Try it.** Find a junction efficiency, intrinsic and loaded Q, and laser detuning that meet the reference-link target, and see what it costs in bandwidth. [Lab 16]({% link labs/lab16_ringmod.md %}) works through the same ring in Python, from its operating point to NRZ eyes and PAM4.
 
 {% include demos/ringmod.html %}
 
@@ -222,6 +222,17 @@ For a four-wavelength link the ring wins on size, energy (tens of femtojoules pe
 
 Four depletion ring modulators with U-shaped junctions (about 50 pm/V), $$Q_L \approx 8000$$, driven with 2 Vpp NRZ by a CMOS driver with equalisation, each locked by its own heater loop. Expected: about 4 dB extinction at about 3 dB insertion loss, roughly 20 fJ/bit in the modulator.
 
+</div>
+
+## In 3D
+
+The modulators of this chapter: a silicon travelling-wave MZM segment, the depletion ring modulator of Worked Example 20.2, and a thin-film lithium-niobate phase shifter. Drag to turn them, scroll to zoom, click a layer in the legend to hide it (shift-click to show it alone), and switch to the exploded view or to 3× height to see the thin layers. They are generic concepts drawn with this chapter's dimensions, not devices from a PDK; real PDK devices are in the [PDK devices in 3D]({% link devices-3d.md %}) gallery.
+
+{% include stack3d-assets.html %}
+<div class="d3-grid">
+{% include stack3d.html slug="mzm" %}
+{% include stack3d.html slug="ringmod" %}
+{% include stack3d.html slug="tfln" %}
 </div>
 
 ## Reading

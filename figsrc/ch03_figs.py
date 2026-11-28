@@ -130,8 +130,8 @@ def fig_beam():
     c.plot(u, np.arctan(u) / (np.pi / 4), color=C3, label="Gouy phase ζ / (π/4)")
     c.axvline(1, color=MUTED, lw=0.6, ls=":")
     c.set_xlim(0, 3); c.set_ylim(0, 3.2)
-    finish(c, "$z/z_R$", "Normalised value", legend=True, loc="upper left")
-    c.legend(loc="upper left", fontsize=6.4, handlelength=1.4)
+    finish(c, "$z/z_R$", "Normalised value", legend=True, loc="lower right")
+    c.legend(loc="lower right", fontsize=6.4, handlelength=1.4)      # clear of the R/(2z_R) curve
     tag(c, "c")
     save(fig, "ch03_beam")
 
@@ -161,7 +161,7 @@ def fig_lens():
     a.fill_between(zs, -ws, ws, color=RED, alpha=0.12, lw=0); a.fill_between(zt, -wt, wt, color=RED, alpha=0.12, lw=0)
     a.add_patch(Ellipse((zl, 0), 0.22, 2.3, fc=MAT["glass"], ec=BLUE, lw=1.2, zorder=4))
     a.plot([-0.3, 10.3], [0, 0], color=MUTED, lw=0.5, ls="-.")
-    for zz, t in ((0, "$w_0$"), (zf, "$w_0' = Mw_0$")):
+    for zz, t in ((0, "$w_0$"), (zf, "$w_0′ = Mw_0$")):
         ww = 0.12 if zz == 0 else 0.40 * s_img
         a.annotate("", (zz, ww), (zz, -ww), arrowprops=dict(arrowstyle="<|-|>", color=INK, lw=0.7, mutation_scale=6, shrinkA=0, shrinkB=0))
         a.text(zz + 0.1 if zz == 0 else zz, 0.0 if zz == 0 else ww + 0.18, t, fontsize=7, color=INK, ha="left" if zz == 0 else "center",
@@ -210,7 +210,7 @@ def fig_lens():
                arrowprops=dict(arrowstyle="-", color=MUTED, lw=0.6))
     c.axvline(f, color=MUTED, lw=0.6, ls=":")
     c.set_xlim(20, 300); c.set_ylim(0.3, 100)
-    finish(c, "Source to lens $d_1$ (µm)", "Magnification $M = w_0'/w_0$")
+    finish(c, "Source to lens $d_1$ (µm)", "Magnification $M = w_0′/w_0$")
     tag(c, "c")
     save(fig, "ch03_lens")
 

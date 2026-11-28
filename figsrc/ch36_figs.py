@@ -76,14 +76,14 @@ def fig_setup():
     block(ax, 8.6, 2.6, 1.9, 0.55, "temperature\ncontroller", fc=INSTR, fs=6.4)
     ewire(ax, [(7.65, 2.6), (7.25, 2.6), (7.25, 2.4), (7.1, 2.4)], arrow_end=False)
     # computer and control lines
-    block(ax, 5.3, 0.55, 8.6, 0.6, "computer: sweep, alignment, temperature, data", fc="#E9EEF6", fs=6.8)
+    block(ax, 5.425, 0.55, 9.45, 0.6, "computer: sweep, alignment, temperature, data", fc="#E9EEF6", fs=6.8)   # wide enough that every control line lands on it
     yc = 0.85
     for x, y in ((0.95, yo - 0.4), (2.25, 2.475), (6.0, 1.85), (8.6, 2.325)):
         ax.plot([x, x], [yc, y], color=ELEC, lw=0.9, zorder=1)
     ax.plot([9.9, 9.9, 9.55], [yc, yo, yo], color=ELEC, lw=0.9, zorder=1)
     ax.plot([0.95, 0.95, 8.6, 8.6], [yo + 0.4, 4.95, 4.95, yo + 0.4], color=ELEC, lw=0.8, ls=(0, (3, 2)), zorder=1)
     label(ax, 4.7, 5.02, "trigger: the detectors sample in step with the wavelength sweep", fs=6.2, col=ELEC, va="bottom")
-    legend_paths(ax, loc="lower left", bbox=(0.0, 0.17), extra=[Line2D([], [], color=ELEC, lw=0.8, ls=(0, (3, 2)), label="trigger")])
+    legend_paths(ax, loc="lower left", bbox=(0.235, 0.17), extra=[Line2D([], [], color=ELEC, lw=0.8, ls=(0, (3, 2)), label="trigger")])   # in the free space, clear of the lines
     note(ax, "not to scale")
     save(fig, "ch36_setup")
 
@@ -375,8 +375,8 @@ def fig_lensedfa():
     label(ax, 30, ys[3] + 88, f"working distance ≈ {WD:.0f} µm", fs=FS_SMALL, ha="left")
     arrow(ax, (28, ys[3] + 80), (WD + 1, ys[3] + 10), col=INK, lw=0.6, ms=5)
     label(ax, 255, 485, "lensed fibre array", fs=FS)
-    callout(ax, (-30, ys[2]), (-150, ys[2] + 48), "edge coupler (inverse taper)", ha="left")
-    scalebar(ax, 190, -78, 100, "100 µm")
+    callout(ax, (-30, ys[2]), (-150, ys[2] + 52), "edge coupler\n(inverse taper)", ha="left")    # two lines: stays on the chip side of the facet
+    scalebar(ax, -155, -82, 100, "100 µm")          # on the chip side, clear of the fibre bodies
     panel(ax, "a", 0.0, 1.0)
     # (b) one channel's spot on its coupler, to scale in micrometres
     b = fig.add_axes([0.64, 0.08, 0.35, 0.84]); frameless(b, (-3.2, 3.2), (-3.2, 3.6))

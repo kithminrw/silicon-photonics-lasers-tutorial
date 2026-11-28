@@ -250,7 +250,7 @@ def fig_rules():
     poly(ax, [(0.5, 0.5), (3.0, 0.5), (3.18, 1.77), (0.5, 2.5)], "si", alpha=0.9)
     ax.plot(3.18, 1.77, "o", ms=3.2, color=ERR, zorder=6)
     ax.plot(3.0, 2.0, "o", ms=3.2, mfc="none", mec=TEAL, zorder=6)
-    label(ax, 3.3, 1.45, "vertex off\nthe grid", fs=5.8, col=ERR, ha="left")
+    label(ax, 3.3, 1.45, "vertex off\nthe grid", fs=5.8, col=ERR, ha="left", bg="white")
     # (k) self-intersection: the outline crosses itself
     ax = axs[10]
     pts = [(0.4, 2.0), (3.6, 2.0), (0.4, 1.0), (3.6, 1.0)]
@@ -362,7 +362,7 @@ def fig_markers():
     clean = ("A1", "A4", "B1")
     # (feature, text, label position, ha)
     calls = [("A2", "SI.W.1", (26, 55.3), "center"), ("A3", "SI.W.1\nSI.ANG.1", (43.5, 56.2), "center"),
-             ("A5", "SI.FP.1", (92.5, 55.3), "center"),
+             ("A5", "SI.FP.1", (93.3, 55.3), "center"),
              ("B2", "SI.S.1", (28, 43.2), "center"), ("B3", "SI.N.1 ×18", (42.6, 43.2), "center"),
              ("B4", "SI.A.1", (51.5, 36.6), "center"), ("B5", "SI.ODD.1 ×1, SI.W.1 ×6,\nSI.N.1 ×4, SI.ANG.1 ×4", (63.0, 43.6), "left"),
              ("C1", "SI.GRID.1 ×272", (12, 25.3), "center"), ("C2", "SI.S.1 ×58\nSI.W.1 ×2", (52.0, 14.5), "left"),
@@ -486,7 +486,7 @@ def fig_curved():
     fig.text(0.29, 0.93, "(b) one vertex, 20 × 20 nm", fontsize=7.5, fontweight="bold", color=INK)
     ax.text(0.5, -0.05, "×: exact   ●: stored (1 nm)   ○: snapped (5 nm)", transform=ax.transAxes, fontsize=5.6, color=INK, ha="center", va="top")
     # (c) the gap along the pulley coupler, at each ring vertex under the bus (the closest points)
-    ax = fig.add_axes([0.575, 0.17, 0.415, 0.66])
+    ax = fig.add_axes([0.575, 0.17, 0.36, 0.66])
     mins = {}
     for gg, col, lab, mk in ((0, MUTED, "exact", None), (0.001, BLUE, "1 nm grid", "o"), (0.005, ERR, "5 nm grid", "s")):
         a, d = pulley_gap(gg, ring_only=True)
@@ -494,10 +494,9 @@ def fig_curved():
         mins[gg] = d.min()
     ax.axhline(200, color=INK, lw=0.8, ls=(0, (4, 2)))
     ax.axhline(198, color=MUTED, lw=0.7, ls=(0, (1, 1.5)))
-    ax.text(227, 200.08, "rule 200 nm", fontsize=6.0, color=INK, ha="left", va="bottom",
-            bbox=dict(boxstyle="square,pad=0.05", fc="white", ec="none"))
-    ax.text(227, 197.92, "2 nm tolerance", fontsize=6.0, color=MUTED, ha="left", va="top",
-            bbox=dict(boxstyle="square,pad=0.05", fc="white", ec="none"))
+    # the two reference lines are labelled in the right margin, off the data
+    ax.text(1.015, 200, "rule\n200 nm", transform=ax.get_yaxis_transform(), fontsize=6.0, color=INK, ha="left", va="center")
+    ax.text(1.015, 198, "2 nm\ntolerance", transform=ax.get_yaxis_transform(), fontsize=6.0, color=MUTED, ha="left", va="center")
     ax.set_xlim(226, 314); ax.set_ylim(197.0, 202.5)
     finish(ax, xlabel="angle around the ring (°)", ylabel="gap at a ring vertex (nm)")
     ax.legend(loc="lower left", fontsize=6.0, ncol=3, handlelength=1.6, columnspacing=0.9, bbox_to_anchor=(0.0, 1.0),
@@ -573,7 +572,8 @@ def fig_connect():
         fig.text(0.675, y0 + 0.215, notes[v], fontsize=6.1, color=INK, va="top", linespacing=1.35)
         span = xl[1] - xl[0]
         sb = {"nudge": 0.2, "width": 0.5, "overlap": 5.0}[v]
-        scalebar(a, xl[0] + 0.05 * span, yl[0] + 0.07 * (yl[1] - yl[0]), sb, f"{int(sb * 1000)} nm" if sb < 1 else f"{sb:g} µm")
+        fx, fy = {"nudge": (0.12, 0.07), "width": (0.05, 0.07), "overlap": (0.05, 0.03)}[v]   # labels clear of the frame and DevRec
+        scalebar(a, xl[0] + fx * span, yl[0] + fy * (yl[1] - yl[0]), sb, f"{int(sb * 1000)} nm" if sb < 1 else f"{sb:g} µm")
         if v == "nudge":
             dim(a, (50.45, 157.25), (50.45, 157.30), "", col=ERR, fs=6.0)
             label(a, 50.52, 157.36, "50 nm", fs=6.0, col=ERR, ha="left")
@@ -685,7 +685,7 @@ def fig_density():
     cmap = plt.get_cmap("viridis")
     for k, (key, t) in enumerate((("map_before", "(c) before fill"), ("map_after", "(d) after fill"))):
         m = np.array(d[key]) * 100
-        a = fig.add_axes([0.56 + k * 0.205, 0.12, 0.18, 0.72])
+        a = fig.add_axes([0.56 + k * 0.215, 0.12, 0.18, 0.72])
         im = a.imshow(m, origin="lower", extent=ext, cmap=cmap, vmin=0, vmax=35, interpolation="nearest")
         a.contour(cen, cen, m, levels=[20], colors=[ERR], linewidths=0.9)
         a.set_xticks([0, 500, 1000]); a.set_yticks([0, 500, 1000])
@@ -696,9 +696,9 @@ def fig_density():
         if not k:
             a.set_ylabel("y (µm)", fontsize=6.8)
         st = d["before" if k == 0 else "after"]
-        fig.text(0.56 + k * 0.205, 0.92, t, fontsize=7.5, fontweight="bold", color=INK)
-        fig.text(0.56 + k * 0.205, 0.865, f"{st['below']} of {st['n']} windows < 20 %", fontsize=6.0, color=ERR)
-    cax = fig.add_axes([0.955, 0.12, 0.012, 0.72])
+        fig.text(0.56 + k * 0.215, 0.92, t, fontsize=7.5, fontweight="bold", color=INK)
+        fig.text(0.56 + k * 0.215, 0.865, f"{st['below']} of {st['n']} windows < 20 %", fontsize=6.0, color=ERR)
+    cax = fig.add_axes([0.99, 0.12, 0.012, 0.72])             # clear of the last x tick label
     cb = fig.colorbar(im, cax=cax); cb.ax.tick_params(labelsize=6.0); cb.set_label("Si density in a 100 µm window (%)", fontsize=6.3)
     save(fig, "ch34_density")
 

@@ -50,7 +50,7 @@ def fig_bV():
     ax.plot(v0, b0, "o", color=INK, ms=5); ax.annotate("220 nm Si\nat 1550 nm", (v0, b0), xytext=(8, -26), textcoords="offset points", fontsize=7)
     for m in range(1, 4): ax.axvline(m * np.pi, color=MUTED, lw=0.6, ls=":")
     ax.set_xlim(0, 12); ax.set_ylim(0, 1)
-    finish(ax, "V = k₀d √(n₁² − n₂²)", "b = (n_eff² − n₂²)/(n₁² − n₂²)", legend=True, loc="lower right")
+    finish(ax, "V = k₀d √(n₁² − n₂²)", "b = (n_eff² − n₂²)/(n₁² − n₂²)", legend=True, loc="upper left")
     savefig(fig, "ch05_bV")
     print(f"220 nm Si slab at 1550: V = {v0:.3f}, b = {b0:.3f}")
 
@@ -67,7 +67,7 @@ def fig_neff_thickness():
             if m < 3: a.plot(x, y, ls, color=SERIES[m], label=("TM" if tm else "TE") + str(m))
     a.axvline(0.22, color=MUTED, lw=0.7, ls=":")
     a.set_xlim(0, 1); a.set_ylim(N_OX, N_SI)
-    finish(a, "Silicon thickness d (µm)", "Effective index", legend=True, loc="lower right")
+    finish(a, "Silicon thickness d (µm)", "Effective index")
     # group index of TE0 and TM0 against thickness (waveguide + material dispersion)
     def nsi(l):
         l1 = 1.1071; return np.sqrt(11.6858 + 0.939816 / l**2 + 0.00810461 * l1**2 / (l**2 - l1**2))
@@ -79,11 +79,14 @@ def fig_neff_thickness():
             n = lambda l: (slab_modes(nsi(l), nox(l), nox(l), d, l, tm) or [np.nan])[0]
             gs.append(n(1.55) - 1.55 * (n(1.555) - n(1.545)) / 0.01)
         b.plot(ds, gs, color=col, label="TM0" if tm else "TE0")
-    b.axhline(3.59, color=MUTED, lw=0.7, ls=":"); b.text(0.62, 3.62, "bulk Si, 3.59", fontsize=7, color=MUTED)
+    b.axhline(3.59, color=MUTED, lw=0.7, ls=":"); b.text(0.62, 3.56, "bulk Si, 3.59", fontsize=7, color=MUTED, va="top")
     b.axvline(0.22, color=MUTED, lw=0.7, ls=":")
     b.set_xlim(0, 1); b.set_ylim(2.5, 5)
     finish(b, "Silicon thickness d (µm)", "Group index n_g", legend=True, loc="upper right")
     tag(a, "a"); tag(b, "b"); fig.tight_layout(w_pad=2.5)
+    h, lb = a.get_legend_handles_labels(); o = [0, 3, 1, 4, 2, 5]          # TE and TM of each order in one column
+    a.legend([h[i] for i in o], [lb[i] for i in o], loc="upper center", bbox_to_anchor=(0.5, -0.24), ncol=3,
+             fontsize=6.8, handlelength=2.0, columnspacing=1.2)              # below the axes: the curves fill the panel
     savefig(fig, "ch05_neff")
 
 

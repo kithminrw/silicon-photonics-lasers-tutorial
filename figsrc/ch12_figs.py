@@ -313,8 +313,9 @@ def fig_split():
     ins.plot([np.cos(np.radians(60))], [np.sin(np.radians(60))], "o", color=INK, ms=3.5, zorder=8)
     label(ins, 1.1, 1.05, "scatterer", fs=6.2, ha="left")
     label(ins, 0, -0.35, "CCW", fs=6.2, col=RED); label(ins, 0, 0.35, "CW", fs=6.2, col=BLUE)
-    arrow(ins, (-2.2, -1.5), (-1.3, -1.5), col=RED, lw=0.9, ms=6); arrow(ins, (-1.3, -0.92), (-2.2, -0.92), col=BLUE, lw=0.9, ms=6)
-    label(ins, -2.25, -1.62, "in", fs=6.2, ha="left", va="top"); label(ins, -2.25, -0.8, "reflected", fs=6.2, ha="left", va="bottom", col=BLUE)
+    # "in" above the bus and "reflected" below it, so the longer label stays clear of the ring
+    arrow(ins, (-2.2, -0.92), (-1.3, -0.92), col=RED, lw=0.9, ms=6); arrow(ins, (-1.3, -1.5), (-2.2, -1.5), col=BLUE, lw=0.9, ms=6)
+    label(ins, -2.25, -0.8, "in", fs=6.2, ha="left", va="bottom"); label(ins, -2.25, -1.62, "reflected", fs=6.2, ha="left", va="top", col=BLUE)
     tag(a1, "a"); tag(a2, "b"); fig.tight_layout(w_pad=2.0)
     save(fig, "ch12_split")
 

@@ -47,6 +47,7 @@ DESC = {
     'laser': ('Laser rate equations', 'Light–current curve, switch-on transient and temperature of a Fabry–Pérot laser, with self-heating.'),
     'dyn': ('Modulation response, RIN and linewidth', 'Small-signal response, relative intensity noise and linewidth of a laser against bias.'),
     'vernier': ('Vernier ring laser', 'Tune a laser over a wide range with two rings of slightly different size.'),
+    'mll': ('Mode-locked laser', 'Lock the phases of a laser\'s modes and watch them add up to a pulse train: repetition rate, pulse width, chirp and the comb they form.'),
     'hybrid': ('III–V/Si supermodes', 'How light is shared between III–V gain and silicon as the silicon width changes, drawn as signed fields.'),
     'soa': ('SOA gain and noise figure', 'Gain saturation and noise figure of a semiconductor optical amplifier.'),
     'isolator': ('Magneto-optic isolator', 'An MZI or ring isolator on silicon: non-reciprocal phase, delay order, arm loss and the magnet, with forward and backward spectra and the isolation window.'),
@@ -54,11 +55,13 @@ DESC = {
     'fdtd': ('FDTD in the browser', 'A real 2D finite-difference time-domain simulation: resolution, the Courant limit and absorbing boundaries.'),
     'wafer': ('Wafer-map Monte Carlo', 'Thickness and width variation across a wafer, and the ring wavelengths and heater power it costs.'),
     'wafermc': ('Wafer-map Monte Carlo', 'Thickness and width variation across a wafer, and the ring wavelengths and heater power it costs.'),
+    'yield': ('Corners or Monte Carlo', 'Will a ring coupler meet its window? Compare process corners with a Monte Carlo yield and its error bar, and centre the design.'),
     'testbench': ('Virtual test bench', 'Sweep a laser across a ring and measure it as in the lab, with real instrument limits.'),
     'ringfit': ('Ring-fit playground', 'Fit ring spectra to extract loss and coupling, and meet the coupling ambiguity.'),
     'linkbudget': ('Link budget', 'Close the reference link\'s power budget with its penalties and margin.'),
     'biosensor': ('Ring biosensor', 'The shift of a ring resonance with the analyte\'s refractive index, and the limit of detection.'),
     'opa': ('Optical phased array', 'Steer a beam by setting the phases of an array of emitters.'),
+    'mesh': ('Programmable MZI mesh', 'Set a 4 × 4 to 8 × 8 mesh for a target matrix, add phase and splitter errors, and watch the fidelity fall.'),
 }
 
 def front(s):

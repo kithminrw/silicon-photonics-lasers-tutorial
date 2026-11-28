@@ -6,7 +6,7 @@ permalink: /demos/
 
 # Interactive Demos
 
-All 52 demos of the tutorial on one page. Each runs in your browser with no installation, computes its pictures and numbers from a small model of the device, and reproduces the chapter's own numbers at its default settings. The link takes you to the demo inside its chapter, where the text explains what it shows.
+All 55 demos of the tutorial on one page. Each runs in your browser with no installation, computes its pictures and numbers from a small model of the device, and reproduces the chapter's own numbers at its default settings. The link takes you to the demo inside its chapter, where the text explains what it shows.
 {: .chapterlead }
 
 ## Part I · Foundations
@@ -138,6 +138,7 @@ All 52 demos of the tutorial on one page. Each runs in your browser with no inst
 ### [26. Single-Frequency and Tunable Lasers]({{ '/part-6/ch26/' | relative_url }})
 
 - [Vernier ring laser]({{ '/part-6/ch26/' | relative_url }}#bdVern): Tune a laser over a wide range with two rings of slightly different size.
+- [Mode-locked laser]({{ '/part-6/ch26/' | relative_url }}#bdMll): Lock the phases of a laser's modes and watch them add up to a pulse train: repetition rate, pulse width, chirp and the comb they form.
 
 ### [27. Lasers on Silicon]({{ '/part-6/ch27/' | relative_url }})
 
@@ -149,6 +150,10 @@ All 52 demos of the tutorial on one page. Each runs in your browser with no inst
 - [SOA gain and noise figure]({{ '/part-6/ch28/' | relative_url }}#bdSoa): Gain saturation and noise figure of a semiconductor optical amplifier.
 
 ## Part VII · Design, Simulation and Layout
+
+### [29. Design Principles and Simulation Workflows]({{ '/part-7/ch29/' | relative_url }})
+
+- [Corners or Monte Carlo]({{ '/part-7/ch29/' | relative_url }}#bdYield): Will a ring coupler meet its window? Compare process corners with a Monte Carlo yield and its error bar, and centre the design.
 
 ### [30. Design Flow and Open PDKs]({{ '/part-7/ch30/' | relative_url }})
 
@@ -183,3 +188,4 @@ All 52 demos of the tutorial on one page. Each runs in your browser with no inst
 
 - [Ring biosensor]({{ '/part-9/ch39/' | relative_url }}#bdBio): The shift of a ring resonance with the analyte's refractive index, and the limit of detection.
 - [Optical phased array]({{ '/part-9/ch39/' | relative_url }}#bdOpa): Steer a beam by setting the phases of an array of emitters.
+- [Programmable MZI mesh]({{ '/part-9/ch39/' | relative_url }}#bdMesh): Set a 4 × 4 to 8 × 8 mesh for a target matrix, add phase and splitter errors, and watch the fidelity fall.

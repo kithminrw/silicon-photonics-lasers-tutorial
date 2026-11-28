@@ -150,7 +150,8 @@ def fig_demux():
     for k in (-1, 1):
         x = L_CH[0] + k * FSR
         b.annotate("", xy=(x, 1.2), xytext=(L_CH[0], 1.2), arrowprops=dict(arrowstyle="<|-|>", color=C1, lw=0.7, mutation_scale=6)) if k == 1 else None
-    b.text(L_CH[0] + FSR / 2, 1.6, f"FSR {FSR:.1f} nm", ha="center", va="bottom", fontsize=6.6, color=C1)
+    b.text(L_CH[0] + FSR / 2, 1.6, f"FSR {FSR:.1f} nm", ha="center", va="bottom", fontsize=6.6, color=C1, zorder=5,
+           bbox=dict(boxstyle="square,pad=0.1", fc="white", ec="none"))       # keeps the dotted channel line off the text
     b.set_xlim(1531, 1571); b.set_ylim(-32, 4.5)
     finish(b, "Wavelength (nm)", "Drop-port transmission (dB)")
     tag(b, "b")
@@ -160,7 +161,7 @@ def fig_demux():
 # ------------------------------------------------------------------ Figure 14.4: AWG and echelle (schematic)
 def fig_awg_echelle():
     fig = plt.figure(figsize=(6.3, 2.75))
-    ax = fig.add_axes([0.0, 0.0, 0.56, 1.0]); frameless(ax, (-5.6, 5.6), (-3.6, 3.2))
+    ax = fig.add_axes([0.0, 0.0, 0.56, 1.0]); frameless(ax, (-5.6, 5.6), (-3.6, 4.0))   # top above the outermost arc (3.43)
     wa = 0.09; n = 9; r0, dr = 1.9, 0.26
     rk = r0 + dr * np.arange(n)
     yc = -0.6                                          # centre of the nested arcs
@@ -354,25 +355,24 @@ def fig_mdm():
     a.legend(loc="lower right", fontsize=6.4)
     frameless(b, (0, 100), (0, 60), equal=False)
     yb = 22
+    yc = 26.8                                   # coupling section of the access guides, just above the bus (top at yb + 2.2)
     b.add_patch(Rectangle((4, yb - 2.2), 92, 4.4, fc=MAT["si"], ec="none"))
     for x0, dirn in ((14, 1), (86, -1)):
         xs = np.linspace(0, 1, 40)
         if dirn > 0:
             b.plot(4 + 10 * xs, 42 - 0 * xs, color=MAT["si"], lw=2.0)
-            b.plot(14 + 8 * xs, 42 - 12 * (1 - np.cos(np.pi * xs)) / 2, color=MAT["si"], lw=2.0)
-            b.plot([22, 36], [30, 30], color=MAT["si"], lw=2.0)
-            b.plot(36 + 8 * xs, 30 + 12 * (1 - np.cos(np.pi * xs)) / 2, color=MAT["si"], lw=2.0)
+            b.plot(14 + 8 * xs, 42 - (42 - yc) * (1 - np.cos(np.pi * xs)) / 2, color=MAT["si"], lw=2.0)
+            b.plot([22, 36], [yc, yc], color=MAT["si"], lw=2.0, solid_capstyle="butt")
         else:
-            b.plot(56 + 8 * xs, 42 - 12 * (1 - np.cos(np.pi * xs)) / 2, color=MAT["si"], lw=2.0)
-            b.plot([64, 78], [30, 30], color=MAT["si"], lw=2.0)
-            b.plot(78 + 8 * xs, 30 + 12 * (1 - np.cos(np.pi * xs)) / 2, color=MAT["si"], lw=2.0)
+            b.plot([64, 78], [yc, yc], color=MAT["si"], lw=2.0, solid_capstyle="butt")
+            b.plot(78 + 8 * xs, yc + (42 - yc) * (1 - np.cos(np.pi * xs)) / 2, color=MAT["si"], lw=2.0)
             b.plot(86 + 10 * xs, 42 + 0 * xs, color=MAT["si"], lw=2.0)
-    b.add_patch(Rectangle((22, 26.5), 14, 3.5, fc="none", ec=AMBER, lw=0.8, ls=(0, (2, 2))))
-    b.add_patch(Rectangle((64, 26.5), 14, 3.5, fc="none", ec=AMBER, lw=0.8, ls=(0, (2, 2))))
+    b.add_patch(Rectangle((22, 24.6), 14, 4.0, fc="none", ec=AMBER, lw=0.8, ls=(0, (2, 2))))
+    b.add_patch(Rectangle((64, 24.6), 14, 4.0, fc="none", ec=AMBER, lw=0.8, ls=(0, (2, 2))))
     label(b, 29, 36, "mux:\nTE0 → TE1", fs=FS_SMALL, col=AMBER); label(b, 71, 36, "demux:\nTE1 → TE0", fs=FS_SMALL, col=AMBER)
-    label(b, 50, yb - 7, f"multimode bus, {w_pm:.2f} µm: TE0 and TE1 together", fs=FS_SMALL)
+    label(b, 50, yb - 9.5, f"multimode bus, {w_pm:.2f} µm: TE0 and TE1 together", fs=FS_SMALL)
     label(b, 4, 46, "channel 2 (TE0)", fs=FS_SMALL, ha="left"); label(b, 96, 46, "channel 2 out", fs=FS_SMALL, ha="right")
-    label(b, 4, yb + 6, "channel 1 (TE0)", fs=FS_SMALL, ha="left"); label(b, 96, yb + 6, "channel 1 out", fs=FS_SMALL, ha="right")
+    label(b, 4, yb - 4.6, "channel 1 (TE0)", fs=FS_SMALL, ha="left"); label(b, 96, yb - 4.6, "channel 1 out", fs=FS_SMALL, ha="right")
     for xc, k in ((50, 0), (50, 1)):
         yy = np.linspace(-1, 1, 50)
         prof = np.cos(np.pi * yy / 2) if k == 0 else np.sin(np.pi * yy)
@@ -380,6 +380,11 @@ def fig_mdm():
     label(b, 40, yb - 3.5, "TE0", fs=5.8, col=C1); label(b, 60, yb - 3.5, "TE1", fs=5.8, col=C2)
     note(b, "schematic", "lower right"); panel(b, "b", 0.0, 1.0)
     tag(a, "a"); fig.tight_layout(w_pad=1.5)
+    # the access guides end in short tapered tips after the mux and before the demux (no blunt, dangling ends)
+    fig.canvas.draw()
+    hw = 1.0 / (b.get_window_extent().height / 60 * 72 / fig.dpi)          # half of the 2 pt line width, in y data units
+    for xa, xt in ((36, 39.5), (64, 60.5)):
+        b.add_patch(Polygon([(xa, yc - hw), (xa, yc + hw), (xt, yc)], closed=True, fc=MAT["si"], ec="none"))
     save(fig, "ch14_mdm")
 
 

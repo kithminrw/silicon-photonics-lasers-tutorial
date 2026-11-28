@@ -18,7 +18,7 @@ Learning by doing, with free tools only: simulate the devices, lay out and submi
 
 <p>The labs are designed and listed below. Each lab has its own page and a script you can download from it.</p>
 
-The fifteen labs follow three tracks. **Simulate** (Labs 1–6): mode solvers, coupled-mode and FDTD simulations, circuit models and grating couplers. **Make** (Labs 7–9): lay out a passive chip in the SiEPIC EBeam PDK, verify and submit it to an openEBL run, and analyse the measured data that comes back. **Lasers and links** (Labs 10–12): rate-equation models, a Vernier tunable laser and the budget of the reference link. Labs 13–15 cross the tracks: the Fabry–Pérot cavity measured through its fringes, coupling light into chips, and the heat that limits a laser. Every tool is free and open source; the interactive demos in the chapters are a quick way to explore the same models before running a lab.
+The seventeen labs follow three tracks. **Simulate** (Labs 1–6): mode solvers, coupled-mode and FDTD simulations, circuit models and grating couplers. **Make** (Labs 7–9): lay out a passive chip in the SiEPIC EBeam PDK, verify and submit it to an openEBL run, and analyse the measured data that comes back. **Lasers and links** (Labs 10–12): rate-equation models, a Vernier tunable laser and the budget of the reference link. Labs 13–17 cross the tracks: the Fabry–Pérot cavity measured through its fringes, coupling light into chips, the heat that limits a laser, driving a ring modulator, and an optical amplifier's gain, saturation and noise. Every tool is free and open source; the interactive demos in the chapters are a quick way to explore the same models before running a lab.
 
 **Table L.1. The labs.** Each lab lists the chapters it supports.
 {: .tabcaption #tab-l-1 }
@@ -40,6 +40,8 @@ The fifteen labs follow three tracks. **Simulate** (Labs 1–6): mode solvers, c
 | 13 | [Fabry–Pérot cavities]({% link labs/lab13_fp.md %}) | 13, 24 | NumPy: Airy spectra, a Bragg-mirror cavity by transfer matrices, loss and gain from measured fringes |
 | 14 | [Coupling light into chips]({% link labs/lab14_coupling.md %}) | 17, 36 | NumPy: overlaps on a grid, test-interface tolerances, ray tracing a printed lens, fibre-array Monte Carlo |
 | 15 | [Self-heating and roll-over]({% link labs/lab15_heating.md %}) | 24, 27 | NumPy: self-consistent temperature, L–I roll-over, heat-sink temperature and thermal shunts |
+| 16 | [Driving a ring modulator]({% link labs/lab16_ringmod.md %}) | 12, 20 | NumPy: operating point, bandwidth against detuning, NRZ eyes from coupled-mode theory, PAM4 pre-distortion |
+| 17 | [SOA gain, saturation and noise]({% link labs/lab17_soa.md %}) | 24, 28 | NumPy: saturating gain along the amplifier, noise figure and ASE, patterning, a large-mode SOA |
 {: .lab-table }
 
 ## The openEBL cycle

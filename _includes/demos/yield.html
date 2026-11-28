@@ -1,0 +1,126 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdYield" role="group" aria-label="Interactive demo: corners against Monte Carlo for a ring coupler's yield">
+  <div class="bd-head"><span>// try it · corners or Monte Carlo: will the ring couplers of the demultiplexer meet their window?</span>
+    <span class="bd-controls" style="margin:0"><button type="button" class="bd-btn" data-act="new">new dies</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>design coupling κ² <b data-v="k"></b></span><input type="range" data-k="k" min="7" max="16" step="0.05" value="11.15" aria-label="design coupling"></label>
+    <label class="bd-sl"><span>width bias σ (gap shrinks as the width grows) <b data-v="sb"></b></span><input type="range" data-k="sb" min="0" max="10" step="0.1" value="3" aria-label="width bias sigma"></label>
+    <label class="bd-sl"><span>silicon thickness σ <b data-v="st"></b></span><input type="range" data-k="st" min="0" max="6" step="0.1" value="2" aria-label="thickness sigma"></label>
+    <label class="bd-sl"><span>independent gap error σ <b data-v="sg"></b></span><input type="range" data-k="sg" min="0" max="6" step="0.1" value="0" aria-label="gap sigma"></label>
+    <label class="bd-sl"><span>dies simulated <b data-v="n"></b></span><input type="range" data-k="n" min="2" max="4" step="0.05" value="3" aria-label="number of dies"></label>
+  </div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="h" aria-hidden="true"></canvas><span class="bd-tag">coupling of every die, the window, and the 2³ corners</span></div>
+    <div class="bd-scope tall"><canvas data-c="y" aria-hidden="true"></canvas><span class="bd-tag">yield against the design coupling</span></div>
+  </div>
+  <div class="bd-scope short"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag">geometry: the ring–bus coupler to scale, and its cross-section at ±3σ</span></div>
+  <div class="bd-read" aria-live="polite"><span>Monte Carlo yield <b data-o="y">–</b></span><span>corners passing <b data-o="c">–</b></span><span>coupling spread (σ) <b data-o="s">–</b></span><span>coupling length <b data-o="L">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Four things to try</p><ol>
+    <li><b>Design off centre.</b> Move the design coupling to 14.5 %, as Chapter 14's Lorentzian estimate suggested: every die fails the crosstalk limit, and so do all eight corners. The yield curve shows the window of designs that work.</li>
+    <li><b>Watch the corners turn pessimistic.</b> Back at 11.15 %, raise the independent gap error to 3 nm: four of the eight corners fail, yet with 10 000 dies about 99.7 % pass the Monte Carlo. The corners stack all three errors at three sigma at once, which almost never happens.</li>
+    <li><b>Count the error bar.</b> Still with the 3 nm gap error, set 100 dies: the estimate is uncertain by about a per cent and cannot tell 99 % from 100 %. With 10 000 dies it is good to about 0.06 %. Press new dies at 100 to watch the estimate jump.</li>
+    <li><b>Find the tolerant direction.</b> Set the thickness and gap errors to 0 and raise the width bias to 10 nm: the spread hardly grows. Wider waveguides couple less, a narrower gap couples more, and in this design the two nearly cancel (Section 29.4).</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>Half of the corners at ±3σ fail, but a Monte Carlo of 10 000 dies passes 99.7 %. Which do you believe, and why?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="The corners put every independent variable at three sigma at the same time; the chance of that is tiny. Monte Carlo draws the variables as they occur, so its 99.7 % (±0.06 % with 10 000 dies) is the better estimate, provided the statistics and the model are right.">The Monte Carlo: the corners assume every error is at its extreme at once</button>
+      <button type="button" data-why="Corners are a quick, safe bound for monotonic responses, but for independent variables they are pessimistic: they test combinations that almost never occur.">The corners: they are the safe, worst-case answer</button>
+      <button type="button" data-why="With 10 000 dies the standard error of a 99.7 % yield is √(0.997 × 0.003/10 000) ≈ 0.06 %: the estimate is not noise.">Neither: 10 000 dies are too few to tell</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdYield'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  // femwell sensitivities of the coupler's cross-over length L_x (Section 29.4; 500 nm wide, 200 nm gap, 220 nm thick, 1550 nm)
+  var LX0 = 37.85, SB = -0.00065, ST = 0.00696, SG = 0.00894;   // um; d ln L_x per nm of width bias, thickness, gap
+  var LO = 9.3, HI = 13.1, seed = 5, Z = null;                  // window in %: passband at least 0.4 nm, crosstalk at most -20 dB (Section 29.5)
+  var S = BD.bind(root, { k: { fmt: function (x) { return x.toFixed(2) + ' %'; } }, sb: { fmt: function (x) { return x.toFixed(1) + ' nm'; } },
+                          st: { fmt: function (x) { return x.toFixed(1) + ' nm'; } }, sg: { fmt: function (x) { return x.toFixed(1) + ' nm'; } },
+                          n: { map: function (v) { return Math.round(Math.pow(10, v)); }, fmt: function (x) { return String(x); } } }, function (k) { if (k === 'n') dies(); draw(); });
+  q('[data-act="new"]').addEventListener('click', function () { seed = (seed * 48271) % 2147483647; dies(); draw(); });
+  function dies() {   // unit Gaussian draws for 10 000 dies; the sliders scale them
+    var r = BD.rng(seed), g = function () { var u = Math.max(1e-12, r()), v = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
+    Z = []; for (var i = 0; i < 10000; i++) Z.push([g(), g(), g()]);
+  }
+  function kap(kd, db, dt, dg) {   // power coupling (%) of a coupler designed for kd (%), with errors in nm
+    var x = Math.asin(Math.sqrt(kd / 100)), lx = Math.exp(SB * db + ST * dt + SG * dg);
+    return 100 * Math.pow(Math.sin(x / lx), 2);
+  }
+  function draw() {
+    if (!Z) dies();
+    var n = S.n, ks = [], pass = 0, i;
+    for (i = 0; i < n; i++) { var z = Z[i], k = kap(S.k, S.sb * z[0], S.st * z[1], S.sg * z[2]); ks.push(k); if (k >= LO && k <= HI) pass++; }
+    var Y = pass / n, se = Math.sqrt(Math.max(Y * (1 - Y), 0.25 / n) / n);
+    var mean = ks.reduce(function (a, b) { return a + b; }, 0) / n, sd = Math.sqrt(ks.reduce(function (a, b) { return a + (b - mean) * (b - mean); }, 0) / n);
+    var corners = [], cp = 0;
+    [-1, 1].forEach(function (a) { [-1, 1].forEach(function (b) { [-1, 1].forEach(function (c) {
+      var k = kap(S.k, 3 * a * S.sb, 3 * b * S.st, 3 * c * S.sg); corners.push(k); if (k >= LO && k <= HI) cp++; }); }); });
+    // ---- histogram
+    (function () {
+      var d = BD.setup(q('[data-c="h"]')), lo = 5, hi = 19, nb = 70, cnt = new Array(nb).fill(0);
+      ks.forEach(function (k) { var b = Math.floor((k - lo) / (hi - lo) * nb); if (b >= 0 && b < nb) cnt[b]++; });
+      var top = Math.max(1, Math.max.apply(null, cnt)) * 1.25;
+      var f = BD.frame(d, { x: [lo, hi], y: [0, top], pad: { l: 30, b: 22 }, xt: [[6, '6'], [9.3, '9.3'], [13.1, '13.1'], [18, '18 %']], yt: [[0, '0']] });
+      d.g.fillStyle = 'rgba(127,224,160,.08)'; d.g.fillRect(f.X(LO), f.p.t, f.X(HI) - f.X(LO), d.h - f.p.t - f.p.b);
+      cnt.forEach(function (c, b) { if (!c) return; var x0 = lo + (hi - lo) * b / nb, xm = x0 + (hi - lo) / nb / 2, ok = xm >= LO && xm <= HI;
+        d.g.fillStyle = ok ? 'rgba(127,184,240,.85)' : 'rgba(240,138,106,.85)'; d.g.fillRect(f.X(x0) + 0.5, f.Y(c), f.X(x0 + (hi - lo) / nb) - f.X(x0) - 1, f.Y(0) - f.Y(c)); });
+      BD.vline(f, LO, BD.C.green, [4, 3], 'passband ≥ 0.4 nm'); BD.vline(f, HI, BD.C.green, [4, 3], 'crosstalk ≤ −20 dB', 12);
+      corners.forEach(function (k) { var ok = k >= LO && k <= HI, x = f.X(Math.max(lo, Math.min(hi, k)));
+        d.g.fillStyle = ok ? BD.C.gold : BD.C.red; d.g.beginPath(); d.g.moveTo(x, f.Y(0) - 1); d.g.lineTo(x - 4, f.Y(0) - 9); d.g.lineTo(x + 4, f.Y(0) - 9); d.g.fill(); });
+      BD.label(d.g, '▲ corners at ±3σ', f.p.l + 4, f.Y(0) - 14, BD.C.gold);
+    })();
+    // ---- yield against the design coupling, on the same dies
+    (function () {
+      var d = BD.setup(q('[data-c="y"]')), xs = [], ys = [], m = Math.min(n, 2000);
+      for (var kd = 7; kd <= 16.0001; kd += 0.15) { var p = 0; for (var j = 0; j < m; j++) { var z = Z[j], k = kap(kd, S.sb * z[0], S.st * z[1], S.sg * z[2]); if (k >= LO && k <= HI) p++; } xs.push(kd); ys.push(100 * p / m); }
+      var f = BD.frame(d, { x: [7, 16], y: [0, 108], pad: { l: 34, b: 22 }, xt: [[7, '7'], [11.15, '11.15'], [14.5, '14.5'], [16, '16 %']], yt: [[0, '0'], [50, '50'], [100, '100 %']] });
+      BD.line(f, xs, ys, BD.C.blue, 1.7);
+      BD.vline(f, S.k, BD.C.gold, [3, 3], 'design: ' + (100 * Y).toFixed(Y > 0.995 ? 2 : 1) + ' %');
+      BD.dot(f, S.k, 100 * Y, BD.C.gold, 3.5);
+    })();
+    // ---- geometry: top view of the racetrack coupler (to scale) and the cross-section at ±3σ
+    (function () {
+      var d = BD.setup(q('[data-c="g"]')), g = d.g, R = 10, Lc = (2 * LX0 / Math.PI) * Math.asin(Math.sqrt(S.k / 100));   // effective length, um
+      var wv = Math.min(d.w * 0.55, 380), sc = Math.min((wv - 30) / (Lc + 2 * R + 8), (d.h - 46) / (2 * R + 3)), ox = 14 + (wv - 30 - (Lc + 2 * R + 8) * sc) / 2, yb = d.h - 14;
+      var cx0 = ox + (4 + R) * sc, cx1 = cx0 + Lc * sc, yr = yb - (0.7 + R) * sc, w = Math.max(1.5, 0.5 * sc);
+      BD.wgr(g, [[ox, yb], [ox + (Lc + 2 * R + 8) * sc, yb]], w, BD.GEO.si, 0);
+      g.strokeStyle = BD.GEO.si; g.lineWidth = w; g.beginPath(); g.moveTo(cx0, yr + R * sc); g.lineTo(cx1, yr + R * sc); g.arc(cx1, yr, R * sc, Math.PI / 2, -Math.PI / 2, true);
+      g.lineTo(cx0, yr - R * sc); g.arc(cx0, yr, R * sc, -Math.PI / 2, Math.PI / 2, true); g.stroke(); g.lineWidth = 1;
+      BD.dim(g, cx0, yb + 9, cx1, yb + 9, '', BD.C.gold);
+      BD.label(g, 'coupling length ' + Lc.toFixed(1) + ' µm', (cx0 + cx1) / 2, yr + R * sc - 6, BD.C.gold, 'center');
+      BD.label(g, 'R = 10 µm', cx1 + R * sc + 6, yr + 3, BD.C.dim);
+      // cross-section: two 500 x 220 nm cores, 200 nm apart, at nominal (filled) and at the two extreme corners (dashed)
+      var x0 = wv + 10, xw = d.w - x0 - 10, s2 = Math.min(xw / 1.6, (d.h - 50) / 0.36), cx = x0 + xw / 2, base = d.h - 16;
+      g.fillStyle = BD.GEO.ox; g.fillRect(x0, 40, xw, d.h - 46);
+      [[-1], [1]].forEach(function (sd) {
+        var xc = cx + sd[0] * (0.1 + 0.25) * s2; g.fillStyle = BD.GEO.si; g.fillRect(xc - 0.25 * s2, base - 0.22 * s2, 0.5 * s2, 0.22 * s2);
+        [[-1, BD.C.blue], [1, BD.C.red]].forEach(function (e) {   // e = -1: narrow, thin, wide gap; +1: wide, thick, narrow gap
+          var dw = e[0] * 3 * S.sb / 1000, dt = e[0] * 3 * S.st / 1000, dg = -e[0] * 3 * S.sg / 1000, wq = 0.5 + dw, gap = 0.2 - dw + dg, xq = cx + sd[0] * (gap / 2 + wq / 2) * s2;
+          g.strokeStyle = e[1]; g.setLineDash([3, 2]); g.strokeRect(xq - wq / 2 * s2, base - (0.22 + dt) * s2, wq * s2, (0.22 + dt) * s2); g.setLineDash([]);
+        });
+      });
+      var xl = g.measureText('filled: nominal; dashed: ±3σ').width < xw - 8 ? 'filled: nominal; dashed: ±3σ' : 'dashed: ±3σ'; BD.label(g, xl, x0 + 4, d.h - 3, BD.C.dim);
+      BD.label(g, 'gap 200 nm', cx, base - 0.22 * s2 - 8, BD.C.white, 'center');
+      BD.scalebar(g, x0 + xw - 70, 60, s2, 60);
+    })();
+    q('[data-o="y"]').textContent = (100 * Y).toFixed(Y > 0.995 && Y < 1 ? 2 : 1) + ' ± ' + (100 * se).toFixed(se < 0.001 ? 2 : 1) + ' %';
+    q('[data-o="c"]').textContent = cp + ' of 8';
+    q('[data-o="s"]').textContent = sd.toFixed(2) + ' points';
+    q('[data-o="L"]').textContent = ((2 * LX0 / Math.PI) * Math.asin(Math.sqrt(S.k / 100))).toFixed(2) + ' µm';
+    var pill = q('[data-o="pill"]');
+    if (Y >= 0.99 && cp < 8) BD.pill(pill, 'corners fail, Monte Carlo passes', 'warn');
+    else if (Y >= 0.99) BD.pill(pill, 'yield above 99 %', 'ok');
+    else if (Y >= 0.9) BD.pill(pill, 'marginal', 'warn'); else BD.pill(pill, 'low yield', 'bad');
+    var c = 'Each die gets its own width bias, thickness and gap error, drawn from the σ above; the coupler\'s cross-over length moves by the femwell sensitivities of Section 29.4 (−0.07, +0.70 and +0.89 % per nm), and its power coupling with it. ';
+    c += 'Of ' + n + ' dies, ' + (100 * Y).toFixed(1) + ' % land inside the 9.3–13.1 % window, with a standard error of ' + (100 * se).toFixed(2) + ' %. ';
+    c += 'The 2³ = 8 corners put all three variables at ±3σ together: ' + cp + ' of them pass. ';
+    c += '<i>Independent Gaussian variables, one coupler per die; the wafer-scale patterns, the four channels and the resonance shift of Figure 29.6 are left out.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  dies(); BD.observe(root, draw);
+})();
+</script>

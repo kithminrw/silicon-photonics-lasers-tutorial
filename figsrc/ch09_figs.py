@@ -57,12 +57,13 @@ def fig_topview():
     ax = fig.add_axes([0.0, 1.55 / (hin + 1.55), axw, hin / (hin + 1.55)])
     frameless(ax, Dx, (ylo, yhi), equal=True)
     box(ax, 0, -yc - H - 0.9, zt, 2 * (yc + H + 0.9), "ox", z=0)
+    sk = dict(ec=MAT["si"], lw=0.3)          # a hairline of the guide's own colour hides the seams between pieces
     for sg in (1, -1):
-        wg_straight(ax, 0, z0, sg * (yc + H), W)
-        xs, ys = sbend_xy(z0, sg * (yc + H), Ls, -sg * H); ribbon(ax, xs, ys, W, "si")
-        wg_straight(ax, z1, z2, sg * yc, W)
-        xs, ys = sbend_xy(z2, sg * yc, Ls, sg * H); ribbon(ax, xs, ys, W, "si")
-        wg_straight(ax, z3, zt, sg * (yc + H), W)
+        wg_straight(ax, 0, z0, sg * (yc + H), W, **sk)
+        xs, ys = sbend_xy(z0, sg * (yc + H), Ls, -sg * H); ribbon(ax, xs, ys, W, "si", **sk)
+        wg_straight(ax, z1, z2, sg * yc, W, **sk)
+        xs, ys = sbend_xy(z2, sg * yc, Ls, sg * H); ribbon(ax, xs, ys, W, "si", **sk)
+        wg_straight(ax, z3, zt, sg * (yc + H), W, **sk)
     label(ax, -0.3, yc + H, "in", ha="right", fs=7)
     label(ax, zt + 0.3, yc + H, "through 50 %", ha="left", fs=7, col=AMBER)
     label(ax, zt + 0.3, -yc - H, "cross 50 %", ha="left", fs=7, col=BLUE)
@@ -242,12 +243,13 @@ def fig_smatrix():
     fig = plt.figure(figsize=(6.3, 2.7))
     a = fig.add_axes([0.0, 0.0, 0.52, 1.0]); frameless(a, (-2.5, 21.5), (-6.8, 6.6), equal=False)
     yU, yL = 2.6, -2.6
+    sk = dict(ec=MAT["si"], lw=0.3)          # a hairline of the guide's own colour hides the seams between pieces
     for sg, y in ((1, yU), (-1, yL)):
-        wg_straight(a, 0, 3.5, y, 0.45)
-        xs, ys = sbend_xy(3.5, y, 3.5, -sg * 2.2); ribbon(a, xs, ys, 0.45, "si")
-        wg_straight(a, 7.0, 12.0, sg * 0.4, 0.45)
-        xs, ys = sbend_xy(12.0, sg * 0.4, 3.5, sg * 2.2); ribbon(a, xs, ys, 0.45, "si")
-        wg_straight(a, 15.5, 19.0, y, 0.45)
+        wg_straight(a, 0, 3.5, y, 0.45, **sk)
+        xs, ys = sbend_xy(3.5, y, 3.5, -sg * 2.2); ribbon(a, xs, ys, 0.45, "si", **sk)
+        wg_straight(a, 7.0, 12.0, sg * 0.4, 0.45, **sk)
+        xs, ys = sbend_xy(12.0, sg * 0.4, 3.5, sg * 2.2); ribbon(a, xs, ys, 0.45, "si", **sk)
+        wg_straight(a, 15.5, 19.0, y, 0.45, **sk)
     for x, y, s in ((-0.3, yU, "$a_1$"), (-0.3, yL, "$a_2$")):
         label(a, x, y, s, ha="right", fs=9)
     for x, y, s in ((19.3, yU, "$b_1$"), (19.3, yL, "$b_2$")):
@@ -272,8 +274,8 @@ def fig_smatrix():
     b.plot(th / np.pi, tot_j, color=C1, lw=1.8, label=r"cross term $-j\kappa$")
     b.fill_between(th / np.pi, 1, tot_r, where=tot_r > 1, color=C4, alpha=0.12, lw=0)
     b.fill_between(th / np.pi, tot_r, 1, where=tot_r < 1, color=C4, alpha=0.12, lw=0)
-    b.text(0.18, 1.62, "power created", fontsize=6.5, color=C4)
-    b.text(0.72, 0.30, "power lost", fontsize=6.5, color=C4)
+    b.text(0.36, 1.62, "power created", fontsize=6.5, color=C4)                 # beside the lobe, clear of the dashed curve
+    b.text(1.0, 0.45, "power lost", fontsize=6.5, color=C4, ha="center")       # inside the lobe
     b.set_xlim(0, 2); b.set_ylim(0, 2.45); b.set_xticks([0, 0.5, 1, 1.5, 2]); b.set_xticklabels(["0", "π/2", "π", "3π/2", "2π"])
     finish(b, r"Relative phase of the inputs, $\arg(a_2/a_1)$", "Total output power")
     b.legend(loc="upper right", fontsize=6.6, bbox_to_anchor=(1.02, 1.04))

@@ -190,7 +190,7 @@ def fig_dopings():
     vv = np.linspace(0.6, 3.0, 50)
     for c in (10, 20, 30):
         b.plot(vv, c / vv, color=MUTED, lw=0.7, ls=":")
-        b.text(2.97, c / 2.97 + 0.4, f"{c} dB·V", fontsize=6.3, color=MUTED, ha="right", va="bottom")
+        b.text(2.97, c / 2.6 + 0.25, f"{c} dB·V", fontsize=6.3, color=MUTED, ha="right", va="bottom")   # above its curve over the label width
     for (v2, l0), col, lab in zip(pts, cols, labs):
         b.plot(v2, l0, "o", color=col, ms=5)
         b.text(v2 + 0.08, l0 + 0.8, lab, fontsize=6.8, color=col, ha="left", va="bottom")

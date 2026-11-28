@@ -113,9 +113,9 @@ def fig_soi():
     # 6 reuse
     a = axs[5]; donor(a, 0.35, h=0.55)
     label(a, W / 2, 0.35 + 0.275, "donor, a little thinner", fs=FS_SMALL)
-    a.annotate("", xy=(0.15, 1.75), xytext=(W - 0.15, 1.15), arrowprops=dict(arrowstyle="-|>", color=INK, lw=0.8,
+    a.annotate("", xy=(0.15, 1.62), xytext=(W - 0.15, 1.02), arrowprops=dict(arrowstyle="-|>", color=INK, lw=0.8,
                connectionstyle="arc3,rad=0.35", mutation_scale=7))
-    label(a, W / 2, 1.95, "back to step 1", fs=FS_SMALL)
+    label(a, W / 2, 1.98, "back to step 1", fs=FS_SMALL)          # above the arc, not on it
     for k in (0, 1, 3, 4):
         fig.text(cols[k % 3 + 1] - 0.012, rows[k // 3] + 0.17, "›", fontsize=13, color=MUTED, ha="center", va="center")
     fig.text(cols[0] - 0.005, 0.93, "b", fontweight="bold", fontsize=9.5, color=INK, ha="left", va="center")
@@ -167,7 +167,7 @@ def fig_litho():
             callout(a, (W * 0.85, 0.7), (W * 0.62, 1.25), "SiO$_2$ cladding", fs=FS_SMALL)
     for k in (0, 1, 3, 4):
         fig.text(cols[k % 3 + 1] - 0.015, rows[k // 3] + 0.2, "›", fontsize=13, color=MUTED, ha="center", va="center")
-    fig.text(0.995, 0.0, "not to scale", fontsize=6, color=MUTED, style="italic", ha="right", va="bottom")
+    fig.text(0.995, -0.005, "not to scale", fontsize=6, color=MUTED, style="italic", ha="right", va="top")   # below panel 6
     save(fig, "ch35_litho")
 
 
@@ -366,7 +366,7 @@ def fig_stack():
     callout(ax, (xg + 1.2, T + 0.3), (xg + 1.7, 1.45), "Ge, 0.5 µm", fs=fs, ha="left")
     callout(ax, (7.6, T / 2), (7.6, 1.25), "p-Si", fs=fs, ha="center")
     callout(ax, (xh + 0.9, 1.96), (xh + 0.4, 2.75), "TiN heater (contacted\nat its ends, out of plane)", fs=fs, ha="left")
-    callout(ax, (6.7, 1.6), (5.65, 2.25), "W contact", fs=fs, ha="right")
+    callout(ax, (6.7, 1.6), (5.35, 2.25), "W contact", fs=fs, ha="center")      # clear of the n++ contact
     callout(ax, (13.3, 2.9), (14.0, 3.6), "metal 1", fs=fs, ha="left")
     callout(ax, (9.75, 3.6), (7.4, 3.6), "via", fs=fs, ha="right")
     label(ax, 9.75, M2[1] + 0.25, "metal 2", fs=fs, va="bottom")

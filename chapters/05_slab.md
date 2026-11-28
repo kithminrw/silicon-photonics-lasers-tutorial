@@ -193,6 +193,58 @@ Free simulations by others that pair well with this chapter:
 
 </div>
 
+## Problems
+
+1. **A silicon nitride film.** A 400 nm film of silicon nitride ($$n_1 = 1.996$$) lies in silica ($$n_2 = n_3 = 1.444$$) at 1550 nm. Find $$V$$ and confirm that the film is single-mode. Solve the TE eigenvalue equation for the fundamental mode, and give its $$n_\mathrm{eff}$$, $$b$$, decay length $$1/\gamma$$ and confinement factor $$\Gamma$$. Compare them with those of the 220 nm silicon film.
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    The normalised frequency is $$V = (2\pi/1.55)\times0.40\times\sqrt{1.996^2 - 1.444^2} = 4.054\times0.40\times1.378 = 2.23$$, below $$\pi$$, so the film is single-mode (the limit is 562 nm, Worked Example 5.2). Bisection on $$\kappa d = 2\arctan(\gamma/\kappa)$$ gives $$n_\mathrm{eff} = 1.743$$, with $$\kappa = 3.94\ \mu\mathrm{m}^{-1}$$ and $$\gamma = 3.96\ \mu\mathrm{m}^{-1}$$, so $$1/\gamma = 253$$ nm and $$b = (1.743^2 - 1.444^2)/(1.996^2 - 1.444^2) = 0.50$$. With the field $$\cos\kappa x$$ in the film and $$\cos(\kappa d/2)\,e^{-\gamma(\lvert x\rvert - d/2)}$$ outside, the integrals of Section 5.5 give
+
+    $$\Gamma = \frac{d/2 + \sin(\kappa d)/2\kappa}{d/2 + \sin(\kappa d)/2\kappa + \cos^2(\kappa d/2)/\gamma} = \frac{0.327}{0.327 + 0.126} = 0.72.$$
+
+    The 220 nm silicon film has $$n_\mathrm{eff} = 2.848$$, $$b = 0.60$$, $$1/\gamma = 101$$ nm and $$\Gamma = 0.81$$. The nitride film, nearly twice as thick, confines less and lets its tail reach two and a half times as far: lower contrast means larger devices.
+
+    </details>
+
+2. **The 220 nm film at 1310 nm.** At 1310 nm silicon has $$n_1 = 3.501$$ and silica 1.447 (Table 2.1). Find $$V$$ for the 220 nm film and the number of TE modes it guides. Solve for their effective indices and give the decay length of the higher mode. What is the thickest single-mode film at this wavelength?
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    The normalised frequency is $$V = (2\pi/1.31)\times0.22\times\sqrt{3.501^2 - 1.447^2} = 4.796\times0.22\times3.188 = 3.36$$, above $$\pi$$, so the film guides TE0 and TE1. Bisection on the eigenvalue equation gives $$n_\mathrm{eff} = 2.989$$ for TE0 and 1.483 for TE1. TE1 has $$b = 0.010$$ and $$\gamma = 4.796\sqrt{1.483^2 - 1.447^2} = 1.56\ \mu\mathrm{m}^{-1}$$, so its field reaches $$1/\gamma = 640$$ nm into the oxide. The film is single-mode for $$d < 1.31/(2\times3.188) = 205$$ nm. This is the slightly multimode film of Worked Example 5.2: TE1 hangs on with a tail three times as long as the film is thick, and the lateral confinement of a narrow strip easily cuts it off.
+
+    </details>
+
+3. **A film with a longer tail.** A coupler designer wants a silicon film in oxide whose TE0 field decays over $$1/\gamma = 150$$ nm at 1550 nm, half as far again as the 220 nm film's 101 nm. Find the effective index this requires, then use the eigenvalue equation to find the film thickness directly, without root-finding. What confinement factor results?
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    With $$\gamma = 1/(0.150\ \mu\mathrm{m}) = 6.67\ \mu\mathrm{m}^{-1}$$ and $$k_0 = 4.054\ \mu\mathrm{m}^{-1}$$, the mode needs $$n_\mathrm{eff} = \sqrt{n_2^2 + (\gamma/k_0)^2} = \sqrt{1.444^2 + 1.645^2} = 2.189$$. Then $$\kappa = k_0\sqrt{3.476^2 - 2.189^2} = 10.95\ \mu\mathrm{m}^{-1}$$, and the eigenvalue equation of a symmetric slab with $$m = 0$$, solved for $$d$$, gives
+
+    $$d = \frac{2}{\kappa}\arctan\frac{\gamma}{\kappa} = \frac{2}{10.95}\arctan\frac{6.67}{10.95} = 0.100\ \mu\mathrm{m}.$$
+
+    A 100 nm film does it, and the formula of Problem 1 gives $$\Gamma = 0.45$$. Thinning the film from 220 to 100 nm stretches the tail by half but moves more than half of the power into the oxide, the trade-off of Section 5.5.
+
+    </details>
+
+4. **Universal curves and the thinnest guiding film.** Show that for a symmetric slab the TE eigenvalue equation becomes $$V\sqrt{1 - b} = m\pi + 2\arctan\sqrt{b/(1 - b)}$$, so that the mode of order $$m$$ appears at $$V = m\pi$$. Then apply the eigenvalue equation at cut-off to an asymmetric slab, silicon on oxide with an air cover ($$n_3 = 1$$), and find the thinnest film that guides TE0 at 1550 nm. How thick must it be to guide TM0?
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    From the definition of $$b$$, $$n_1^2 - n_\mathrm{eff}^2 = (1 - b)(n_1^2 - n_2^2)$$ and $$n_\mathrm{eff}^2 - n_2^2 = b(n_1^2 - n_2^2)$$, so $$\kappa d = V\sqrt{1 - b}$$ and $$\gamma/\kappa = \sqrt{b/(1 - b)}$$. With $$p_2 = p_3 = \gamma$$ the eigenvalue equation becomes the universal relation. At cut-off $$b \to 0$$, the arctangent vanishes and $$V = m\pi$$.
+
+    In the asymmetric slab, cut-off comes when $$n_\mathrm{eff}$$ falls to the larger cladding index, $$n_2 = 1.444$$. Then $$\gamma_2 = 0$$, $$\kappa = k_0\sqrt{n_1^2 - n_2^2} = 12.82\ \mu\mathrm{m}^{-1}$$ and $$\gamma_3 = k_0\sqrt{n_2^2 - 1} = 4.22\ \mu\mathrm{m}^{-1}$$, and the equation for $$m = 0$$ gives
+
+    $$d_c = \frac{1}{\kappa}\arctan\frac{\gamma_3}{\kappa} = \frac{\arctan 0.329}{12.82\ \mu\mathrm{m}^{-1}} = 24.8\ \mathrm{nm}.$$
+
+    For TM0, $$p_3 = (n_1^2/n_3^2)\gamma_3$$ and $$d_c = \arctan(12.08\times0.329)/\kappa = 103$$ nm. A symmetric slab always guides its fundamental mode; silicon on oxide under air does not below 25 nm for TE, and the larger TM reflection phase raises the TM cut-off fourfold.
+
+    </details>
+
 ## Check yourself
 
 {% include quiz.html %}

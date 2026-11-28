@@ -12,6 +12,7 @@ import matplotlib           # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 LAM = 1.55
+_trapz = getattr(np, "trapezoid", None) or np.trapz     # NumPy 2 renamed trapz; the same trapezoidal integral
 OPT_C = RED
 
 
@@ -19,6 +20,12 @@ def sb(ax, x0, y0, L, H, w, mat="si"):
     """S-bend with fewer points than geomstyle.wg_sbend (smaller SVG)."""
     xs, ys = sbend_xy(x0, y0, L, H, n=48)
     return ribbon(ax, xs, ys, w, mat)
+
+
+def joint(ax, x, y, w, mat="si", e=0.03):
+    """A short straight piece over the joint of two waveguide pieces at (x, y), where both run along x: abutting
+    polygons leave a hairline seam when anti-aliased; this covers it (same colour, opaque)."""
+    return wg_straight(ax, x - e, x + e, y, w, mat)
 
 
 # ------------------------------------------------------------------ Figure: the sensor waveguide's fields (femwell)
@@ -93,6 +100,13 @@ def fig_opa():
                 new.append(yc + s * h / 2)
         ys = new
     ys = sorted(ys)
+    joint(a, xs[0], 0.0, w)
+    yl = [0.0]
+    for lev in range(3):                       # cover the seams where the tree's levels meet
+        h = 4.0 / 2 ** lev
+        yl = [yc + s * h / 2 for yc in yl for s in (1, -1)]
+        for yc in yl:
+            joint(a, xs[lev + 1], yc, w)
     for yc in ys:
         wg_straight(a, 8.8, 15.0, yc, w)
         cbox(a, 12.0, yc - 0.22, 3.4, 0.44, "tin", z=3)
@@ -104,6 +118,7 @@ def fig_opa():
     for y0, y1 in zip(ys, ye):
         sb(a, 15.0, y0, 4.0, y1 - y0, w)
         wg_straight(a, 19.0, 28.5, y1, w)
+        joint(a, 15.0, y0, w); joint(a, 19.0, y1, w)
         for xt in np.arange(19.6, 28.4, 0.45):
             a.plot([xt, xt], [y1 - 0.13, y1 + 0.13], color="white", lw=0.8, zorder=4)
     label(a, 23.8, max(ye) + 0.9, "grating emitters", fs=6.6)
@@ -209,6 +224,11 @@ def fig_quantum():
         for s2 in (1, -1):
             sb(a, 19.5, s * 4.0, 3.0, s2 * 1.2, w)
             wg_straight(a, 22.5, 24.0, s * 4.0 + s2 * 1.2, w)
+            for xj in (22.5, 24.0):            # no hairline seams at the joints
+                joint(a, xj, s * 4.0 + s2 * 1.2, w)
+        for xj in (8.5, 18.0, 19.5):
+            joint(a, xj, s * 4.0, w)
+    joint(a, 5.5, 0.0, w)
     label(a, 10.5, 8.3, "SFWM ring sources", fs=6.5)
     label(a, 16.5, -6.4, "pump\nfilters", fs=6.0, col=MUTED, va="top")
     label(a, 21.0, -6.6, "signal /\nidler split", fs=6.0, col=MUTED, va="top")
@@ -257,14 +277,15 @@ def fig_mesh():
     frameless(a, xlim=(-0.5, 25.5), ylim=(-1.9, 2.3))
     w = 0.12
     ytop, ybot, yc = 1.0, -1.0, 0.25
+    e = 0.02                                   # straights overlap the S-bends slightly: no hairline seam at the joints
     def coupler(x0):
         for s in (1, -1):
             yv = ytop if s == 1 else ybot
             sb(a, x0, yv, 1.5, -s * (1.0 - yc), w)
-            wg_straight(a, x0 + 1.5, x0 + 3.0, s * yc, w)
+            wg_straight(a, x0 + 1.5 - e, x0 + 3.0 + e, s * yc, w)
             sb(a, x0 + 3.0, s * yc, 1.5, s * (1.0 - yc), w)
     for s, yv in ((1, ytop), (-1, ybot)):
-        wg_straight(a, 0.0, 5.0, yv, w); wg_straight(a, 9.5, 12.0, yv, w); wg_straight(a, 16.5, 19.0, yv, w)
+        wg_straight(a, 0.0, 5.0 + e, yv, w); wg_straight(a, 9.5 - e, 12.0 + e, yv, w); wg_straight(a, 16.5 - e, 19.0, yv, w)
     coupler(5.0); coupler(12.0)
     cbox(a, 2.5, ytop - 0.25, 3.0, 0.5, "tin", z=3); label(a, 2.5, ytop + 0.6, "φ (external)", fs=6.5)
     cbox(a, 10.75, ytop - 0.25, 2.5, 0.5, "tin", z=3); label(a, 10.75, ytop + 0.6, "θ (internal)", fs=6.5)
@@ -310,7 +331,7 @@ def fig_comb():
     arrow(a, (4.2, -2.7), (6.2, -2.7), col=OPT_C, lw=1.2, ms=8)
     label(a, 5.2, -3.45, "comb out", fs=6.6, col=OPT_C)
     label(a, 0, 1.15, "high-Q\nSi$_3$N$_4$ ring", fs=6.6)
-    label(a, 0, 4.15, "line spacing = FSR = $c/(n_g L)$", fs=6.6, va="top")
+    label(a, 0, 4.05, "line spacing = FSR = $c/(n_g L)$", fs=6.6, va="bottom")      # above the ring, not on it
     note(a, "schematic", loc="lower left")
     panel(a, "a", 0.0, 1.0)
     b = fig.add_axes([0.52, 0.2, 0.46, 0.68])
@@ -331,6 +352,158 @@ def fig_comb():
     tag(b, "b")
     save(fig, "ch39_comb")
 
+# ------------------------------------------------------------------ Figure: a Fourier-transform spectrometer (Section 39.6)
+FTS_N, FTS_DL, FTS_NG, FTS_LAM = 32, 0.40e-3, 4.2, 1.55e-6     # MZIs, delay step (m), group index of the Si wire, centre (m)
+
+
+def fts_model():
+    """MZI k has a delay k*DL, so it samples the interferogram at an optical path difference x_k = n_g k DL
+    (the phase's slope with wavenumber is set by the group index). Spectrum on a fine wavenumber grid inside the
+    unaliased band of width 1/(2 dx) above sigma0, where sigma0*dx is an integer (the band folds onto itself there)."""
+    dx = FTS_NG * FTS_DL
+    s0 = np.floor(1 / FTS_LAM * dx) / dx                     # band edge, 1/m
+    band = 1 / (2 * dx)
+    s = np.linspace(0, band, 4001)                            # offset wavenumber inside the band
+    lam = 1 / (s0 + s) * 1e9                                  # nm
+    lc = lam[2000]
+    def line(l0, w, a): return a * np.exp(-0.5 * ((lam - l0) / w) ** 2)
+    S = line(lc - 0.16, 0.006, 1.0) + line(lc - 0.06, 0.006, 0.8) + line(lc + 0.17, 0.05, 0.45)   # two close lines and a broad band
+    k = np.arange(FTS_N); x = k * dx
+    # each MZI's two outputs, subtracted, give the cosine interferogram without its constant part
+    I = np.array([_trapz(S * np.cos(2 * np.pi * s * xk), s) for xk in x])
+    # reconstruction: one-sided cosine transform (half weight at k = 0), Hann apodisation, on the band's grid
+    w = 0.5 * (1 + np.cos(np.pi * k / FTS_N)); w[0] *= 0.5
+    rec = np.array([np.sum(w * I * np.cos(2 * np.pi * sj * x)) for sj in s])
+    rec = np.clip(rec, 0, None); rec *= _trapz(S, s) / _trapz(rec, s)    # same area as the input
+    m = S.max(); S /= m; rec /= m
+    dlam = (lam[0] - lam[-1]) / 1
+    res = FTS_LAM ** 2 / (FTS_N * dx) * 1e12               # pm, about lambda^2/(N n_g DL)
+    return k, I / np.abs(I).max(), lam, S, rec, dlam, res, (FTS_N - 1) * FTS_DL * 1e3
+
+
+def fig_spectrometer():
+    k, I, lam, S, rec, band, res, lmax = fts_model()
+    print(f"spectrometer: N = {FTS_N}, delay step {FTS_DL*1e3:.2f} mm, longest delay {lmax:.1f} mm, n_g = {FTS_NG}: "
+          f"band {band:.3f} nm, resolution lambda^2/(N n_g dL) = {res:.1f} pm, channels {band*1e3/res:.1f}")
+    fig = plt.figure(figsize=(6.3, 3.9))
+    a = fig.add_axes([0.0, 0.50, 1.0, 0.48]); frameless(a, (-1, 41), (-1.2, 9.6), equal=False)
+    wg_straight(a, -0.5, 2.7, 4.6, 0.10, "si"); label(a, -0.4, 5.2, "light in", fs=FS_SMALL, ha="left", col=RED)
+    block(a, 4.0, 4.6, 2.6, 2.4, "splitter\ntree", fs=FS_SMALL)
+    ys = [8.4, 6.7, 5.0, 2.3, 0.6]; names = ["k = 0", "k = 1", "k = 2", "k = 30", "k = 31"]; dls = [0, 1, 2, 30, 31]
+    for yv, nm, n in zip(ys, names, dls):
+        # branch from the splitter tree: a diagonal, then level into the MZI (its label sits on the level part)
+        a.plot([5.3, 7.0, 8.8], [4.6 + (yv - 4.6) * 0.15, yv, yv], color=INK, lw=0.7)
+        block(a, 10.0, yv, 2.4, 0.9, "", fc="#F3F6FB", lw=0.7)
+        a.plot([11.2, 22.8], [yv - 0.25, yv - 0.25], color=INK, lw=0.7)      # each arm one unbroken line
+        a.plot([11.2, 22.8], [yv + 0.25, yv + 0.25], color=INK, lw=0.7)
+        if n:                                                    # MZI k > 0: the delay arm drawn as a loop that grows with k
+            r = 0.2 + 0.5 * n / 31
+            hh = r * 1.1 + 0.05                                  # loop height; it rests on the arm (tangent), as a coiled delay
+            a.add_patch(matplotlib.patches.Ellipse((14.0 + r * 2.2, yv + 0.25 + hh / 2), r * 4.4, hh, fill=False, ec=AMBER, lw=0.9))
+        block(a, 24.0, yv, 2.4, 0.9, "", fc="#F3F6FB", lw=0.7)
+        a.plot([25.2, 27.35], [yv, yv], color=INK, lw=0.7)
+        block(a, 28.0, yv, 1.3, 0.8, "PD", fs=5.8, fc="#FFF4E0", ec=AMBER, lw=0.7)
+        label(a, 7.9, yv + 0.12, nm, fs=6.0, va="bottom")
+        label(a, 29.0, yv, f"P$_{{{n}}}$", fs=6.4, ha="left")
+    for xv in (10.0, 24.0, 28.0): label(a, xv, 3.65, "·\n·\n·", fs=6.5)
+    label(a, 19.0, 9.45, "MZI k: one arm longer by k·ΔL (drawn as a loop)", fs=FS_SMALL)
+    label(a, 35.5, 5.6, "each detector reads one\npoint of the interferogram;\nits Fourier transform\nis the spectrum", fs=FS_SMALL, ha="center")
+    panel(a, "a", 0.0, 1.0); label(a, 40.8, -1.0, "schematic", fs=6.0, col=MUTED, italic=True, ha="right")
+    b = fig.add_axes([0.07, 0.08, 0.36, 0.34])
+    b.vlines(k, 0, I, color=C1, lw=1.0); b.plot(k, I, "o", color=C1, ms=2.6); b.axhline(0, color=INK, lw=0.6)
+    b.set_xlim(-1, FTS_N); b.set_ylim(-1.08, 1.08); b.set_yticks([-1, 0, 1])
+    finish(b, "MZI number k (delay k·ΔL)", "Output difference"); tag(b, "b")
+    c = fig.add_axes([0.55, 0.08, 0.43, 0.34])
+    c.plot(lam, S, color=MUTED, lw=1.0, label="input spectrum")
+    c.plot(lam, rec, color=C4, lw=1.4, label=f"from 32 detectors ({res:.0f} pm resolution)")
+    c.set_xlim(lam.min(), lam.max()); c.set_ylim(0, 1.25); c.set_yticks([0, 0.5, 1])
+    c.xaxis.set_major_locator(matplotlib.ticker.MultipleLocator(0.2))           # every 0.2 nm: the labels do not run together
+    c.xaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter("%.1f"))
+    finish(c, "Wavelength (nm)", "Power (normalised)"); c.legend(loc="upper left", fontsize=6.0); tag(c, "c")
+    save(fig, "ch39_spectrometer")
+
+
+# ------------------------------------------------------------------ Figure: a chip gyroscope and its shot-noise limit (Section 39.7)
+def gyro_limit(ell, loss_db_cm, r=2.5e-3, P0=1e-3, lam=1.55e-6):
+    """Shot-noise-limited rotation rate (deg/h in 1 s) of an interferometric gyroscope: a spiral of length ell (m)
+    at mean radius r encloses N A = ell r / 2, so dphi = 4 pi ell r Omega / (lam c); the detected power is P0 e^(-alpha ell),
+    and the phase noise sqrt(2 h nu B / P) for B = 1 Hz (ideal detector; backscatter, Kerr and drift left out)."""
+    h, c = 6.626e-34, 2.998e8
+    alpha = loss_db_cm * 100 / 4.343
+    dphi = np.sqrt(2 * h * c / lam / (P0 * np.exp(-alpha * ell)))
+    om = dphi * lam * c / (4 * np.pi * ell * r)
+    return om * 180 / np.pi * 3600
+
+
+def fig_gyro():
+    earth = 15.04                         # deg/h
+    om_e = earth * np.pi / 180 / 3600
+    dph_chip = 4 * np.pi * 1.0 * 2.5e-3 * om_e / (1.55e-6 * 2.998e8)
+    dph_fib = 4 * np.pi * 1000 * 0.04 * om_e / (1.55e-6 * 2.998e8)
+    print(f"gyro: Earth rate {om_e:.3e} rad/s; Sagnac phase of 1 m at r = 2.5 mm {dph_chip:.2e} rad, of 1 km fibre at r = 4 cm "
+          f"{dph_fib:.2e} rad ({dph_fib/dph_chip:.0f}x)")
+    for D, ng in ((0.018, 1.5),):
+        print(f"gyro: ring of diameter {D*1e3:.0f} mm, n_g {ng}: Sagnac splitting {D*om_e/(ng*1.55e-6):.2f} Hz at the Earth rate")
+    ell = np.logspace(-2, 1.3, 400)
+    fig = plt.figure(figsize=(6.3, 2.7))
+    a = fig.add_axes([0.0, 0.0, 0.48, 1.0]); frameless(a, (-4.3, 7.6), (-4.6, 4.3))
+    # one continuous Archimedean spiral; its outer end and its inner end both lead to the coupler on the right
+    N, r0, pitch, W = 4, 1.0, 0.55, 1.5
+    th = np.linspace(0, 2 * np.pi * N, 1600); rr = r0 + pitch * th / (2 * np.pi)
+    sx, sy = rr * np.cos(th), rr * np.sin(th); rmax = rr[-1]
+    a.plot(sx, sy, color=MAT["sin"], lw=W, solid_capstyle="butt", zorder=2)
+    def qarc(cx, cy, R, t0, t1):
+        t = np.linspace(t0, t1, 60); return cx + R * np.cos(t), cy + R * np.sin(t)
+    xc = 5.4                                                   # coupler position
+    # outer lead: leaves the outer end going up (+y), a quarter turn right, then straight into the top coupler arm
+    R1 = 0.95; x1, y1 = qarc(rmax + R1, 0, R1, np.pi, np.pi / 2)
+    a.plot(np.r_[x1, xc - 0.6], np.r_[y1, R1], color=MAT["sin"], lw=W, zorder=2)
+    # inner lead: leaves the inner end going down (-y), a quarter turn right, then straight out to the bottom arm,
+    # passing under the turns on a second waveguide layer (dashed between the two interlayer transitions, dots)
+    # the transition (first dot) sits on the quarter turn, in the gap before the next turn, so the inner end never
+    # touches that turn; from there on it is dashed, under every turn
+    R2 = 0.45; tsplit = 1.25 * np.pi
+    x2, y2 = qarc(r0 + R2, 0, R2, np.pi, tsplit)
+    a.plot(x2, y2, color=MAT["sin"], lw=W, zorder=2)
+    x3, y3 = qarc(r0 + R2, 0, R2, tsplit, 3 * np.pi / 2)
+    xb = rmax + 0.35
+    a.plot(np.r_[x3, xb], np.r_[y3, -R2], color=VIOLET, lw=W, ls=(0, (3, 1.6)), zorder=3)
+    for xv, yv in ((x2[-1], y2[-1]), (xb, -R2)):
+        a.plot([xv], [yv], "o", color=VIOLET, ms=3.2, zorder=4)
+    a.plot([xb, xc - 0.6], [-R2, -R2], color=MAT["sin"], lw=W, zorder=2)
+    yb = -R2
+    block(a, xc, (R1 + yb) / 2, 1.2, R1 - yb + 0.3, "2×2\ncoupler", fs=5.6, fc="#F3F6FB", lw=0.7)
+    for yv, txt in ((R1, "laser"), (yb, "detector")):
+        a.plot([xc + 0.6, xc + 1.0], [yv, yv], color=MAT["sin"], lw=W, zorder=2)
+        label(a, xc + 1.05, yv, txt, fs=5.6, ha="left")
+    # light both ways round: arrowheads on the spiral itself
+    def head(tc, sgn, col):
+        t = np.array([tc, tc + sgn * 0.12]); r = r0 + pitch * t / (2 * np.pi)
+        a.annotate("", xy=(r[1] * np.cos(t[1]), r[1] * np.sin(t[1])), xytext=(r[0] * np.cos(t[0]), r[0] * np.sin(t[0])),
+                   arrowprops=dict(arrowstyle="-|>", color=col, lw=0, mutation_scale=9), zorder=6)
+    head(2 * np.pi * 3 + 1.1, -1, RED); head(2 * np.pi * 2 + 4.3, +1, BLUE)
+    label(a, 2.2, 3.35, "clockwise", fs=FS_SMALL, col=RED); label(a, -3.2, -3.4, "anticlockwise", fs=FS_SMALL, col=BLUE)
+    label(a, 1.0, -3.95, "spiral: N turns at mean radius r", fs=5.8)
+    a.add_patch(matplotlib.patches.FancyArrowPatch((-3.9, 2.4), (-2.6, 3.7), connectionstyle="arc3,rad=-0.4", arrowstyle="-|>", mutation_scale=8, color=INK, lw=0.9))
+    label(a, -4.2, 1.9, "rotation Ω", fs=FS_SMALL, ha="left")
+    label(a, 5.0, -1.6, "inner end crosses under\nthe turns on a second\nwaveguide layer (dashed)", fs=5.6, col=VIOLET, ha="center")
+    panel(a, "a", 0.02, 1.0); label(a, 7.5, -4.5, "schematic", fs=6.0, col=MUTED, italic=True, ha="right")
+    b = fig.add_axes([0.57, 0.16, 0.41, 0.76])
+    for ldb, col, (tx, ty) in ((1.0, C2, (0.2, 900)), (0.1, C1, (2.0, 95)), (0.01, C3, (8.6, 9.0))):   # labels off the curves
+        om = gyro_limit(ell, ldb); i = np.argmin(om)
+        b.loglog(ell, om, color=col, lw=1.5)
+        b.plot(ell[i], om[i], "o", color=col, ms=3.5)
+        b.text(tx, ty, f"{ldb:g} dB/cm", fontsize=6.4, color=col, ha="center", va="center")
+        print(f"gyro: {ldb} dB/cm: best length {ell[i]:.2f} m (2/alpha = {2*4.343/(ldb*100):.2f} m), limit {om[i]:.0f} deg/h in 1 s")
+    b.axhline(earth, color=INK, lw=0.8, ls=(0, (4, 3))); b.text(0.012, earth * 1.3, "Earth's rotation, 15°/h", fontsize=6.3, color=INK)
+    b.set_xlim(0.01, 20); b.set_ylim(3, 3e4)
+    finish(b, "Spiral length (m)", "Smallest rotation (°/h, 1 s)")
+    tag(b, "b")
+    save(fig, "ch39_gyro")
+
 
 if __name__ == "__main__":
-    fig_sensor(); fig_opa(); fig_fmcw(); fig_quantum(); fig_mesh(); fig_comb()
+    ALL = {"sensor": fig_sensor, "opa": fig_opa, "fmcw": fig_fmcw, "quantum": fig_quantum, "mesh": fig_mesh, "comb": fig_comb,
+           "spectrometer": fig_spectrometer, "gyro": fig_gyro}
+    for name in (sys.argv[1:] or list(ALL)):
+        ALL[name]()

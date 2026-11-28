@@ -248,8 +248,8 @@ def fig_spectra():
             a.annotate("1.3 = $N_\\mathrm{tr}$", xy=(lp, gpk), xytext=(1585, 420), fontsize=6.8, color=col, fontweight="bold",
                        arrowprops=dict(arrowstyle="-", color=col, lw=0.6))
             continue
-        dx, dy = {1.0e18: (6, -150), 2.0e18: (6, 60), 2.7e18: (6, 70), 5.0e18: (8, 60)}[N]
-        a.text(lp + dx, gpk + dy, f"{N/1e18:.1f}", fontsize=6.8, color=col, ha="left", va="bottom" if dy > 0 else "top", fontweight="bold")
+        dx, dy = {1.0e18: (6, -150), 2.0e18: (-6, -90), 2.7e18: (6, 70), 5.0e18: (8, 60)}[N]
+        a.text(lp + dx, gpk + dy, f"{N/1e18:.1f}", fontsize=6.8, color=col, ha="left" if dx > 0 else "right", va="bottom" if dy > 0 else "top", fontweight="bold")
     a.axhline(0, color=MUTED, lw=0.6)
     a.set_xlim(1250, 1650); a.set_ylim(-1500, 2000)
     a.text(1645, 1880, "N in 10$^{18}$ cm$^{-3}$", fontsize=6.6, color=INK, ha="right", va="top")
@@ -309,7 +309,7 @@ def fig_hetero():
         for t, n in layers:
             nprof[(xs >= z) & (xs < z + t)] = n; z += t
         # ---- band diagram (schematic energies, positions to scale but zoomed to +-0.3 um)
-        ab = fig.add_axes([0.07 + 0.49 * k, 0.56, 0.42, 0.34])
+        ab = fig.add_axes([0.07 + 0.51 * k, 0.56, 0.40, 0.34])
         Egx = np.where(nprof == N_INP, 1.34, np.where(nprof == N_Q125, HC / 1250, 0.80))
         Ec = 0.40 * (Egx - 0.80) + 0.80; Ev = -0.60 * (Egx - 0.80)       # 40 % of each gap step in the conduction band
         ab.plot(*_step(xs, Ec), color=INK, lw=1.1); ab.plot(*_step(xs, Ev), color=INK, lw=1.1)
@@ -322,7 +322,7 @@ def fig_hetero():
                 ab.plot([xa, xb], [0.87, 0.87], color=C1, lw=1.0); ab.plot([xa, xb], [-0.08, -0.08], color=C4, lw=1.0)
                 ab.plot((xa + xb) / 2, 0.92, "o", ms=2.4, color=C1); ab.plot((xa + xb) / 2, -0.13, "o", ms=2.4, mfc="white", mec=C4, mew=0.8)
         ab.text(-0.29, 1.13, "n-InP", fontsize=6.6, color=INK); ab.text(0.29, 1.13, "p-InP", fontsize=6.6, color=INK, ha="right")
-        ab.text(-0.29, 0.88, "$E_c$", fontsize=7, color=INK); ab.text(-0.29, -0.36, "$E_v$", fontsize=7, color=INK)
+        ab.text(-0.29, 0.88, "$E_c$", fontsize=7, color=INK); ab.text(-0.29, -0.29, "$E_v$", fontsize=7, color=INK)
         if k == 0:
             ab.text(0.10, 0.62, "electrons", fontsize=6.4, color=C1); ab.text(0.10, 0.10, "holes", fontsize=6.4, color=C4)
         else:
@@ -337,7 +337,7 @@ def fig_hetero():
         ab.text(0.3, -0.45, "energies schematic", fontsize=5.8, color=MUTED, style="italic", ha="right", va="bottom")
         tag(ab, tg)
         # ---- index and mode, wider window
-        am = fig.add_axes([0.07 + 0.49 * k, 0.12, 0.42, 0.33])
+        am = fig.add_axes([0.07 + 0.51 * k, 0.12, 0.40, 0.33])
         an = am.twinx()
         Xn, Yn = _step(xs, nprof)
         an.fill_between(Xn, 3.0, Yn, color="#D9DEE7", lw=0, zorder=0)
@@ -377,7 +377,7 @@ def fig_dos():
     b.plot(1000 * E, rb, color=MUTED, ls="--", lw=0.9, label="bulk")
     b.plot(1000 * E, rq, color=C1, label="10 nm well")
     b.fill_between(1000 * E, 0, rq, color=C1, alpha=0.12, lw=0)
-    b.text(1000 * E1 + 6, step + 0.12, "full step at\nthe band edge", fontsize=6.4, color=INK)
+    b.text(1000 * E1 + 70, step + 0.12, "full step at\nthe band edge", fontsize=6.4, color=INK)
     b.text(1000 * 4 * E1 - 4, 2 * step + 0.12, "$n$ = 2", fontsize=6.4, color=INK, ha="right")
     b.legend(loc="upper left", fontsize=6.3, handlelength=1.4)
     b.set_title("Quantum well", fontsize=7.6, color=INK)
@@ -390,7 +390,7 @@ def fig_dos():
         c.plot([1000 * e0] * 2, [0, 3.6 * w / 4], color=INK, lw=1.0)
     c.plot(1000 * E, rd, color=C1)
     c.fill_between(1000 * E, 0, rd, color=C1, alpha=0.12, lw=0)
-    c.text(145, 3.0, "one dot:\nsharp levels", fontsize=6.3, color=INK)
+    c.text(144, 2.55, "one dot:\nsharp levels", fontsize=6.3, color=INK, va="top")
     c.text(185, 1.3, "ensemble:\nbroadened by\nthe size spread", fontsize=6.3, color=C1)
     c.set_title("Quantum dots (illustrative)", fontsize=7.6, color=INK)
     for ax, t in zip(axs, "abc"):
@@ -506,7 +506,7 @@ def fig_alloys():
     sec = ax.secondary_yaxis("right", functions=(lambda e: HC / 1000 / np.maximum(e, 1e-3), lambda l: HC / 1000 / np.maximum(l, 1e-3)))
     sec.set_yticks([0.5, 0.6, 0.8, 1.0, 1.3, 1.55, 2.0, 3.0, 5.0]); sec.set_ylabel("Wavelength (µm)")
     finish(ax, "Lattice constant (Å)", "Band gap at 300 K (eV)")
-    ax.text(5.41, 0.06, "filled: direct gap   open: indirect   dashed: indirect alloy", fontsize=6.2, color=MUTED, va="bottom")
+    ax.text(5.41, 0.06, "filled: direct gap\u00a0\u00a0\u00a0open: indirect\u00a0\u00a0\u00a0dashed: indirect alloy", fontsize=6.2, color=MUTED, va="bottom")
     save(fig, "ch23_alloys")
 
 

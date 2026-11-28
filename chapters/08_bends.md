@@ -137,6 +137,15 @@ Platforms with two guiding layers, such as silicon nitride above silicon, move l
   <figcaption><span class="capnum">Figure 8.6.</span> <strong>A TE0-to-TE1 mode converter</strong> by phase matching (220 nm silicon, 1550 nm). (a) Top view to scale: TE0 of a narrow guide couples to TE1 of a 1.0 µm guide beside it (gap and length illustrative). (b) Effective indices against width from femwell (the data of <a href="{% link chapters/06_soi.md %}#fig-6-1">Figure 6.1</a>): TE1 of the 1.0 µm guide has \(n_\mathrm{eff} = 2.420\), equal to TE0 of a 486 nm guide, so these two widths are phase-matched. Drawn by <code>figsrc/ch08_figs.py</code> from <code>figsrc/ch06_sweep.json</code>.</figcaption>
 </figure>
 
+## In 3D
+
+A crossing with multimode expanders, a bend and an adiabatic taper, the routing elements of this chapter, joined into one piece of a circuit. Drag to turn it, scroll to zoom, click a layer in the legend to hide it (shift-click to show it alone), and switch to the exploded view or to 3× height to see the thin layers. It is a generic concept drawn with this chapter's dimensions, not a device from a PDK; real PDK devices are in the [PDK devices in 3D]({% link devices-3d.md %}) gallery.
+
+{% include stack3d-assets.html %}
+<div class="d3-grid">
+{% include stack3d.html slug="routing" %}
+</div>
+
 <div class="tbox tbox-tryit" markdown="1">
 <div class="tbox-title">Explore further</div>
 
@@ -161,6 +170,56 @@ Free simulations by others that pair well with this chapter {% include cite.html
 - Crossings, escalators and mode converters all work by managing the mode adiabatically or by phase matching.
 
 </div>
+
+## Problems
+
+1. **Bend radii for other modes.** Worked Example 8.1 takes $$\gamma x_r \approx 11$$ as the mark of a bend that hardly radiates. Find the radius that reaches it for (a) the TE mode of the 500 × 220 nm strip at 1310 nm ($$n_\mathrm{eff} = 2.712$$, $$\gamma = 11.0\ \mu\mathrm{m}^{-1}$$, oxide index 1.447) and (b) its TM mode at 1550 nm ($$n_\mathrm{eff} = 1.771$$, $$\gamma = 4.2\ \mu\mathrm{m}^{-1}$$).
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    (a) The caustic is at $$x_r = R(2.712/1.447 - 1) = 0.874R$$, so $$\gamma x_r = 11.0\times0.874R = 9.62R$$ with $$R$$ in micrometres, which reaches 11 at $$R = 1.14$$ µm; a 2 µm bend at 1310 nm has $$\gamma x_r = 19$$. (b) Here $$x_r = R(1.771/1.444 - 1) = 0.226R$$ and $$\gamma x_r = 4.2\times0.226R = 0.951R$$, which reaches 11 at $$R = 11.6$$ µm. The TE mode at 1550 nm needs 2 µm, so the same strip bends almost twice as tightly at 1310 nm, while its TM mode needs about six times the radius.
+
+    </details>
+
+2. **A wider crossing.** The expanders of Figure 8.4b widen the mode to 1.6 µm. Suppose they widen it to 2.4 µm instead, where the lateral mode is close to a Gaussian with a 1/e² half-width $$w_0 = 0.87$$ µm, and the open intersection is 2.4 µm long. The beam diffracts in the 220 nm film, whose slab index is 2.848. Find the beam's half-width on the far side and estimate the crossing's diffraction loss.
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    In the film the Rayleigh range is $$z_R = \pi w_0^2n/\lambda_0 = \pi\times0.87^2\times2.848/1.55 = 4.37$$ µm, so after 2.4 µm the half-width is $$0.87\sqrt{1 + (2.4/4.37)^2} = 0.99$$ µm. The film still guides vertically, so only the lateral profile diffracts, and the overlap of two one-dimensional Gaussians a distance $$L$$ apart is the square root of the circular result of Chapter 3:
+
+    $$\eta = \left[1 + \left(\frac{L}{2z_R}\right)^2\right]^{-1/2} = \left[1 + \left(\frac{2.4}{8.74}\right)^2\right]^{-1/2} = 0.964,$$
+
+    a loss of 0.16 dB. The same estimate gives the 1.5 dB and 0.3 dB of Figure 8.4 for the plain crossing and the 1.6 µm expanders. Widening further halves the diffraction loss again, but it saves only 0.16 dB and needs longer expanders.
+
+    </details>
+
+3. **The shortest linear taper.** Design a linear taper from 500 nm to 2 µm in the 220 nm film (TE, 1550 nm). By the effective-index method, at 2 µm the TE0 and TE2 modes have $$n_\mathrm{eff} = 2.823$$ and 2.614. Figure 8.3b shows that the allowed rate of widening is 0.17 at 500 nm, rises to 0.30 at 0.84 µm and falls beyond. Find the shortest linear taper that meets Love's criterion everywhere, and the length that gives a margin of two.
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    With $$\beta = 2\pi n_\mathrm{eff}/\lambda$$ the criterion reads $$\mathrm{d}\rho/\mathrm{d}z < \rho\,(n_\mathrm{TE0} - n_\mathrm{TE2})/\lambda$$. At 2 µm, $$\rho = 1.0$$ µm and the limit is $$1.0\times(2.823 - 2.614)/1.55 = 0.135$$. That is below the 0.17 at the narrow end, and the criterion only falls between 0.84 µm and 2 µm, so the wide end sets the limit. A linear taper widens at $$\mathrm{d}\rho/\mathrm{d}z = (1.0 - 0.25)\ \mu\mathrm{m}/L$$, so
+
+    $$L > \frac{0.75\ \mu\mathrm{m}}{0.135} = 5.6\ \mu\mathrm{m},$$
+
+    and a margin of two needs 11 µm. By the same rule a linear taper to 3 µm needs 14 µm, or 28 µm for a margin of two (Figure 8.3): the last micrometre of width, where TE0 and TE2 crowd together, costs most of the length.
+
+    </details>
+
+4. **Why bend loss falls exponentially with radius.** Use the conformal transformation $$n'(x) = n(x)(1 + x/R)$$ to derive the caustic $$x_r = R(n_\mathrm{eff}/n_\mathrm{clad} - 1)$$. Combine it with the tail factor $$e^{-4\gamma x_r/3}$$ to show that $$\alpha_\mathrm{bend} \approx C_1e^{-C_2R}$$, and find $$C_2$$ for the silicon strip (TE) and the SiN guide of Worked Example 8.1. Why must the SiN bend be about ten times larger?
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    Outside the guide $$n(x) = n_\mathrm{clad}$$, so the tilted index reaches the mode index where $$n_\mathrm{clad}(1 + x_r/R) = n_\mathrm{eff}$$, which gives $$x_r = R(n_\mathrm{eff}/n_\mathrm{clad} - 1)$$. The caustic grows in proportion to $$R$$, so the tail factor becomes
+
+    $$e^{-4\gamma x_r/3} = e^{-C_2R}, \qquad C_2 = \frac{4}{3}\gamma\left(\frac{n_\mathrm{eff}}{n_\mathrm{clad}} - 1\right).$$
+
+    For the silicon strip, $$C_2 = \tfrac{4}{3}\times8.0\times0.694 = 7.4\ \mu\mathrm{m}^{-1}$$: each extra micrometre of radius divides the radiation by $$e^{7.4} \approx 1600$$, or 32 dB. For the SiN guide, $$\gamma = 1/(0.29\ \mu\mathrm{m}) = 3.45\ \mu\mathrm{m}^{-1}$$ and $$C_2 = \tfrac{4}{3}\times3.45\times0.157 = 0.72\ \mu\mathrm{m}^{-1}$$, or 3.1 dB per micrometre. The one-dimensional model behind Figure 8.2 falls at close to these rates. The two values differ by a factor of 10.3, so the SiN bend reaches the same loss per unit length at ten times the radius: lower contrast shrinks both factors of $$C_2$$, giving a slower-decaying tail and a caustic closer to the guide.
+
+    </details>
 
 ## Check yourself
 

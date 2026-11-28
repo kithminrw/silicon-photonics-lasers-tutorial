@@ -387,12 +387,12 @@ def fig_vcsel_li():
         a.plot(Is[j] * 1e3, P[j], "o", color=col, ms=3.5)
     a.set_xlim(0, 18); a.set_ylim(0, 7.2)
     a.text(14.3, 6.75, "roll-over", fontsize=7, color=INK, ha="center")
-    finish(a, "Current (mA)", "Output power (mW)", legend=True, loc="lower right")
+    finish(a, "Current (mA)", "Output power (mW)", legend=True, loc="upper left")
     tag(a, "a")
     Ts = np.linspace(0, 100, 201)
     b.plot(Ts, [ith(T) / ith(25) for T in Ts], color=C1, label="VCSEL (gain–cavity detuning)")
     b.plot(Ts, np.exp((Ts - 25) / FP["T0"]), color=C2, label="Ch 24 FP laser, T$_0$ = 60 K")
-    b.axvline(25 + (850 - LP25) / (DLP - DLC), color=MUTED, lw=0.6, ls=":")
+    b.axvline(25 + (850 - LP25) / (DLP - DLC), ymax=0.78, color=MUTED, lw=0.6, ls=":")      # stops below the legend
     b.text(25 + (850 - LP25) / (DLP - DLC) + 1.5, 0.3, "gain peak on\ncavity mode", fontsize=6.5, color=MUTED, ha="left")
     b.set_xlim(0, 100); b.set_ylim(0, 3.5)
     finish(b, "Junction temperature (°C)", "Threshold / threshold at 25 °C", legend=True, loc="upper left")
@@ -463,14 +463,14 @@ def fig_zerolevel():
     a.plot(I0s * 1e3, (P1 - P0) * 1e3, color=MUTED, ls="--", label="OMA (steady levels)")
     a.plot(I0s * 1e3, eye * 1e3, color=C1, marker="o", ms=2.5, label="eye height")
     a.axhline(0, color=INK, lw=0.6); a.set_ylim(-3, 4.8)
-    finish(a, "Zero-level current I$_0$ (mA)", "Power (mW)", legend=True, loc="center right")
+    finish(a, "Zero-level current I$_0$ (mA)", "Power (mW)", legend=True, loc="lower right")
     b.plot(I0s[1:] * 1e3, ER[1:], color=C2, marker="o", ms=2.5); b.set_ylim(0, 25)
     finish(b, "Zero-level current I$_0$ (mA)", "Extinction ratio (dB)")
     cax.plot(I0s * 1e3, cpp, color=C4, marker="o", ms=2.5); cax.set_ylim(0, 180)
     finish(cax, "Zero-level current I$_0$ (mA)", "Peak-to-peak chirp (GHz)")
     for ax, t in zip(axs, "abc"):
         ax.axvline(ithv * 1e3, color=MUTED, lw=0.6, ls=":"); ax.set_xlim(0, 5); tag(ax, t)
-    a.text(ithv * 1e3 + 0.12, -2.6, r"I$_\mathrm{th}$", fontsize=6.5, color=MUTED)
+    a.text(ithv * 1e3 + 0.12, 4.3, r"I$_\mathrm{th}$", fontsize=6.5, color=MUTED)      # above the OMA line, clear of the legend
     fig.tight_layout(w_pad=1.6)
     savefig(fig, "ch25_zerolevel")
 

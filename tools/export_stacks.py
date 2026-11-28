@@ -16,6 +16,12 @@ stacks the chapters already use, so that the 3D views and the 2D figures agree:
           unpumped InP window region 12 um long where the wells stop, and an AR coating on the facet.
   soi     the active SOI process of Figure 35.5 (Chapter 35): PN phase shifter, Ge photodiode, heater, grating
           coupler, W contacts, two metal levels, cladding with a pad opening and a grating window.
+  heater  TiN heater over a 500 x 220 nm rib (90 nm slab) of Table 18.1: 2 um wide, 1.7 um above the rib, 2.3 um of
+          cladding on a 2 um BOX, deep trenches through cladding and BOX 3 um either side, vias and pads at the ends.
+  pn      lateral PN rib phase shifter of Worked Example 19.1: p and n halves (5e17 cm-3), the 69 nm depletion region at
+          0 V, p++ and n++ contact strips from 1.2 um, tungsten plugs and two metal-1 electrodes.
+  ge      vertical PIN germanium photodiode of Worked Example 21.1: a strip waveguide tapering onto a p-doped silicon pad,
+          germanium 3.8 um x 0.5 um and 15 um long with an n++ cap, p++ silicon contacts at the sides, plugs and metal 1.
   vcsel   oxide-aperture VCSEL of Figure 24.6, cut open: 34-pair n-DBR and 20-pair p-DBR (AlGaAs, n = 3.52 / 3.05 at
           850 nm, quarter-wave layers), a one-wavelength cavity with three 8 nm wells, a 30 nm AlAs layer oxidised
           to a 6 um aperture, a 20 um mesa and a ring contact.
@@ -82,6 +88,12 @@ MAT = {
     "metal1":  ("metal 1", (0.93, 0.74, 0.36, 1.0), 0.85, "first interconnect level"),
     "metal2":  ("metal 2 (pads)", (0.98, 0.82, 0.42, 1.0), 0.85, "second interconnect level, opened as bond pads"),
     "clad":    ("oxide cladding", (0.55, 0.75, 0.95, 0.10), 0.0, "the deposited dielectrics, opened over the pad and the grating coupler"),
+    "tin18":   ("TiN heater", (0.88, 0.54, 0.23, 1.0), 0.6, "a resistive film 2 µm wide, 1.7 µm above the waveguide (Table 18.1)"),
+    "box":     ("buried oxide, 2 µm", (0.55, 0.75, 0.95, 0.30), 0.0, "insulates the waveguide from the substrate, thermally too"),
+    "cladx":   ("oxide cladding, 2.3 µm", (0.55, 0.75, 0.95, 0.14), 0.0, "deposited oxide; the trenches cut through it and the BOX"),
+    "dep":     ("depletion region", (0.97, 0.97, 0.90, 1.0), 0.05, "69 nm wide at 0 V, 123 nm at 2 V: where the carriers are swept out"),
+    "gei":     ("germanium, undoped", (0.45, 0.46, 0.50, 1.0), 0.1, "absorbs 1550 nm light; the field across it collects the carriers"),
+    "nge":     ("n++ germanium cap", (0.30, 0.48, 0.80, 1.0), 0.05, "the top contact of the vertical PIN"),
 }
 
 
@@ -396,10 +408,102 @@ def soi():
         orbit="-28deg 62deg 80%"))
 
 
+def heater():
+    """TiN heater of Table 18.1 and Figure 18.1a, with the deep trenches of Section 18.4."""
+    m = Model("heater")
+    X0, X1, Y0, Y1 = -9.0, 9.0, 0.0, 30.0
+    T, SLAB, ZH, TH, ZC = 0.22, 0.09, 0.22 + 1.7, 0.12, 0.22 + 2.3
+    trench = [sbox(3.0, 4.0, 7.0, 26.0), sbox(-7.0, 4.0, -3.0, 26.0)]
+    area = sbox(X0, Y0, X1, Y1)
+    keep = area.difference(trench[0]).difference(trench[1])
+    m.box(X0, X1, Y0, Y1, -3.0, -2.0, "sisub", 0)
+    m.prism(keep, -2.0, 0.0, "box", 1)
+    m.prism(keep, 0.0, SLAB, "si", 2)                                     # the 90 nm slab, cut by the trenches
+    m.box(-0.25, 0.25, Y0, Y1, SLAB, T, "si", 2)                         # the rib
+    m.prism(keep.difference(sbox(-0.25, Y0, 0.25, Y1)), SLAB, T, "cladx", 3)
+    m.prism(keep, T, ZC, "cladx", 3)
+    m.box(-1.0, 1.0, 3.0, 27.0, ZH, ZH + TH, "tin18", 4)                 # the heater over the waveguide
+    for ya, yb in ((0.8, 3.0), (27.0, 29.2)):
+        m.box(-1.5, 1.5, ya, yb, ZH, ZH + TH, "tin18", 4)                 # its contact pads
+        for xv in (-0.8, 0.0, 0.8):
+            m.box(xv - 0.15, xv + 0.15, (ya + yb) / 2 - 0.15, (ya + yb) / 2 + 0.15, ZH + TH, ZC, "wplug", 5)
+        m.box(-1.6, 1.6, ya - 0.1, yb + 0.1, ZC, ZC + 0.6, "metal1", 6)
+    return m.export(0.7, dict(
+        title="Thermo-optic phase shifter with deep trenches", short="TiN heater",
+        blurb="The heater of Table 18.1: a TiN strip 2 µm wide, 1.7 µm above a 500 × 220 nm rib with a 90 nm slab, in 2.3 µm of oxide on a 2 µm BOX. Deep trenches 3 µm either side cut through the cladding, the slab and the BOX, so the heat must go down to the substrate through the narrow ridge of oxide under the waveguide: 16 mW per π instead of 26 mW, but a slower response (Section 18.4). Vias and metal pads at both ends carry the current.",
+        orbit="-58deg 62deg 80%"))
+
+
+def pn():
+    """Lateral PN rib phase shifter of Worked Example 19.1 and Figure 19.2a."""
+    m = Model("pn")
+    X0, X1, Y0, Y1 = -3.6, 3.6, 0.0, 20.0
+    T, SLAB = 0.22, 0.09
+    M1, CL = (2.6, 3.2), 3.4
+    W2 = 0.0345                                                          # half the 69 nm depletion width at 0 V
+    m.box(X0, X1, Y0, Y1, -3.0, -2.0, "sisub", 0)
+    m.box(X0, X1, Y0, Y1, -2.0, 0.0, "box", 1)
+    for xa, xb, mat in ((-2.2, -1.2, "pp"), (-1.2, -W2, "pdop"), (-W2, W2, "dep"), (W2, 1.2, "ndop"), (1.2, 2.2, "nn")):
+        m.box(xa, xb, Y0, Y1, 0, SLAB, mat, 2)
+    m.box(-0.25, -W2, Y0, Y1, SLAB, T, "pdop", 2); m.box(-W2, W2, Y0, Y1, SLAB, T, "dep", 2); m.box(W2, 0.25, Y0, Y1, SLAB, T, "ndop", 2)
+    area = sbox(X0, Y0, X1, Y1)
+    m.prism(area.difference(sbox(-2.2, Y0, 2.2, Y1)), 0.0, SLAB, "cladx", 3)
+    m.prism(area.difference(sbox(-0.25, Y0, 0.25, Y1)), SLAB, T, "cladx", 3)
+    for xm in (-1.7, 1.7):
+        y = 1.0
+        while y <= Y1 - 1.0 + 1e-9:
+            m.box(xm - 0.11, xm + 0.11, y - 0.11, y + 0.11, SLAB, M1[0], "wplug", 4); y += 2.0
+        m.box(xm - 0.6, xm + 0.6, Y0, Y1, M1[0], M1[1], "metal1", 5)
+    m.prism(area, T, CL, "cladx", 3)
+    return m.export(0.7, dict(
+        title="Depletion-mode PN phase shifter", short="PN phase shifter",
+        blurb="The lateral junction of Worked Example 19.1 in a 500 × 220 nm rib with a 90 nm slab: p and n halves doped 5 × 10¹⁷ cm⁻³ meet in the middle of the rib, where a depletion region 69 nm wide at 0 V (pale) widens to 123 nm at 2 V reverse bias and changes the index the light sees. Heavily doped strips from 1.2 µm carry the current to rows of tungsten plugs and two metal electrodes, kept away from the mode to add little loss.",
+        orbit="-58deg 62deg 80%"))
+
+
+def gepd():
+    """Vertical PIN germanium photodiode of Worked Example 21.1 and Figure 21.1a, fed by a strip waveguide."""
+    m = Model("ge")
+    X0, X1, Y0, Y1 = -4.6, 4.6, 0.0, 24.0
+    T, M1, CL = 0.22, (2.6, 3.2), 3.4
+    m.box(X0, X1, Y0, Y1, -3.0, -2.0, "sisub", 0)
+    m.box(X0, X1, Y0, Y1, -2.0, 0.0, "box", 1)
+    feed = Polygon([(-0.25, 0.0), (0.25, 0.0), (0.25, 2.0), (2.55, 4.0), (-2.55, 4.0), (-0.25, 2.0)])
+    m.prism(feed, 0.0, T, "si", 2)
+    m.box(-2.55, 2.55, 4.0, 22.0, 0.0, T, "pdop", 2)
+    m.box(-3.55, -2.55, 4.0, 22.0, 0.0, T, "pp", 2); m.box(2.55, 3.55, 4.0, 22.0, 0.0, T, "pp", 2)
+    m.box(-1.9, 1.9, 5.5, 20.5, T, T + 0.42, "gei", 3)
+    m.box(-1.85, 1.85, 5.5, 20.5, T + 0.42, T + 0.5, "nge", 3)
+    for xm, ya, yb in ((-3.05, 5.0, 21.0), (3.05, 5.0, 21.0), (0.0, 7.0, 19.0)):
+        y = ya; z0 = T + 0.5 if xm == 0.0 else T
+        while y <= yb + 1e-9:
+            m.box(xm - 0.11, xm + 0.11, y - 0.11, y + 0.11, z0, M1[0], "wplug", 4); y += 2.0
+    for xa, xb in ((-3.55, -2.55), (2.55, 3.55), (-0.6, 0.6)):
+        m.box(xa, xb, 4.5 if xb < 0 or xa > 0 else 6.5, 21.5 if xb < 0 or xa > 0 else 19.5, M1[0], M1[1], "metal1", 5)
+    area = sbox(X0, Y0, X1, Y1)
+    si = feed.union(sbox(-3.55, 4.0, 3.55, 22.0))
+    m.prism(area.difference(si), 0.0, T, "cladx", 6)
+    m.prism(area.difference(sbox(-1.9, 5.5, 1.9, 20.5)), T, T + 0.5, "cladx", 6)
+    m.prism(area, T + 0.5, CL, "cladx", 6)
+    return m.export(0.7, dict(
+        title="Vertical germanium photodiode", short="Ge photodiode",
+        blurb="The PIN of Worked Example 21.1: a strip waveguide tapers onto a p-doped silicon pad, and on it sits germanium 3.8 µm wide, 0.5 µm thick and 15 µm long, undoped except for an n++ cap. The light leaks up into the germanium along its length and is absorbed (89.5 % in 15 µm, Figure 21.1c); the field across its thickness sweeps the carriers to the n++ cap above and to the p++ silicon strips at the sides, which tungsten plugs connect to metal 1.",
+        orbit="-50deg 62deg 80%"))
+
+
 if __name__ == "__main__":
+    import sys
     OUT.mkdir(parents=True, exist_ok=True)
-    entries = [ridge(), bh(), hetero(), soa(), vcsel(), soi()]
-    for e in entries:
+    ALL = {"ridge": ridge, "bh": bh, "hetero": hetero, "soa": soa, "vcsel": vcsel, "soi": soi, "heater": heater, "pn": pn, "ge": gepd}
+    names = sys.argv[1:] or list(ALL)                 # name some models to export only those; the manifest keeps the others
+    man = ROOT / "_data" / "stacks3d.json"
+    old = {e["slug"]: e for e in json.loads(man.read_text(encoding="utf-8"))} if man.exists() else {}
+    new = {}
+    for n in names:
+        e = ALL[n]()
         e["credit"] = "Generic, illustrative stack drawn for this tutorial (not any company's process); thicknesses to scale, length and width cut short."
-    (ROOT / "_data" / "stacks3d.json").write_text(json.dumps(entries, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
-    print("wrote _data/stacks3d.json")
+        new[e["slug"]] = e
+    order = list(old) + [k for k in new if k not in old]
+    entries = [new.get(k, old.get(k)) for k in order]
+    man.write_text(json.dumps(entries, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+    print("wrote _data/stacks3d.json:", ", ".join(order))

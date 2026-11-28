@@ -331,7 +331,7 @@ def fig_multistage():
     label(ax, 6, -2.6, "BOX", fs=FS_SMALL, ha="left")
     # (b) silicon to silicon nitride, then a SiN inverse taper
     ax = axs[1]
-    box(ax, 0, -7.2, FAC, 2.2, "sub"); box(ax, 0, -5, FAC, 5, "ox"); box(ax, 0, 0, FAC, 4.4, "oxtop")
+    box(ax, 0, -7.2, FAC, 2.2, "sub"); box(ax, 0, -5, FAC, 5, "ox"); box(ax, 0, 0, FAC, 4.9, "oxtop")   # thick enough to hold the SiN spot
     box(ax, 0, 0, 50, 0.4, "si", z=4)
     box(ax, 20, 1.4, FAC - 20, 0.6, "sin", z=4)
     _envelope(ax, z, _smooth(z, 22, 50, 0.2, 1.7), np.maximum(_smooth(z, 22, 50, 0.5, 0.85), _smooth(z, 66, FAC, 0.85, 3.1)))
@@ -408,7 +408,7 @@ def fig_modes():
         ax.text(X0 + 0.5, Y0 + 0.5, f"{name} {mfd:g} µm: {100 * ov:.0f} %", ha="left", va="bottom", fontsize=6.6, color=col, zorder=7)
         if m["below2um"] >= 0.005:
             pct = 100 * m["below2um"]
-            ax.text(X1 - 0.5, yb - 0.4, f"{pct:.1f} % below" if pct < 9.95 else f"{pct:.0f} % below", ha="right", va="top", fontsize=6.3,
+            ax.text(X1 - 0.5, yb - 1.6, f"{pct:.1f} % below" if pct < 9.95 else f"{pct:.0f} % below", ha="right", va="top", fontsize=6.3,
                     color=INK, zorder=7, bbox=dict(boxstyle="square,pad=0.1", fc="white", ec="none", alpha=0.8))
         if k == 0:
             ax.text(X1 - 0.5, yb + 0.3, "2 µm BOX ends", ha="right", va="bottom", fontsize=6.3, color=INK, zorder=7)
@@ -428,6 +428,59 @@ def fig_modes():
 
 FIGS = {"butt": fig_butt, "taper": fig_taper, "modes": fig_modes, "multistage": fig_multistage, "facets": fig_facets,
         "angled": fig_angled}
+
+
+# ====================================================================== Figure 16.7: elliptical and astigmatic beams
+def gw(z, w0, z0, lam=1.55):
+    zr = math.pi * w0 ** 2 / lam
+    return w0 * np.sqrt(1 + ((z - z0) / zr) ** 2)
+
+
+def fig_astig():
+    lam, wx0, wy0, zx0, zy0 = 1.55, 1.5, 1.2, -4.0, 0.0       # illustrative edge-coupler beam: x waist 4 um inside the chip
+    z = np.linspace(-8, 20, 600); zo = z >= 0
+    fig = plt.figure(figsize=(6.3, 3.3))
+    for k, (w0, z0, ttl, col) in enumerate(((wx0, zx0, "top view: width in the chip plane, x", C1), (wy0, zy0, "side view: height across the chip, y", C4))):
+        ax = fig.add_axes([0.08, 0.56 - 0.44 * k, 0.48, 0.36])
+        w = gw(z, w0, z0, lam)
+        ax.add_patch(plt.Rectangle((-8, -6), 8, 12, fc="#E3E7EE", ec="none", zorder=0))
+        ax.text(-7.6, 4.6, "chip", fontsize=6.5, color=MUTED, va="center")
+        ax.axvline(0, color=INK, lw=0.9); ax.text(0.3, 4.6, "facet", fontsize=6.5, color=INK, va="center")
+        ax.fill_between(z[zo], -w[zo], w[zo], color=col, alpha=0.18, lw=0)
+        ax.plot(z[zo], w[zo], color=col, lw=1.4); ax.plot(z[zo], -w[zo], color=col, lw=1.4)
+        if z0 < 0:                                              # the beam seems to come from a waist inside the chip
+            ax.plot(z[~zo], w[~zo], color=col, lw=1.0, ls=(0, (3, 2))); ax.plot(z[~zo], -w[~zo], color=col, lw=1.0, ls=(0, (3, 2)))
+        ax.axvline(z0, color=col, lw=0.8, ls=":")
+        ax.annotate("", xy=(z0, -w0), xytext=(z0, w0), arrowprops=dict(arrowstyle="<|-|>", color=col, lw=0.7, mutation_scale=6))
+        lab = f"waist {2*w0:.1f} µm,\n{abs(z0):.0f} µm inside\nthe chip" if z0 < 0 else f"waist {2*w0:.1f} µm, on the facet"
+        ax.text(z0 + 0.5 if z0 >= 0 else -7.7, -4.3 if z0 < 0 else -4.8, lab, fontsize=6.2, color=col, ha="left", va="center", zorder=5,
+                bbox=dict(boxstyle="square,pad=0.1", fc="#E3E7EE" if z0 < 0 else "white", ec="none"))
+        ax.set_xlim(-8, 20); ax.set_ylim(-6, 6); ax.set_yticks([-4, 0, 4]); ax.grid(False)
+        ax.set_title(ttl, loc="left", fontsize=7.2, color=INK, pad=2)
+        if k == 1:
+            finish(ax, "Distance from the facet, z (µm)", "y (µm)")
+            ax.annotate("", xy=(zx0, 5.3), xytext=(zy0, 5.3), arrowprops=dict(arrowstyle="<|-|>", color=INK, lw=0.7, mutation_scale=6))
+            ax.text((zx0 + zy0) / 2, 5.5, "Δz", fontsize=6.6, ha="center", va="bottom", color=INK)
+        else:
+            ax.set_xticklabels([]); finish(ax, None, "x (µm)"); tag(ax, "a")
+    b = fig.add_axes([0.66, 0.14, 0.32, 0.76])
+    dz = np.linspace(0, 15, 301)
+    print("astigmatism loss (one direction defocused by dz, the other matched):")
+    for w0, col, txt in ((1.25, C4, "2.5 µm spot"), (2.5, C2, "5 µm spot"), (5.2, C1, "10.4 µm (SMF-28)")):
+        zr = math.pi * w0 ** 2 / lam; loss = 5 * np.log10(1 + (dz / (2 * zr)) ** 2)
+        b.plot(dz, loss, color=col, lw=1.5)
+        l5 = 5 * math.log10(1 + (5 / (2 * zr)) ** 2); l10 = 5 * math.log10(1 + (10 / (2 * zr)) ** 2)
+        print(f"  w0 {w0} um (zR {zr:.2f} um): 5 um -> {l5:.2f} dB, 10 um -> {l10:.2f} dB")
+        tx, ty, ha = (9.4, 1.9, "left") if w0 < 2 else (14.6, min(loss[-1], 3.8) + 0.12, "right")
+        b.text(tx, ty, txt, fontsize=6.4, color=col, ha=ha, va="bottom")
+    b.axvline(5, color=MUTED, lw=0.6, ls=":")
+    b.set_xlim(0, 15); b.set_ylim(0, 4)
+    finish(b, "Astigmatism Δz (µm)", "Coupling loss (dB)"); tag(b, "b")
+    print(f"  drawn beam: x waist {2*wx0} um at z = {zx0}, y waist {2*wy0} um on the facet")
+    save(fig, "ch16_astig")
+
+
+FIGS["astig"] = fig_astig
 
 if __name__ == "__main__":
     names = sys.argv[1:] or list(FIGS)

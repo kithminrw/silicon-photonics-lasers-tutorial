@@ -215,7 +215,7 @@ def fig_hetero():
     box(ax, 26, 3.47, 48, 0.55, "q"); ax.plot([26, 74], [3.75, 3.75], color=MAT["mqw"], lw=1.0, zorder=3)
     box(ax, 26, 4.02, 48, 2.3, "inp"); box(ax, 30, 6.32, 40, 0.35, "metal")
     box(ax, 22.5, 3.47, 2.5, 0.25, "metal"); box(ax, 75, 3.47, 2.5, 0.25, "metal")
-    label(ax, 50, 5.2, "III–V gain section (p-InP / MQW / n-InP)", fs=FS_SMALL)
+    label(ax, 50, 5.2, "III–V gain section\n(p-InP / MQW / n-InP)", fs=FS_SMALL)      # two lines: inside the 38-62 section
     label(ax, 10, 4.1, "Si Bragg mirror", fs=FS_SMALL); label(ax, 90, 4.1, "Si Bragg mirror\n(partial: output)", fs=FS_SMALL)
     label(ax, 50, 1.7, "buried oxide", fs=FS_SMALL); label(ax, 50, 0.45, "Si substrate", fs=FS_SMALL)
     # Si width along the laser and the taper regions

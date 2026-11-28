@@ -115,7 +115,7 @@ def fig_pdk():
     a.text(0.40, 0.66, "$\\left[\\matrix{S_{11} & S_{12}\\\\ S_{21} & S_{22}}\\right]$" if False else "S$_{11}$  S$_{12}$\nS$_{21}$  S$_{22}$",
            fontsize=7, va="center", color=INK, linespacing=1.5)
     a.plot([0.37, 0.36, 0.36, 0.37], [0.77, 0.77, 0.55, 0.55], color=INK, lw=0.8)
-    a.plot([0.66, 0.67, 0.67, 0.66], [0.77, 0.77, 0.55, 0.55], color=INK, lw=0.8)
+    a.plot([0.62, 0.63, 0.63, 0.62], [0.77, 0.77, 0.55, 0.55], color=INK, lw=0.8)      # closes the matrix, clear of the inset
     inset = fig.add_axes([pos[2][0] + 0.75 * cw * 0.0 + 0.215, pos[2][1] + 0.12, 0.09, 0.19])
     lam = np.linspace(1500, 1600, 200)
     inset.plot(lam, -GC_IL - (lam - 1550) ** 2 * (1.0 / (GC_BW1 / 2) ** 2), color=C1, lw=1.0)
@@ -228,7 +228,7 @@ def draw_y(ax, x, y, LY, SEP, flip=False, col=MAT["si"], z=3):
 def fig_layout():
     P, g = mzi_cell()
     fig = plt.figure(figsize=(6.3, 2.95))
-    ax = fig.add_axes([0.0, 0.0, 0.64, 1.0]); frameless(ax, (-50, 215), (-36, 150))
+    ax = fig.add_axes([0.0, 0.0, 0.64, 1.0]); frameless(ax, (-57, 215), (-36, 150))      # room for the panel letter left of the floor plan
     wl = dict(color=MAT["si"], lw=1.4, solid_capstyle="butt", zorder=3)
     for k in ("in", "upper", "lower", "out"):
         ax.plot(P[k][:, 0], P[k][:, 1], **wl)

@@ -147,6 +147,15 @@ Wider waveguides are less sensitive to width errors (the curve flattens), lose l
 
 </div>
 
+## In 3D
+
+The three channel waveguides of this chapter side by side, to scale: the silicon strip, the silicon rib on its slab, and the silicon-nitride strip. Drag to turn it, scroll to zoom, click a layer in the legend to hide it (shift-click to show it alone), and switch to the exploded view or to 3× height to see the thin layers. It is a generic concept drawn with this chapter's dimensions, not a device from a PDK; real PDK devices are in the [PDK devices in 3D]({% link devices-3d.md %}) gallery.
+
+{% include stack3d-assets.html %}
+<div class="d3-grid">
+{% include stack3d.html slug="waveguides" %}
+</div>
+
 <div class="tbox tbox-tryit" markdown="1">
 <div class="tbox-title">Explore further</div>
 
@@ -169,6 +178,56 @@ Wider waveguides are less sensitive to width errors (the curve flattens), lose l
 - A 1 nm width error shifts a silicon resonance by about 0.6 nm; a 1 nm thickness error by about 1.4 nm.
 
 </div>
+
+## Problems
+
+1. **A shallow-etched rib by the effective-index method.** Etch the 220 nm film by only 70 nm, leaving a 150 nm slab as in the grating coupler of Figure 1.2, and keep the 500 nm width. The vertical slabs give $$n_\mathrm{I} = 2.848$$ under the ridge and $$n_\mathrm{II} = 2.539$$ beside it (TE, 1550 nm). Solve the lateral slab for the TE-like mode, with the demo of Section 6.2 or a few lines of bisection, and find the width at which the method predicts TE1 to appear. Compare both with the rib of Figure 6.3.
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    The lateral slab has core index 2.848, cladding index 2.539 and width 500 nm, with TM boundary conditions, $$p = (n_\mathrm{I}^2/n_\mathrm{II}^2)\gamma$$. Bisection on the eigenvalue equation finds a single mode, with $$n_\mathrm{eff} = 2.702$$. TE1 appears where the lateral slab's $$V$$ reaches $$\pi$$; at cut-off $$\gamma \to 0$$, so the TM factor drops out and
+
+    $$W_1 = \frac{\lambda_0}{2\sqrt{n_\mathrm{I}^2 - n_\mathrm{II}^2}} = \frac{1.55\ \mu\mathrm{m}}{2\sqrt{2.848^2 - 2.539^2}} = 601\ \mathrm{nm}.$$
+
+    The same steps give 2.600 and 404 nm for the 90 nm slab of Figure 6.3, and 2.491 and 316 nm for the strip. The shallow etch lowers the lateral contrast, pulls $$n_\mathrm{eff}$$ up towards $$n_\mathrm{I}$$ and keeps the guide single-mode up to 600 nm; the price is a loosely held mode that needs large bends.
+
+    </details>
+
+2. **Width and thickness errors together.** A die comes out with strips 5 nm wider than drawn and a film 2 nm thinner than nominal. Using the sensitivities of Section 6.7, find the shift of a ring resonance at 1550 nm caused by each error and by both together. What width error would cancel the thickness error exactly?
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    The width error changes the effective index by $$5\times1.6\times10^{-3} = +8.0\times10^{-3}$$ and moves the resonance by $$1550\times8.0\times10^{-3}/4.18 = +2.97$$ nm. The thickness error gives $$-2\times3.7\times10^{-3} = -7.4\times10^{-3}$$ and $$-2.74$$ nm. Together, $$\Delta n_\mathrm{eff} = +0.6\times10^{-3}$$ and the resonance moves by only $$+0.22$$ nm. A film 2 nm too thin is cancelled by strips $$2\times3.7/1.6 = 4.6$$ nm too wide. Errors of a few nanometres move a ring by nanometres; here they nearly cancel, but only by chance, so every ring still needs its heater.
+
+    </details>
+
+3. **An interleaver.** An unbalanced Mach–Zehnder interferometer that sends alternate channels of the 400 GHz grid to its two outputs needs a free spectral range of twice the channel spacing, 6.4 nm. Choose its arm-length difference for 500 × 220 nm strips (TE, 1550 nm). What free spectral range would you get had you sized it with $$n_\mathrm{eff}$$, and what does the correct $$\Delta L$$ give for TM0?
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    From $$\mathrm{FSR} = \lambda^2/(n_g\Delta L)$$,
+
+    $$\Delta L = \frac{\lambda^2}{n_g\,\mathrm{FSR}} = \frac{(1550\ \mathrm{nm})^2}{4.18\times6.4\ \mathrm{nm}} = 89.8\ \mu\mathrm{m}.$$
+
+    Sized with $$n_\mathrm{eff} = 2.446$$, $$\Delta L$$ would be 153.5 µm, and the real free spectral range $$1550^2/(4.18\times153.5\times10^3) = 3.75$$ nm: the device would not interleave the channels at all. For TM0 ($$n_g = 3.74$$, Table 6.1) the 89.8 µm arm difference gives $$6.4\times4.18/3.74 = 7.15$$ nm. The channel plan follows the group index, and a polarisation error moves it by 12 %.
+
+    </details>
+
+4. **Why resonances follow the group index.** A ring of length $$L$$ resonates where $$m\lambda = n_\mathrm{eff}(\lambda)L$$. A fabrication error adds $$\Delta n_\mathrm{eff}$$ at every wavelength. Show that the resonance moves by $$\Delta\lambda/\lambda = \Delta n_\mathrm{eff}/n_g$$, not $$\Delta n_\mathrm{eff}/n_\mathrm{eff}$$, and find how much the second formula would overstate the shift from the 1 nm thickness error of Section 6.7.
+
+    <details markdown="1">
+    <summary>Solution</summary>
+
+    Keep the order $$m$$ fixed. At the new resonance $$\lambda + \Delta\lambda$$ the index is $$n_\mathrm{eff} + \Delta n_\mathrm{eff} + (\mathrm{d}n_\mathrm{eff}/\mathrm{d}\lambda)\Delta\lambda$$, so
+
+    $$m(\lambda + \Delta\lambda) = \left[n_\mathrm{eff} + \Delta n_\mathrm{eff} + \frac{\mathrm{d}n_\mathrm{eff}}{\mathrm{d}\lambda}\Delta\lambda\right]L.$$
+
+    Subtracting $$m\lambda = n_\mathrm{eff}L$$ and replacing $$m$$ by $$n_\mathrm{eff}L/\lambda$$ gives $$(L/\lambda)\left(n_\mathrm{eff} - \lambda\,\mathrm{d}n_\mathrm{eff}/\mathrm{d}\lambda\right)\Delta\lambda = L\,\Delta n_\mathrm{eff}$$, that is $$\Delta\lambda/\lambda = \Delta n_\mathrm{eff}/n_g$$. For 1 nm of thickness this is $$1550\times3.7\times10^{-3}/4.18 = 1.37$$ nm; dividing by $$n_\mathrm{eff}$$ instead gives 2.34 nm, 71 % too much. Dispersion holds the resonance back: as it moves to longer wavelengths the effective index falls, which undoes part of the shift.
+
+    </details>
 
 ## Check yourself
 

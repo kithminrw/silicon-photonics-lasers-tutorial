@@ -82,7 +82,7 @@ def fig_rays():
     # material labels
     label(ax, 0.06, x1 - 0.05, r"cover, $n_3$ = 1.444 (SiO$_2$)", fs=7, ha="left", va="top")
     label(ax, 0.06, x0 + 0.035, r"substrate, $n_2$ = 1.444 (SiO$_2$)", fs=7, ha="left", va="bottom")
-    label(ax, 2.0 + 0.015, d / 2, r"film, $n_1$ = 3.476 (Si)", fs=6.5, ha="left", va="center", bg=MAT["si"])
+    label(ax, 2.31, d / 2, r"film, $n_1$ = 3.476 (Si)", fs=6.5, ha="right", va="center", bg=MAT["si"])   # left of the field axis
     # transverse field of the mode at the right end
     xf = np.linspace(x0, x1, 400)
     E = profile(ne, d, xf); E /= E.max()

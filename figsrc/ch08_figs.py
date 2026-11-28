@@ -124,7 +124,7 @@ def fig_conformal():
     c.plot(xb[xb < xr + 2.0], 10 * np.log10(Ib / Ib.max())[xb < xr + 2.0], color=C1, lw=1.2)
     c.axvline(xr, color=INK, lw=0.7)
     lev = 10 * np.log10(np.exp(-2 * g * (xr - W / 2)))
-    c.text(xr + 0.1, -60, "beyond the caustic the tail\nradiates instead of decaying", fontsize=6.8, color=INK, va="center")
+    c.text(xr + 0.1, -30, "beyond the caustic the tail\nradiates instead of decaying", fontsize=6.8, color=INK, va="center")   # above the tail
     c.set_ylim(-140, 5); c.set_xlim(-1.0, 3.0)
     finish(c, "Distance from the guide centre, towards the outside of the bend (µm)", r"$|E|^2$ (dB)")
     for ax, t in zip((a, b, c), "abc"): tag(ax, t)

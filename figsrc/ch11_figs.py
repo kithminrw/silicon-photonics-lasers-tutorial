@@ -44,14 +44,15 @@ def fig_chain():
     def dc(x0, L=16):
         """schematic directional coupler between x0 and x0 + L; returns nothing."""
         for s, y in ((1, yU), (-1, yL)):
-            xs, ys = sbend_xy(x0, y, 5, -s * (abs(y - yc) - 0.9)); ribbon(ax, xs, ys, w, "si")
-            wg_straight(ax, x0 + 5, x0 + L - 5, yc + s * 0.9, w)
-            xs, ys = sbend_xy(x0 + L - 5, yc + s * 0.9, 5, s * (abs(y - yc) - 0.9)); ribbon(ax, xs, ys, w, "si")
+            xs, ys = sbend_xy(x0, y, 5, -s * (abs(y - yc) - 0.9)); ribbon(ax, xs, ys, w, "si", **sk)
+            wg_straight(ax, x0 + 5, x0 + L - 5, yc + s * 0.9, w, **sk)
+            xs, ys = sbend_xy(x0 + L - 5, yc + s * 0.9, 5, s * (abs(y - yc) - 0.9)); ribbon(ax, xs, ys, w, "si", **sk)
+    sk = dict(ec=MAT["si"], lw=0.3)          # a hairline of the guide's own colour hides the seams between pieces
     box(ax, 0, -1, 100, 22, "ox", z=0)
-    wg_straight(ax, 3, 12, yU, w); wg_straight(ax, 3, 12, yL, w)
+    wg_straight(ax, 3, 12, yU, w, **sk); wg_straight(ax, 3, 12, yL, w, **sk)
     dc(12); dc(70)
-    wg_straight(ax, 28, 70, yU, w); wg_straight(ax, 28, 70, yL, w)
-    wg_straight(ax, 86, 96, yU, w); wg_straight(ax, 86, 96, yL, w)
+    wg_straight(ax, 28, 70, yU, w, **sk); wg_straight(ax, 28, 70, yL, w, **sk)
+    wg_straight(ax, 86, 96, yU, w, **sk); wg_straight(ax, 86, 96, yL, w, **sk)
     box(ax, 40, yL - 1.6, 18, 3.2, "tin", z=3, alpha=0.85)                    # heater over the lower arm
     label(ax, 49, yL - 3.3, "phase shifter (heater)", fs=6.3, va="top")
     label(ax, 49, yU + 2.2, r"$a_1e^{-j\phi_1}$", fs=7.5, va="bottom")
@@ -138,22 +139,24 @@ def fig_lattice():
     yU, yL, yc, w = 15.0, 5.0, 10.0, 0.9
     def dc(x0, L=12):
         for s, y in ((1, yU), (-1, yL)):
-            xs, ys = sbend_xy(x0, y, 4, -s * (abs(y - yc) - 0.9)); ribbon(ax, xs, ys, w, "si")
-            wg_straight(ax, x0 + 4, x0 + L - 4, yc + s * 0.9, w)
-            xs, ys = sbend_xy(x0 + L - 4, yc + s * 0.9, 4, s * (abs(y - yc) - 0.9)); ribbon(ax, xs, ys, w, "si")
+            xs, ys = sbend_xy(x0, y, 4, -s * (abs(y - yc) - 0.9)); ribbon(ax, xs, ys, w, "si", **sk)
+            wg_straight(ax, x0 + 4, x0 + L - 4, yc + s * 0.9, w, **sk)
+            xs, ys = sbend_xy(x0 + L - 4, yc + s * 0.9, 4, s * (abs(y - yc) - 0.9)); ribbon(ax, xs, ys, w, "si", **sk)
+    sk = dict(ec=MAT["si"], lw=0.3)          # a hairline of the guide's own colour hides the seams between pieces
     box(ax, 0, 0.6, 100, 18.8, "ox", z=0)
     xs_c = (6, 40, 80)
     for i, x0 in enumerate(xs_c):
         dc(x0); label(ax, x0 + 6, 2.1,f"$\\kappa_{i+1}^2$ = {100*k2[i]:.0f} %", fs=6.8)
-    wg_straight(ax, 1, 6, yU, w); wg_straight(ax, 1, 6, yL, w); wg_straight(ax, 92, 99, yU, w); wg_straight(ax, 92, 99, yL, w)
+    wg_straight(ax, 1, 6, yU, w, **sk); wg_straight(ax, 1, 6, yL, w, **sk); wg_straight(ax, 92, 99, yU, w, **sk); wg_straight(ax, 92, 99, yL, w, **sk)
     # stage 1: upper arm longer by dL, stage 2: by 2 dL (drawn as loops)
     for (xa, xb, m) in ((18, 40, 1), (52, 80, 2)):
-        wg_straight(ax, xa, xb, yL, w)
+        wg_straight(ax, xa, xb, yL, w, **sk)
         xm, hw, hh = (xa + xb) / 2, 4.5, 1.8 * m + 0.6
         pts = [(xa, yU), (xm - hw, yU), (xm - hw, yU + hh), (xm + hw, yU + hh), (xm + hw, yU), (xb, yU)]
         P = np.array(pts, float)
-        for p0, p1 in zip(P[:-1], P[1:]):
-            ribbon(ax, np.linspace(p0[0], p1[0], 2), np.linspace(p0[1], p1[1], 2), w, "si")
+        for p0, p1 in zip(P[:-1], P[1:]):            # each leg runs w/2 past its ends, so the corners are filled
+            u = (p1 - p0) / np.hypot(*(p1 - p0)); q0, q1 = p0 - u * w / 2, p1 + u * w / 2
+            ribbon(ax, np.linspace(q0[0], q1[0], 2), np.linspace(q0[1], q1[1], 2), w, "si", **sk)
         box(ax, xa + 1.2, yL - 1.1, 5.5, 2.2, "tin", z=3, alpha=0.85)
         label(ax, xm, yU + hh + 1.0, "Δ$L$" if m == 1 else "2Δ$L$", fs=7.5, va="bottom")
     label(ax, 23.5, yL - 2.1, "trim heaters", fs=6.3, va="top", ha="left")
@@ -185,7 +188,7 @@ def fig_lattice():
         b.text(l, 1.2, f"ch {i+1}", ha="center", va="bottom", fontsize=6.5, color=MUTED)
     b.set_xlim(1544, 1558); b.set_ylim(-42, 1)
     finish(b, "Wavelength (nm)", "Transmission (dB)")
-    b.legend(loc="lower center", fontsize=6.8, bbox_to_anchor=(0.25, 0.0), handlelength=2.4)
+    b.legend(loc="lower right", fontsize=6.8, bbox_to_anchor=(1.0, 1.06), ncol=2, handlelength=2.4, borderaxespad=0)   # above the plot: the curves fill it
     tag(b, "b")
     # numbers: pass band of the even port around channel 2, stop band (rejection > 20 dB) around channel 1
     def span(mask, l0):
@@ -281,8 +284,8 @@ def mzi_icon(ax, x0, y0, L=10.0, sep=2.4, heat=False, path=None, col=RED):
             xs, ys = sbend_xy(x + bl + cl, y0 + s_ * 0.25, bl, s_ * (sep / 2 - 0.25)); segs.append((xs, ys))
     for y in (yu, yd):
         segs.append((np.array([x0 + 2 * bl + cl, x0 + L - 2 * bl - cl]), np.array([y, y])))
-    for xs, ys in segs:
-        ribbon(ax, xs, ys, w, "si", z=2)
+    for xs, ys in segs:                       # hairline of the guide's own colour: no seams between the pieces
+        ribbon(ax, xs, ys, w, "si", z=2, ec=MAT["si"], lw=0.3)
     if heat:
         box(ax, x0 + 2 * bl + cl + 1.2, yd - 0.35, L - 4 * bl - 2 * cl - 2.4, 0.7, "tin", z=3, alpha=0.85)
     if path:

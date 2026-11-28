@@ -9,7 +9,7 @@ The laser is the 400 um InGaAsP Fabry-Perot laser of Worked Example 24.1 with th
 (FP in ch2x_lasers.py). The ridge cross-section uses the illustrative layer stack of figsrc/ch23_figs.py (Figure 23.3b)
 and an effective-index estimate of the mode.
 """
-import os, sys
+import math, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
 from figstyle import *
@@ -99,10 +99,10 @@ def fig_ridge():
     # labels
     callout(ax, P(Lx * 0.3, Wy / 2 + rw / 2, zc + rh), (0.6, 5.7), "p contact on the ridge", ha="left")
     callout(ax, P(0.25, 0, za + ha / 2), (-0.45, 4.3), "active region (MQW)", ha="left")
-    callout(ax, P(Lx, Wy * 0.78, 0.7), (8.7, 0.45), "cleaved facet,\n$R$ ≈ 0.32", ha="left")
+    callout(ax, P(Lx, Wy * 0.78, 0.7), (8.7, 0.05), "cleaved facet,\n$R$ ≈ 0.32", ha="left")
     label(ax, *P(Lx * 0.42, 0, 0.75), "n-InP substrate", fs=FS_SMALL, rot=0)
     callout(ax, P(0.6, 0, -0.09), (-0.45, -1.05), "n contact", ha="left")
-    label(ax, cx + 2.15, cy + 1.15, "light out", col=RED, fs=FS_SMALL)
+    label(ax, cx + 1.8, cy + 1.45, "light out", col=RED, fs=FS_SMALL)
     # length dimension along the near bottom edge
     p0, p1 = P(0, 0, -0.55), P(Lx, 0, -0.55)
     dim(ax, p0, p1, "$L$ = 400 µm")
@@ -166,7 +166,7 @@ def fig_threshold():
     for k, txt in ((1, "front facet $R_1$"), (2, "rear facet $R_2$"), (3, "front"), (4, "rear")):
         a.text(400 * k + (8 if k < 4 else -8), 5.6, txt, ha="left" if k < 4 else "right", va="top", fontsize=6.3, color=MUTED)
     a.text(150, 3.4, f"gain ×{per_pass:.2f}\nper pass", ha="center", va="bottom", fontsize=6.4, color=INK)
-    a.text(415, 2.6, f"facet ×{R:.2f}", ha="left", va="center", fontsize=6.4, color=INK)
+    a.text(415, -1.7, f"facet ×{R:.2f}", ha="left", va="center", fontsize=6.4, color=INK)
     a.set_xlim(0, 1600); a.set_ylim(-7, 6); a.set_xticks([0, 400, 800, 1200, 1600])
     finish(a, "Distance travelled, unfolded (µm)", "Power (dB, rel. start)", legend=True, loc="lower left")
     a.legend(loc="lower left", fontsize=6.4)
@@ -178,7 +178,7 @@ def fig_threshold():
         am = np.log(1 / R ** 2) / (2 * Lu * 1e-4); loss = P_["ai"] + am; Nt = P_["Ntr"] * np.exp(loss / P_["Gam"] / P_["g0"])
         b.axhline(loss, color=col, lw=1.0, ls="--")
         b.plot(Nt / 1e18, loss, "o", color=col, ms=4, zorder=5)
-        b.text(1.55 if Lu < 1000 else 2.85, loss + 1.5 if Lu < 1000 else loss - 1.5, f"{Lu} µm: $\\alpha_i + \\alpha_m$ = {loss:.1f} cm$^{{-1}}$", fontsize=6.3, color=col, va="bottom" if Lu < 1000 else "top")
+        b.text(1.55 if Lu < 1000 else 2.85, {200: loss + 1.5, 400: loss + 4.0, 1000: loss - 1.5}[Lu], f"{Lu} µm: $\\alpha_i + \\alpha_m$ = {loss:.1f} cm$^{{-1}}$", fontsize=6.3, color=col, va="bottom" if Lu < 1000 else "top")
         print(f"L = {Lu} um: alpha_m {am:.1f}, total {loss:.1f} /cm, N_th {Nt:.3e}, I_th {QE*Lu*1e-4*P_['w']*P_['d']/P_['eta']*rrec(Nt)*1e3:.1f} mA,"
               f" eta_d {P_['eta']*am/(P_['ai']+am):.2f}")
     b.axhline(P_["ai"], color=MUTED, lw=0.7, ls=":")
@@ -220,7 +220,7 @@ def fig_clamp():
     # below threshold: no photons in the mode, so N follows from I = qV R(N)/eta alone (extend the curve to I = 0)
     Nlow = np.linspace(1e16, N[0], 200); Ilow = QE * V / P_["eta"] * rrec(Nlow)
     a.plot(np.r_[Ilow, I[sel]] * 1e3, np.r_[Nlow, N[sel]] / 1e18, color=C1)
-    a.axhline(NTH / 1e18, color=MUTED, lw=0.7, ls="--"); a.axvline(ITH * 1e3, color=MUTED, lw=0.6, ls=":")
+    a.axhline(NTH / 1e18, color=MUTED, lw=0.7, ls="--"); a.axvline(ITH * 1e3, ymax=0.82, color=MUTED, lw=0.6, ls=":")   # stops under the label
     a.text(1.5, NTH / 1e18 + 0.08, f"clamped at $N_\\mathrm{{th}}$ = {NTH/1e18:.2f} × 10$^{{18}}$ cm$^{{-3}}$", fontsize=6.6, color=INK, va="bottom")
     a.text(ITH * 1e3 + 1, 0.4, f"$I_\\mathrm{{th}}$ = {ITH*1e3:.0f} mA", fontsize=6.6, color=MUTED)
     a.text(8, 0.75, "below threshold, nearly\nall of $I$ recombines:\n$I \\approx qV R(N)/\\eta_i$", fontsize=6.5, color=INK)
@@ -233,7 +233,7 @@ def fig_clamp():
     b.plot(I[i50] * 1e3, Pf[i50] * 1e3, "o", color=C2, ms=4)
     b.annotate(f"50 mA: slope\n{sl:.2f} W/A per facet", xy=(I[i50] * 1e3, Pf[i50] * 1e3), xytext=(30, 0.06), fontsize=6.6, color=INK,
                arrowprops=dict(arrowstyle="-", color=MUTED, lw=0.6))
-    b.text(3, 2e-4, "spontaneous emission\ninto the lasing mode", fontsize=6.5, color=INK)
+    b.text(1.0, 3.5e-3, "spontaneous\nemission into\nthe lasing mode", fontsize=6.5, color=INK, va="bottom")
     b.text(ITH * 1e3 + 1.5, 4e-3, "stimulated\nemission", fontsize=6.5, color=INK, ha="left")
     b.set_xlim(0, 60); b.set_ylim(1e-5, 30)
     finish(b, "Current (mA)", "Output per facet (mW, log scale)")
@@ -337,7 +337,7 @@ def fig_modes():
     b.annotate("", xy=(lam0 + dlam, 0.06), xytext=(lam0, 0.06), arrowprops=dict(arrowstyle="<|-|>", color=INK, lw=0.6, mutation_scale=5, shrinkA=0, shrinkB=0))
     b.text(lam0 + dlam / 2, 0.09, f"{dlam:.2f} nm", fontsize=6.4, ha="center", va="bottom", color=INK)
     b.annotate(f"neighbours: {loss - gm(lam0 + dlam):.3f} cm$^{{-1}}$\nbelow the loss", xy=(lam0 - dlam, gm(lam0 - dlam) - loss),
-               xytext=(lam0 - 4.0, -0.45), fontsize=6.4, color=INK, arrowprops=dict(arrowstyle="-", color=MUTED, lw=0.6))
+               xytext=(lam0, -0.55), fontsize=6.4, color=INK, ha="center", va="top", arrowprops=dict(arrowstyle="-", color=MUTED, lw=0.6))
     b.set_xlim(lam0 - 4.3, lam0 + 4.3); b.set_ylim(-0.9, 0.25)
     b.set_xticks([1546, 1548, 1550, 1552, 1554])
     finish(b, "Wavelength (nm)", "Modal gain − loss (cm$^{-1}$)")
@@ -429,11 +429,61 @@ def fig_process():
     print("Fig 24.8: schematic (layer names and order as in Table 24.1)")
 
 
+
+# ================================================================== Figure 24.14: elliptical and astigmatic laser beams
+def _gw(z, w0, z0, lam=1.55):
+    zr = math.pi * w0 ** 2 / lam
+    return w0 * np.sqrt(1 + ((z - z0) / zr) ** 2)
+
+
+def fig_astig():
+    lam = 1.55
+    # Gaussian beams with the far field of Figure 24.9 (16 x 36 degrees FWHM): w0 = 1.177 lam / (pi theta_FWHM)
+    wx0 = 1.1774 * lam / (math.pi * math.radians(16)); wy0 = 1.1774 * lam / (math.pi * math.radians(36))
+    zrx, zry = math.pi * wx0 ** 2 / lam, math.pi * wy0 ** 2 / lam
+    zr = math.sqrt((wx0 ** 2 - wy0 ** 2) / (wy0 ** 2 / zry ** 2 - wx0 ** 2 / zrx ** 2))      # where the spot is round
+    print(f"astig: equivalent Gaussians w0x {wx0:.2f}, w0y {wy0:.2f} um; z_R {zrx:.2f}, {zry:.2f} um; round at z = {zr:.2f} um")
+    fig = plt.figure(figsize=(6.3, 3.35))
+    a = fig.add_axes([0.0, 0.50, 1.0, 0.46]); a.set_xlim(0, 10); a.set_ylim(-1.25, 1.15); a.axis("off")
+    zs = [0.0, 2.0, round(zr, 1), 10.0, 40.0]
+    for k, zz in enumerate(zs):
+        wx, wy = _gw(zz, wx0, 0), _gw(zz, wy0, 0); m = max(wx, wy); cx = 1.0 + 2.0 * k
+        a.add_patch(Ellipse((cx, 0.05), 1.5 * wx / m, 1.5 * wy / m, fc=C4, alpha=0.30, ec=C4, lw=1.0))
+        a.plot([cx - 0.75 * wx / m, cx + 0.75 * wx / m], [0.05, 0.05], color=C1, lw=0.7)
+        a.plot([cx, cx], [0.05 - 0.75 * wy / m, 0.05 + 0.75 * wy / m], color=C1, lw=0.7)
+        a.text(cx, 1.05, f"z = {zz:g} µm" + (" (facet)" if zz == 0 else " (round)" if k == 2 else ""), ha="center", fontsize=6.6, color=INK)
+        a.text(cx, -0.95, f"{2*wx:.1f} × {2*wy:.1f} µm", ha="center", fontsize=6.4, color=INK)
+        print(f"   z {zz:5.1f} um: 1/e2 {2*wx:.2f} x {2*wy:.2f} um")
+    a.text(0.0, -1.2, "each spot scaled to the same size; numbers: 1/e² width × height", fontsize=6.0, color=MUTED, style="italic")
+    a.annotate("", xy=(9.6, 0.05), xytext=(0.4, 0.05), arrowprops=dict(arrowstyle="-|>", color=MUTED, lw=0.6, mutation_scale=7), zorder=0)
+    panel(a, "a", 0.0, 1.0)
+    z = np.linspace(-25, 25, 500)
+    for k, (ttl, zx0) in enumerate((("index-guided (ridge, buried mesa)", 0.0), ("gain-guided stripe", -20.0))):
+        b = fig.add_axes([0.07 + 0.49 * k, 0.10, 0.42, 0.32])
+        wx, wy = _gw(z, wx0 if zx0 == 0 else 2.5, zx0), _gw(z, wy0, 0)
+        out = z >= 0
+        b.add_patch(plt.Rectangle((-25, 0), 25, 30, fc="#E3E7EE", ec="none", zorder=0)); b.axvline(0, color=INK, lw=0.9)
+        for w, col, lab in ((wx, C1, "half-width"), (wy, C4, "half-height")):
+            b.plot(z[out], w[out], color=col, lw=1.4, label=lab); b.plot(z[~out], w[~out], color=col, lw=0.9, ls=(0, (3, 2)))
+        b.axvline(zx0, color=C1, lw=0.7, ls=":"); b.axvline(0, color=C4, lw=0.7, ls=":")
+        b.set_xlim(-25, 25); b.set_ylim(0, 22); b.set_yticks([0, 10, 20]); b.grid(False)
+        b.text(-24, 19.5, "laser", fontsize=6.3, color=MUTED); b.text(0.8, 19.5, "facet", fontsize=6.3, color=INK)
+        b.set_title(ttl, loc="left", fontsize=7.0, color=INK, pad=2)
+        if zx0 < 0:
+            b.annotate("", xy=(zx0, 13), xytext=(0, 13), arrowprops=dict(arrowstyle="<|-|>", color=INK, lw=0.7, mutation_scale=6))
+            b.text(zx0 / 2, 13.6, "20 µm", fontsize=6.3, ha="center", va="bottom", color=INK)
+        finish(b, "Distance from the facet (µm)", "Beam size (µm)" if k == 0 else None)
+        if k == 0:
+            b.legend(loc="upper left", bbox_to_anchor=(0.14, 1.0), fontsize=6.2, handlelength=1.4); tag(b, "b")
+        else:
+            tag(b, "c")
+    save(fig, "ch24_astig")
+
 if __name__ == "__main__":
     o = fp_op(50e-3)
     print(f"FP laser: V = {V:.2e} cm3, alpha_m {AM:.2f} /cm, g_th {GTH:.1f} /cm, N_th {NTH:.3e}, I_th {ITH*1e3:.2f} mA,"
           f" slope/facet {o['slope']:.3f} W/A, tau_p {TP*1e12:.2f} ps, tau_n = N_th/R {NTH/rrec(NTH)*1e9:.2f} ns")
     only = sys.argv[1:]
-    for fn in (fig_ridge, fig_threshold, fig_clamp, fig_turnon, fig_modes, fig_process):
+    for fn in (fig_ridge, fig_threshold, fig_clamp, fig_turnon, fig_modes, fig_process, fig_astig):
         if not only or fn.__name__ in only:
             fn()

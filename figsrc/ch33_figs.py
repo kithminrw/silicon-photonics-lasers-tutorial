@@ -88,7 +88,7 @@ def fig_layers():
     callout(ax, (40, 13), (55, 20), "DevRec 68/0", fs=6, col=TEAL, ha="left")
     ax.text(83, -24, "FloorPlan 99/0", fontsize=5.8, color=MUTED, ha="right", va="bottom")
     scalebar(ax, -82, -23, 20, "20 µm")
-    panel(ax, "a", 0.02, 0.99)
+    panel(ax, "a", 0.0, 1.08)                      # above the FloorPlan outline, not on it
     # (b) what each layer becomes
     bx = fig.add_axes([0.49, 0.0, 0.51, 1.0])
     frameless(bx, (0, 1), (0, 1), equal=False)
@@ -204,7 +204,7 @@ def fig_records():
         x += w + 0.0025
     v = list(zip(val[0::2], val[1::2]))
     ax.text(0.035, 0.30, f"0x002C = {n} bytes", fontsize=6.4, color=INK, va="top")
-    ax.text(0.155, 0.30, "0x10 = XY,  3 = 4-byte signed integers", fontsize=6.4, color=INK, va="top")
+    ax.text(0.168, 0.30, "0x10 = XY,  3 = 4-byte signed integers", fontsize=6.4, color=INK, va="top")
     ax.text(0.47, 0.30, "five (x, y) pairs in nm: " + ", ".join(f"({a}, {b})" for a, b in v),
             fontsize=6.4, color=INK, va="top")
     ax.text(0.47, 0.13, "the fifth point repeats the first: a boundary is closed; FF FF FF 06 = −250 (two's complement)",
@@ -319,14 +319,14 @@ def fig_klayout():
     fig = plt.figure(figsize=(6.6, 2.9))
     # (a) the three cells as placed, to scale
     ax = fig.add_axes([0.0, 0.02, 0.2, 0.96])
-    frameless(ax, (-30, 40), (-25, 275))
+    frameless(ax, (-30, 54), (-25, 275))           # room on the right for the pitch dimension
     for p in E["outlines"]:
         draw_poly(ax, p, MAT["si"], ec="#6F86A3", lw=0.5)
     for t, x, y in E["texts"]:
         ax.text(-16, y + 3.0, t, fontsize=5.6, color=INK, ha="left", va="top")
         ax.text(-16, y + 29.0, f"ring_r10_g{t.split()[1]}", fontsize=5.0, color=MUTED, ha="left", va="bottom", **MONO)
-    dim(ax, (24, 0), (24, 127), "127 µm", text_off=(0, 0), fs=5.6)
-    dim(ax, (24, 127), (24, 254), "127 µm", text_off=(0, 0), fs=5.6)
+    dim(ax, (47, 0), (47, 127), "127 µm", text_off=(0, 0), fs=5.6)      # right of the gap labels and cell names
+    dim(ax, (47, 127), (47, 254), "127 µm", text_off=(0, 0), fs=5.6)
     panel(ax, "a", 0.0, 1.0)
     # (b) one ring polygon as stored in GDS: hull and cut line, vertices marked
     bx = fig.add_axes([0.2, 0.02, 0.42, 0.96])
@@ -350,7 +350,7 @@ def fig_klayout():
             fontsize=5.8, color=INK, va="top")
     bx.add_patch(Rect((-1.0, 9.7), 2.0, 1.55, fc="none", ec=RED, lw=0.7, zorder=8))
     scalebar(bx, 13, -11, 5, "5 µm")
-    panel(bx, "b", 0.0, 1.0)
+    panel(bx, "b", 0.0, 1.07)                      # clear of the bus
     # (c) zoom on the gap: vertices on the 1 nm grid
     cx = fig.add_axes([0.70, 0.12, 0.29, 0.8])
     out = hull[r > 10.0]
@@ -636,7 +636,7 @@ def fig_gdsfactory():
     bx.set_xlim(1535, 1565)
     bx.set_ylim(-40, 3)
     finish(bx, xlabel="Wavelength (nm)", ylabel="Transmission (dB)")
-    bx.text((a + b) / 2, -33.5, f"expected {S['fsr_formula_nm']:.2f}", fontsize=5.8, color=INK, ha="center", va="top")
+    bx.text((a + b) / 2, -33.5, f"expected\n{S['fsr_formula_nm']:.2f}", fontsize=5.8, color=INK, ha="center", va="top")   # fits between the dips
     tag(bx, "b")
     save(fig, "ch33_gdsfactory")
 
@@ -656,7 +656,7 @@ def fig_floorplan():
     ax.text(-30, ys[0] - 25, "fibre\narray", fontsize=7.0, color=INK, ha="center", va="top")
     # what is where (positions from the gdsfactory script: devices between their couplers, pads at 100 um pitch)
     ax.text(240, 82.5 + 127 * 1.5 + 2, "MZI, ΔL = 100 µm", fontsize=7.4, color=INK, ha="left", va="center")
-    ax.text(150, 82.5 + 127 * 3 + 40, "ring with heater", fontsize=7.4, color=INK, ha="left", va="center")
+    ax.text(222, 82.5 + 127 * 3 + 83, "ring with heater", fontsize=7.4, color=INK, ha="left", va="center")   # beside the ring, clear of the bus
     ax.text(W - 48, H / 2, "loopback", fontsize=7.4, color=INK, ha="center", va="center", rotation=90)
     dim(ax, (480, 680), (580, 680), "100 µm", fs=7.0, text_off=(0, 11))
     ax.text(635, 623.5, "probe pads\n80 × 80 µm", fontsize=7.4, color=INK, ha="left", va="center")
@@ -696,10 +696,10 @@ def fig_routing():
     for y in (175, 180, 185, 190):
         bx.plot([40, 45], [y, y], color=MAT["si"], lw=0)
     dim(bx, (38, 175), (38, 180), "5 µm", fs=5.8, text_off=(3.3, 0))
-    bx.text(1, 203.5, "10 µm Euler bends, nested;\nvertical runs 5.5 µm apart", fontsize=5.8, color=INK, va="top")
+    bx.text(44, 203.5, "10 µm Euler bends, nested;\nvertical runs 5.5 µm apart", fontsize=5.8, color=INK, va="top", ha="right")   # clear of the runs
     bx.add_patch(Rect((0, 160), 45, 45, fc="none", ec=RED, lw=0.9, zorder=8))
     scalebar(bx, 30, 162, 10, "10 µm")
-    panel(bx, "b", 0.0, 1.0)
+    panel(bx, "b", 0.0, 1.07)                      # above the frame, not on its corner
     save(fig, "ch33_routing")
 
 
