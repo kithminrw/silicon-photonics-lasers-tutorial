@@ -1,0 +1,137 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdIso" role="group" aria-label="Interactive demo: a magneto-optic isolator, as a Mach–Zehnder or a ring">
+  <div class="bd-head"><span>// try it · a magneto-optic isolator on silicon (1550 nm)</span>
+    <span class="bd-seg" role="group" aria-label="Device"><button type="button" data-dev="mzi" aria-pressed="true">MZI</button><button type="button" data-dev="ring" aria-pressed="false">ring</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span data-o="nrl">non-reciprocal phase, each arm <b data-v="nr"></b></span><input type="range" data-k="nr" min="0" max="90" step="0.5" value="45" aria-label="non-reciprocal phase in degrees"></label>
+    <label class="bd-sl"><span>probe detuning from 1550 nm <b data-v="pr"></b></span><input type="range" data-k="pr" min="-50" max="50" step="0.05" value="0" aria-label="probe wavelength detuning in nm"></label>
+    <label class="bd-sl" data-only="mzi"><span>reciprocal delay order <b data-v="m"></b></span><input type="range" data-k="m" min="1" max="30" step="1" value="1" aria-label="order of the reciprocal delay"></label>
+    <label class="bd-sl" data-only="mzi"><span>extra loss in one arm <b data-v="la"></b></span><input type="range" data-k="la" min="0" max="3" step="0.05" value="0" aria-label="extra loss in one arm in dB"></label>
+    <label class="bd-sl" data-only="ring" style="display:none"><span>ring power coupling κ² <b data-v="k2"></b></span><input type="range" data-k="k2" min="1" max="30" step="0.1" value="13.5" aria-label="ring power coupling in percent"></label>
+    <label class="bd-sl" data-only="ring" style="display:none"><span>ring loss (garnet-clad) <b data-v="rl"></b></span><input type="range" data-k="rl" min="2" max="40" step="0.5" value="20" aria-label="ring loss in dB per cm"></label>
+  </div>
+  <div class="bd-controls"><button type="button" class="bd-toggle" data-o="mag" aria-pressed="false">reverse the magnet</button></div>
+  <div class="bd-scope"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag" data-o="gtag">top view: forward and backward light</span></div>
+  <div class="bd-scope"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">blue: forward · gold: backward</span></div>
+  <div class="bd-read" aria-live="polite"><span>forward loss <b data-o="tf">–</b></span><span>backward transmission <b data-o="tb">–</b></span><span>isolation <b data-o="iso">–</b></span><span>20 dB bandwidth <b data-o="bw">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Mismatch the garnet.</b> On the MZI, lower the non-reciprocal phase from 45° to 30° per arm: the isolation falls from beyond 40 dB to about 11 dB, and 0.3 dB of the forward light is lost. The reciprocal −π/2 was designed for 45°; the two must match.</li>
+    <li><b>Trade bandwidth for delay.</b> Raise the delay order from 1 to 20 and widen your view with the probe: the 20 dB window shrinks from 76 nm to about 3 nm. Then add 1 dB of extra loss in one arm: even at the design point, unequal arms cannot cancel completely, and the isolation is capped near 25 dB.</li>
+    <li><b>Try a ring.</b> Switch to the ring: the non-reciprocal phase splits the resonance, so at the probe the backward light sits on its resonance and is absorbed while the forward light is off resonance. Reverse the magnet: the roles swap, and the device now isolates the other way.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>A colleague proposes an "isolator" made of a silicon waveguide with a tapered, lossy section that absorbs more light going one way than the other. Will it isolate?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-why="Asymmetric loss does not break reciprocity: the transmission from the fundamental mode at one end to the fundamental mode at the other is the same in both directions. Light lost one way is light converted into other modes, not light stopped.">Yes, if the taper is asymmetric enough</button>
+      <button type="button" data-correct data-why="A linear, time-invariant, unbiased structure is reciprocal: mode-to-mode transmission is the same both ways, however asymmetric it looks. Isolation needs a magnetic bias, time modulation or (with limits) nonlinearity.">No: without a magnetic bias or time modulation it is reciprocal</button>
+      <button type="button" data-why="Making the loss nonlinear or time-varying could break reciprocity, but plain absorption cannot, at any power level in a linear device.">Only at high power</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdIso'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  var dev = 'mzi', rev = false, NG = 4.2, NEFF = 2.45, L0 = 1550, RRING = 50, FSR = L0 * L0 / (NG * 2 * Math.PI * RRING * 1e3);   // nm
+  var S = BD.bind(root, {
+    nr: { fmt: function (x) { return x.toFixed(1) + '°'; } }, pr: { fmt: function (x) { return (x >= 0 ? '+' : '−') + Math.abs(x).toFixed(2) + ' nm'; } },
+    m: { fmt: function (x) { return x.toFixed(0); } }, la: { fmt: function (x) { return x.toFixed(2) + ' dB'; } },
+    k2: { fmt: function (x) { return x.toFixed(1) + ' %'; } }, rl: { fmt: function (x) { return x.toFixed(1) + ' dB/cm'; } }
+  }, function () { draw(); });
+  function setSl(k, v) { var el = q('[data-k="' + k + '"]'); el.value = v; el.dispatchEvent(new Event('input', { bubbles: true })); }
+  BD.seg(root, 'dev', function (v) {
+    dev = v;
+    root.querySelectorAll('[data-only]').forEach(function (el) { el.style.display = el.getAttribute('data-only') === v ? '' : 'none'; });
+    var pr = q('[data-k="pr"]');
+    q('[data-o="nrl"]').firstChild.textContent = v === 'mzi' ? 'non-reciprocal phase, each arm ' : 'non-reciprocal phase per round trip ';
+    if (v === 'mzi') { pr.min = -50; pr.max = 50; pr.step = 0.05; setSl('nr', 45); setSl('pr', 0); }
+    else { pr.min = -2; pr.max = 2; pr.step = 0.002; setSl('nr', 30); setSl('pr', -(30 / 360) * FSR); }
+    draw();
+  });
+  BD.toggle(q('[data-o="mag"]'), function (on) { rev = on; draw(); });
+  // ---- the two devices: transmission from "in" to "out" (forward) and from "out" to "in" (backward)
+  function mzi(dl, back) {
+    var lam = L0 + dl, m = S.m, nL = (m - 0.25) * L0;                                    // n_eff dL in nm: reciprocal phase 2 pi m - pi/2 at 1550 nm
+    var phr = 2 * Math.PI * (m - 0.25) + 2 * Math.PI * (nL / NEFF) * NG * (1 / lam - 1 / L0);
+    var dir = (back ? -1 : 1) * (rev ? -1 : 1), nr = S.nr * Math.PI / 180;
+    var d = phr + 2 * dir * nr, a1 = 1, a2 = Math.pow(10, -S.la / 20);                  // phase and amplitudes of the two arms
+    return (a1 * a1 + a2 * a2 + 2 * a1 * a2 * Math.cos(d)) / 4;                        // |a1 e^{-j d} + a2|^2 / 4, 50:50 couplers
+  }
+  function ring(dl, back) {
+    var lam = L0 + dl, Lr = 2 * Math.PI * RRING * 1e3;                                   // nm
+    var phr = 2 * Math.PI * NG * Lr * (1 / lam - 1 / L0);
+    var dir = (back ? -1 : 1) * (rev ? -1 : 1), ph = phr + dir * S.nr * Math.PI / 180;
+    var a = Math.exp(-S.rl / 4.343 * Lr * 1e-7 / 2), t = Math.sqrt(1 - S.k2 / 100), c = Math.cos(ph);
+    return (a * a - 2 * a * t * c + t * t) / (1 - 2 * a * t * c + a * a * t * t);
+  }
+  function T(dl, back) { return dev === 'mzi' ? mzi(dl, back) : ring(dl, back); }
+  function db(x) { return 10 * Math.log10(Math.max(x, 1e-9)); }
+  function draw() {
+    var p = S.pr, tf = T(p, false), tb = T(p, true), iso = db(tf) - db(tb);
+    // 20 dB window around the probe
+    var span = dev === 'mzi' ? 50 : 2, step = span / 2000, lo = p, hi = p;
+    if (iso >= 20) { while (lo - step > -span && db(T(lo - step, false)) - db(T(lo - step, true)) >= 20) lo -= step;
+                     while (hi + step < span && db(T(hi + step, false)) - db(T(hi + step, true)) >= 20) hi += step; }
+    // ---------------------------------------------------------------- the device, top view (schematic)
+    (function () {
+      var d = BD.setup(q('[data-c="g"]')), g = d.g, W = d.w, H = d.h, cy = 28 + (H - 28) / 2;
+      var mcol = 'rgba(200,180,240,', arrowC = rev ? '←' : '→';
+      if (dev === 'mzi') {
+        var x0 = 12, x1 = W - 12, xs = x0 + 0.13 * (x1 - x0), xe = x1 - 0.13 * (x1 - x0), dy = Math.min(40, (H - 50) / 2.4), up = cy - dy, dn = cy + dy;
+        BD.wgr(g, [[x0, cy], [xs, cy]], 2.2, BD.GEO.si); BD.wgr(g, [[xe, cy], [x1, cy]], 2.2, BD.GEO.si);
+        var extra = Math.min(dy * 0.9, 1.2 * (S.m - 1));                                    // the longer arm, drawn with a bump that grows with the delay order
+        BD.wgr(g, BD.offsetPath([xs, cy], [xs + 30, up], 16).concat([[(xs + xe) / 2 - 40, up], [(xs + xe) / 2 - 20, up - extra], [(xs + xe) / 2 + 20, up - extra], [(xs + xe) / 2 + 40, up]], BD.offsetPath([xe - 30, up], [xe, cy], 16)), 2.2, BD.GEO.si, 8);
+        BD.wgr(g, BD.offsetPath([xs, cy], [xs + 30, dn], 16).concat(BD.offsetPath([xe - 30, dn], [xe, cy], 16)), 2.2, BD.GEO.si, 8);
+        var gw = Math.max(8, (xe - xs - 80) * 0.55 * S.nr / 90), gx = xs + 34;               // garnet length grows with the non-reciprocal phase
+        [[up, 1], [dn, -1]].forEach(function (r) {
+          g.fillStyle = mcol + '.35)'; g.strokeStyle = mcol + '.9)'; g.fillRect(gx, r[0] - 5, gw, 10); g.strokeRect(gx, r[0] - 5, gw, 10);
+          var dirm = r[1] * (rev ? -1 : 1);
+          BD.label(g, 'M ' + (dirm > 0 ? '→' : '←'), gx + gw / 2, r[0] + (r[1] > 0 ? -9 : 18), mcol + '1)', 'center');
+        });
+        if (S.la > 0.02) { g.fillStyle = 'rgba(240,138,106,.7)'; g.fillRect(xe - 70, dn - 3, 20, 6); BD.label(g, '−' + S.la.toFixed(1) + ' dB', xe - 60, dn + 16, BD.C.red, 'center'); }
+        g.fillStyle = 'rgba(224,138,58,.85)'; g.fillRect(xe - 62, up - 3, 14, 6);
+        BD.label(g, 'in', x0, cy - 7, BD.C.dim); BD.label(g, 'out', x1, cy - 7, BD.C.dim, 'right');
+        BD.label(g, 'reciprocal −π/2 + 2π·' + (S.m - 1), xe - 55, up + 16, BD.C.gold, 'center');
+      } else {
+        var R = Math.min(42, (H - 60) / 2), rx = W / 2, ry = cy - 6, by = ry + R + 6 + 14 * (1 - S.k2 / 30);
+        BD.wgr(g, [[12, by], [W - 12, by]], 2.2, BD.GEO.si);
+        var al = (0.25 + 0.75 * Math.exp(-S.rl / 25)).toFixed(2);
+        g.strokeStyle = 'rgba(157,179,204,' + al + ')'; g.lineWidth = 2.2; g.beginPath(); g.arc(rx, ry, R, 0, 7); g.stroke(); g.lineWidth = 1;
+        var arc = Math.PI * 2 * Math.min(1, 0.15 + S.nr / 90);
+        g.strokeStyle = mcol + '.8)'; g.lineWidth = 7; g.beginPath(); g.arc(rx, ry, R, -Math.PI / 2 - arc / 2, -Math.PI / 2 + arc / 2); g.stroke(); g.lineWidth = 1;
+        BD.label(g, 'garnet, M ' + (rev ? 'inward' : 'outward'), rx, ry - R - 10, mcol + '1)', 'center');
+        BD.label(g, 'in', 12, by - 7, BD.C.dim); BD.label(g, 'out', W - 12, by - 7, BD.C.dim, 'right');
+        BD.label(g, 'gap sets κ² = ' + S.k2.toFixed(1) + ' %', rx, by + 16, BD.C.dim, 'center');
+      }
+      // forward and backward arrows, thick when the light gets through
+      var yA = 40, fw = Math.max(0.8, 6 * Math.sqrt(tf)), bw = Math.max(0.8, 6 * Math.sqrt(tb));
+      g.strokeStyle = BD.C.blue; g.lineWidth = fw; g.beginPath(); g.moveTo(16, yA); g.lineTo(W * 0.42, yA); g.stroke();
+      g.strokeStyle = BD.C.gold; g.lineWidth = bw; g.beginPath(); g.moveTo(W - 16, yA); g.lineTo(W * 0.58, yA); g.stroke(); g.lineWidth = 1;
+      BD.label(g, 'forward ' + (tf < 1e-7 ? '≈ 0' : tf < 0.001 ? (100 * tf).toExponential(0) : (100 * tf).toFixed(tf < 0.1 ? 2 : 0)) + ' %', 16, yA - 8, BD.C.blue);
+      BD.label(g, 'backward ' + (tb < 1e-7 ? '≈ 0' : tb < 0.001 ? (100 * tb).toExponential(0) : (100 * tb).toFixed(tb < 0.1 ? 2 : 0)) + ' %', W - 16, yA - 8, BD.C.gold, 'right');
+    })();
+    // ---------------------------------------------------------------- spectra
+    var dv = BD.setup(q('[data-c="s"]')), span2 = dev === 'mzi' ? 50 : 2, xs = [], yf = [], yb = [];
+    for (var i = 0; i <= 800; i++) { var dl = -span2 + 2 * span2 * i / 800; xs.push(dl); yf.push(Math.max(-50, db(T(dl, false)))); yb.push(Math.max(-50, db(T(dl, true)))); }
+    var xt = dev === 'mzi' ? [[-50, '1500'], [-25, '1525'], [0, '1550'], [25, '1575'], [50, '1600 nm']] : [[-2, '−2'], [-1, '−1'], [0, '1550'], [1, '+1'], [2, '+2 nm']];
+    var f = BD.frame(dv, { x: [-span2, span2], y: [-50, 2], xt: xt, yt: [[-50, '−50'], [-40, '−40'], [-20, '−20'], [0, '0 dB']], pad: { l: 40, b: 24 } });
+    if (iso >= 20 && hi > lo) { dv.g.fillStyle = 'rgba(127,224,160,.08)'; dv.g.fillRect(f.X(lo), f.p.t, f.X(hi) - f.X(lo), dv.h - f.p.t - f.p.b); }
+    BD.line(f, xs, yb, BD.C.gold, 1.4, [5, 3]); BD.line(f, xs, yf, BD.C.blue, 1.8);
+    BD.vline(f, p, BD.C.white, [2, 3]); BD.dot(f, p, Math.max(-50, db(tf)), BD.C.blue, 3.5); BD.dot(f, p, Math.max(-50, db(tb)), BD.C.gold, 3.5);
+    // ---------------------------------------------------------------- readouts
+    q('[data-o="tf"]').textContent = -db(tf) > 49.9 ? '> 50 dB' : (-db(tf)).toFixed(2) + ' dB';
+    q('[data-o="tb"]').textContent = db(tb) <= -49.9 ? '< −50 dB' : db(tb).toFixed(1) + ' dB';
+    q('[data-o="iso"]').textContent = iso > 49.9 ? '> 50 dB' : iso < -49.9 ? '< −50 dB' : iso.toFixed(1) + ' dB';
+    q('[data-o="bw"]').textContent = iso >= 20 ? ((hi - lo) >= 1 ? (hi - lo).toFixed(1) + ' nm' : ((hi - lo) * 1000).toFixed(0) + ' pm') : '–';
+    BD.pill(q('[data-o="pill"]'), iso >= 20 ? 'isolating' : iso <= -20 ? 'reversed' : 'leaky', iso >= 20 ? 'ok' : iso <= -20 ? 'warn' : 'bad');
+    var c;
+    if (dev === 'mzi') c = 'Forward, the garnet adds +' + S.nr.toFixed(0) + '° in one arm and −' + S.nr.toFixed(0) + '° in the other, and the reciprocal −π/2 brings the arms together at "out". Backward, the non-reciprocal phases change sign, so the arms differ by π and the light leaves through the other port instead of reaching "in". ';
+    else c = 'The garnet shifts the ring\'s phase by ±' + S.nr.toFixed(0) + '° per round trip for the two directions, so the resonance splits: one direction is absorbed on resonance while the other, off resonance, passes. The window is narrow, a fraction of the FSR (' + FSR.toFixed(2) + ' nm here). ';
+    if (rev) c += 'With the magnet reversed, the device isolates the other way. ';
+    c += '<i>Schematic geometry; ideal 50:50 couplers, the non-reciprocal phase constant with wavelength; ring of 50 µm radius with n<sub>g</sub> = 4.2. Real garnet devices also add loss and usually act on one polarisation.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

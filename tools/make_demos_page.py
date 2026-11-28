@@ -49,6 +49,7 @@ DESC = {
     'vernier': ('Vernier ring laser', 'Tune a laser over a wide range with two rings of slightly different size.'),
     'hybrid': ('III–V/Si supermodes', 'How light is shared between III–V gain and silicon as the silicon width changes, drawn as signed fields.'),
     'soa': ('SOA gain and noise figure', 'Gain saturation and noise figure of a semiconductor optical amplifier.'),
+    'isolator': ('Magneto-optic isolator', 'An MZI or ring isolator on silicon: non-reciprocal phase, delay order, arm loss and the magnet, with forward and backward spectra and the isolation window.'),
     'circuit': ('Circuit simulator', 'Chain S-parameter models of couplers, delays and rings into circuits and see their spectra.'),
     'fdtd': ('FDTD in the browser', 'A real 2D finite-difference time-domain simulation: resolution, the Courant limit and absorbing boundaries.'),
     'wafer': ('Wafer-map Monte Carlo', 'Thickness and width variation across a wafer, and the ring wavelengths and heater power it costs.'),

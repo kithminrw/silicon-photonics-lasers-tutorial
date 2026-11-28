@@ -60,4 +60,4 @@ The tutorial has learned from the teaching material of the field, above all Chro
 
 **How this tutorial is made.** Its text, figures, demos and labs were written and drawn for it with the help of AI tools; nothing is copied from elsewhere ([Preface]({% link preface.md %})). This draft may still contain mistakes, and any mistake will be corrected as soon as it is pointed out.
 
-This is a living draft (v0.1, November 2026): all nine parts (Chapters 1–39) are written, with fifty-one interactive demos, fifteen hands-on labs and the 3D gallery.
+This is a living draft (v0.1, November 2026): all nine parts (Chapters 1–39) are written, with fifty-two interactive demos, fifteen hands-on labs and the 3D gallery.

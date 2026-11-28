@@ -6,7 +6,7 @@ permalink: /demos/
 
 # Interactive Demos
 
-All 51 demos of the tutorial on one page. Each runs in your browser with no installation, computes its pictures and numbers from a small model of the device, and reproduces the chapter's own numbers at its default settings. The link takes you to the demo inside its chapter, where the text explains what it shows.
+All 52 demos of the tutorial on one page. Each runs in your browser with no installation, computes its pictures and numbers from a small model of the device, and reproduces the chapter's own numbers at its default settings. The link takes you to the demo inside its chapter, where the text explains what it shows.
 {: .chapterlead }
 
 ## Part I · Foundations
@@ -142,6 +142,7 @@ All 51 demos of the tutorial on one page. Each runs in your browser with no inst
 ### [27. Lasers on Silicon]({{ '/part-6/ch27/' | relative_url }})
 
 - [III–V/Si supermodes]({{ '/part-6/ch27/' | relative_url }}#bdHybrid): How light is shared between III–V gain and silicon as the silicon width changes, drawn as signed fields.
+- [Magneto-optic isolator]({{ '/part-6/ch27/' | relative_url }}#bdIso): An MZI or ring isolator on silicon: non-reciprocal phase, delay order, arm loss and the magnet, with forward and backward spectra and the isolation window.
 
 ### [28. Semiconductor Optical Amplifiers]({{ '/part-6/ch28/' | relative_url }})
 

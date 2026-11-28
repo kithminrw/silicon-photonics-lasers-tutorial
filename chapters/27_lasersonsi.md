@@ -319,6 +319,10 @@ Section 25.5 of [Chapter 25]({% link chapters/25_dynamics.md %}) showed that −
   <figcaption><span class="capnum">Figure 27.11.</span> <strong>A magneto-optic Mach–Zehnder isolator.</strong> (a) Schematic: garnet on both arms, magnetised in opposite directions, adds ±π/4 forward and ∓π/4 backward. With the reciprocal −π/2, the arms meet in phase going forward (light leaves through "out") and in antiphase going backward (light from "out" is radiated at the Y-branch). (b) Forward (solid) and backward (dashed) transmission for reciprocal delays of order 1 (\(\Delta L\) = 0.47 µm) and order 20 (12.5 µm), with \(n_g\) = 4.2 and a non-reciprocal phase taken as constant: 20 dB of isolation over 76 nm against 2.9 nm. Drawn by <code>figsrc/ch27_figs.py</code>.</figcaption>
 </figure>
 
+**Try it.** Build the isolator of [Figure 27.11](#fig-27-11), then mismatch its garnet, lengthen its delay, add loss to one arm, or switch to a ring isolator, and reverse the magnet.
+
+{% include demos/isolator.html %}
+
 **Living without isolators.** Most silicon transceivers today have no on-chip isolator. Instead they:
 
 - use lasers that tolerate more feedback, such as quantum-dot lasers, with their small α-factor and strongly damped dynamics ([Chapter 23]({% link chapters/23_gain.md %}), [Chapter 25]({% link chapters/25_dynamics.md %}));

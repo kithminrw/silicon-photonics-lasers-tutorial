@@ -248,7 +248,7 @@ Demos: Vernier ring laser
 
 27.1 Why the light source is the hard part · 27.2 External and flip-chip lasers · 27.3 Heterogeneous integration · 27.4 Micro-transfer printing · 27.5 Monolithic growth · 27.6 Thermal and reliability · 27.7 Open laser-integration projects · 27.8 Directly modulated microring lasers · 27.9 Reliability: how lasers age and fail · 27.10 Isolators and non-reciprocity
 
-Demos: III–V/Si supermodes
+Demos: III–V/Si supermodes · Magneto-optic isolator
 
 ### [28. Semiconductor Optical Amplifiers]({% link chapters/28_soa.md %})
 
