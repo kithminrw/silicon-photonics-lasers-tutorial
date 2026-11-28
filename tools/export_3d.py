@@ -198,7 +198,7 @@ def siepic_ebeam_pcells():
          "add-drop filter with no free spectral range. Each guide's two sidewalls are offset by half a period to cancel "
          "its own reflection, and a Gaussian apodisation leaves visible teeth (sidewall steps of up to 50 and 25 nm) only "
          "in the middle 80 µm or so.",
-         [["Chapter 13 (Section 13.6)", "/part-3/ch13/#fig-13-6"], ["Chapter 14", "/part-3/ch14/"]]),
+         [["Chapter 13 (Section 13.7)", "/part-3/ch13/#fig-13-7"], ["Chapter 14", "/part-3/ch14/"]]),
     ]
     out = []
     for cell, params, slug, title, by, refs, blurb, chapters in items:

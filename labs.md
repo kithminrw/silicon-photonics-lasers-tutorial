@@ -18,7 +18,7 @@ Learning by doing, with free tools only: simulate the devices, lay out and submi
 
 <p>The labs are designed and listed below. Each lab has its own page and a script you can download from it.</p>
 
-The twelve labs follow three tracks. **Simulate** (Labs 1–6): mode solvers, coupled-mode and FDTD simulations, circuit models and grating couplers. **Make** (Labs 7–9): lay out a passive chip in the SiEPIC EBeam PDK, verify and submit it to an openEBL run, and analyse the measured data that comes back. **Lasers and links** (Labs 10–12): rate-equation models, a Vernier tunable laser and the budget of the reference link. Every tool is free and open source; the interactive demos in the chapters are a quick way to explore the same models before running a lab.
+The thirteen labs follow three tracks. **Simulate** (Labs 1–6): mode solvers, coupled-mode and FDTD simulations, circuit models and grating couplers. **Make** (Labs 7–9): lay out a passive chip in the SiEPIC EBeam PDK, verify and submit it to an openEBL run, and analyse the measured data that comes back. **Lasers and links** (Labs 10–12): rate-equation models, a Vernier tunable laser and the budget of the reference link. Lab 13 joins the passive and laser tracks: the Fabry–Pérot cavity, simulated and then measured through its fringes. Every tool is free and open source; the interactive demos in the chapters are a quick way to explore the same models before running a lab.
 
 **Table L.1. The labs.** Each lab lists the chapters it supports.
 {: .tabcaption #tab-l-1 }
@@ -37,6 +37,7 @@ The twelve labs follow three tracks. **Simulate** (Labs 1–6): mode solvers, co
 | 10 | [Laser rate equations]({% link labs/lab10_rate_equations.md %}) | 24–25 | NumPy: L–I, turn-on transients, modulation response, temperature, linewidth |
 | 11 | [Design a Vernier tunable laser]({% link labs/lab11_vernier.md %}) | 26 | NumPy: two ring filters, gain, mode selection and the tuning map |
 | 12 | [Close the reference link budget]({% link labs/lab12_link.md %}) | 38 | NumPy: power budget, sensitivity and BER, crosstalk and dispersion penalties, energy per bit |
+| 13 | [Fabry–Pérot cavities]({% link labs/lab13_fp.md %}) | 13, 24 | NumPy: Airy spectra, a Bragg-mirror cavity by transfer matrices, loss and gain from measured fringes |
 {: .lab-table }
 
 ## The openEBL cycle
@@ -45,7 +46,7 @@ Labs 7–9 follow the SiEPIC openEBL workflow {% include cite.html keys="openebl
 
 ## What you need
 
-- Python 3.11 or newer with NumPy and Matplotlib for Labs 1, 3, 5 and 9–12.
+- Python 3.11 or newer with NumPy and Matplotlib for Labs 1, 3, 5 and 9–13.
 - [femwell](https://github.com/HelgeGehring/femwell) for Lab 2, [SAX](https://github.com/flaport/sax) for Lab 4 and [MEEP](https://github.com/NanoComp/meep) for Lab 6 (MEEP runs on Linux and macOS, or on Windows through WSL or Docker).
 - [KLayout](https://www.klayout.de) with [SiEPIC-Tools](https://github.com/SiEPIC/SiEPIC-Tools) and the [SiEPIC EBeam PDK](https://github.com/SiEPIC/SiEPIC_EBeam_PDK), or [gdsfactory](https://github.com/gdsfactory/gdsfactory) with [ubcpdk](https://github.com/gdsfactory/ubc), for Labs 7–8.
 

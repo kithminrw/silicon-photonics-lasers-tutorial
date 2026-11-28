@@ -221,7 +221,7 @@ def fwhm(lam, R):
 
 
 # ---------------------------------------------------------------------------------------------------------
-# Part D. A quarter-wave-shifted cavity (Chapter 13, Section 13.5)
+# Part D. A quarter-wave-shifted cavity (Chapter 13, Section 13.6)
 # ---------------------------------------------------------------------------------------------------------
 def shifted(lam, n_per, kappa=KAPPA):
     """R and T of a uniform grating whose second half is shifted by half a period (a lambda/4 phase shift)."""

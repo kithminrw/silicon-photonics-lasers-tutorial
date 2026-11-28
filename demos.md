@@ -6,7 +6,7 @@ permalink: /demos/
 
 # Interactive Demos
 
-All 48 demos of the tutorial on one page. Each runs in your browser with no installation, computes its pictures and numbers from a small model of the device, and reproduces the chapter's own numbers at its default settings. The link takes you to the demo inside its chapter, where the text explains what it shows.
+All 50 demos of the tutorial on one page. Each runs in your browser with no installation, computes its pictures and numbers from a small model of the device, and reproduces the chapter's own numbers at its default settings. The link takes you to the demo inside its chapter, where the text explains what it shows.
 {: .chapterlead }
 
 ## Part I · Foundations
@@ -72,6 +72,7 @@ All 48 demos of the tutorial on one page. Each runs in your browser with no inst
 ### [13. Bragg Gratings and Photonic Crystals]({{ '/part-3/ch13/' | relative_url }})
 
 - [Bragg grating]({{ '/part-3/ch13/' | relative_url }}#bdBragg): The reflection spectrum of a waveguide grating by transfer matrices, with apodisation and phase shifts.
+- [Fabry–Pérot cavity]({{ '/part-3/ch13/' | relative_url }}#bdFp): Two mirrors and many round trips: the Airy spectrum, finesse, Q, peak transmission and the approach to threshold, with the transmitted fields added up pass by pass.
 
 ### [14. WDM Filters and Polarisation Management]({{ '/part-3/ch14/' | relative_url }})
 
@@ -92,6 +93,7 @@ All 48 demos of the tutorial on one page. Each runs in your browser with no inst
 
 - [Alignment tolerance]({{ '/part-4/ch17/' | relative_url }}#bdCouple): Coupling between two Gaussian modes against lateral offset, tilt and gap.
 - [Fibre-array alignment]({{ '/part-4/ch17/' | relative_url }}#bdAlign): Align a fibre array to two grating couplers by hand, as on a probe station.
+- [Facet-attached microlenses]({{ '/part-4/ch17/' | relative_url }}#bdFaml): Expand an edge coupler's mode with printed lenses and compare the alignment tolerances with a lensed fibre.
 
 ## Part V · Active Devices
 

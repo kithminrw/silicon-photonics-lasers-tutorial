@@ -1,0 +1,199 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdFaml" role="group" aria-label="Interactive demo: facet-attached microlenses between an edge coupler and a fibre array">
+  <div class="bd-head"><span>// try it · facet-attached microlenses: expand the beam, relax the alignment (1550 nm)</span>
+    <span class="bd-seg" role="group" aria-label="Interface"><button type="button" data-ifc="faml" aria-pressed="true">FaML pair</button><button type="button" data-ifc="lens" aria-pressed="false">lensed fibre, no FaML</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>edge-coupler mode (MFD) <b data-v="mc"></b></span><input type="range" data-k="mc" min="2" max="5" step="0.05" value="2.5" aria-label="edge-coupler mode field diameter"></label>
+    <label class="bd-sl"><span>expanded beam (MFD) <b data-v="mb"></b></span><input type="range" data-k="mb" min="12" max="80" step="0.5" value="25" aria-label="expanded beam mode field diameter"></label>
+    <label class="bd-sl"><span>lateral offset <b data-v="d"></b></span><input type="range" data-k="d" min="0" max="15" step="0.05" value="0" aria-label="lateral offset"></label>
+    <label class="bd-sl"><span>tilt <b data-v="th"></b></span><input type="range" data-k="th" min="0" max="12" step="0.02" value="0" aria-label="tilt"></label>
+    <label class="bd-sl"><span data-o="gl">gap, lens to lens <b data-v="g"></b></span><input type="range" data-k="g" min="0" max="800" step="1" value="150" aria-label="gap"></label>
+  </div>
+  <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag" data-o="tag">side view to scale: chip, lenses, beam</span></div>
+  <div class="bd-scope"><canvas data-c="p" aria-hidden="true"></canvas><span class="bd-tag">blue: FaML pair · gold: lensed fibre</span></div>
+  <div class="bd-read" aria-live="polite"><span>coupling <b data-o="eta">–</b></span><span>1 dB offset <b data-o="td">–</b></span><span>1 dB tilt <b data-o="tt">–</b></span><span>1 dB gap <b data-o="tz">–</b></span><span>lens lengths <b data-o="ll">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Offset both interfaces.</b> With the FaML pair, slide the offset to 6 µm: the coupling falls by about 1 dB, as Worked Example 17.2 predicts. Switch to the lensed fibre: the same 6 µm sends it far off the bottom of the plot, which already reached −1 dB at 0.6 µm.</li>
+    <li><b>Find the price.</b> Back at zero offset, tilt the FaML pair by 1.1°: about −1 dB. The lensed fibre loses only 0.01 dB at that angle. A wide beam has a narrow far field, so the parts must be held parallel, which flat reference faces and mechanical stops do well.</li>
+    <li><b>Grow the beam.</b> Set the expanded beam to 50 µm: the 1 dB offset doubles to ±12 µm and the tilt tolerance halves to 0.54°, but the lens on the fibre grows to 394 µm. Push past 79 µm and the lens bodies no longer fit side by side on a 127 µm array.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>You double the diameter of the expanded beam. What happens to the alignment tolerances?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="The 1 dB offset grows in proportion to the beam (±6 µm → ±12 µm), the tilt tolerance falls in proportion (1.09° → 0.54°), and the Rayleigh range, which sets the gap tolerance, grows with the square of the beam (322 µm → 1.3 mm).">Offset tolerance doubles, tilt tolerance halves, gap tolerance grows four times</button>
+      <button type="button" data-why="Tilt is the exception: a wider beam has a narrower far field, so it becomes more, not less, sensitive to angle.">Every tolerance doubles</button>
+      <button type="button" data-why="The lens's job is to make the beam large in the gap, and the alignment tolerances follow from that beam, not from the edge coupler's small mode.">Nothing changes: the edge coupler's mode sets the tolerances</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdFaml'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  var lam = 1.55, NL = 1.53, WF = 5.2, PITCH = 127, WD = 12, ifc = 'faml';
+  var S = BD.bind(root, {
+    mc: { fmt: function (x) { return x.toFixed(2) + ' µm'; } }, mb: { fmt: function (x) { return x.toFixed(1) + ' µm'; } },
+    d: { fmt: function (x) { return x.toFixed(2) + ' µm'; } }, th: { fmt: function (x) { return x.toFixed(2) + '°'; } },
+    g: { fmt: function (x) { return x.toFixed(0) + ' µm'; } }
+  }, function () { draw(); });
+  BD.seg(root, 'ifc', function (v) { ifc = v; q('[data-o="gl"]').firstChild.textContent = v === 'faml' ? 'gap, lens to lens ' : 'axial error from the working distance '; draw(); });
+  // ---- Gaussian overlap (as in the Chapter 17 alignment demo): waist w1 at the reference plane against a beam of
+  // waist w2 whose waist is a distance z away, offset d and tilted th (radians), in air
+  function cm(a, b) { return [a[0] * b[0] - a[1] * b[1], a[0] * b[1] + a[1] * b[0]]; }
+  function cd(a, b) { var s = b[0] * b[0] + b[1] * b[1]; return [(a[0] * b[0] + a[1] * b[1]) / s, (a[1] * b[0] - a[0] * b[1]) / s]; }
+  function csqrt(a) { var r = Math.hypot(a[0], a[1]), t = Math.atan2(a[1], a[0]) / 2; return [Math.sqrt(r) * Math.cos(t), Math.sqrt(r) * Math.sin(t)]; }
+  function eta1(w1, w2, d, th, z) {
+    var k = 2 * Math.PI / lam, zr = Math.PI * w2 * w2 / lam;
+    var jk2q = cm([0, k / 2], cd([1, 0], [-z, -zr]));
+    var A = [1 / (w1 * w1) - jk2q[0], -jk2q[1]];
+    var B = [-2 * d * jk2q[0], -2 * d * jk2q[1] + k * th];
+    var C = [d * d * jk2q[0], d * d * jk2q[1]];
+    var E = cd(cm(B, B), [4 * A[0], 4 * A[1]]); E = [E[0] + C[0], E[1] + C[1]];
+    var sq = csqrt(cd([Math.PI, 0], A)), mag2 = (sq[0] * sq[0] + sq[1] * sq[1]) * Math.exp(2 * E[0]);
+    return mag2 / (Math.PI / 2 * w1 * w2 * Math.sqrt(1 + Math.pow(z / zr, 2)));
+  }
+  function etaW(w, d, thDeg, z) { var th = thDeg * Math.PI / 180; return eta1(w, w, d, th, z) * eta1(w, w, 0, 0, z); }
+  function tol(f, hi) {
+    var e0 = f(0), lo = 0; if (f(hi) > e0 * Math.pow(10, -0.1)) return null;
+    for (var i = 0; i < 50; i++) { var m = (lo + hi) / 2; if (f(m) > e0 * Math.pow(10, -0.1)) lo = m; else hi = m; } return (lo + hi) / 2;
+  }
+  // ---- the printed lens: polymer length that expands waist w0 to W, and its collimating ellipse (eccentricity 1/n)
+  function lens(w0, W) {
+    var zr = Math.PI * NL * w0 * w0 / lam, L = zr * Math.sqrt(Math.max(0, W * W / (w0 * w0) - 1)), R = L * (1 + Math.pow(zr / Math.max(L, 1e-9), 2));
+    var e = 1 / NL, a = R / (1 + e);
+    return { zr: zr, L: L, R: R, a: a, b: a * Math.sqrt(1 - e * e), c: a * e };
+  }
+  function fresnel(n1, n2) { var r = Math.pow((n1 - n2) / (n1 + n2), 2); return 1 - r; }
+  function fmtL(v) { return v >= 1000 ? (v / 1000).toFixed(2) + ' mm' : v.toFixed(v < 10 ? 1 : 0) + ' µm'; }
+  function draw() {
+    var faml = ifc === 'faml', w0 = S.mc / 2, W = S.mb / 2, Pc = lens(w0, W), Pf = lens(WF, W), rb = 1.6 * W;
+    var wB = faml ? W : w0;                                   // the beams that meet in the gap
+    var eta = etaW(wB, S.d, S.th, S.g), Tfr = faml ? Math.pow(fresnel(NL, 1), 2) : fresnel(1.444, 1) * fresnel(1.444, 1);
+    var dB = 10 * Math.log10(eta * Tfr), wide = faml && 2 * rb > PITCH;
+    // ---------------------------------------------------------------- side view, to scale except a long gap
+    (function () {
+      var d = BD.setup(q('[data-c="g"]')), g = d.g, Wc = d.w, H = d.h, CH = 34, FB = 34, V = 70;
+      var GMAX = 260, gd = Math.min(S.g, GMAX), Lc = faml ? Pc.L : 0, Lf = faml ? Pf.L : 110, gap0 = faml ? 0 : WD;
+      var total = CH + Lc + gap0 + gd + Lf + FB, sc = Math.min((Wc - 16) / total, (H - 58) / (2 * V));
+      var x0 = 8 + (Wc - 16 - total * sc) / 2 + CH * sc, cy = 36 + (H - 58) / 2;
+      var X = function (x) { return x0 + x * sc; }, Y = function (y) { return cy - y * sc; };
+      var zg = function (z) { return S.g > 0 ? z * gd / S.g : 0; };      // true distance in the gap -> drawn distance
+      var xa = Lc + gap0 + gd;                                            // apex of the fibre-side lens (drawn)
+      // chip: substrate, oxide, waveguide; the trench below the lens
+      g.fillStyle = 'rgba(157,179,204,.20)'; g.fillRect(0, Y(-2.1), X(0), H - Y(-2.1));
+      g.fillStyle = BD.GEO.ox; g.fillRect(0, Y(3), X(0), Y(-2.1) - Y(3));
+      g.strokeStyle = BD.GEO.si; g.lineWidth = Math.max(1.5, 0.22 * sc); g.beginPath(); g.moveTo(0, cy); g.lineTo(X(0), cy); g.stroke(); g.lineWidth = 1;
+      g.strokeStyle = BD.GEO.edge; g.beginPath(); g.moveTo(X(0), Y(3)); g.lineTo(X(0), Y(-V)); g.stroke();
+      g.fillStyle = 'rgba(157,179,204,.12)'; g.fillRect(X(0), Y(-V + 6), Math.min(X(Lc + 20) - X(0), 90 * sc), H - Y(-V + 6));
+      // the beam leaving the chip: in the chip lens it expands from w0 to W, then crosses the gap
+      var top = [], bot = [], i, z, w;
+      top.push([0, Y(w0)]); bot.push([0, Y(-w0)]);
+      if (faml) for (i = 0; i <= 40; i++) { z = Lc * i / 40; w = w0 * Math.sqrt(1 + Math.pow(z / Pc.zr, 2)); top.push([X(z), Y(w)]); bot.push([X(z), Y(-w)]); }
+      var zrB = Math.PI * wB * wB / lam, zEnd = (faml ? 0 : WD) + S.g;
+      for (i = 0; i <= 40; i++) {
+        z = zEnd * i / 40;                                                // true distance from the chip-side waist
+        var zd = faml ? zg(z) : (z <= S.g ? zg(z) : gd + (z - S.g));
+        w = wB * Math.sqrt(1 + Math.pow(z / zrB, 2)); top.push([X(Lc + zd), Y(w)]); bot.push([X(Lc + zd), Y(-w)]);
+      }
+      g.fillStyle = 'rgba(224,184,90,.55)'; g.beginPath(); top.forEach(function (p, k) { if (k) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); });
+      for (i = bot.length - 1; i >= 0; i--) g.lineTo(bot[i][0], bot[i][1]); g.closePath(); g.fill();
+      // chip-side lens outline
+      if (faml) {
+        g.fillStyle = 'rgba(200,180,240,.16)'; g.strokeStyle = 'rgba(200,180,240,.85)'; g.beginPath();
+        var xs = Lc - Pc.R, xc = xs + Pc.c, rr = Math.min(rb, 0.999 * Pc.b);
+        g.moveTo(X(0), Y(-rr));
+        for (i = 0; i <= 60; i++) { var yy = -rr + 2 * rr * i / 60; g.lineTo(X(xc + Pc.a * Math.sqrt(Math.max(0, 1 - yy * yy / (Pc.b * Pc.b)))), Y(yy)); }
+        g.lineTo(X(0), Y(rr)); g.closePath(); g.fill(); g.stroke();
+      }
+      // fibre side, offset by d and tilted by th about its apex (or the lensed fibre's tip)
+      g.save(); g.translate(X(xa), Y(S.d)); g.rotate(-S.th * Math.PI / 180);
+      var Xl = function (x) { return x * sc; }, Yl = function (y) { return -y * sc; };
+      if (faml) {
+        var xsf = Pf.R, xcf = xsf - Pf.c, rf = Math.min(rb, 0.999 * Pf.b);
+        // fibre (cladding, core) and the array lid and groove chip
+        g.fillStyle = 'rgba(232,238,245,.10)'; g.fillRect(Xl(Lf), Yl(62.5), Xl(Lf + FB + 400) - Xl(Lf), 125 * sc);
+        g.strokeStyle = BD.GEO.edge; g.strokeRect(Xl(Lf), Yl(62.5), Xl(Lf + FB + 400) - Xl(Lf), 125 * sc);
+        g.fillStyle = 'rgba(246,215,168,.18)'; g.fillRect(Xl(Lf), Yl(4.1), 600, 8.2 * sc);
+        g.fillStyle = 'rgba(224,184,90,' + (0.12 + 0.5 * eta).toFixed(3) + ')'; g.beginPath();
+        for (i = 0; i <= 40; i++) { z = Lf * i / 40; w = WF * Math.sqrt(1 + Math.pow((Lf - z) / Pf.zr, 2)); if (i) g.lineTo(Xl(z), Yl(w)); else g.moveTo(Xl(z), Yl(w)); }
+        g.lineTo(600, Yl(WF)); g.lineTo(600, Yl(-WF));
+        for (i = 40; i >= 0; i--) { z = Lf * i / 40; w = WF * Math.sqrt(1 + Math.pow((Lf - z) / Pf.zr, 2)); g.lineTo(Xl(z), Yl(-w)); } g.closePath(); g.fill();
+        g.fillStyle = 'rgba(200,180,240,.16)'; g.strokeStyle = 'rgba(200,180,240,.85)'; g.beginPath(); g.moveTo(Xl(Lf), Yl(-rf));
+        for (i = 0; i <= 60; i++) { yy = -rf + 2 * rf * i / 60; g.lineTo(Xl(xcf - Pf.a * Math.sqrt(Math.max(0, 1 - yy * yy / (Pf.b * Pf.b)))), Yl(yy)); }
+        g.lineTo(Xl(Lf), Yl(rf)); g.closePath(); g.fill(); g.stroke();
+        // the mode the fibre side accepts, traced back across the gap (dashed)
+        g.strokeStyle = 'rgba(224,184,90,.9)'; g.setLineDash([4, 3]);
+        [1, -1].forEach(function (sg) { g.beginPath(); for (var k = 0; k <= 30; k++) { var zz = S.g * k / 30, ww = W * Math.sqrt(1 + Math.pow(zz / (Math.PI * W * W / lam), 2)); if (k) g.lineTo(-zg(zz) * sc, Yl(sg * ww)); else g.moveTo(-zg(zz) * sc, Yl(sg * ww)); } g.stroke(); });
+        g.setLineDash([]);
+      } else {
+        // lensed fibre: a cone ending in a rounded tip, focusing to w0 at the working distance in front of it
+        var rt = 7, Lcone = 100;
+        g.fillStyle = 'rgba(232,238,245,.10)'; g.strokeStyle = BD.GEO.edge; g.beginPath(); g.moveTo(Xl(rt), Yl(rt));
+        g.lineTo(Xl(Lcone), Yl(62.5)); g.lineTo(Xl(Lcone + 600), Yl(62.5)); g.lineTo(Xl(Lcone + 600), Yl(-62.5)); g.lineTo(Xl(Lcone), Yl(-62.5)); g.lineTo(Xl(rt), Yl(-rt));
+        g.arc(Xl(rt), 0, rt * sc, Math.PI / 2, 3 * Math.PI / 2, false); g.closePath(); g.fill(); g.stroke();
+        g.fillStyle = 'rgba(224,184,90,' + (0.12 + 0.5 * eta).toFixed(3) + ')'; g.beginPath(); g.moveTo(0, Yl(4)); g.lineTo(Xl(Lcone), Yl(WF)); g.lineTo(600, Yl(WF)); g.lineTo(600, Yl(-WF)); g.lineTo(Xl(Lcone), Yl(-WF)); g.lineTo(0, Yl(-4)); g.closePath(); g.fill();
+        g.strokeStyle = 'rgba(224,184,90,.9)'; g.setLineDash([4, 3]);
+        [1, -1].forEach(function (sg) { g.beginPath(); for (var k = 0; k <= 30; k++) { var zz = WD * k / 30, ww = w0 * Math.sqrt(1 + Math.pow((WD - zz) / (Math.PI * w0 * w0 / lam), 2)); if (k) g.lineTo(-zz * sc, Yl(sg * ww)); else g.moveTo(0, Yl(sg * ww)); } g.stroke(); });
+        g.setLineDash([]);
+      }
+      g.restore();
+      g.strokeStyle = BD.C.dim; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(0, cy); g.lineTo(Wc, cy); g.stroke(); g.setLineDash([]);
+      // gap dimension, broken when drawn shortened
+      var gx0 = X(Lc + gap0), gx1 = X(xa);
+      if (S.g > 0.5 && gx1 - gx0 > 8) BD.dim(g, gx0, H - 10, gx1, H - 10, '', BD.C.gold, 0);
+      if (S.g > GMAX) { var xm = (gx0 + gx1) / 2; g.strokeStyle = BD.C.white; g.beginPath(); g.moveTo(xm - 5, H - 15); g.lineTo(xm - 1, H - 5); g.moveTo(xm + 1, H - 15); g.lineTo(xm + 5, H - 5); g.stroke(); }
+      var gl = (faml ? 'gap ' : 'error ') + S.g.toFixed(0) + ' µm' + (S.g > GMAX ? ' (drawn shorter)' : '');
+      g.font = '9.5px "IBM Plex Mono", monospace';
+      var glw = g.measureText(gl).width, glx = Math.min(Math.max((gx0 + gx1) / 2, glw / 2 + 4), Wc - glw / 2 - 4);
+      BD.label(g, gl, glx, H - 16, BD.C.gold, 'center');
+      // labels: chip on the left, fibre on the right, beam in the middle when it fits
+      var l1 = 'chip · MFD ' + S.mc.toFixed(1) + ' µm', l2 = (faml ? 'fibre array' : 'lensed fibre') + ' · MFD ' + (faml ? '10.4' : S.mc.toFixed(1)) + ' µm';
+      var w1 = g.measureText(l1).width, w2 = g.measureText(l2).width;
+      if (w1 + w2 + 24 > Wc) { l1 = 'chip'; l2 = faml ? 'fibre' : 'lensed fibre'; w1 = g.measureText(l1).width; w2 = g.measureText(l2).width; }
+      BD.label(g, l1, 6, 40, BD.C.gold); BD.label(g, l2, Wc - 6, 40, BD.C.blue, 'right');
+      var l3 = 'beam MFD ' + (2 * wB).toFixed(1) + ' µm · zR ' + fmtL(zrB);
+      if (g.measureText(l3).width < Wc - 12) BD.label(g, l3, Wc / 2, 54, BD.C.dim, 'center');
+      BD.scalebar(g, 10, H - 12, sc, Math.min(90, Wc / 4));
+    })();
+    // ---------------------------------------------------------------- three tolerance panels
+    var dv = BD.setup(q('[data-c="p"]')), W3 = dv.w / 3, wF = W, wL = w0;
+    var panels = [
+      // the active interface's curve keeps the other misalignments at their slider values; the other interface's curve has none
+      { hi: 15, f: function (w, v, a) { return etaW(w, v, a ? S.th : 0, a ? S.g : 0); }, cur: S.d, xt: [[0, '0'], [5, '5'], [10, '10'], [15, '15 µm']], name: 'offset' },
+      { hi: 12, f: function (w, v, a) { return etaW(w, a ? S.d : 0, v, a ? S.g : 0); }, cur: S.th, xt: [[0, '0'], [4, '4'], [8, '8'], [12, '12°']], name: 'tilt' },
+      { hi: 1000, log: true, f: function (w, v, a) { return etaW(w, a ? S.d : 0, a ? S.th : 0, v); }, cur: Math.max(0.1, S.g), xt: [[0.1, '0.1'], [1, '1'], [10, '10'], [100, '100'], [1000, '1 mm']], name: 'gap' }];
+    panels.forEach(function (P, k) {
+      var f = BD.frame(dv, { x: [P.log ? 0.1 : 0, P.hi], xlog: !!P.log, y: [-6, 0.3], pad: { l: k * W3 + 34, r: (2 - k) * W3 + 8, b: 22, t: 34 }, xt: P.xt,
+        yt: k === 0 ? [[-6, '−6'], [-3, '−3'], [-1, '−1'], [0, '0 dB']] : [[-6, ''], [-3, ''], [-1, ''], [0, '']] });
+      BD.hline(f, -1, BD.C.dim, [3, 3]);
+      [[wL, BD.C.gold, !faml], [wF, BD.C.blue, faml]].forEach(function (c) {
+        var xs = [], ys = []; for (var j = 0; j <= 160; j++) { var v = P.log ? Math.pow(10, -1 + 4 * j / 160) : P.hi * j / 160; xs.push(v); ys.push(Math.max(-7, 10 * Math.log10(P.f(c[0], v, c[2])))); }
+        BD.line(f, xs, ys, c[1], 1.7);
+      });
+      var yc = 10 * Math.log10(P.f(faml ? wF : wL, P.cur, true)); if (yc > -6) BD.dot(f, P.cur, yc, BD.C.white, 4);
+      dv.g.fillStyle = BD.C.white; dv.g.textAlign = 'right'; dv.g.fillText(P.name, (k + 1) * W3 - 12, 48); dv.g.textAlign = 'left';
+    });
+    // ---------------------------------------------------------------- readouts and caption
+    var td = tol(function (v) { return etaW(wB, v, 0, S.g); }, 60), tt = tol(function (v) { return etaW(wB, 0, v, S.g); }, 40), tz = tol(function (v) { return etaW(wB, 0, 0, v); }, 20000);
+    q('[data-o="eta"]').textContent = dB.toFixed(2) + ' dB';
+    q('[data-o="td"]').textContent = td === null ? '–' : '± ' + td.toFixed(td < 1 ? 2 : 1) + ' µm';
+    q('[data-o="tt"]').textContent = tt === null ? '–' : '± ' + tt.toFixed(2) + '°';
+    q('[data-o="tz"]').textContent = tz === null ? '> 20 mm' : fmtL(tz);
+    q('[data-o="ll"]').textContent = faml ? Pc.L.toFixed(0) + ' / ' + Pf.L.toFixed(0) + ' µm' : '–';
+    var ok = eta >= etaW(wB, 0, 0, 0) * Math.pow(10, -0.1);
+    BD.pill(q('[data-o="pill"]'), wide ? 'too wide' : ok ? 'within 1 dB' : 'misaligned', wide ? 'warn' : ok ? 'ok' : 'warn');
+    var c;
+    if (faml) {
+      c = 'Each printed lens lets the small mode spread inside the polymer (' + Pc.L.toFixed(0) + ' µm on the chip, ' + Pf.L.toFixed(0) + ' µm on the fibre) and then flattens its wavefront, so the two parts face each other through a ' + S.mb.toFixed(0) + ' µm beam. ';
+      c += 'The lateral tolerance grows with the beam and the gap tolerance with its square; the angle tolerance shrinks. The two uncoated polymer surfaces reflect 0.39 dB away. ';
+      if (wide) c += '<b>The lens bodies, 3.2 times the beam radius across, are now wider than the 127 µm pitch of a fibre array.</b> ';
+    } else {
+      c = 'Without lenses on the facets, a lensed fibre must focus to the edge coupler’s own ' + S.mc.toFixed(1) + ' µm spot, a few micrometres in front of its tip: forgiving in angle, but a fraction of a micrometre in offset and a few micrometres in distance cost a decibel. The chip facet and the fibre tip, uncoated, reflect 0.29 dB away. ';
+    }
+    c += '<i>Paraxial Gaussian beams; ideal lenses (no aberrations or shape errors); the edge coupler’s own loss is left out; offset and tilt in the plane of the drawing; the curve of the interface not shown has no other misalignment.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

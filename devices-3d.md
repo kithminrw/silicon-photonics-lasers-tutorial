@@ -73,7 +73,7 @@ Luxtelligence's LNOI400 PDK {% include cite.html keys="lxtpdk" %} is for thin-fi
 
 - **VTT 3 µm SOI.** VTT's public gdsfactory PDK {% include cite.html keys="vttpdk" %} draws its rib and strip waveguides with add and subtract mask layers but still publishes no layer stack (checked November 2026), so its devices will be added once the etch depths can be taken from the PDK or another public source.
 - **More SiEPIC devices:** active devices with doping layers.
-- **InP and BTO.** There is no open InP or BTO PDK with published layouts yet; this page will add one when there is. Commercial PDKs, including those of heterogeneous InP-on-silicon platforms, are under licence and are not shown.
+- **InP and BTO.** There is no open InP or BTO PDK with published layouts yet; this page will add one when there is. Generic laser, SOA and VCSEL layer stacks, drawn for this tutorial rather than taken from a PDK, are in [Section 24.9]({% link chapters/24_fp.md %}#249inside-the-chip-layer-stacks-in-3d). Commercial PDKs, including those of heterogeneous InP-on-silicon platforms, are under licence and are not shown.
 
 ## Licences
 

@@ -1,0 +1,9 @@
+{%- comment -%}
+  One generic laser/SOA/VCSEL stack from _data/stacks3d.json (written by tools/export_stacks.py):
+  {% include stack3d.html slug="ridge" %}. Put {% include stack3d-assets.html %} once on the page first.
+{%- endcomment -%}
+{%- assign st = site.data.stacks3d | where: "slug", include.slug | first -%}
+<figure class="d3-card st-card" id="stack-{{ st.slug }}">
+<model-viewer class="d3-view" src="{{ '/assets/models/' | append: st.file | relative_url }}" data-src="{{ '/assets/models/' | append: st.file | relative_url }}" data-src-x="{{ '/assets/models/' | append: st.file_x | relative_url }}" alt="3D model of a {{ st.title }}" camera-controls touch-action="pan-y" interaction-prompt="none" loading="lazy" reveal="auto" camera-orbit="{{ st.orbit }}" shadow-intensity="0" exposure="1.05" environment-image="neutral" data-orbit="{{ st.orbit }}"><button type="button" slot="poster" class="d3-poster">Load 3D model ({{ st.kb }} kB)</button></model-viewer>
+<figcaption><b class="d3-title">{{ st.title }}</b><span class="d3-meta">piece shown {{ st.size_um[0] }} × {{ st.size_um[1] }} µm, {{ st.size_um[2] }} µm tall · thicknesses to scale</span><span class="d3-blurb">{{ st.blurb }}</span><span class="st-views" role="group" aria-label="View"><button type="button" data-view="a" aria-pressed="true">assembled</button><button type="button" data-view="x" aria-pressed="false">exploded</button><button type="button" data-zs="1" aria-pressed="true">1× height</button><button type="button" data-zs="3" aria-pressed="false">3× height</button></span><span class="d3-legend" role="group" aria-label="Layers">{% for l in st.layers %}<button type="button" data-layer="{{ l.key }}" aria-pressed="true" title="{{ l.role }}"><i style="background:{{ l.colour }}"></i>{{ l.label }}</button>{% endfor %}<button type="button" class="d3-reset">reset view</button></span><span class="d3-credit">{{ st.credit }}</span></figcaption>
+</figure>

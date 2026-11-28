@@ -23,7 +23,7 @@ Build a grating from its index steps, multiply 2 × 2 matrices along it, and che
 
 ## What you need
 
-- [Chapter 13]({% link chapters/13_bragg.md %}) (Sections 13.1 to 13.5).
+- [Chapter 13]({% link chapters/13_bragg.md %}) (Sections 13.1 to 13.6).
 - Python 3.11 or newer with NumPy and Matplotlib: `pip install numpy matplotlib`.
 - The script <a href="{{ '/labs/lab05_bragg.py' | relative_url }}" download><code>lab05_bragg.py</code></a>.
 - About an hour and a half, including the exercises.
@@ -144,7 +144,7 @@ The peak sits 4 pm short of 1550 nm because the central layer has the lower inde
 
 ## Going further
 
-- The contra-directional coupler of Section 13.6 couples four waves, forward and backward in two waveguides: extend the matrices to 4 × 4.
+- The contra-directional coupler of Section 13.7 couples four waves, forward and backward in two waveguides: extend the matrices to 4 × 4.
 - Give the effective index an imaginary part to add gain or loss; with gain, the λ/4-shifted grating becomes the DFB laser of [Chapter 26]({% link chapters/26_tunable.md %}), and its transmission peak grows without limit as it approaches threshold.
 - Section 37.6 reads κ back from a measured stop-band; [Lab 9]({% link labs/lab09_analysis.md %}) analyses real openEBL measurements.
 - The Chapter 13 demo uses coupled-mode matrices section by section; run this script at its defaults (Λ = 317 nm) and compare the two.

@@ -214,7 +214,224 @@ def fig_pwb():
 
 
 # =====================================================================================================
-# Figure 17.4: flip-chip laser on a silicon chip, height set by pedestals (schematic cross-section)
+# Section 17.5: facet-attached microlenses (FaML). One shared model for Figure 17.4, the text and the faml demo.
+# A printed lens is a polymer body on the facet (n = 1.53, the resist index reported by Xu et al. 2023) in which the
+# device's Gaussian mode expands from waist w0 to the target waist W; its far end is an ellipsoid of eccentricity
+# 1/n whose far focus sits at the centre of curvature of the arriving wavefront, which turns that wavefront flat
+# (a Cartesian oval for a point source inside the lens, collimating into air). The beam leaves with its waist W at
+# the apex. Paraxial Gaussian optics; aberrations, the edge coupler's own loss and its ellipticity are left out.
+# =====================================================================================================
+LAM, N_LENS = 1.55, 1.53
+W_CHIP, W_FIB, W_EXP = 1.25, 5.2, 12.5          # 1/e^2 radii: edge coupler (MFD 2.5 um), SMF-28 (10.4 um), expanded beam (25 um)
+
+
+def faml_lens(w0, W, n=N_LENS, lam=LAM):
+    """Length of polymer that expands waist w0 to W, the wavefront radius there, and the collimating ellipse (a, b, c)."""
+    zr = math.pi * n * w0 ** 2 / lam
+    L = zr * math.sqrt((W / w0) ** 2 - 1)
+    R = L * (1 + (zr / L) ** 2)
+    e = 1 / n
+    a = R / (1 + e)
+    return dict(zr=zr, L=L, R=R, a=a, b=a * math.sqrt(1 - e * e), c=a * e, rs=(n - 1) / n * R)
+
+
+def faml_profile(w0, W, x_apex, facing=+1, rb=None, npts=80):
+    """Outline (x, y) of a lens whose apex is at x_apex, emitting towards +x (facing=+1) or -x (-1). rb: body radius."""
+    P = faml_lens(w0, W); rb = rb or 1.6 * W
+    xs_f = x_apex - facing * P["R"]                    # far focus: the centre of curvature of the arriving wavefront
+    xc = xs_f + facing * P["c"]
+    ys = np.linspace(-rb, rb, npts)
+    xcap = xc + facing * P["a"] * np.sqrt(np.clip(1 - (ys / P["b"]) ** 2, 0, 1))
+    x_base = x_apex - facing * P["L"]                  # the facet the lens stands on
+    return np.r_[x_base, xcap, x_base], np.r_[-rb, ys, rb], P
+
+
+def eta_offset(d, w1, w2):
+    return math.exp(-2 * d * d / (w1 * w1 + w2 * w2))
+
+
+def eta_tilt(th, w1, w2, n=1.0, lam=LAM):
+    return math.exp(-2 * (math.pi * n * th / lam) ** 2 * w1 * w1 * w2 * w2 / (w1 * w1 + w2 * w2))
+
+
+def eta_gap(g, w, n=1.0, lam=LAM):
+    zr = math.pi * n * w * w / lam
+    return 1 / (1 + (g / (2 * zr)) ** 2)
+
+
+def tol1db(f, hi):
+    lo = 0.0
+    for _ in range(80):
+        m = (lo + hi) / 2
+        if f(m) > 10 ** -0.1: lo = m
+        else: hi = m
+    return (lo + hi) / 2
+
+
+def faml_numbers():
+    pc, pf = faml_lens(W_CHIP, W_EXP), faml_lens(W_FIB, W_EXP)
+    out = {}
+    for name, w in (("lensed", W_CHIP), ("faml", W_EXP)):
+        out[name] = dict(d=tol1db(lambda d: eta_offset(d, w, w), 50), th=math.degrees(tol1db(lambda t: eta_tilt(t, w, w), 1.0)),
+                         g=tol1db(lambda g: eta_gap(g, w), 5000), zr=math.pi * w * w / LAM)
+        out[name]["rot"] = math.degrees(out[name]["d"] / (7 * PITCH))
+    Rf = ((N_LENS - 1) / (N_LENS + 1)) ** 2; Rs = ((N_GL - 1) / (N_GL + 1)) ** 2
+    out["fresnel_faml"] = -20 * math.log10(1 - Rf); out["fresnel_lensed"] = -20 * math.log10(1 - Rs)
+    out["chip"], out["fibre"] = pc, pf
+    return out
+
+
+def fig_faml():
+    F = faml_numbers(); pc, pf = F["chip"], F["fibre"]
+    GAP = 150.0
+    Lc, Lf = pc["L"], pf["L"]; xa = Lc + GAP; xF = xa + Lf
+    fig = plt.figure(figsize=(6.3, 3.85))
+    # ---------------- (a) side view to scale
+    X0, X1, Y0, Y1 = -72, xF + 64, -78, 78
+    ax = fig.add_axes([0.0, 0.43, 1.0, 0.57]); frameless(ax, (X0, X1), (Y0, Y1))
+    XE = 112                                                          # where the chip was diced, beyond the trench
+    box(ax, X0, Y0, -X0, Y0 * -1 - 2.1, "sub")                        # substrate below the BOX
+    box(ax, 0, Y0, XE, -60 - Y0, "sub")                               # ledge left by the deep trench
+    box(ax, X0, -2.1, -X0, 2.0, "ox"); box(ax, X0, 0.11, -X0, 2.9, "oxtop")
+    ax.plot([X0, 0], [0, 0], color=MAT["si"], lw=1.1, zorder=3, solid_capstyle="butt")
+    # fibre array: one fibre in its groove, lid above, V-groove chip below
+    box(ax, xF, -62.5, X1 - xF, 125, "glass", ec=MUTED, lw=0.5, z=2)
+    box(ax, xF, -4.1, X1 - xF, 8.2, "core", z=3)
+    box(ax, xF, 62.5, X1 - xF, Y1 - 62.5, "glass", ec=MUTED, lw=0.5, z=2)
+    box(ax, xF, Y0, X1 - xF, -62.5 - Y0, "si", z=2)
+    # the two lenses
+    x, y, _ = faml_profile(W_CHIP, W_EXP, Lc, +1); poly(ax, np.c_[x, y], "polymer", ec=VIOLET, lw=0.6, z=4)
+    x, y, _ = faml_profile(W_FIB, W_EXP, xa, -1); poly(ax, np.c_[x, y], "polymer", ec=VIOLET, lw=0.6, z=4)
+    # the beam (1/e^2 radius): expanding in the chip lens, collimated in the gap, focused by the fibre lens
+    z1 = np.linspace(0, Lc, 120); w1 = W_CHIP * np.sqrt(1 + (z1 / pc["zr"]) ** 2)
+    zr_air = math.pi * W_EXP ** 2 / LAM
+    z2 = np.linspace(Lc, xa, 60); w2 = W_EXP * np.sqrt(1 + ((z2 - Lc) / zr_air) ** 2)
+    z3 = np.linspace(xa, xF, 160); w3 = W_FIB * np.sqrt(1 + ((xF - z3) / pf["zr"]) ** 2)
+    xb = np.r_[X0, z1, z2, z3, X1]; wb = np.r_[W_CHIP, w1, w2, w3, W_FIB]
+    ax.fill_between(xb, -wb, wb, color=AMBER, alpha=0.5, lw=0, zorder=5)
+    ax.plot([X0, X1], [0, 0], color=MUTED, lw=0.5, ls=(0, (3, 3)), zorder=6)
+    # labels
+    callout(ax, (-40, 0.5), (-68, 30), "Si edge coupler\nMFD 2.5 µm", ha="left")
+    callout(ax, (Lc * 0.55, 18), (14, 58), f"printed lens on the chip facet\nn = {N_LENS}, {Lc:.0f} µm long", ha="left")
+    label(ax, (Lc + xa) / 2, 21, f"collimated beam\nMFD {2 * W_EXP:.0f} µm", fs=FS_SMALL)
+    dim(ax, (Lc, -30), (xa, -30), f"air gap {GAP:.0f} µm", bg=None, text_off=(0, -7))
+    callout(ax, (xa + Lf * 0.55, 19), (xa + Lf * 0.25, 52), f"printed lens on the fibre, {Lf:.0f} µm long", ha="left")
+    label(ax, xF + 32, 34, "fibre\narray", fs=FS_SMALL)
+    callout(ax, (xF + 14, -2), (xF + 30, -36), "SMF core\nMFD 10.4 µm", ha="center")
+    label(ax, -36, -45, "Si chip", fs=FS_SMALL)
+    label(ax, XE / 2 + 4, -69, "deep-etched trench", fs=FS_SMALL)
+    scalebar(ax, XE + 40, -68, 100, "100 µm")
+    label(ax, XE + 205, -68, "to scale", fs=6.0, col=MUTED, italic=True)
+    panel(ax, "a", 0.0, 1.0)
+    # ---------------- (b)-(d) tolerances
+    axs = [fig.add_axes([0.075 + k * 0.33, 0.085, 0.255, 0.27]) for k in range(3)]
+    cols = {"lensed": C2, "faml": C1}
+    names = {"lensed": "lensed fibre on taper", "faml": "FaML pair"}
+    ws = {"lensed": W_CHIP, "faml": W_EXP}
+    d = np.linspace(0, 10, 400); t = np.linspace(0, 15, 400); g = np.logspace(-1, 3, 400)
+    for k in ("lensed", "faml"):
+        w = ws[k]
+        axs[0].plot(d, [10 * math.log10(eta_offset(v, w, w)) for v in d], color=cols[k], label=names[k])
+        axs[1].plot(t, [10 * math.log10(eta_tilt(math.radians(v), w, w)) for v in t], color=cols[k])
+        axs[2].plot(g, [10 * math.log10(eta_gap(v, w)) for v in g], color=cols[k])
+    for a_ in axs:
+        a_.axhline(-1, color=MUTED, lw=0.7, ls=(0, (3, 3))); a_.set_ylim(-6, 0.3); a_.set_yticks([-6, -4, -2, -1, 0])
+    axs[2].set_xscale("log"); axs[2].set_xlim(0.1, 1000)
+    axs[0].set_xlim(0, 10); axs[1].set_xlim(0, 15)
+    finish(axs[0], "lateral offset (µm)", "coupling change (dB)"); finish(axs[1], "tilt (°)"); finish(axs[2], "gap (µm)")
+    a0 = axs[0]
+    a0.text(F["lensed"]["d"] + 0.5, -0.45, f"±{F['lensed']['d']:.2f} µm", color=C2, fontsize=6.6, ha="left", va="top")
+    a0.text(F["faml"]["d"] - 0.25, -1.35, f"±{F['faml']['d']:.1f} µm", color=C1, fontsize=6.6, ha="right", va="top")
+    axs[1].text(F["faml"]["th"] + 0.8, -0.45, f"{F['faml']['th']:.2f}°", color=C1, fontsize=6.6, ha="left", va="top")
+    axs[1].text(F["lensed"]["th"] - 0.3, -1.35, f"{F['lensed']['th']:.1f}°", color=C2, fontsize=6.6, ha="right", va="top")
+    axs[2].text(F["lensed"]["g"] / 1.3, -1.35, f"{F['lensed']['g']:.1f} µm", color=C2, fontsize=6.6, ha="right", va="top")
+    axs[2].text(F["faml"]["g"] / 1.25, -1.35, f"{F['faml']['g']:.0f} µm", color=C1, fontsize=6.6, ha="right", va="top")
+    axs[0].legend(loc="lower left", fontsize=6.3, handlelength=1.4)
+    for a_, s in zip(axs, "bcd"): tag(a_, s)
+    save(fig, "ch17_faml")
+    print(f"Fig 17.4: chip lens {Lc:.1f} um (zR {pc['zr']:.2f} um in polymer, wavefront R {pc['R']:.1f} um, apex radius {pc['rs']:.1f} um,"
+          f" ellipse a {pc['a']:.1f} b {pc['b']:.1f}); fibre lens {Lf:.1f} um (zR {pf['zr']:.1f}, R {pf['R']:.1f}, apex radius {pf['rs']:.1f})")
+    for k in ("lensed", "faml"):
+        v = F[k]
+        print(f"  {k:7s} w {ws[k]:5.2f}: 1 dB offset +-{v['d']:.2f} um, tilt {v['th']:.2f} deg, gap {v['g']:.1f} um (zR {v['zr']:.1f} um),"
+              f" rotation of an 8-fibre array about one end {v['rot']:.3f} deg")
+    print(f"  Fresnel, two uncoated surfaces: polymer {F['fresnel_faml']:.2f} dB, silica {F['fresnel_lensed']:.2f} dB;"
+          f" truncation at 1.6 W {100 * math.exp(-2 * 1.6 ** 2):.2f} %")
+    for W in (5.0, 10.0, 12.5, 20.0):
+        print(f"  W = {W:4.1f} um: chip lens {faml_lens(W_CHIP, W)['L']:6.1f} um, fibre lens {faml_lens(W_FIB, W)['L'] if W > W_FIB else float('nan'):6.1f} um,"
+              f" 1 dB offset {math.sqrt(0.115 * 2 * W * W):.2f} um, tilt {math.degrees(tol1db(lambda t: eta_tilt(t, W, W), 1.0)):.2f} deg")
+
+
+# =====================================================================================================
+# Figure 17.5: how facet-attached microlenses are made (schematic)
+# =====================================================================================================
+def _chip_edge(ax, x0=4, xf=46, yw=52, bot=24, floor=32):
+    """Side view of a chip ending at a deep-etched facet at xf (schematic heights)."""
+    box(ax, x0, bot, xf - x0, yw - 4 - bot, "sub")
+    box(ax, xf, bot, 22, floor - bot, "sub")
+    box(ax, x0, yw - 4, xf - x0, 3.4, "ox"); box(ax, x0, yw - 0.6, xf - x0, 1.2, "si", z=2); box(ax, x0, yw + 0.6, xf - x0, 4, "oxtop")
+
+
+def _lens_shape(ax, xf, yw, L=15, rb=8, z=4, alpha=1.0, ls="-", facing=1):
+    t = np.linspace(-1, 1, 60)
+    xs = np.r_[xf, xf + facing * (L - 6 + 6 * np.sqrt(1 - t ** 2)), xf]
+    ys = np.r_[yw - rb, yw + rb * t, yw + rb]
+    poly(ax, np.c_[xs, ys], "polymer", ec=VIOLET, lw=0.7, z=z, alpha=alpha, ls=ls)
+
+
+def fig_famlprint():
+    fig = plt.figure(figsize=(6.3, 1.95))
+    W_ = 0.25
+    titles = ["1 · find the waveguide", "2 · write the lens", "3 · develop", "4 · assemble"]
+    texts = ["camera finds the waveguide\nend or printed markers\n(to about 0.1 µm)",
+             "the fs-laser focus hardens\nthe resist only where it is\nbrightest: voxel by voxel",
+             "solvent washes away the\nunexposed resist; optional\nUV flood cure",
+             "camera or mechanical stops\nplace the parts: the wide\nbeam forgives µm errors"]
+    yw, xf, floor = 52, 46, 32
+    for k in range(4):
+        ax = fig.add_axes([k * W_, 0.0, W_ - 0.008, 0.9]); frameless(ax, (0, 100), (0, 80), equal=False)
+        ax.text(2, 79, titles[k], fontsize=FS, color=INK, fontweight="bold", va="top")
+        label(ax, 50, 10, texts[k], fs=FS_SMALL)
+        if k < 3:
+            _chip_edge(ax, xf=xf, yw=yw, floor=floor)
+        if k == 0:
+            box(ax, 62, 62, 16, 8, "#DDE3EC", ec=INK, lw=0.6, z=5); poly(ax, [(67, 62), (73, 62), (75, 58), (65, 58)], "#C5CEDB", ec=INK, lw=0.6, z=5)
+            arrow(ax, (68, 57), (xf + 2.5, yw + 2.5), col=BLUE, lw=0.8, ms=6, ls=(0, (2, 2)))
+            ax.plot([xf - 5, xf + 5], [yw, yw], color=RED, lw=0.7, zorder=6); ax.plot([xf, xf], [yw - 5, yw + 5], color=RED, lw=0.7, zorder=6)
+            ax.add_patch(Circle((xf, yw), 3.0, fc="none", ec=RED, lw=0.7, zorder=6))
+            label(ax, 84, 72, "camera", fs=FS_SMALL)
+        elif k == 1:
+            t = np.linspace(0, np.pi / 2, 40)
+            poly(ax, np.c_[np.r_[xf, xf + 30 * np.cos(t)], np.r_[floor, floor + 30 * np.sin(t)]], "#EADFF3", alpha=0.9, z=3)
+            _lens_shape(ax, xf, yw, z=4, alpha=0.35, ls=(0, (2, 2)))
+            xfo, yfo = xf + 9, yw + 4
+            poly(ax, [(xfo - 8, 76), (xfo + 8, 76), (xfo + 5, 67), (xfo - 5, 67)], "#C5CEDB", ec=INK, lw=0.6, z=6)
+            poly(ax, [(xfo - 5, 67), (xfo + 5, 67), (xfo, yfo)], RED, alpha=0.35, z=5)
+            ax.add_patch(Ellipse((xfo, yfo), 1.6, 3.0, fc=RED, ec="none", zorder=7))
+            callout(ax, (xfo + 5, 72), (84, 72), "objective", ha="center")
+            callout(ax, (xf + 24, floor + 16), (86, 50), "liquid\nresist", ha="center")
+        elif k == 2:
+            _lens_shape(ax, xf, yw)
+            for yy in (60, 66):
+                arrow(ax, (xf + 24, yy), (xf + 36, yy + 4), col=MUTED, lw=0.8, ms=6)
+            callout(ax, (xf + 10, yw - 5), (84, 42), "solid lens,\naligned to the\nwaveguide", ha="center")
+        else:
+            box(ax, 2, 20, 96, 4, "al")
+            box(ax, 2, 24, 24, 22, "sub"); box(ax, 2, 46, 24, 3.4, "ox"); box(ax, 2, 49.4, 24, 1.2, "si", z=2); box(ax, 2, 50.6, 24, 4, "oxtop")
+            _lens_shape(ax, 26, 50, L=10, rb=6)
+            box(ax, 74, 24, 24, 44, "glass", ec=MUTED, lw=0.5); box(ax, 74, 48.8, 24, 2.4, "core", z=2)
+            _lens_shape(ax, 74, 50, L=10, rb=6, facing=-1)
+            box(ax, 36, 45.5, 28, 9, AMBER, alpha=0.5, z=3)
+            for x_, sg in ((26, 1), (74, -1)):
+                poly(ax, [(x_, 24), (x_ + sg * 6, 24), (x_, 30)], "epoxy", ec=MUTED, lw=0.4, z=5)
+            label(ax, 50, 33, "glue clear\nof the beam", fs=FS_SMALL)
+            label(ax, 14, 35, "chip", fs=FS_SMALL); label(ax, 86, 38, "fibre\narray", fs=FS_SMALL)
+    save(fig, "ch17_famlprint")
+    print("Fig 17.5: schematic (no numbers beyond the ~0.1 um alignment of Xu et al. 2023)")
+
+
+# =====================================================================================================
+# Figure 17.6: flip-chip laser on a silicon chip, height set by pedestals (schematic cross-section)
 # =====================================================================================================
 def fig_flipchip():
     """Cleaner construction: heights chosen so that the laser's active layer lines up with the Si waveguide."""
@@ -256,11 +473,11 @@ def fig_flipchip():
     callout(ax, (8, Y_SUB + 3), (8, 40), "recess etched\ninto the PIC", ha="center")
     note(ax, "schematic, layers exaggerated", "lower right")
     save(fig, "ch17_flipchip")
-    print("Fig 17.4: schematic (no numbers)")
+    print("Fig 17.6: schematic (no numbers)")
 
 
 # =====================================================================================================
-# Figure 17.5: pluggable modules against co-packaged optics (schematic top views of a switch board)
+# Figure 17.7: pluggable modules against co-packaged optics (schematic top views of a switch board)
 # =====================================================================================================
 def fig_cpo():
     PCB, PKG = "#EEF1F4", "#DDE3EA"
@@ -301,11 +518,11 @@ def fig_cpo():
     panel(a2, "b", 0.0, 1.0)
     note(a2, "schematic", "lower right")
     save(fig, "ch17_cpo")
-    print("Fig 17.5: schematic (no numbers beyond the chapter's 'tens of cm' and 'millimetres')")
+    print("Fig 17.7: schematic (no numbers beyond the chapter's 'tens of cm' and 'millimetres')")
 
 
 # =====================================================================================================
-# Figure 17.6: a test layout for a fibre array (to scale), and a packaging template (illustrative)
+# Figure 17.8: a test layout for a fibre array (to scale), and a packaging template (illustrative)
 # =====================================================================================================
 def _gc(ax, x, y, L=30.0, half=20.0):
     """Focusing grating coupler footprint: a sector with its apex (the waveguide end) at (x, y), opening to -x."""
@@ -373,11 +590,11 @@ def fig_layout():
     panel(a2, "b", -0.02, 1.08)
     note(a2, "illustrative", "lower right")
     save(fig, "ch17_layout")
-    print(f"Fig 17.6: {N} couplers on a {PITCH:.0f} um pitch, span {(N - 1) * PITCH:.0f} um")
+    print(f"Fig 17.8: {N} couplers on a {PITCH:.0f} um pitch, span {(N - 1) * PITCH:.0f} um")
 
 
-FIGS = {"vgroove": fig_vgroove, "arrays": fig_arrays, "pwb": fig_pwb, "flipchip": fig_flipchip, "cpo": fig_cpo,
-        "layout": fig_layout}
+FIGS = {"vgroove": fig_vgroove, "arrays": fig_arrays, "pwb": fig_pwb, "faml": fig_faml, "famlprint": fig_famlprint,
+        "flipchip": fig_flipchip, "cpo": fig_cpo, "layout": fig_layout}
 
 if __name__ == "__main__":
     names = sys.argv[1:] or list(FIGS)

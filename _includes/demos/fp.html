@@ -1,0 +1,159 @@
+{% include demos/assets.html %}
+<div class="bd" id="bdFp" role="group" aria-label="Interactive demo: the Fabry–Pérot cavity, its round trips and its Airy spectrum">
+  <div class="bd-head"><span>// try it · the Fabry–Pérot cavity: two mirrors, many round trips (1550 nm)</span>
+    <span class="bd-seg" role="group" aria-label="Preset"><button type="button" data-pre="bragg" aria-pressed="true">Bragg mirrors, Si</button><button type="button" data-pre="inp" aria-pressed="false">cleaved InP chip</button><button type="button" data-pre="gc" aria-pressed="false">two grating couplers</button></span></div>
+  <div class="bd-sliders">
+    <label class="bd-sl"><span>cavity length L <b data-v="L"></b></span><input type="range" data-k="L" min="20" max="2000" step="1" value="166" aria-label="cavity length"></label>
+    <label class="bd-sl"><span>mirror 1 reflectance R₁ <b data-v="R1"></b></span><input type="range" data-k="R1" min="0.001" max="0.995" step="0.001" value="0.694" aria-label="mirror 1 reflectance"></label>
+    <label class="bd-sl"><span>mirror 2 reflectance R₂ <b data-v="R2"></b></span><input type="range" data-k="R2" min="0.001" max="0.995" step="0.001" value="0.694" aria-label="mirror 2 reflectance"></label>
+    <label class="bd-sl"><span>propagation loss (left of 0: gain) <b data-v="a"></b></span><input type="range" data-k="a" min="-150" max="80" step="0.5" value="2" aria-label="propagation loss in dB per cm; negative values are gain"></label>
+    <label class="bd-sl"><span>probe detuning <b data-v="dt"></b></span><input type="range" data-k="dt" min="-0.5" max="0.5" step="0.002" value="0" aria-label="probe detuning in fractions of the free spectral range"></label>
+  </div>
+  <div class="bd-row">
+    <div class="bd-scope tall"><canvas data-c="g" aria-hidden="true"></canvas><span class="bd-tag" data-o="gtag">the cavity: power on each pass</span></div>
+    <div class="bd-scope tall"><canvas data-c="f" aria-hidden="true"></canvas><span class="bd-tag">transmitted fields, pass by pass</span></div>
+  </div>
+  <div class="bd-scope"><canvas data-c="s" aria-hidden="true"></canvas><span class="bd-tag">blue: transmission · gold: reflection</span></div>
+  <div class="bd-read" aria-live="polite"><span>FSR <b data-o="fsr">–</b></span><span>FWHM <b data-o="fw">–</b></span><span>finesse <b data-o="F">–</b></span><span>Q <b data-o="Q">–</b></span><span>photon lifetime <b data-o="tp">–</b></span><span>peak T <b data-o="tm">–</b></span><span>contrast <b data-o="ct">–</b></span><span class="bd-pill" data-o="pill" hidden></span></div>
+  <p class="bd-caption" data-o="cap"></p>
+  <div class="bd-try"><p class="bd-try-h">Three things to try</p><ol>
+    <li><b>Raise the mirrors.</b> On Bragg mirrors, take both reflectances from 0.30 to 0.95: the finesse climbs from 2.2 to 53 and the resonance narrows to 32 pm. The 2 dB/cm of loss, harmless at 0.69, now costs a quarter of the peak (76 %), because the light makes many more passes before it leaves.</li>
+    <li><b>Unbalance them.</b> Set the loss to 0 and R₂ to 0.60 with R₁ at 0.95: the peak transmission falls to 33 % and the reflection no longer vanishes on resonance. Lower R₁ until R₁ = R₂ and the peak returns to 100 %, at any reflectance. Now raise the loss to 20 dB/cm: the reflection vanishes only when R₁ = R₂e<sup>−2αL</sup>, and even then part of the light is absorbed.</li>
+    <li><b>Pump the laser chip.</b> On cleaved InP, drag the loss below zero into gain. At 110 dB/cm of gain the peaks rise to 90 times the input and narrow to 34 pm; near 124 dB/cm (28.5 cm⁻¹) the round trip gives ρ = 1 and the chip lases: the threshold of Chapter 24.</li>
+  </ol></div>
+  <div class="bd-check"><p class="bd-check-q"><span class="bd-check-h">Check yourself</span>A lossless cavity has two identical mirrors, each reflecting 99 % and transmitting 1 %. On resonance, how much of the light gets through?</p>
+    <div class="bd-check-opts" role="group" aria-label="Answers">
+      <button type="button" data-correct data-why="(1 − R)²/(1 − R)² = 1. The light inside builds up a hundredfold, so the 1 % that leaks through the second mirror equals the input, and the reflections from the first mirror cancel.">All of it</button>
+      <button type="button" data-why="That would be true of one pass. On resonance the light circulates about a hundred times and builds up until the leak through the second mirror equals the input.">1 %, what one mirror lets through</button>
+      <button type="button" data-why="Multiplying the two mirrors' transmissions ignores the round trips, which add in phase on resonance.">0.01 %, through both mirrors</button>
+    </div>
+    <p class="bd-check-fb" aria-live="polite"></p>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.getElementById('bdFp'); if (!root || !window.BD) return;
+  var q = function (s) { return root.querySelector(s); };
+  var lam = 1550, C = 2.998e8, pre = 'bragg';
+  var PRE = { bragg: { L: 166, R1: 0.694, R2: 0.694, a: 2, ng: 4.18, m: 'bragg' },
+              inp: { L: 400, R1: 0.32, R2: 0.32, a: 65, ng: 3.6, m: 'facet' },
+              gc: { L: 1000, R1: 0.016, R2: 0.016, a: 2, ng: 4.18, m: 'gc' } };
+  var S = BD.bind(root, {
+    L: { fmt: function (x) { return x.toFixed(0) + ' µm'; } }, R1: { fmt: function (x) { return x.toFixed(3); } }, R2: { fmt: function (x) { return x.toFixed(3); } },
+    a: { fmt: function (x) { return x < 0 ? 'gain ' + (-x).toFixed(1) + ' dB/cm' : x.toFixed(1) + ' dB/cm'; } },
+    dt: { fmt: function (x) { return (x >= 0 ? '+' : '−') + Math.abs(x).toFixed(3) + ' FSR'; } }
+  }, function () { draw(); });
+  function setSl(k, v) { var el = q('[data-k="' + k + '"]'); el.value = v; el.dispatchEvent(new Event('input', { bubbles: true })); }
+  BD.seg(root, 'pre', function (v) { pre = v; var P = PRE[v]; setSl('L', P.L); setSl('R1', P.R1); setSl('R2', P.R2); setSl('a', P.a); setSl('dt', 0); draw(); });
+  function model() {
+    var P = PRE[pre], A = Math.pow(10, -S.a * S.L * 1e-4 / 10), rho = Math.sqrt(S.R1 * S.R2) * A;
+    var fsr = lam * lam / (2 * P.ng * S.L * 1e3);                                    // nm
+    var T = function (ph) { return (1 - S.R1) * (1 - S.R2) * A / (Math.pow(1 - rho, 2) + 4 * rho * Math.pow(Math.sin(ph / 2), 2)); };
+    var R = function (ph) { var s2 = Math.pow(Math.sin(ph / 2), 2); return (Math.pow(Math.sqrt(S.R1) - Math.sqrt(S.R2) * A, 2) + 4 * Math.sqrt(S.R1 * S.R2) * A * s2) / (Math.pow(1 - rho, 2) + 4 * rho * s2); };
+    return { P: P, A: A, rho: rho, fsr: fsr, T: T, R: R };
+  }
+  function fmtW(nm) { return nm >= 1 ? nm.toFixed(nm >= 10 ? 1 : 2) + ' nm' : (nm * 1000).toFixed(nm * 1000 >= 100 ? 0 : 1) + ' pm'; }
+  function draw() {
+    var M = model(), rho = M.rho, lasing = rho >= 0.9995, phi = 2 * Math.PI * S.dt;
+    // ---------------------------------------------------------------- the cavity and its passes
+    (function () {
+      var d = BD.setup(q('[data-c="g"]')), g = d.g, W = d.w, H = d.h, x1 = 34, x2 = W - 46, cy = 52, mw = 12;
+      // waveguide
+      g.fillStyle = 'rgba(157,179,204,.18)'; g.fillRect(0, cy - 4, W, 8);
+      // mirrors: style from the preset, opacity from the reflectance
+      [[x1, S.R1], [x2, S.R2]].forEach(function (m, k) {
+        var x = m[0], R = m[1], al = (0.25 + 0.75 * Math.sqrt(R)).toFixed(2);
+        if (M.P.m === 'bragg') { for (var i = 0; i < 6; i++) { g.fillStyle = 'rgba(157,179,204,' + al + ')'; g.fillRect(x - mw / 2 + i * 2.2, cy - 11, 1.2, 22); } }
+        else if (M.P.m === 'facet') { g.fillStyle = 'rgba(215,230,247,' + al + ')'; g.fillRect(x - 2, cy - 16, 4, 32); }
+        else { g.strokeStyle = 'rgba(157,179,204,' + al + ')'; for (var j = 0; j < 4; j++) { g.beginPath(); g.arc(x + (k ? 1 : -1) * (j * 3), cy, 7 + j * 3, k ? -0.6 : Math.PI - 0.6, k ? 0.6 : Math.PI + 0.6); g.stroke(); } }
+        BD.label(g, 'R' + (k ? '₂' : '₁') + ' ' + R.toFixed(2), x, cy - 20, BD.C.white, 'center');
+      });
+      BD.dim(g, x1, cy + 22, x2, cy + 22, 'L = ' + S.L.toFixed(0) + ' µm', BD.C.gold, 10);
+      // the zig-zag of passes: power after each pass, line width and brightness from the power (unfolded downwards)
+      var p = 1 - S.R1, y = cy + 44, dy = Math.max(9, Math.min(16, (H - 70 - 44) / 10)), kmax = 0, pk;
+      g.strokeStyle = BD.C.gold; g.lineWidth = 7.8; g.beginPath(); g.moveTo(4, y); g.lineTo(x1, y); g.stroke();
+      BD.label(g, '1', 6, y - 5, BD.C.gold);
+      var tot = 0;
+      for (var k = 0; k < 40 && y + dy < H - 6; k++) {
+        var fwd = k % 2 === 0, pin = p; p *= M.A;                                       // across the cavity
+        var xa = fwd ? x1 : x2, xb = fwd ? x2 : x1, ya = y, yb = y + dy;
+        var lw = Math.min(9, 0.8 + 7 * Math.sqrt(pin)), al = Math.min(1, 0.3 + 0.7 * Math.sqrt(Math.min(1, pin)));   // width: amplitude of the light on this pass
+        g.strokeStyle = 'rgba(224,184,90,' + al.toFixed(2) + ')'; g.lineWidth = lw; g.beginPath(); g.moveTo(xa, ya); g.lineTo(xb, yb); g.stroke();
+        var out = p * (fwd ? 1 - S.R2 : 1 - S.R1), xo = fwd ? xb + 4 : xb - 4, xe = fwd ? W - 4 : 4;
+        if (out > 1e-4) { g.strokeStyle = fwd ? 'rgba(127,184,240,' + Math.min(1, 0.35 + 0.65 * Math.sqrt(Math.min(1, out))).toFixed(2) + ')' : 'rgba(224,184,90,.35)'; g.lineWidth = Math.min(9, 0.8 + 7 * Math.sqrt(out)); g.beginPath(); g.moveTo(xo, yb); g.lineTo(xe, yb); g.stroke(); }
+        if (fwd) tot += out;
+        p *= fwd ? S.R2 : S.R1; y = yb; kmax = k + 1;
+        if (p < 0.004 && !lasing) break;
+      }
+      g.lineWidth = 1;
+      BD.label(g, 'out', W - 6, cy + 40, BD.C.blue, 'right');
+      q('[data-o="gtag"]').textContent = 'power on each pass (' + kmax + ' drawn)';
+      var bu = rho < 1 ? (1 - S.R1) / Math.pow(1 - rho, 2) : Infinity;
+      BD.label(g, rho < 1 ? 'ρ = ' + rho.toFixed(3) + ' per round trip · inside ×' + (bu >= 100 ? bu.toFixed(0) : bu.toFixed(1)) + ' on resonance' : 'ρ ≥ 1: the round trip gains', W / 2, H - 6, lasing ? BD.C.red : BD.C.dim, 'center');
+    })();
+    // ---------------------------------------------------------------- phasor sum of the transmitted fields
+    (function () {
+      var d = BD.setup(q('[data-c="f"]')), g = d.g, W = d.w, H = d.h;
+      var t0 = Math.sqrt((1 - S.R1) * (1 - S.R2) * M.A), r = Math.min(rho, 0.999), Nmax = 400, pts = [[0, 0]], re = 0, im = 0, k;
+      for (k = 0; k < Nmax; k++) { var mag = t0 * Math.pow(r, k), ang = -phi * k; re += mag * Math.cos(ang); im += mag * Math.sin(ang); pts.push([re, im]); if (mag < 1e-3 * t0 && k > 6) break; }
+      var full = t0 / (1 - r), sc = Math.min((W - 40) / Math.max(1.05 * full, 1e-9), (H - 88) / Math.max(full, 1e-9)), ox = 20, oy = 62 + (H - 88) / 2;
+      var Xp = function (v) { return ox + v * sc; }, Yp = function (v) { return oy - v * sc; };
+      g.strokeStyle = BD.C.grid; g.beginPath(); g.moveTo(ox, oy); g.lineTo(W - 10, oy); g.stroke();
+      // full-length reference (on resonance) and unit circle of the input
+      g.strokeStyle = BD.C.dim; g.setLineDash([3, 3]); g.beginPath(); g.moveTo(Xp(0), oy + 10); g.lineTo(Xp(full), oy + 10); g.stroke(); g.setLineDash([]);
+      BD.label(g, 'on resonance', Math.min(Xp(full), W - 6), oy + 22, BD.C.dim, 'right');
+      // each pass's field, head to tail
+      for (k = 1; k < pts.length; k++) {
+        var al = Math.max(0.25, 1 - k / Math.min(pts.length, 60));
+        g.strokeStyle = 'rgba(127,184,240,' + al.toFixed(2) + ')'; g.lineWidth = k < 30 ? 1.4 : 0.8;
+        g.beginPath(); g.moveTo(Xp(pts[k - 1][0]), Yp(pts[k - 1][1])); g.lineTo(Xp(pts[k][0]), Yp(pts[k][1])); g.stroke();
+      }
+      g.lineWidth = 1;
+      // the resultant
+      var ex = pts[pts.length - 1];
+      g.strokeStyle = BD.C.gold; g.lineWidth = 2; g.beginPath(); g.moveTo(Xp(0), Yp(0)); g.lineTo(Xp(ex[0]), Yp(ex[1])); g.stroke(); g.lineWidth = 1;
+      var a = Math.atan2(-(Yp(ex[1]) - Yp(0)), Xp(ex[0]) - Xp(0)), hx = Xp(ex[0]), hy = Yp(ex[1]);
+      g.fillStyle = BD.C.gold; g.beginPath(); g.moveTo(hx, hy); g.lineTo(hx - 7 * Math.cos(a - 0.4), hy + 7 * Math.sin(a - 0.4)); g.lineTo(hx - 7 * Math.cos(a + 0.4), hy + 7 * Math.sin(a + 0.4)); g.fill();
+      var Tn = ex[0] * ex[0] + ex[1] * ex[1];
+      BD.label(g, 'sum² = T = ' + (Tn >= 10 ? Tn.toFixed(1) : Tn.toFixed(3)) + (lasing ? ' (clipped at ρ = 0.999)' : ''), 8, 40, BD.C.gold);
+      BD.label(g, 'each pass turned by ' + (360 * Math.abs(S.dt)).toFixed(1) + '°, scaled by ρ', 8, 54, BD.C.dim);
+    })();
+    // ---------------------------------------------------------------- the spectrum
+    var dv = BD.setup(q('[data-c="s"]')), span = 1.6 * M.fsr, N = 900, xs = [], ts = [], rs = [], tmax = 0;
+    for (var i = 0; i <= N; i++) { var dl = -span + 2 * span * i / N, ph = 2 * Math.PI * dl / M.fsr, t = M.T(ph); xs.push(dl); ts.push(t); rs.push(M.R(ph)); if (t > tmax) tmax = t; }
+    var ymax = lasing ? 2 : Math.max(1.05, Math.min(tmax, 1e3) * 1.08), unit = M.fsr >= 2 ? 1 : 1e-3, un = unit === 1 ? ' nm' : ' pm';
+    var step = BD.nice(span / 2.2 / unit) * unit, xt = [];
+    for (var v = -Math.floor(span / step) * step; v <= span + 1e-12; v += step) xt.push([v, (Math.abs(v) < 1e-12 ? '0' : (v / unit).toFixed(0)) + (Math.abs(v - Math.floor(span / step) * step) < 1e-9 ? un : '')]);
+    var yt = ymax <= 1.2 ? [[0, '0'], [0.5, '0.5'], [1, '1']] : [[0, '0'], [ymax / 2, (ymax / 2).toPrecision(2)], [ymax / 1.08, (ymax / 1.08).toPrecision(2)]];
+    var f = BD.frame(dv, { x: [-span, span], y: [0, ymax], xt: xt, yt: yt, xl: 'detuning from a resonance', pad: { l: 40, b: 26 } });
+    if (!lasing) BD.line(f, xs, rs.map(function (r) { return Math.min(r, ymax * 1.5); }), BD.C.gold, 1.3);
+    BD.line(f, xs, ts.map(function (t) { return Math.min(t, ymax * 1.5); }), BD.C.blue, 1.8);
+    BD.vline(f, S.dt * M.fsr, BD.C.white, [2, 3]);
+    if (!lasing) BD.dot(f, S.dt * M.fsr, Math.min(M.T(phi), ymax), BD.C.white, 3.5);
+    // FSR dimension between the resonances at 0 and +1 FSR
+    if (!lasing) { var yy = f.Y(ymax * 0.9); if (f.X(M.fsr) < dv.w - 12) BD.dim(dv.g, f.X(0), yy, f.X(M.fsr), yy, 'FSR', BD.C.gold, -6); }
+    // ---------------------------------------------------------------- readouts
+    var x = (1 - rho) / (2 * Math.sqrt(rho)), F = rho < 1 && x <= 1 ? Math.PI / (2 * Math.asin(x)) : null, fw = F ? M.fsr / F : null;
+    var tpk = M.T(0), tmn = M.T(Math.PI);
+    q('[data-o="fsr"]').textContent = fmtW(M.fsr);
+    q('[data-o="fw"]').textContent = fw ? fmtW(fw) : '–';
+    q('[data-o="F"]').textContent = F ? (F >= 100 ? F.toFixed(0) : F.toFixed(F >= 10 ? 1 : 2)) : '–';
+    q('[data-o="Q"]').textContent = fw ? (lam / fw >= 1e5 ? (lam / fw / 1e3).toFixed(0) + ' k' : Math.round(lam / fw).toLocaleString('en-GB')) : '–';
+    var vg = C / M.P.ng, tp = rho < 1 ? S.L * 1e-6 / (vg * Math.log(1 / rho)) : null;
+    q('[data-o="tp"]').textContent = tp ? (tp >= 1e-9 ? (tp * 1e9).toFixed(2) + ' ns' : (tp * 1e12).toFixed(tp * 1e12 >= 10 ? 1 : 2) + ' ps') : '–';
+    q('[data-o="tm"]').textContent = lasing ? '∞' : (tpk >= 10 ? tpk.toFixed(1) : (100 * tpk).toFixed(1) + ' %');
+    q('[data-o="ct"]').textContent = lasing ? '–' : (10 * Math.log10(tpk / tmn)).toFixed(2) + ' dB';
+    var matched = !lasing && M.A <= 1 && M.R(0) < 0.005;   // no reflection on resonance: R1 = R2 A^2
+    BD.pill(q('[data-o="pill"]'), lasing ? 'lasing' : rho > 1e-9 && M.A > 1 ? 'amplifying' : matched ? 'matched' : '', lasing ? 'bad' : M.A > 1 ? 'warn' : 'ok');
+    var c = 'Each round trip returns ρ = √(R₁R₂)·e<sup>−αL</sup> = ' + rho.toFixed(3) + ' of the field, so the transmitted fields form a geometric series: on resonance they add in a straight line, off resonance they curl into a spiral and the sum shrinks. That sum is the Airy function. ';
+    if (lasing) c += '<b>With ρ ≥ 1 the round trip gains more than it loses: the series no longer converges, and the cavity lases (Chapter 24).</b> ';
+    else if (M.A > 1) c += 'With gain inside, the peaks grow and narrow as ρ approaches 1: below threshold, the spectrum of a laser chip looks like this, and the depth of its fringes measures the gain (Hakki–Paoli). ';
+    else if (!F) c += 'With ρ below 0.17 the fringes never dip to half the peak: a weak, parasitic cavity whose ripple reveals the reflections. ';
+    else if (matched) c += 'The front mirror leaks exactly as fast as the light is lost behind it (R₁ = R₂e<sup>−2αL</sup>), so nothing is reflected on resonance' + (S.a > 0.05 ? '; the loss still absorbs ' + (100 * (1 - tpk)).toFixed(1) + ' % of the light. ' : ' and everything is transmitted. ');
+    else c += 'On resonance ' + (100 * M.R(0)).toFixed(1) + ' % is reflected, because R₁ ≠ R₂e<sup>−2αL</sup>' + (S.a > 0.05 ? ', and ' + (100 * Math.max(0, 1 - tpk - M.R(0))).toFixed(1) + ' % is absorbed inside. ' : '. ');
+    c += '<i>Mirror reflectances independent of wavelength (a Bragg mirror’s fall off outside its stop-band); probe detuning in fractions of the FSR.</i>';
+    q('[data-o="cap"]').innerHTML = c;
+  }
+  BD.observe(root, draw);
+})();
+</script>

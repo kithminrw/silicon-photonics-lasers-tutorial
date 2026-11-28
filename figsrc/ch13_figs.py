@@ -1,6 +1,6 @@
 """Figures and numbers for Chapter 13 (Bragg gratings).
 
-Run from the worktree root:   python -I -X utf8 figsrc/ch13_figs.py
+Run from the repository root:   python -I -X utf8 figsrc/ch13_figs.py [name ...]
 Writes assets/figs/ch13_*.svg (and PNG previews if $FIGPREVIEW is set) and prints every number the figures and
 captions use.
 
@@ -219,7 +219,81 @@ def fig_apod():
     save(fig, "ch13_apod")
 
 
-# ------------------------------------------------------------------ Figure 13.5: quarter-wave-shifted cavity
+# ------------------------------------------------------------------ Figure 13.5: the Fabry-Perot cavity (Section 13.5)
+def airy_T(phi, R1, R2, A=1.0):
+    """Power transmission of a Fabry-Perot cavity: mirror reflectances R1, R2, single-pass power transmission A,
+    round-trip phase phi (radians)."""
+    rho = np.sqrt(R1 * R2) * A
+    return (1 - R1) * (1 - R2) * A / ((1 - rho) ** 2 + 4 * rho * np.sin(phi / 2) ** 2)
+
+
+def finesse_exact(rho):
+    """FSR / FWHM of the Airy peak (exact); None when the fringes never fall to half the peak (rho < 3 - 2 sqrt 2)."""
+    x = (1 - rho) / (2 * np.sqrt(rho))
+    return np.pi / (2 * np.arcsin(x)) if x <= 1 else None
+
+
+def dbr_cavity(l, N=300, Ns=316, nsec=60):
+    """Two N-period gratings of Worked Example 13.2 around a spacer of Ns + 1/2 periods (a quarter-wave spacer plus
+    Ns whole periods), so that one resonance sits at the Bragg wavelength."""
+    Lg = N * PER
+    P = np.array([[np.full_like(l, -1j, complex), 0 * l], [0 * l, np.full_like(l, 1j, complex)]])
+    G = grating(l, np.full(nsec, K0), Lg)
+    return mul(mul(mul(G, sec(Ns * PER, delta(l), 0.0)), P), G)
+
+
+def fig_fp():
+    fig, (a1, a2) = plt.subplots(1, 2, figsize=FULL)
+    ph = np.linspace(-1.3, 1.3, 4001)
+    for R, col in ((0.3, C2), (0.7, C3), (0.95, C1)):
+        F = finesse_exact(R)
+        a1.plot(ph, airy_T(2 * np.pi * ph, R, R), color=col, lw=1.4, label=f"R = {R:.2f}, F = {F:.1f}")
+        print(f"Airy, lossless, R1 = R2 = {R}: finesse {F:.2f} (approximate formula {np.pi * np.sqrt(R) / (1 - R):.2f}),"
+              f" T_min {airy_T(np.pi, R, R):.3f}")
+    F95 = finesse_exact(0.95); hw = 0.5 / F95
+    a1.annotate("", xy=(1, 1.08), xytext=(0, 1.08), arrowprops=dict(arrowstyle="<|-|>", color=INK, lw=0.7, mutation_scale=6))
+    a1.text(0.5, 1.12, "FSR", fontsize=6.6, ha="center", va="bottom", color=INK)
+    a1.annotate(f"FWHM = FSR / F", xy=(hw, 0.5), xytext=(0.18, 0.62), fontsize=6.6, color=C1, ha="left",
+                arrowprops=dict(arrowstyle="-", color=C1, lw=0.6))
+    a1.set_xlim(-1.3, 1.3); a1.set_ylim(0, 1.62); a1.set_yticks([0, 0.25, 0.5, 0.75, 1.0])
+    a1.set_xticks([-1, -0.5, 0, 0.5, 1])
+    finish(a1, "Round-trip phase / 2π (cycles from resonance)", "Transmission")
+    a1.legend(loc="upper left", fontsize=6.2, borderaxespad=0.1, ncol=1)
+    # (b) the Bragg-mirror cavity of Worked Example 13.3: transfer matrices against the Airy formula with L_eff
+    N, Ns = 300, 316
+    Lg = N * PER; Ls = (Ns + 0.5) * PER; R = np.tanh(K0 * Lg) ** 2; Lp = np.tanh(K0 * Lg) / (2 * K0); Leff = Ls + 2 * Lp
+    l = LAM + np.linspace(-4e-9, 4e-9, 16001)
+    Tm = 1 - refl(dbr_cavity(l, N, Ns))
+    phi = 4 * np.pi * NG * Leff * (1 / l - 1 / LAM) * 1.0       # round-trip phase from the resonance at 1550 nm (group index)
+    Ta = airy_T(phi, R, R)
+    Rg = np.abs(r_uniform(l, K0, Lg)) ** 2
+    a2.plot((l - LAM) * 1e9, Rg, color=MUTED, lw=1.0, ls=(0, (1, 1.5)), label="one mirror: reflectance")
+    a2.plot((l - LAM) * 1e9, Ta, color=C2, lw=1.2, ls=(0, (4, 2)), label=f"Airy, R = {R:.2f}, $L_\\mathrm{{eff}}$ = {Leff * 1e6:.0f} µm")
+    a2.plot((l - LAM) * 1e9, Tm, color=C1, lw=1.4, label="transfer matrices")
+    lf = LAM + np.linspace(-0.4e-9, 0.4e-9, 16001); Tf = 1 - refl(dbr_cavity(lf, N, Ns)); fw = fwhm(lf * 1e9, Tf)
+    FSR = LAM ** 2 / (2 * NG * Leff); Fe = finesse_exact(R)
+    from scipy.signal import find_peaks
+    pk, _ = find_peaks(Tm, height=0.5); offs = (l[pk] - LAM) * 1e9
+    near = offs[np.argsort(np.abs(offs))[:3]]
+    i1 = pk[np.argmin(np.abs(offs - 1.66))]
+    lf1 = l[i1] + np.linspace(-0.5e-9, 0.5e-9, 8001); fw1 = fwhm(lf1 * 1e9, 1 - refl(dbr_cavity(lf1, N, Ns)))
+    a2.annotate(f"FWHM {fw * 1000:.0f} pm\nQ ≈ {round(1550 / fw, -2):.0f}", xy=(fw / 2 + 0.02, 0.55), xytext=(1.0, 1.3), fontsize=6.4, color=C1,
+                ha="left", va="center", arrowprops=dict(arrowstyle="-", color=C1, lw=0.6))
+    a2.set_xlim(-4, 4); a2.set_ylim(0, 1.62); a2.set_yticks([0, 0.25, 0.5, 0.75, 1.0])
+    finish(a2, "Wavelength − 1550 nm (nm)", "Transmission, reflectance")
+    a2.legend(loc="upper left", fontsize=6.0, borderaxespad=0.1, bbox_to_anchor=(0.0, 1.0), handlelength=1.8)
+    tag(a1, "a"); tag(a2, "b"); fig.tight_layout(w_pad=2.0)
+    save(fig, "ch13_fp")
+    print(f"DBR cavity: two {N}-period gratings, kL {K0 * Lg:.3f}, R {R:.4f}, penetration {Lp * 1e6:.1f} um, spacer {Ls * 1e6:.2f} um,"
+          f" L_eff {Leff * 1e6:.1f} um, Airy FSR {FSR * 1e9:.3f} nm, finesse {Fe:.2f}, FWHM {FSR / Fe * 1e12:.0f} pm, Q {LAM / (FSR / Fe):.0f}")
+    print(f"  transfer matrices: peaks nearest 1550 nm at {np.round(np.sort(near), 3)} nm; centre FWHM {fw * 1000:.1f} pm (Q {1550 / fw:.0f});"
+          f" neighbour FWHM {fw1 * 1000:.0f} pm; one grating's reflectance at +1.66 nm {np.abs(r_uniform(np.array([LAM + 1.66e-9]), K0, Lg))[0] ** 2:.3f}")
+    A = np.exp(-2 / 4.343 * 100 * Leff); rho = R * A
+    print(f"  with 2 dB/cm over L_eff: single pass {A:.5f}, rho {rho:.4f}, T_max {(1 - R) ** 2 * A / (1 - rho) ** 2:.3f}, finesse {finesse_exact(rho):.2f};"
+          f" photon lifetime (lossless) {LAM / (FSR / Fe) * LAM / (2 * np.pi * 3e8) * 1e12:.2f} ps")
+
+
+# ------------------------------------------------------------------ Figure 13.6: quarter-wave-shifted cavity
 def fig_cavity():
     N = 750; L = N * PER; ns = 750
     kz = np.full(ns, K0)
@@ -266,7 +340,7 @@ def fig_cavity():
     save(fig, "ch13_cavity")
 
 
-# ------------------------------------------------------------------ Figure 13.6: contra-directional coupler
+# ------------------------------------------------------------------ Figure 13.7: contra-directional coupler
 def fig_contradc():
     S = json.load(open(os.path.join(HERE, "ch06_sweep.json")))
     W = S["widths"]
@@ -338,7 +412,7 @@ def fig_contradc():
     return l11, l12, l22
 
 
-# ------------------------------------------------------------------ Figure 13.7: photonic-crystal waveguide and cavity
+# ------------------------------------------------------------------ Figure 13.8: photonic-crystal waveguide and cavity
 def fig_phc():
     a = 0.40; r = 0.30 * a                       # illustrative lattice constant and hole radius (um)
     h = a * np.sqrt(3) / 2
@@ -369,6 +443,11 @@ def fig_phc():
     save(fig, "ch13_phc")
 
 
+FIGS = {"geometry": fig_geometry, "band": fig_band, "kappaL": fig_kappaL, "apod": fig_apod, "fp": fig_fp, "cavity": fig_cavity,
+        "contradc": fig_contradc, "phc": fig_phc}
+
 if __name__ == "__main__":
-    numbers()
-    fig_geometry(); fig_band(); fig_kappaL(); fig_apod(); fig_cavity(); fig_contradc(); fig_phc()
+    names = sys.argv[1:]
+    if not names: numbers()
+    for nme in names or list(FIGS):
+        FIGS[nme]()

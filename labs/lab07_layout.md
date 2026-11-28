@@ -24,7 +24,7 @@ Write the first chip of this tutorial as Python code, with gdsfactory and the Si
 
 ## What you need
 
-- [Chapter 30]({% link chapters/30_flow.md %}) (Sections 30.2 to 30.4, 30.7 and 30.8), with [Chapter 17]({% link chapters/17_fiberarrays.md %}) (Section 17.7), [Chapter 15]({% link chapters/15_gc.md %}) (Section 15.7), [Chapter 11]({% link chapters/11_mzi.md %}) (Section 11.3), [Chapter 12]({% link chapters/12_rings.md %}) (Table 12.1) and [Chapter 7]({% link chapters/07_loss.md %}) (Section 7.7).
+- [Chapter 30]({% link chapters/30_flow.md %}) (Sections 30.2 to 30.4, 30.7 and 30.8), with [Chapter 17]({% link chapters/17_fiberarrays.md %}) (Section 17.8), [Chapter 15]({% link chapters/15_gc.md %}) (Section 15.7), [Chapter 11]({% link chapters/11_mzi.md %}) (Section 11.3), [Chapter 12]({% link chapters/12_rings.md %}) (Table 12.1) and [Chapter 7]({% link chapters/07_loss.md %}) (Section 7.7).
 - Python 3.11 or newer with gdsfactory, ubcpdk and Matplotlib: `pip install "gdsfactory==9.51.0" "ubcpdk==3.3.5" matplotlib`. Tested with Python 3.12, gdsfactory 9.51.0, ubcpdk 3.3.5 (the SiEPIC EBeam PDK for gdsfactory {% include cite.html keys="ubcpdk" %}), the KLayout Python module 0.30.13 that gdsfactory installs, NumPy 2.4 and Matplotlib 3.11.
 - Optionally [KLayout](https://www.klayout.de) 0.29 or newer, to look at the layout (Section L7.7). The lab does not need it.
 - The script <a href="{{ '/labs/lab07_layout.py' | relative_url }}" download><code>lab07_layout.py</code></a>.

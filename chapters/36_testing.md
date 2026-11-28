@@ -19,6 +19,7 @@ Measurement closes the loop: a design is only as good as the data that comes bac
 - calibrate and reference measurements;
 - test active devices and lasers (IV, LIV, spectra, SMSR, RIN, linewidth);
 - measure high-speed behaviour (S-parameters, eye diagrams, BER) and run wafer-scale tests.
+- test edge couplers with lensed fibres and lensed fibre arrays, and compare their tolerances with grating couplers and printed lenses.
 
 </div>
 
@@ -111,16 +112,47 @@ The openEBL chips are measured on an automated probe station: a swept tunable la
 
 </div>
 
+## <span class="secnum">36.8</span>Testing edge couplers: lensed fibre arrays
+
+Grating couplers make testing easy because a fibre array can land on them anywhere on the wafer. Edge couplers ([Chapter 16]({% link chapters/16_edge.md %})) are broadband, polarisation-tolerant and low-loss. But their light leaves through a facet, in a mode only 2.5–3 µm across, so a test needs a facet to reach and a spot that small to meet it.
+
+**Lensed fibres.** A lensed fibre has its end shaped into a lens. It may be polished into a cone with a rounded tip, or carry a short piece of graded-index fibre spliced on and cut to length. Either way it focuses the fibre's 10.4 µm mode to a spot of 2–3 µm a few micrometres to some tens of micrometres in front of the tip. One lensed fibre at the input and one at the output, each on its own six-axis stage, is the classic edge-coupled test. It is slow: each fibre is aligned actively to within a fraction of a micrometre, at the right working distance, for every device.
+
+**Lensed fibre arrays.** A **lensed fibre array** holds a row of such fibres in V-grooves at the array pitch, usually 127 µm, facing a row of edge couplers at the same pitch on the chip's facet. As with grating couplers (Section 17.1), the array is rigid. A loopback between the outermost couplers aligns it, and one alignment then serves every channel. The difficulty is that every spot must sit on its coupler at the same time, within about ±0.6 µm and at the same working distance to within a few micrometres ([Table 36.1](#tab-36-1)). Several errors add up: the positions of the cores in their grooves, the pointing and focal length of each lens, and the array's rotation. Over 889 µm of an eight-fibre array, a rotation of only 0.04° costs the far channel 1 dB (Worked Example 17.1). Lensed arrays are built in several ways:
+
+- shaped lensed fibres placed one by one in the grooves;
+- a micro-lens array of glass or silicon on the same pitch in front of a standard array, with one lens imaging each core;
+- graded-index fibre lenses spliced onto every fibre and polished to length together;
+- lenses printed on each fibre by two-photon lithography ([Section 17.5]({% link chapters/17_fiberarrays.md %})).
+
+Back-reflections, which add fringes to the spectrum ([Section 13.5]({% link chapters/13_bragg.md %})), are reduced with anti-reflection coatings on the lenses and with edge couplers that meet an angled facet ([Chapter 16]({% link chapters/16_edge.md %})).
+
+**Lenses on the chip as well.** If the chip's edge couplers also carry printed lenses, the test interface becomes the pair of expanded beams of Section 17.5. The tolerances grow to ±6 µm and hundreds of micrometres of gap, while the angle tolerance falls to about ±1° ([Table 36.1](#tab-36-1)). A station can then place the array passively and step quickly from die to die; angle errors are controlled by flat reference faces. Printed probes that dip into deep-etched trenches go further: they reach edge couplers on the wafer before it is diced {% include cite.html keys="trappen2020" %}.
+
+**Table 36.1. Fibre interfaces for testing at 1550 nm: 1 dB tolerances in air** (Gaussian overlap of Section 17.2; 1/e² mode diameters fibre / chip).
+{: .tabcaption #tab-36-1 }
+
+| Interface | Modes | Lateral offset | Tilt | Gap | Array rotation (889 µm) |
+|---|---|---|---|---|---|
+| cleaved fibre array over grating couplers | 10.4 / 9.2 µm | ±2.35 µm | ±2.8° | 50 µm | 0.15° |
+| high-NA fibre array butted to edge couplers | 4.0 / 3.6 µm | ±0.91 µm | ±7.2° | 7.5 µm | 0.06° |
+| lensed fibre array at edge couplers | 2.5 / 2.5 µm | ±0.60 µm | ±10.9° | 3.2 µm | 0.04° |
+| lenses on the fibres and on the chip | 25 / 25 µm | ±6.0 µm | ±1.1° | 322 µm | 0.39° |
+
+**Calibrating edge-coupled tests.** De-embedding works as in Section 36.3. Loopbacks join neighbouring edge couplers with U-turn waveguides on the array pitch, and the device's spectrum is divided by theirs. Two things differ from grating couplers. The facets, not the couplers, cause the main reflections, so the fringe period gives the distance between the reflectors ([Section 13.5]({% link chapters/13_bragg.md %})). And the response is broadband, so the loopback's spectrum is nearly flat and the de-embedded loss is more reliable.
+
 <div class="tbox tbox-tryit" markdown="1">
 <div class="tbox-title">Explore further</div>
 
 - [VM-Lab game: Illuminator (build a sensing circuit)](https://s3.amazonaws.com/vmlab-app-2/Main/index.html) {% include cite.html keys="vmlab" %}
+- The facet-attached microlens demo of [Section 17.5]({% link chapters/17_fiberarrays.md %}): compare a lensed fibre with lenses on both the chip and the fibre.
+- Foundry services have begun to offer printed lenses on edge-coupler chips, with matching lensed fibres, as a fabrication option; see, for example, [Applied Nanotools: NanoSOI process specifications](https://www.appliednt.com/nanosoi/sys/resources/specs/) (facet-attached micro lens).
 
 </div>
 
 ## Reading
 
-{% include reflist.html keys="siepiclab,openebl,phot1x,chrostowski2015" %}
+{% include reflist.html keys="siepiclab,openebl,phot1x,chrostowski2015,xu2023faml,trappen2020" %}
 
 <div class="tbox tbox-takeaways" markdown="1">
 <div class="tbox-title">Key takeaways</div>
@@ -130,5 +162,6 @@ The openEBL chips are measured on an automated probe station: a swept tunable la
 - De-embed the couplers with a loopback or a fitted envelope; trust relative quantities more than absolute losses.
 - Lasers: LIV, spectrum and SMSR, RIN and linewidth; high-speed devices: S-parameters, eyes and BER.
 - Wafer-scale testing with grating couplers maps the process variation before dicing.
+- Edge couplers are tested with lensed fibres or lensed fibre arrays: 2.5 µm spots need about ±0.6 µm on every channel at once. Printed lenses on the chip and the fibres widen that to about ±6 µm, at the cost of angle tolerance.
 
 </div>

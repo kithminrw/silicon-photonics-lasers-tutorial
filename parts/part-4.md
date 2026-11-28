@@ -12,7 +12,7 @@ Part IV
 # Coupling and Packaging
 {: .part-title }
 
-Getting light on and off the chip: grating couplers, edge couplers, fibre arrays, photonic wire bonds and the packaging that turns a die into a product.
+Getting light on and off the chip: grating couplers, edge couplers, fibre arrays, photonic wire bonds, printed facet lenses and the packaging that turns a die into a product.
 {: .part-blurb }
 
 ## Chapters in this part

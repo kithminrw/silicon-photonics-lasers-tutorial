@@ -1,0 +1,433 @@
+[
+ {
+  "title": "Ridge-waveguide Fabry–Pérot laser (InP)",
+  "short": "ridge laser",
+  "blurb": "The laser of Figure 24.1 and Worked Example 24.1. The p-InP ridge is etched down to an etch-stop layer 0.35 µm above the wells, which stay unetched under the whole chip; the ridge's small index step guides the light sideways, and the current spreads a little beyond it. BCB fills the etched area so the contact can cross it to a pad.",
+  "orbit": "-75deg 68deg 75%",
+  "slug": "ridge",
+  "file": "stack-ridge.glb",
+  "kb": 13,
+  "file_x": "stack-ridge-x.glb",
+  "kb_x": 13,
+  "layers": [
+   {
+    "key": "sub",
+    "label": "n-InP substrate (cut short)",
+    "role": "mechanical support, thinned to about 100 µm",
+    "colour": "#7f8ead"
+   },
+   {
+    "key": "ninp",
+    "label": "n-InP buffer and cladding",
+    "role": "confines the light from below and carries the electrons",
+    "colour": "#a8badb"
+   },
+   {
+    "key": "sch",
+    "label": "InGaAsP SCH and barriers",
+    "role": "guides the light onto the wells and feeds them carriers",
+    "colour": "#756038"
+   },
+   {
+    "key": "qw",
+    "label": "quantum wells",
+    "role": "the gain: carriers recombine here and amplify the light",
+    "colour": "#d81e19"
+   },
+   {
+    "key": "pinp",
+    "label": "p-InP cladding",
+    "role": "confines the light from above and carries the holes",
+    "colour": "#edbca3"
+   },
+   {
+    "key": "estop",
+    "label": "InGaAsP etch stop",
+    "role": "stops the ridge etch at a fixed height",
+    "colour": "#7f6642"
+   },
+   {
+    "key": "sin",
+    "label": "SiN passivation",
+    "role": "seals the etched surfaces and insulates them",
+    "colour": "#db9e3f"
+   },
+   {
+    "key": "bcb",
+    "label": "BCB planarisation",
+    "role": "low-permittivity polymer: flat surface, low pad capacitance",
+    "colour": "#ccdbcc"
+   },
+   {
+    "key": "cap",
+    "label": "p++ InGaAs contact layer",
+    "role": "narrow gap and heavy doping: a low-resistance contact",
+    "colour": "#51332d"
+   },
+   {
+    "key": "nmetal",
+    "label": "n contact, AuGe/Ni/Au",
+    "role": "injects electrons",
+    "colour": "#dbb25b"
+   },
+   {
+    "key": "pmetal",
+    "label": "p contact, Ti/Pt/Au",
+    "role": "injects holes; ohmic on the p++ InGaAs",
+    "colour": "#f2c154"
+   }
+  ],
+  "size_um": [
+   30.0,
+   16.0,
+   6.82
+  ],
+  "credit": "Generic, illustrative stack drawn for this tutorial (not any company's process); thicknesses to scale, length and width cut short."
+ },
+ {
+  "title": "Buried-heterostructure DFB laser (InP)",
+  "short": "buried heterostructure",
+  "blurb": "A mesa 1.5 µm wide is etched through the wells and regrown on both sides with semi-insulating Fe:InP, so the active region is buried in InP on every side: no exposed surface, current only through the mesa, strong guiding. An InGaAsP grating above the wells, period 242 nm, gives the feedback of a DFB laser (Chapter 26).",
+  "orbit": "-75deg 68deg 75%",
+  "slug": "bh",
+  "file": "stack-bh.glb",
+  "kb": 59,
+  "file_x": "stack-bh-x.glb",
+  "kb_x": 59,
+  "layers": [
+   {
+    "key": "sub",
+    "label": "n-InP substrate (cut short)",
+    "role": "mechanical support, thinned to about 100 µm",
+    "colour": "#7f8ead"
+   },
+   {
+    "key": "ninp",
+    "label": "n-InP buffer and cladding",
+    "role": "confines the light from below and carries the electrons",
+    "colour": "#a8badb"
+   },
+   {
+    "key": "feinp",
+    "label": "Fe:InP, semi-insulating",
+    "role": "regrown beside the mesa: blocks current, buries the wells",
+    "colour": "#93938e"
+   },
+   {
+    "key": "sch",
+    "label": "InGaAsP SCH and barriers",
+    "role": "guides the light onto the wells and feeds them carriers",
+    "colour": "#756038"
+   },
+   {
+    "key": "qw",
+    "label": "quantum wells",
+    "role": "the gain: carriers recombine here and amplify the light",
+    "colour": "#d81e19"
+   },
+   {
+    "key": "pinp",
+    "label": "p-InP cladding",
+    "role": "confines the light from above and carries the holes",
+    "colour": "#edbca3"
+   },
+   {
+    "key": "grating",
+    "label": "InGaAsP grating",
+    "role": "DFB feedback: a period of 242 nm selects one wavelength",
+    "colour": "#5b4723"
+   },
+   {
+    "key": "cap",
+    "label": "p++ InGaAs contact layer",
+    "role": "narrow gap and heavy doping: a low-resistance contact",
+    "colour": "#51332d"
+   },
+   {
+    "key": "sin",
+    "label": "SiN passivation",
+    "role": "seals the etched surfaces and insulates them",
+    "colour": "#db9e3f"
+   },
+   {
+    "key": "nmetal",
+    "label": "n contact, AuGe/Ni/Au",
+    "role": "injects electrons",
+    "colour": "#dbb25b"
+   },
+   {
+    "key": "pmetal",
+    "label": "p contact, Ti/Pt/Au",
+    "role": "injects holes; ohmic on the p++ InGaAs",
+    "colour": "#f2c154"
+   }
+  ],
+  "size_um": [
+   24.0,
+   16.0,
+   7.47
+  ],
+  "credit": "Generic, illustrative stack drawn for this tutorial (not any company's process); thicknesses to scale, length and width cut short."
+ },
+ {
+  "title": "III–V-on-silicon laser: gain section and taper",
+  "short": "III–V on silicon",
+  "blurb": "The stack of Table 27.1. Under the gain section (front, with contacts) the silicon strip is 0.5 µm wide and the light lives in the III–V mesa; along the taper the mesa narrows to a 0.6 µm tip while the silicon widens to 1.5 µm, and the light moves down into the silicon (Figure 27.2). Both contacts are on top: electrons flow sideways through the thin n-InP layer, and implanted mesa edges steer the holes to the centre.",
+  "orbit": "-62deg 64deg 80%",
+  "slug": "hetero",
+  "file": "stack-hetero.glb",
+  "kb": 14,
+  "file_x": "stack-hetero-x.glb",
+  "kb_x": 14,
+  "layers": [
+   {
+    "key": "sisub",
+    "label": "Si substrate (cut short)",
+    "role": "the silicon wafer",
+    "colour": "#9eb2cc"
+   },
+   {
+    "key": "ox",
+    "label": "oxide (BOX and fill)",
+    "role": "buried oxide and the fill around the waveguide",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "si",
+    "label": "silicon waveguide",
+    "role": "carries the light outside the gain section",
+    "colour": "#7793c1"
+   },
+   {
+    "key": "bond",
+    "label": "bonding oxide",
+    "role": "30 nm of oxide joining the III–V to the silicon",
+    "colour": "#8cbff2"
+   },
+   {
+    "key": "nlayer",
+    "label": "n-InP contact layer",
+    "role": "thin and wide: electrons flow sideways to the mesa",
+    "colour": "#a8badb"
+   },
+   {
+    "key": "mqw",
+    "label": "MQW region",
+    "role": "wells and barriers, 300 nm: the gain",
+    "colour": "#d81e19"
+   },
+   {
+    "key": "sin",
+    "label": "SiN passivation",
+    "role": "seals the etched surfaces and insulates them",
+    "colour": "#db9e3f"
+   },
+   {
+    "key": "pinp",
+    "label": "p-InP cladding",
+    "role": "confines the light from above and carries the holes",
+    "colour": "#edbca3"
+   },
+   {
+    "key": "implant",
+    "label": "proton-implanted p-InP",
+    "role": "made resistive by H⁺ implantation: steers current to the centre",
+    "colour": "#b293e0"
+   },
+   {
+    "key": "cap",
+    "label": "p++ InGaAs contact layer",
+    "role": "narrow gap and heavy doping: a low-resistance contact",
+    "colour": "#51332d"
+   },
+   {
+    "key": "nmetal",
+    "label": "n contact, AuGe/Ni/Au",
+    "role": "injects electrons",
+    "colour": "#dbb25b"
+   },
+   {
+    "key": "pmetal",
+    "label": "p contact, Ti/Pt/Au",
+    "role": "injects holes; ohmic on the p++ InGaAs",
+    "colour": "#f2c154"
+   }
+  ],
+  "size_um": [
+   50.0,
+   14.0,
+   5.94
+  ],
+  "credit": "Generic, illustrative stack drawn for this tutorial (not any company's process); thicknesses to scale, length and width cut short."
+ },
+ {
+  "title": "Angled-waveguide SOA: the output facet",
+  "short": "SOA facet",
+  "blurb": "The output end of the SOA of Figure 28.1. The ridge crosses the chip at 8° to the facet normal, so what the AR coating fails to suppress is reflected away from the waveguide. The wells stop 12 µm before the facet: in the unpumped InP window the beam spreads, so even less of the reflection finds its way back. The contact ends before the window.",
+  "orbit": "-62deg 60deg 80%",
+  "slug": "soa",
+  "file": "stack-soa.glb",
+  "kb": 15,
+  "file_x": "stack-soa-x.glb",
+  "kb_x": 15,
+  "layers": [
+   {
+    "key": "sub",
+    "label": "n-InP substrate (cut short)",
+    "role": "mechanical support, thinned to about 100 µm",
+    "colour": "#7f8ead"
+   },
+   {
+    "key": "ar",
+    "label": "AR coating",
+    "role": "anti-reflection layers on the facet",
+    "colour": "#72d8ea"
+   },
+   {
+    "key": "ninp",
+    "label": "n-InP buffer and cladding",
+    "role": "confines the light from below and carries the electrons",
+    "colour": "#a8badb"
+   },
+   {
+    "key": "sch",
+    "label": "InGaAsP SCH and barriers",
+    "role": "guides the light onto the wells and feeds them carriers",
+    "colour": "#756038"
+   },
+   {
+    "key": "window",
+    "label": "InP window (no wells)",
+    "role": "unpumped and transparent: the beam spreads before the facet",
+    "colour": "#cccccc"
+   },
+   {
+    "key": "qw",
+    "label": "quantum wells",
+    "role": "the gain: carriers recombine here and amplify the light",
+    "colour": "#d81e19"
+   },
+   {
+    "key": "pinp",
+    "label": "p-InP cladding",
+    "role": "confines the light from above and carries the holes",
+    "colour": "#edbca3"
+   },
+   {
+    "key": "estop",
+    "label": "InGaAsP etch stop",
+    "role": "stops the ridge etch at a fixed height",
+    "colour": "#7f6642"
+   },
+   {
+    "key": "sin",
+    "label": "SiN passivation",
+    "role": "seals the etched surfaces and insulates them",
+    "colour": "#db9e3f"
+   },
+   {
+    "key": "bcb",
+    "label": "BCB planarisation",
+    "role": "low-permittivity polymer: flat surface, low pad capacitance",
+    "colour": "#ccdbcc"
+   },
+   {
+    "key": "cap",
+    "label": "p++ InGaAs contact layer",
+    "role": "narrow gap and heavy doping: a low-resistance contact",
+    "colour": "#51332d"
+   },
+   {
+    "key": "nmetal",
+    "label": "n contact, AuGe/Ni/Au",
+    "role": "injects electrons",
+    "colour": "#dbb25b"
+   },
+   {
+    "key": "pmetal",
+    "label": "p contact, Ti/Pt/Au",
+    "role": "injects holes; ohmic on the p++ InGaAs",
+    "colour": "#f2c154"
+   }
+  ],
+  "size_um": [
+   40.3,
+   20.0,
+   6.82
+  ],
+  "credit": "Generic, illustrative stack drawn for this tutorial (not any company's process); thicknesses to scale, length and width cut short."
+ },
+ {
+  "title": "Oxide-aperture VCSEL, cut open",
+  "short": "VCSEL",
+  "blurb": "The VCSEL of Figure 24.6 and Worked Example 24.2, with a quarter cut away. Under 20 p-type mirror pairs a one-wavelength cavity holds three wells, and below it 34 n-type pairs. One AlAs layer, oxidised in from the wall of the 20 µm mesa, leaves a 6 µm conducting aperture that funnels current and light into the centre; the light leaves through the ring contact.",
+  "orbit": "45deg 64deg 85%",
+  "slug": "vcsel",
+  "file": "stack-vcsel.glb",
+  "kb": 383,
+  "file_x": "stack-vcsel-x.glb",
+  "kb_x": 383,
+  "layers": [
+   {
+    "key": "gaas",
+    "label": "n-GaAs substrate (cut short)",
+    "role": "the GaAs wafer",
+    "colour": "#e0e5ed"
+   },
+   {
+    "key": "dbrh",
+    "label": "DBR, high-index AlGaAs",
+    "role": "quarter-wave layers, n = 3.52: half of each mirror pair",
+    "colour": "#dbe0ea"
+   },
+   {
+    "key": "dbrl",
+    "label": "DBR, low-index AlGaAs",
+    "role": "quarter-wave layers, n = 3.05: the other half",
+    "colour": "#4c5b84"
+   },
+   {
+    "key": "cav",
+    "label": "AlGaAs cavity",
+    "role": "one wavelength thick; the wells sit at its centre",
+    "colour": "#b7a8d1"
+   },
+   {
+    "key": "qw",
+    "label": "quantum wells",
+    "role": "the gain: carriers recombine here and amplify the light",
+    "colour": "#d81e19"
+   },
+   {
+    "key": "alas",
+    "label": "AlAs aperture (unoxidised)",
+    "role": "the 6 µm conducting disc left in the middle",
+    "colour": "#599edb"
+   },
+   {
+    "key": "alox",
+    "label": "aluminium oxide (oxidised AlAs)",
+    "role": "insulating ring: funnels current and light into the aperture",
+    "colour": "#fcf9ed"
+   },
+   {
+    "key": "nmetal",
+    "label": "n contact, AuGe/Ni/Au",
+    "role": "injects electrons",
+    "colour": "#dbb25b"
+   },
+   {
+    "key": "pmetal",
+    "label": "p contact, Ti/Pt/Au",
+    "role": "injects holes; ohmic on the p++ InGaAs",
+    "colour": "#f2c154"
+   }
+  ],
+  "size_um": [
+   32.0,
+   32.0,
+   9.07
+  ],
+  "credit": "Generic, illustrative stack drawn for this tutorial (not any company's process); thicknesses to scale, length and width cut short."
+ }
+]

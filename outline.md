@@ -122,9 +122,9 @@ Demos: Ring resonator
 
 *How long and how strong must a grating be for a given reflectivity and bandwidth?*
 
-13.1 Periodic waveguides and the Bragg condition · 13.2 Coupled-mode theory of gratings · 13.3 The transfer-matrix method · 13.4 Apodisation and chirp · 13.5 Cavities · 13.6 Contra-directional couplers and SWG metamaterials · 13.7 Photonic crystals
+13.1 Periodic waveguides and the Bragg condition · 13.2 Coupled-mode theory of gratings · 13.3 The transfer-matrix method · 13.4 Apodisation and chirp · 13.5 The Fabry–Pérot cavity · 13.6 Phase-shifted gratings · 13.7 Contra-directional couplers and SWG metamaterials · 13.8 Photonic crystals
 
-Demos: Bragg grating
+Demos: Bragg grating · Fabry–Pérot cavity
 
 ### [14. WDM Filters and Polarisation Management]({% link chapters/14_wdm.md %})
 
@@ -158,9 +158,9 @@ Demos: Inverse-taper edge coupler
 
 *How tolerant is a coupling interface, and how do you find the peak quickly?*
 
-17.1 Fibre arrays · 17.2 Alignment · 17.3 Attaching fibres · 17.4 Photonic wire bonds and micro-optics · 17.5 Laser and chip assembly · 17.6 Co-packaged optics · 17.7 Design rules for test and packaging
+17.1 Fibre arrays · 17.2 Alignment · 17.3 Attaching fibres · 17.4 Photonic wire bonds and micro-optics · 17.5 Facet-attached microlenses · 17.6 Laser and chip assembly · 17.7 Co-packaged optics · 17.8 Design rules for test and packaging
 
-Demos: Alignment tolerance · Fibre-array alignment
+Demos: Alignment tolerance · Fibre-array alignment · Facet-attached microlenses
 
 ## Part V · Active Devices
 
@@ -222,9 +222,9 @@ Demos: Gain spectrum
 
 *What sets a laser's threshold current and slope efficiency?*
 
-24.1 The optical cavity · 24.2 Threshold · 24.3 Rate equations · 24.4 The L–I curve and efficiency · 24.5 Temperature · 24.6 Transients · 24.7 The Fabry–Pérot spectrum · 24.8 The vertical-cavity surface-emitting laser
+24.1 The optical cavity · 24.2 Threshold · 24.3 Rate equations · 24.4 The L–I curve and efficiency · 24.5 Temperature · 24.6 Transients · 24.7 The Fabry–Pérot spectrum · 24.8 The vertical-cavity surface-emitting laser · 24.9 Inside the chip: layer stacks in 3D
 
-Demos: Laser rate equations, with self-heating
+Demos: Laser rate equations, with self-heating · 3D models of laser, SOA and VCSEL stacks
 
 ### [25. Laser Dynamics, Noise and Linewidth]({% link chapters/25_dynamics.md %})
 
@@ -318,7 +318,7 @@ Demos: Wafer-map Monte Carlo
 
 *How do you trust a measured spectrum?*
 
-36.1 The passive test setup · 36.2 Automated testing and design for test · 36.3 Calibration and de-embedding · 36.4 Testing active devices · 36.5 Testing lasers · 36.6 High-speed testing · 36.7 Wafer-scale testing
+36.1 The passive test setup · 36.2 Automated testing and design for test · 36.3 Calibration and de-embedding · 36.4 Testing active devices · 36.5 Testing lasers · 36.6 High-speed testing · 36.7 Wafer-scale testing · 36.8 Testing edge couplers: lensed fibre arrays
 
 Demos: Virtual test bench
 

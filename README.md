@@ -7,7 +7,7 @@ across the **Si, SiN, thin-film LiNbO₃ (TFLN), BaTiO₃ (BTO) and InP** platfo
 
 **Read it online:** <https://www.kithminrw.com/silicon-photonics-lasers-tutorial/>
 
-> **Status: draft v0.1 (November 2026).** All nine parts and twelve labs are written. Corrections are very welcome
+> **Status: draft v0.1 (November 2026).** All nine parts and thirteen labs are written. Corrections are very welcome
 > (see [Contributing](#contributing)).
 
 ## What makes it different
@@ -47,7 +47,7 @@ across the **Si, SiN, thin-film LiNbO₃ (TFLN), BaTiO₃ (BTO) and InP** platfo
 | VII. Design, simulation, layout | 29 Design principles and workflows · 30 Design flow and open PDKs · 31 How simulators work · 32 Simulation tools in practice · 33 KLayout and GDSII · 34 Verification and tape-out | **written** |
 | VIII. Fabrication, testing, data | 35 Fabrication · 36 Testing · 37 Data analysis | **written** |
 | IX. Systems | 38 Links and transceivers · 39 Sensing, LiDAR, quantum, computing | **written** |
-| Hands-on labs | 12 labs: simulate, make (openEBL), lasers and links | **written** |
+| Hands-on labs | 13 labs: simulate, make (openEBL), lasers and links, Fabry–Pérot fringes | **written** |
 | PDK devices in 3D | 15 devices from three open PDKs | working |
 | Appendices | A formulas · B materials · C glossary · D open tools, PDKs, data · E reading and free simulations | in progress |
 
@@ -119,6 +119,7 @@ When writing a page:
 python3.12 -m venv .venv && .venv/bin/pip install numpy matplotlib gdsfactory ubcpdk cspdk trimesh
 .venv/bin/python figsrc/part1_figs.py            # Part I figures -> assets/figs/
 .venv/bin/python tools/export_3d.py              # SiEPIC EBeam and CORNERSTONE models -> assets/models/
+python3 -I tools/export_stacks.py                # generic laser, SOA and VCSEL stacks of Section 24.9 (numpy, trimesh, shapely)
 ```
 
 The Luxtelligence TFLN models need that PDK in its own environment, because it pins its own gdsfactory

@@ -98,11 +98,11 @@ The SOA's gain recovers with the carrier lifetime, from 100 ps to a nanosecond. 
 
 Quantum-well gain is polarised (TE for compressive strain, [Chapter 23]({% link chapters/23_gain.md %})), so an SOA fed from a fibre would have polarisation-dependent gain; tensile-strained or mixed-strain wells balance it. On a chip, where the light is already TE, it does not matter.
 
-Reflections matter more. Any residual facet reflectivity turns the SOA into a weak Fabry–Pérot cavity, rippling the gain with wavelength by
+Reflections matter more. Any residual facet reflectivity turns the SOA into a weak Fabry–Pérot cavity ([Section 13.5]({% link chapters/13_bragg.md %})), rippling the gain with wavelength by
 
 $$\frac{G_\mathrm{max}}{G_\mathrm{min}} = \left(\frac{1 + G\sqrt{R_1R_2}}{1 - G\sqrt{R_1R_2}}\right)^2.$$
 
-For 20 dB of gain and 10⁻⁴ reflectivity at each end, the ripple is 0.17 dB; at 10⁻³ it is 1.7 dB, and the amplifier is close to lasing ([Figure 28.5](#fig-28-5)). Anti-reflection coatings alone rarely reach 10⁻⁴, so SOAs combine them with waveguides angled at 7–10° to the facet, the same trick as the edge couplers of [Chapter 16]({% link chapters/16_edge.md %}), and with transparent window regions.
+For 20 dB of gain and 10⁻⁴ reflectivity at each end, the ripple is 0.17 dB; at 10⁻³ it is 1.7 dB, and the amplifier is close to lasing ([Figure 28.5](#fig-28-5)). Anti-reflection coatings alone rarely reach 10⁻⁴, so SOAs combine them with waveguides angled at 7–10° to the facet, the same trick as the edge couplers of [Chapter 16]({% link chapters/16_edge.md %}), and with transparent window regions. The 3D model of an angled SOA facet in Section 24.9 of [Chapter 24]({% link chapters/24_fp.md %}#249inside-the-chip-layer-stacks-in-3d) shows all three.
 
 <figure id="fig-28-5">
   <img src="{{ '/assets/figs/ch28_ripple.svg' | relative_url }}" style="width:460px" alt="Gain in decibels against wavelength offset over 1000 picometres: two sinusoid-like ripples around 20 decibels with a period of 334 picometres, a small one of 0.17 decibels for reflectivity 1e-4 and a large one of 1.7 decibels for 1e-3.">

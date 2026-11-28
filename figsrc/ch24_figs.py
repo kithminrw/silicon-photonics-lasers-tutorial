@@ -1,7 +1,8 @@
 """Figures for Chapter 24 (the Fabry-Perot laser and the rate equations), Sections 24.1-24.7.
 
 Run from the repository root:  python -I -X utf8 figsrc/ch24_figs.py
-Writes assets/figs/ch24_ridge.svg, ch24_threshold.svg, ch24_clamp.svg, ch24_turnon.svg and ch24_modes.svg, and prints
+Writes assets/figs/ch24_ridge.svg, ch24_threshold.svg, ch24_clamp.svg, ch24_turnon.svg, ch24_modes.svg and ch24_process.svg
+(Section 24.9), and prints
 every number the figures and captions use. (The VCSEL figures of Section 24.8 come from figsrc/ch2x_lasers.py.)
 
 The laser is the 400 um InGaAsP Fabry-Perot laser of Worked Example 24.1 with the parameters of the laser and dyn demos
@@ -345,11 +346,94 @@ def fig_modes():
     save(fig, "ch24_modes")
 
 
+# ================================================================== Figure 24.8: making a ridge laser (Section 24.9)
+def fig_process():
+    """Six schematic cross-sections of the ridge laser of Figure 24.1 from the epitaxial wafer to coated bars."""
+    fig = plt.figure(figsize=(6.3, 3.55))
+    titles = ["1 · grow the layers", "2 · etch the ridge", "3 · passivate", "4 · planarise, open the ridge",
+              "5 · contacts, thin, back metal", "6 · cleave into bars, coat"]
+    notes = ["MOVPE on an n-InP wafer:\nwells, claddings, contact layer",
+             "SiO₂ mask; dry etch, then a wet\netch that stops on the etch stop",
+             "SiN over every etched surface",
+             "spin BCB, etch it back to the\nridge top, open the SiN there",
+             "Ti/Pt/Au on the ridge and pad;\nwafer thinned to ~100 µm, n metal",
+             "cleaved facets are mirrors;\nHR at the back, AR or none in front"]
+    X0, X1 = -5.0, 5.0
+    z_sub, z_buf, z_act, t_act, z_res, z_es = -1.6, -0.5, 0.0, 0.35, 0.35, 0.95
+    z_top, z_cap = 2.35, 2.6                      # schematic heights (layers exaggerated)
+    RW = 1.2
+    for k in range(6):
+        r, c = divmod(k, 3)
+        ax = fig.add_axes([c / 3 + 0.004, 0.52 - r * 0.5, 1 / 3 - 0.012, 0.44]); frameless(ax, (-5.3, 5.3), (-3.6, 4.6), equal=False)
+        ax.text(-5.2, 4.55, titles[k], fontsize=FS, color=INK, fontweight="bold", va="top")
+        label(ax, 0, -2.85, notes[k], fs=FS_SMALL)
+        if k == 5:
+            # a laser bar seen from above: chips side by side, ridges running front to back, coatings on the facets
+            for i in range(5):
+                x = -4.5 + i * 1.8
+                box(ax, x, -1.4, 1.8, 4.2, "#E6E1D5", ec=INK, lw=0.5, z=2)
+                box(ax, x + 0.75, -1.4, 0.3, 4.2, "inp", ec=INK, lw=0.3, z=3)
+                box(ax, x + 0.3, -0.2, 1.2, 1.8, "metal", alpha=0.85, z=4)
+            box(ax, -4.5, 2.8, 9.0, 0.35, "#9FD3E0", z=5); box(ax, -4.5, -1.75, 9.0, 0.35, "#F2D4CF", z=5)
+            label(ax, 0, 3.55, "HR coating (back facet)", fs=FS_SMALL); label(ax, 4.75, -1.58, "AR", fs=FS_SMALL, ha="left")
+            for i in range(1, 5):
+                ax.plot([-4.5 + i * 1.8] * 2, [-1.75, 3.15], color=RED, lw=0.7, ls=(0, (2, 2)), zorder=6)
+            arrow(ax, (0, -1.85), (0, -2.35), col=RED, lw=1.0, ms=6)
+            continue
+        # epitaxial stack (full width), with the ridge cut from step 2 on
+        box(ax, X0, -2.0 if k < 4 else -2.0, X1 - X0, z_buf - (-2.0), "inp", z=1)
+        box(ax, X0, z_buf, X1 - X0, -z_buf, "inp", z=1, alpha=0.85)
+        box(ax, X0, z_act, X1 - X0, t_act, "q", z=2); box(ax, X0, z_act + 0.13, X1 - X0, 0.09, "mqw", z=3)
+        if k == 0:
+            box(ax, X0, z_res, X1 - X0, z_top - z_res, "#DCD6C8", z=2)
+            ax.plot([X0, X1], [z_es, z_es], color="#8E7F5A", lw=1.2, zorder=3)
+            box(ax, X0, z_top, X1 - X0, z_cap - z_top, "#6E6250", z=3)
+            callout(ax, (3.6, z_act + 0.17), (5.25, 1.15), "wells", ha="right")
+            callout(ax, (3.6, z_es), (5.25, 1.9), "etch stop", ha="right")
+            callout(ax, (-3.6, z_cap - 0.1), (-3.0, 3.6), "p++ InGaAs", ha="left")
+            label(ax, -2.5, 1.65, "p-InP", fs=FS_SMALL); label(ax, -2.5, -1.25, "n-InP", fs=FS_SMALL)
+            continue
+        box(ax, X0, z_res, X1 - X0, z_es - z_res, "#DCD6C8", z=2)
+        ax.plot([X0, X1], [z_es, z_es], color="#8E7F5A", lw=1.2, zorder=3)
+        box(ax, -RW / 2, z_es, RW, z_top - z_es, "#DCD6C8", z=2)
+        box(ax, -RW / 2, z_top, RW, z_cap - z_top, "#6E6250", z=3)
+        if k == 1:
+            box(ax, -RW / 2 - 0.05, z_cap, RW + 0.1, 0.35, "ox", ec=MUTED, lw=0.5, z=4)
+            for xs in (-2.6, 2.6):
+                arrow(ax, (xs, 3.9), (xs, z_es + 0.15), col=BLUE, lw=1.0, ms=7)
+            label(ax, 0, 3.75, "SiO₂ mask", fs=FS_SMALL)
+            continue
+        tn = 0.16                                   # SiN: floor, ridge walls, ridge top (opened from step 4)
+        box(ax, X0, z_es, X1 - X0, tn, "sin", z=4, alpha=0.9)
+        for sg in (-1, 1):
+            box(ax, sg * RW / 2 if sg > 0 else -RW / 2 - tn, z_es, tn, z_cap - z_es, "sin", z=4, alpha=0.9)
+        if k == 2:
+            box(ax, -RW / 2 - tn, z_cap, RW + 2 * tn, tn, "sin", z=4, alpha=0.9)
+            continue
+        for sg in (-1, 1):
+            x0 = RW / 2 + tn if sg > 0 else X0
+            box(ax, x0, z_es + tn, X1 - RW / 2 - tn, z_cap - z_es - tn, "bcb", z=3)
+        if k == 3:
+            label(ax, -3.0, 1.8, "BCB", fs=FS_SMALL)
+            arrow(ax, (0, 3.9), (0, z_cap + 0.1), col=BLUE, lw=1.0, ms=7)
+            label(ax, 0.35, 3.6, "open", fs=FS_SMALL, ha="left")
+            continue
+        # k == 4: contacts and back metal; the substrate drawn thinner
+        box(ax, -1.6, z_cap, 3.2, 0.3, "metal", z=5); box(ax, 1.6, z_cap, 3.0, 0.3, "metal", z=5)
+        box(ax, X0, -2.3, X1 - X0, 0.3, "metal", z=5)
+        label(ax, 3.1, 3.25, "pad on BCB", fs=FS_SMALL)
+        label(ax, -3.0, 3.25, "Ti/Pt/Au", fs=FS_SMALL)
+        label(ax, 0, -1.25, "n-InP", fs=FS_SMALL)
+    fig.text(0.995, 0.005, "schematic: layers and ridge exaggerated", ha="right", va="bottom", fontsize=6.0, color=MUTED, style="italic")
+    save(fig, "ch24_process")
+    print("Fig 24.8: schematic (layer names and order as in Table 24.1)")
+
+
 if __name__ == "__main__":
     o = fp_op(50e-3)
     print(f"FP laser: V = {V:.2e} cm3, alpha_m {AM:.2f} /cm, g_th {GTH:.1f} /cm, N_th {NTH:.3e}, I_th {ITH*1e3:.2f} mA,"
           f" slope/facet {o['slope']:.3f} W/A, tau_p {TP*1e12:.2f} ps, tau_n = N_th/R {NTH/rrec(NTH)*1e9:.2f} ns")
     only = sys.argv[1:]
-    for fn in (fig_ridge, fig_threshold, fig_clamp, fig_turnon, fig_modes):
+    for fn in (fig_ridge, fig_threshold, fig_clamp, fig_turnon, fig_modes, fig_process):
         if not only or fn.__name__ in only:
             fn()

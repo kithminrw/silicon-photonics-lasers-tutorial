@@ -22,3 +22,11 @@ html[data-theme="dark"] .d3-meta,html[data-theme="dark"] .d3-toolbar span{color:
 html[data-theme="dark"] .d3-credit{color:#a4afc2;}
 html[data-theme="dark"] .d3-toolbar button,html[data-theme="dark"] .d3-legend button{background:#141b28;border-color:#243149;color:#c3cbd9;}
 html[data-theme="dark"] .d3-toolbar button[aria-pressed="true"]{background:#0b7a85;border-color:#0b7a85;color:#fff;}
+/* Generic laser stacks in Section 24.9 (_includes/stack3d.html): view and height switches above the legend */
+.st-views{display:flex;flex-wrap:wrap;gap:5px;margin-top:.15rem;font-family:"IBM Plex Mono",monospace;}
+.st-views button{font:inherit;font-size:.74rem;border:1px solid #c9d2e0;background:#fff;color:#172036;border-radius:30px;padding:3px 11px;cursor:pointer;}
+.st-views button[aria-pressed="true"]{background:#0b7a85;border-color:#0b7a85;color:#fff;}
+.st-card .d3-blurb{color:#3a4459;}
+html[data-theme="dark"] .st-views button{background:#141b28;border-color:#243149;color:#c3cbd9;}
+html[data-theme="dark"] .st-views button[aria-pressed="true"]{background:#0b7a85;border-color:#0b7a85;color:#fff;}
+html[data-theme="dark"] .st-card .d3-blurb{color:#a4afc2;}

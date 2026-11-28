@@ -5,6 +5,10 @@
 > Data Analysis 37, Links 38, Applications 39); 171 figures, Labs 2–12, six more demos (48 in all), sections 25.10
 > and 27.9, number checks of every chapter and an IP audit followed. Chapter numbers below use the old numbering;
 > the git log from 19 Nov onwards has the details.
+> On 27 Nov three sections were added: 13.5 The Fabry–Pérot cavity (demo `fp`; old 13.5–13.7 became 13.6–13.8), 17.5
+> Facet-attached microlenses (demo `faml`, from open papers only; old 17.5–17.7 became 17.6–17.8) and 24.9 Inside the chip:
+> layer stacks in 3D (generic ridge, BH-DFB, III–V-on-Si, SOA and VCSEL models from `tools/export_stacks.py`, shown with
+> `_includes/stack3d.html`), 36.8 lensed fibre arrays, and Lab 13 (Fabry–Pérot cavities, `labs/lab13_fp.py`). 50 demos, 13 labs.
 
 Last updated: 18 November 2026 (layout pass over all 42 demos; numbers in Ch 22–34 checked). Repository scaffolded, full outline, **Part I (Ch 1–4) written**, 17 demos and
 the 3D gallery working; pushed to `main` and live at https://www.kithminrw.com/silicon-photonics-lasers-tutorial/
